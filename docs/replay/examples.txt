@@ -1,0 +1,35 @@
+
+=== 2025-09-17  exp 2025-10-17 (30 DTE)  anchor 6635P  base 6380P  width 5.0  target credit 0.5
+SPX open 6608.56 lo 6555.78 hi 6623.16 last 6603.12
+  09:35  SPX  6608.56  BTO 6635P (anchor, -0.50d)             @   96.80   bid/ask 96.3/96.8                                       book: +6635P
+  09:35  SPX  6608.56  STO 6380P (-0.20d)                     @   36.10   bid/ask 36.1/36.4                                       book: +6635P -6380P
+  14:05  SPX  6623.16  BTO 6385P  (limit 35.60, ask 34.4)     @   35.60   bomb #1 planted: 6385/6380 for +0.50 credit             book: +6635P + 1 bombs
+  14:15  SPX  6586.45  STO 6380P  (limit 36.10, bid 40.6)     @   36.10   covered by anchor (wide debit spread) until the K+5 fills book: +6635P -6380P + 1 bombs
+  15:10  SPX   6602.5  BTO 6385P  (limit 35.60, ask 35.2)     @   35.60   bomb #2 planted: 6385/6380 for +0.50 credit             book: +6635P + 2 bombs
+  15:15  SPX  6588.88  STO 6380P  (limit 36.10, bid 36.4)     @   36.10   covered by anchor (wide debit spread) until the K+5 fills book: +6635P -6380P + 2 bombs
+  15:20  SPX  6599.14  BTO 6385P  (limit 35.60, ask 35.6)     @   35.60   bomb #3 planted: 6385/6380 for +0.50 credit             book: +6635P + 3 bombs
+  15:50  SPX  6603.12  STC 6635P (anchor)                     @   94.00   anchor P&L -2.80                                        book: 3 bombs
+bombs 3  credits [0.5, 0.5, 0.5]  total 1.5  anchor P&L -2.8  bomb mark @15:50 0.6  unpaired short: False
+
+=== 2024-04-10  exp 2024-05-10 (30 DTE)  anchor 5175P  base 4975P  width 5.0  target credit 0.5
+SPX open 5150.81 lo 5139.21 hi 5177.34 last 5163.86
+  09:35  SPX  5150.81  BTO 5175P (anchor, -0.50d)             @   82.60   bid/ask 81.9/82.60000000000001                          book: +5175P
+  09:35  SPX  5150.81  STO 4975P (-0.20d)                     @   28.10   bid/ask 28.1/28.6                                       book: +5175P -4975P
+  10:10  SPX  5162.22  BTO 4980P  (limit 27.60, ask 27.5)     @   27.60   bomb #1 planted: 4980/4975 for +0.50 credit             book: +5175P + 1 bombs
+  13:05  SPX  5145.95  STO 4975P  (limit 28.10, bid 28.2)     @   28.10   covered by anchor (wide debit spread) until the K+5 fills book: +5175P -4975P + 1 bombs
+  13:25  SPX  5165.37  BTO 4980P  (limit 27.60, ask 24.900000000000002) @   27.60   bomb #2 planted: 4980/4975 for +0.50 credit             book: +5175P + 2 bombs
+  13:35  SPX  5149.47  STO 4975P  (limit 28.10, bid 28.6)     @   28.10   covered by anchor (wide debit spread) until the K+5 fills book: +5175P -4975P + 2 bombs
+  14:05  SPX  5160.49  BTO 4980P  (limit 27.60, ask 27.1)     @   27.60   bomb #3 planted: 4980/4975 for +0.50 credit             book: +5175P + 3 bombs
+  14:25  SPX  5149.47  STO 4975P  (limit 28.10, bid 28.400000000000002) @   28.10   covered by anchor (wide debit spread) until the K+5 fills book: +5175P -4975P + 3 bombs
+  14:50  SPX  5156.25  BTO 4980P  (limit 27.60, ask 27.5)     @   27.60   bomb #4 planted: 4980/4975 for +0.50 credit             book: +5175P + 4 bombs
+  15:00  SPX  5143.86  STO 4975P  (limit 28.10, bid 29.5)     @   28.10   covered by anchor (wide debit spread) until the K+5 fills book: +5175P -4975P + 4 bombs
+  15:15  SPX  5157.24  BTO 4980P  (limit 27.60, ask 27.1)     @   27.60   bomb #5 planted: 4980/4975 for +0.50 credit             book: +5175P + 5 bombs
+  15:50  SPX  5163.86  STC 5175P (anchor)                     @   74.20   anchor P&L -8.40                                        book: 5 bombs
+bombs 5  credits [0.5, 0.5, 0.5, 0.5, 0.5]  total 2.5  anchor P&L -8.4  bomb mark @15:50 0.7  unpaired short: False
+
+=== 2024-11-20  exp 2024-12-20 (30 DTE)  anchor 5940P  base 5705P  width 5.0  target credit 0.5
+SPX open 5912.84 lo 5867.25 hi 5915.01 last 5915.01
+  09:35  SPX  5912.84  BTO 5940P (anchor, -0.50d)             @   91.40   bid/ask 91.0/91.4                                       book: +5940P
+  09:35  SPX  5912.84  STO 5705P (-0.20d)                     @   32.30   bid/ask 32.3/32.7                                       book: +5940P -5705P
+  15:50  SPX  5915.01  STC 5940P (anchor)                     @   92.50   anchor P&L +1.10                                        book: 0 bombs + unpaired short 5705P
+bombs 0  credits []  total 0  anchor P&L 1.1  bomb mark @15:50 0.75  unpaired short: True
