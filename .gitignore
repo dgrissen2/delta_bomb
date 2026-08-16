@@ -1,0 +1,52 @@
+# Python Core
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Build & Distribution
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Environment & Secrets
+.env
+*.json
+!package.json
+service_account.json
+
+# Scraped Content (never push)
+output/**/*.png
+output/**/*.jpg
+output/**/*.html
+output/**/*.pdf
+**/data/*.html
+**/data/*.png
+
+# MCP & Claude Code
+.mcp.json
+
+# IDE & Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# Logs & Temp
+*.log
+tmp/
+scratch/
