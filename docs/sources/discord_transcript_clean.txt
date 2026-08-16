@@ -1,0 +1,774 @@
+[2024-12-18T22:49] LoveOfProfit: 
+[2024-12-18T22:49] LoveOfProfit (cont): Meme port proof of the pudding  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319074097140858971/image.png?ex=6a82e73b&is=6a8195bb&hm=ca59ffdaf0a4fe1301e78b9a3154a15bfc755971f9dc771cd43a1da3b95768f3&', 'text': ''}]]
+[2024-12-18T22:49] LoveOfProfit (cont): Positions a week prior ⁠market-chat⁠
+[2024-12-18T22:50] LoveOfProfit (cont):   [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319074261956038686/image.png?ex=6a82e763&is=6a8195e3&hm=9f07517afa49b33b1f3c5dbde169f91c0bacde38f7c92ff0eb272660b1b0ea6a&', 'text': ''}]]
+[2024-12-18T22:50] LoveOfProfit (cont):   [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319074329148788827/image.png?ex=6a82e773&is=6a8195f3&hm=b4ed7ef85d6db51c5cced5776ecb8c6092c26f6033dec624a0549a3a008ef19d&', 'text': ''}]]
+[2024-12-18T22:50] LoveOfProfit (cont):   [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319074377513570324/image.png?ex=6a82e77e&is=6a8195fe&hm=432031cf43e7bbe8033086c0a67255cc0f432a75b68c3bd3ff35118a22d0b7bf&', 'text': ''}]]
+[2024-12-18T22:50] LoveOfProfit (cont): @PandarBear I compiled your earlier answers so you don't have to repeat them.
+[2024-12-18T22:51] LoveOfProfit: LoveOfProfit
+ pinned a message to this channel. See all pinned messages.
+ — 
+12/18/24, 11:51 PM
+Wednesday, December 18, 2024 at 11:51 PM
+[2024-12-18T22:52] thetagangalwayswins: okay Panda let's see the next trade haha
+[2024-12-18T22:55] Yungchaney: Panda I am in awe.
+[2024-12-18T22:55] Cris: Biggest question is sizing. I.e: You have profits on a trade and use those profits to set up NVDA hedges, how do you size that or what is the general idea there?
+[2024-12-18T22:58] PandarBear: Biggest question is sizing. I.e: You have profits on a trade and use those profits to set up NVDA hedges, how do you size that or what is the general idea there?
+I'll have to preface this by saying the buying puts or spreads part of this is nowhere near certain of a strategy
+[2024-12-18T22:59] PandarBear (cont): My main goal going into this was to find a decent hedge that would only lose little/break even most of the time.
+[2024-12-18T23:00] PandarBear: I started doing this in beginning of September after noticing how often NVDA options expand and then crush
+[2024-12-18T23:01] throwawayoptions: i asked this another day, can't remember answer...what %X of my NLV should I go buy NVDA put spreads lol. and also, are you long shares in nvda?
+[2024-12-18T23:02] PandarBear: i asked this another day, can't remember answer...what %X of my NLV should I go buy NVDA put spreads lol. and also, are you long shares in nvda?
+I would say the most guaranteed return part of this strat is to not follow my strat of buying puts/spreads, and just wait for vol/tail expansion and sell naked haha
+[2024-12-18T23:03] throwawayoptions: yea but muh 400% gains
+[2024-12-18T23:03] PandarBear: Because that is what this strat depends on in order to be a low cost/free hedge
+[2024-12-18T23:03] PandarBear: yea but muh 400% gains
+I would say that is mainly luck
+[2024-12-18T23:03] throwawayoptions: i'm still curious on your sizing. assuming vol is low in NVDA, how much of your NLV do you put up to buy these spreads
+[2024-12-18T23:04] Yungchaney: My main goal going into this was to find a decent hedge that would only lose little/break even most of the time.
+You say that you essentially buy spreads, but wouldn’t a ratio of a sold closer to the money put and purchase of multiples of out of the money puts not do this as well?
+[2024-12-18T23:06] PandarBear: i'm still curious on your sizing. assuming vol is low in NVDA, how much of your NLV do you put up to buy these spreads
+I don't really have a set sizing. I dump out performance that is in excess of my 30%-50% annual return goal on PM account into buying hedges
+[2024-12-18T23:07] PandarBear (cont): That is why the PM account's graph is relatively smooth
+[2024-12-18T23:07] PandarBear (cont):   [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319078701937463438/image.png?ex=6a82eb85&is=6a819a05&hm=6ef5ffa3802b6d8c95cfe3dda9a5e9e5a3c616d77db8dfeb16399516d16d828a&', 'text': ''}]]
+[2024-12-18T23:08] PandarBear (cont): But down side is that my PM account will rarely exceed 50% returns in one year, which is fine for reaching financial goals
+[2024-12-18T23:09] PandarBear: You say that you essentially buy spreads, but wouldn’t a ratio of a sold closer to the money put and purchase of multiples of out of the money puts not do this as well?
+I can't effectively do ratios on the retail brokerages like robinhood, because no PM there haha
+[2024-12-18T23:10] PandarBear (cont): So they are all 1:1 vertical spreads (edited)
+Thursday, December 19, 2024 at 12:10 AM
+[2024-12-18T23:12] PandarBear: You say that you essentially buy spreads, but wouldn’t a ratio of a sold closer to the money put and purchase of multiples of out of the money puts not do this as well?
+I have some ratioed spreads on my PM account, but once you exceed a certain qty of long spreads on IBKR (even just verticals), the margin requirement explodes for some reason (probably due IBKR being worried about pin risk even)
+[2024-12-18T23:13] Yungchaney: I can't effectively do ratios on the retail brokerages like robinhood, because no PM there haha
+Ah got it. Thank you for the clarification. Do you also mainly perform the sale 1:1 ratios for your main PM account then? And then a few ratios here and there. (edited)
+Thursday, December 19, 2024 at 12:13 AM
+[2024-12-18T23:13] PandarBear: Ah got it. Thank you for the clarification. Do you also mainly perform the sale 1:1 ratios for your main PM account then? And then a few ratios here and there. (edited)
+Thursday, December 19, 2024 at 12:13 AM
+Yeah, on PM account sometimes I will very conservatively sell a few tails if vol is expanded and then later buy the spreads when inexpensive
+[2024-12-18T23:14] throwawayoptions: But down side is that my PM account will rarely exceed 50% returns in one year, which is fine for reaching financial goals
+Oh the horror
+[2024-12-18T23:18] PandarBear: It takes a bit to wait for good opportunities to build up the put spreads without paying too much. But once built up, you can buy/sell them every week or so based on the ebb and flow of the vol.
+[2024-12-18T23:22] PandarBear (cont): Also, unless you have very low ToS commissions, the commissions will eat a ton into the cost/profit. That is why I mainly do it on meme account at free brokerage lol
+[2024-12-18T23:23] PandarBear (cont): I'll start calling out when NVDA tails appear elevated, because that is the most certain part of the trade
+[2024-12-18T23:24] LoveOfProfit: 0.25 comm here, I'm ready
+[2024-12-18T23:25] PandarBear: The buying puts/spreads part though, I am reluctant to recommend because that is more luck dependent and if NVDA has a super long run up again, you will probably lose a ton on your puts
+[2024-12-18T23:25] LoveOfProfit: The ebb and flow you do to make it break even( or profit) is super interesting as vol moves (edited)
+Thursday, December 19, 2024 at 12:25 AM
+[2024-12-18T23:25] PandarBear: The ebb and flow you do to make it break even( or profit) is super interesting as vol moves (edited)
+Thursday, December 19, 2024 at 12:25 AM
+Here is an example of when sometimes the puts/spreads can be very low cost. After NVDA earnings, at beginning of December, you could buy some NVDA 1/3/2024 80P for 0.05 or 0.04. Stock price didn't go anywhere, but the premium on that stayed flat and even expanded sometimes.  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319088531162923051/image.png?ex=6a82f4ad&is=6a81a32d&hm=9bce303bfc1d615e06d45f85c75c19017bc486811d01a80f974e17570f1157a7&', 'text': ''}]]
+[2024-12-18T23:25] PandarBear: It probably mainly worked so far, because NVDA has been stuck in this range since July
+[2024-12-18T23:25] PandarBear (cont): Or June (edited)
+Thursday, December 19, 2024 at 12:25 AM
+[2024-12-18T23:29] PandarBear (cont): So if you want a safer/more reliable version I would do sell tails first, then buy when inexpensive and turn your tail into a spread (edited)
+Thursday, December 19, 2024 at 12:29 AM
+[2024-12-18T23:31] LoveOfProfit: Makes sense. Risky at first but once it builds up it's self-protecting
+[2024-12-18T23:40] PandarBear: Yeah, once you have a large amount of low cost spreads, you basically can sell a lot of NVDA tails without fear because if NVDA actually tanks, your account with spreads will surpass the losses
+[2024-12-18T23:44] LoveOfProfit: What do you like to pay for these $5 wide spreads
+[2024-12-18T23:44] LoveOfProfit (cont): Or is there some other way you think about it
+[2024-12-18T23:50] LoveOfProfit (cont): So even before today's vix, you could recoup your cost at any time in the past few weeks
+[2024-12-18T23:58] PandarBear: What do you like to pay for these $5 wide spreads
+I try to have at least one positions in every reasonable strike above 80p, since my assumption is that I have no informational edge on where the price will be. I purely try to maintain the hedge for 0 cost, and sometimes it just happens to profit
+[2024-12-19T00:01] PandarBear (cont): I try to buy the $5 wide spreads that are under $0.10
+[2024-12-19T00:04] PandarBear (cont): But I wouldn't follow that rule haha. I think without already having a large established position, it is better to sell low risk naked puts first in safe qty.
+[2024-12-19T00:05] LoveOfProfit: But I wouldn't follow that rule haha. I think without already having a large established position, it is better to sell low risk naked puts first in safe qty.
+Well, I tend to do that via lottos as is
+[2024-12-19T00:05] LoveOfProfit (cont): Though I've sized them way down lately after 8/5
+[2024-12-19T00:05] LoveOfProfit (cont): however, via this, it makes sense to go bigger
+[2024-12-19T00:18] PandarBear: @Yungchaney's question ⁠market-chat⁠, I started out meme account with low amount, but I have to deposit funds sometimes if bad marks make my buying power negative lol (even though the spreads are verticals)
+[2024-12-19T00:20] Yungchaney: @Yungchaney's question ⁠market-chat⁠, I started out meme account with low amount, but I have to deposit funds sometimes if bad marks make my buying power negative lol (even though the spreads are verticals)
+Wait so… you’re telling me your $1k meme account basically 500x’d. And that additional deposits were just for buying power purposes.
+[2024-12-19T00:20] Yungchaney (cont): Man what the FucK
+[2024-12-19T00:29] thetagangalwayswins: Please call them out lol
+[2024-12-19T00:30] Yungchaney: @PandarBear You have a legitimate case to enter the wallstreetbets hall of fame here.
+[2024-12-19T00:36] throwawayoptions: I'll start calling out when NVDA tails appear elevated, because that is the most certain part of the trade
+What does it mean...nvda tails elevated...i thought we were buying put spreads.
+[2024-12-19T00:37] throwawayoptions: Yeah, once you have a large amount of low cost spreads, you basically can sell a lot of NVDA tails without fear because if NVDA actually tanks, your account with spreads will surpass the losses
+isn't this just a 1-1-2? lol
+[2024-12-19T00:38] throwawayoptions: But down side is that my PM account will rarely exceed 50% returns in one year, which is fine for reaching financial goals
+it sounds like you're pretty confident in 30-50% per year. is that true? or are you just mondo long spoos this year?
+[2024-12-19T02:42] dez1024: I would say that is mainly luck 
+you’re too humble lol, takes a lot of experience and talent to identify these cheap premium buying opportunities
+[2024-12-19T03:07] PandarBear: isn't this just a 1-1-2? lol
+It could become 1-1-2 if selling too many nakeds without enough spreads haha
+[2024-12-19T03:13] PandarBear: What does it mean...nvda tails elevated...i thought we were buying put spreads.
+Buying the spreads at good price is one part of it, but there is more risk/luck in that aspect. I'm not that comfortable recommending starting the trade with that the buying step because NVDA could start its next meteoric rise and kill all the puts, and I don't want people to lose money haha. It worked well this past 6 months or so because NVDA has been pretty stagnant since June
+[2024-12-19T03:15] PandarBear (cont): Selling the puts during nvda tail expansion is more of a reliable bet, because usually it collapses quickly and you can buy back or turn into spread with very low risk as long as you size conservatively
+[2024-12-19T03:20] throwawayoptions: Selling the puts during nvda tail expansion is more of a reliable bet, because usually it collapses quickly and you can buy back or turn into spread with very low risk as long as you size conservatively
+so like...today was a good time to sell nvda tails
+[2024-12-19T03:21] PandarBear: it sounds like you're pretty confident in 30-50% per year. is that true? or are you just mondo long spoos this year?
+That is just what I aim for haha. I am actually not long enough on PM account unfortunately. Have too many floating rate treas etfs and could have had about 15% or so more performance this year if I was just 100% long SP500 as my core holdings and done the options strategies around that. My longs got called away throughout the year (edited)
+Thursday, December 19, 2024 at 4:24 AM  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319142530222391347/image.png?ex=6a8326f7&is=6a81d577&hm=2bf055f68fce5ee5ac6312b4becc53c1ba92c3cd9a770327f4ac51b36cd943b3&', 'text': ''}]]
+[2024-12-19T03:21] PandarBear: so like...today was a good time to sell nvda tails
+Yeah
+[2024-12-19T03:22] PandarBear (cont): The bottom of chain stuff hasn't expanded that much today actually, but the closer to the money stuff did of course
+[2024-12-19T03:24] throwawayoptions: That is just what I aim for haha. I am actually not long enough on PM account unfortunately. Have too many floating rate treas etfs and could have had about 15% or so more performance this year if I was just 100% long SP500 as my core holdings and done the options strategies around that. My longs got called away throughout the year (edited)
+Thursday, December 19, 2024 at 4:24 AM
+40% ytd with <0.7x beta...you gonna share this alpha or am i gonna go off and play diablo now (edited)
+Thursday, December 19, 2024 at 4:30 AM
+[2024-12-19T03:31] throwawayoptions: The bottom of chain stuff hasn't expanded that much today actually, but the closer to the money stuff did of course
+when you say bottom of the chain in nvda, we talking about the 0.5 strike?  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1319145069026218004/image.png?ex=6a832954&is=6a81d7d4&hm=ee78430190e6a1c15b2fd44cb1d2768e8a3b6348f8c3f1335e3338a7b8d5aa6b&', 'text': ''}]]
+[2024-12-19T03:32] PandarBear: when you say bottom of the chain in nvda, we talking about the 0.5 strike?
+Oh I meant the near 50p or so for the next few weeks
+[2024-12-19T03:32] throwawayoptions: are you selling 50p and buying 55p?
+[2024-12-19T03:32] PandarBear: I don't buy them that low because not very useful hedges haha. I normally only buy them 80p+
+[2024-12-19T03:33] throwawayoptions: so you're buying 80/50 spread?
+[2024-12-19T03:34] PandarBear: $5 spread width unless better deals to be had buying the wider spreads
+[2024-12-19T03:34] throwawayoptions: so like 75/80
+[2024-12-19T03:34] PandarBear: so 85/80, 90/85, etc
+[2024-12-19T03:34] PandarBear (cont): Yeah
+[2024-12-19T03:34] throwawayoptions: ok
+[2024-12-19T03:35] throwawayoptions (cont): typical price you've been paying?
+[2024-12-19T03:35] throwawayoptions (cont): these are spreads at 1 delta so ideally about...5 dollars?
+[2024-12-19T03:35] throwawayoptions (cont): aka 0.05
+[2024-12-19T03:35] PandarBear: I normally do under $0.10 cost, and I keep track of what spread width you can normally buy for $X
+[2024-12-19T03:36] throwawayoptions: and what does that spread expand to? 0.40?
+[2024-12-19T03:38] PandarBear: It depends, much of the time I sell them away on any small gain if I already have a very large inventory rofl
+[2024-12-19T03:38] PandarBear (cont): Or if DTE is getting lower, I'll sell for as small of a loss as possible to buy further DTE
+[2024-12-19T03:39] throwawayoptions: i see, and no commissions on robbing hood
+[2024-12-19T03:39] PandarBear: Yeah haha
+[2024-12-19T03:39] throwawayoptions: which is important to this
+[2024-12-19T03:39] throwawayoptions (cont): so there are like...lotto spreads
+[2024-12-19T03:42] PandarBear: so there are like...lotto spreads
+This wouldn't have really worked last year because NVDA was just on a roll, and the puts were too expensive and lost value quickly
+[2024-12-19T03:44] PandarBear (cont): Right now it seems like people are more confident about NVDA's price range/floor and are willing to sell puts for relatively inexpensive amounts
+[2024-12-19T03:46] PandarBear: i see, and no commissions on robbing hood
+Just the 6c or so per spread for regulatory fees
+[2024-12-19T03:48] PandarBear (cont): If I could get down to 15-25 cents or so on ToS, I'd do it there for the better fills and BP relief haha. Robinhood is horrid on fills, sometimes I am hitting both the bid and ask, and it still wont fill  (edited)
+Thursday, December 19, 2024 at 4:49 AM
+[2024-12-19T03:49] throwawayoptions: If I could get down to 15-25 cents or so on ToS, I'd do it there for the better fills and BP relief haha. Robinhood is horrid on fills, sometimes I am hitting both the bid and ask, and it still wont fill  (edited)
+Thursday, December 19, 2024 at 4:49 AM
+you might be able to negotiate that by offering to bring over that 500k
+[2024-12-19T12:25] psyche444: you might be able to negotiate that by offering to bring over that 500k
+Getting to 0.15-0.25 on 500k seems overoptimistic but I'm sure some discount could be achieved.
+[2024-12-19T20:07] PandarBear: NVDA puts are expanded at the moment, even with lower vix and higher price. ⁠market-chat⁠
+[2024-12-19T20:21] throwawayoptions: NVDA puts are expanded at the moment, even with lower vix and higher price. ⁠market-chat⁠
+how do you track this? just look at the options day to day?
+[2024-12-19T20:21] throwawayoptions (cont): pencil and paper?
+[2024-12-20T03:37] PandarBear: how do you track this? just look at the options day to day?
+Yeah, I have the chain up all the time at work and look at it pretty often haha.
+
+Having such a large qty of NVDA contracts active, every $0.01 change in the options price can mean thousands of gain/loss
+[2024-12-20T17:12] PandarBear: SMH tail expansion happening right now. Particularly on 165p for 12/27 and 1/03. Underlying up, IV down, and still more expensive than past 2 days.
+[2024-12-20T17:12] PandarBear (cont): Size conservatively of course in case market actually does tank further
+[2024-12-20T17:40] dez1024: NVDA puts are expanded at the moment, even with lower vix and higher price. ⁠market-chat⁠
+Thanks for these call outs, sold some and they decayed 40% in a day
+[2024-12-20T18:24] throwawayoptions: SMH tail expansion happening right now. Particularly on 165p for 12/27 and 1/03. Underlying up, IV down, and still more expensive than past 2 days.
+that looks mispriced relative to the other strikes/dates
+[2024-12-20T18:24] throwawayoptions (cont): huge volume, big buyer mayber?
+[2024-12-23T14:49] PandarBear: NVDA puts collapsed a good amount, especially nearer DTE for those who want to close/convert to spreads
+[2024-12-23T19:41] PandarBear: SMH tail expansion happening right now. Particularly on 165p for 12/27 and 1/03. Underlying up, IV down, and still more expensive than past 2 days.
+Many SMH puts also down by ~50% or so since Friday, good time to buy back/convert spread if desired
+[2024-12-23T19:41] thetagangalwayswins: Please keep the commentary it helps
+[2025-01-01T20:02] dmoney0899: heya @PandarBear (or anyone), this is an interesting strat i'm trying to understand.  What I gathered is that in 2024 you bought vertical put spreads (same transaction?) when IV in NVDA collapsed so you could buy a 5 point wide spread for $.05 - $.10 deep OTM.  Then as IV would ramp again you would close the short leg so you just had long puts?  And then you would sell more puts (to form a ratio?) deeper out of the money (lower delta) than longs, same DTE?  further out?
+[2025-01-03T16:23] LoveOfProfit: @PandarBear look at me, I'm the Pandar now  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1324775038364422187/image.png?ex=6a828ca6&is=6a813b26&hm=a596a3948e525497727e637e188c6ba8d3a6d54f7fa4a228e8cd4d00f6e68e0c&', 'text': ''}]]
+[2025-01-03T16:23] LoveOfProfit (cont): (Jan 17 NVDA) (edited)
+Friday, January 3, 2025 at 5:23 PM
+[2025-01-11T16:14] dmoney0899: @PandarBear look at me, I'm the Pandar now
+@LoveOfProfit could you do a favor and walk through the timeline of how you constructed that?  And now you're waiting on NVDA VRP to rise and the 40 puts will increase in value faster than the 33?
+[2025-01-11T16:18] LoveOfProfit: @LoveOfProfit could you do a favor and walk through the timeline of how you constructed that?  And now you're waiting on NVDA VRP to rise and the 40 puts will increase in value faster than the 33?
+It wasn't any genius level trading. @NuancedFlow noticed the 35 and 40 were trading at the same price if you hit the bid/ask correctly. 
+
+So I was able to slam all these on effectively just for the cost of fees, in my case about $75.
+
+I just treated this as a cheap black swan hedge in case vol blew out on NVDA (edited)
+Saturday, January 11, 2025 at 5:18 PM
+[2025-01-11T16:19] LoveOfProfit (cont): All I did was push the spread out a little wider than what NF found (edited)
+Saturday, January 11, 2025 at 5:19 PM
+[2025-01-11T17:40] NuancedFlow: I got some short 33's too
+[2025-01-24T18:50] Cris: @PandarBear Would you consider NVDA tails elevated here?
+[2025-01-24T18:51] PandarBear: @PandarBear Would you consider NVDA tails elevated here?
+Hmm, not particularly. Low-medium
+[2025-01-24T18:51] PandarBear (cont): I wouldn't sell tails in qty at the moment. It can go up a lot more
+[2025-01-24T18:52] PandarBear (cont): They actually died down a lot from earlier, even though underlying price is down even more now lol (edited)
+Friday, January 24, 2025 at 7:52 PM
+[2025-01-27T10:28] PandarBear: @PandarBear Would you consider NVDA tails elevated here?
+Today if yall are wanting to sell tails, I would say it is better to sell the closer DTE ones (under 26 days), rather than further DTE unless hoping for assignment. Don't think the further ones will be priced as well yet risk/reward wise vs cycling through multiple shorter DTE ones throughout the weeks/months
+
+Also save a decent amount of PNR cushion just in case better opportunities arise, NVDA drops further, schwab decides to change EPR, etc
+@LoveOfProfit (edited)
+Monday, January 27, 2025 at 11:57 AM
+[2025-01-27T10:47] PandarBear: I plan on closing out as many of my long spreads as I can for a profit today because portfolio beta is around 0.8 and has a lot of BP left, and who knows if NVDA might V recovery after tech earnings haha
+[2025-01-27T14:27] Yungchaney: Today seems like a grand old day to start positioning on this trade.
+[2025-01-27T14:28] LoveOfProfit: even better day to have already been positioned
+[2025-01-27T14:28] LoveOfProfit (cont): tragically I sold a bunch of NVDA and SMH puts on friday, no longs
+[2025-01-27T14:30] LoveOfProfit (cont): my NVDA positioned opened a little down  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1333444079211642900/image.png?ex=6a831b12&is=6a81c992&hm=93c11fb184f7abed1ef5bd70d91dc2aa0860e624418c700e079d4a01b39eefdb&', 'text': ''}]]
+[2025-01-27T14:31] Cris: B/A kind of wide
+[2025-01-27T14:31] Cris (cont): No longer a penny wide
+[2025-01-29T13:21] TheTwaddler: so are most of you legging into the spreads or are you opening the position as a spread to start? was a little of both discussed at the start of this thread. still trying to learn what you are doing here.
+
+if you are selling puts to start the strategy, you wait for vol to be elevated and then would sell puts at various strikes down the chain and then be opportunistic to turn them into spreads for low to no cost?
+[2025-01-29T13:37] PandarBear: so are most of you legging into the spreads or are you opening the position as a spread to start? was a little of both discussed at the start of this thread. still trying to learn what you are doing here.  if you are selling puts to start the strategy, you wait for vol to be elevated and then would sell puts at various strikes down the chain and then be opportunistic to turn them into spreads for low to no cost?
+I personally open the spread by buying the long leg first, but I would recommend most sell a naked put first and then later buying higher strike at a good price to turn into long spread
+[2025-01-29T15:53] Cris: @PandarBear Is there a specific way you choose the strikes? I know you’ve said before you want own a variety of strikes but have you found certain deltas work better? 
+For example, I sold some 80Ps and 90Ps for next week. The 80s have only come in like 20% while the 90s have come in 50%. So it seems like the 80s were too far out?
+[2025-01-29T15:55] thetagangalwayswins: yeah I would love to hear when you start putting them on. It feels like we are still in the sell portion of the spreads.
+[2025-01-30T16:18] bravo_liquidatemore: would the buying and selling of the strike and exp over and over trigger wash sales? (edited)
+Thursday, January 30, 2025 at 5:18 PM
+[2025-01-30T16:18] NuancedFlow: would the buying and selling of the strike and exp over and over trigger wash sales? (edited)
+Thursday, January 30, 2025 at 5:18 PM
+Does it matter if it is all STCG?
+[2025-01-30T18:14] throwawayoptions: only if you tell the IRS!
+[2025-01-30T20:27] bravo_liquidatemore: its free real estate  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1334620990327754863/image.png?ex=6a82c5e8&is=6a817468&hm=8e24470aa07a1aaa2ad26cb5edcbda6eda51fe7ce91661be0a4bfa006d8dae3e&', 'text': ''}]]
+[2025-01-30T23:11] nybhh: I started experimenting with this today with SPX.  Bought a 90dte 4980p this am and left a resting STO limit order for the 4970p for $1 more than the long was bought for that filled at 3:41 during that dump.  Gonna take some time to get a good rhythm down but I like this a lot.  Thank @PandarBear  For sharing. (edited)
+Friday, January 31, 2025 at 12:15 AM
+[2025-01-30T23:14] nybhh: 5980 and 5970?
+No, 5-deltaish.  [ATTACH: image0.jpg, image0.jpg]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1334663181905170503/image0.jpg?ex=6a82ed33&is=6a819bb3&hm=8d33d324e76be131d81beca122b215131e37dec71411baab394bd580f11efe56&', 'text': ''}]]
+[2025-01-30T23:15] Seb: ah your message says 4980 and 5970 so i got confused lol
+[2025-01-30T23:15] Seb: I started experimenting with this today with SPX.  Bought a 90dte 4980p this am and left a resting STO limit order for the 4970p for $1 more than the long was bought for that filled at 3:41 during that dump.  Gonna take some time to get a good rhythm down but I like this a lot.  Thank @PandarBear  For sharing. (edited)
+Friday, January 31, 2025 at 12:15 AM
+5980 and 5970?
+[2025-01-30T23:16] nybhh: ah your message says 4980 and 5970 so i got confused lol
+Fixed, thx.
+[2025-01-30T23:21] nybhh (cont): Ideally get into a rhythm doing 20-30+ of these per month at a small profit each.
+[2025-01-30T23:25] nybhh: May try to automate this at some point using TDEX values as a trigger
+[2025-01-30T23:26] TheTwaddler: A more volatile underlying is better for this, right? Because you'll have more opportunity for vol expansion and contraction
+[2025-01-30T23:27] Seb: I've been doing more aggressive strikes/expirations, similar to what SMR does on /ES
+[2025-01-30T23:28] nybhh: A more volatile underlying is better for this, right? Because you'll have more opportunity for vol expansion and contraction
+In theory, it is probably easier to accumulate more freebies but as a free-hedge, individual tickers are a little less reliable for that I think. (edited)
+Friday, January 31, 2025 at 12:29 AM
+[2025-01-30T23:29] ProfessorDiamond: In theory, it is probably easier to accumulate more freebies but as a free-hedge, individual tickers are a little less reliable for that I think. (edited)
+Friday, January 31, 2025 at 12:29 AM
+So a bit naive here, but… what if the stonk keeps going up? You never get filled on the short… or is the idea simply that it’s a way to lock in gains (and potentially gain more) on hedges you’d be placing anyway?
+[2025-01-30T23:29] Seb: I've also thought about doing this on the call-side for MSTR
+[2025-01-30T23:30] Cris: I think Pander liked NVDA because it moves so much, so building a big position is easier because you're always given opportunities for new positions
+[2025-01-30T23:31] Seb: SPX chain moves a lot differently than individual names. in my experience (edited)
+Friday, January 31, 2025 at 12:31 AM
+[2025-01-31T01:06] nybhh: @ProfessorDiamond Yes, pretty much.  I generally run a few SPX long puts at 90dte every month anyway so the  BTO was just the first one of those.  The spreads are not going to have the same  long Vega component obviously but aren’t bleeding theta anymore either.  Time will tell but worth a shot if one can accumulate a few dozen of these per month, rent free. (edited)
+Friday, January 31, 2025 at 2:06 AM
+[2025-01-31T01:07] TheTwaddler: So a bit naive here, but… what if the stonk keeps going up? You never get filled on the short… or is the idea simply that it’s a way to lock in gains (and potentially gain more) on hedges you’d be placing anyway?
+I think that's why pandar says he recommended selling puts to enter the position
+[2025-01-31T01:18] ProfessorDiamond: I guess there’s risk either way, but I have enough negative vega already so I’d be looking to add the long first to balance the rest of the port
+[2025-01-31T01:50] Seb: I'm doing short first as theta works in my favor and I'm basically doing the SMR trade (entry) anyway
+[2025-01-31T02:03] TheTwaddler: I'm doing short first as theta works in my favor and I'm basically doing the SMR trade (entry) anyway
+I'm looking at it as an enhancement to my normal theta strategies by turning them into free downside plays instead of closing for pennies. Not getting as concentrated as pandar (edited)
+Friday, January 31, 2025 at 5:18 AM
+[2025-01-31T04:17] PandarBear: @PandarBear Is there a specific way you choose the strikes? I know you’ve said before you want own a variety of strikes but have you found certain deltas work better?  For example, I sold some 80Ps and 90Ps for next week. The 80s have only come in like 20% while the 90s have come in 50%. So it seems like the 80s were too far out?
+I don't particularly go by delta, but rather by what are the strikes that are more within the realm of possibility to go ITM in black swan-ish cases. Like during 8/5, which there wasn't even that extreme of a catalyst/impact, NVDA dropped the 90s.
+[2025-01-31T04:19] PandarBear: So that is why I tend to buy spreads that are around there or higher. Since in a more serious black swan it be more likely to breach those levels
+[2025-01-31T04:24] PandarBear: I think Pander liked NVDA because it moves so much, so building a big position is easier because you're always given opportunities for new positions
+Yeah, that is right   Lots of volume, bid/asks are usually tight, and for some reason the options seem to cycle between "its so over" and "we are so back" relatively frequently lol
+[2025-01-31T04:27] PandarBear (cont): And that allows you to build up and maintain hedges for a pretty low long term cost
+[2025-01-31T04:30] PandarBear (cont): Because of the phenomenon that the options undergo expansion and collapse quite frequently
+[2025-01-31T04:38] throwawayoptions: @PandarBear are you really up 1M ytd
+[2025-01-31T04:41] PandarBear: I think that's why pandar says he recommended selling puts to enter the position
+Yeah, the buying spreads part is not an exact science so I am not as comfortable recommending it because more chance of losing money lol. But the selling put at comfortable assignment price and then choosing to aggressively turn it into low cost spread is pretty reliable (edited)
+Friday, January 31, 2025 at 5:44 AM
+[2025-01-31T04:44] igr: Yeah, the buying spreads part is not an exact science so I am not as comfortable recommending it because more chance of losing money lol. But the selling put at comfortable assignment price and then choosing to aggressively turn it into low cost spread is pretty reliable (edited)
+Friday, January 31, 2025 at 5:44 AM
+How did you accumulate 19k of them once?  I’d guess it’s easier to go bigger (say 1k at a time) if you long the put first rather than sell because you aren’t stressing about short gamma/margin as much. (edited)
+Friday, January 31, 2025 at 9:15 AM
+[2025-01-31T04:44] thetagangalwayswins: Yeah, the buying spreads part is not an exact science so I am not as comfortable recommending it because more chance of losing money lol. But the selling put at comfortable assignment price and then choosing to aggressively turn it into low cost spread is pretty reliable (edited)
+Friday, January 31, 2025 at 5:44 AM
+What is the width you’re doing?
+[2025-01-31T05:08] Cris: So that is why I tend to buy spreads that are around there or higher. Since in a more serious black swan it be more likely to breach those levels
+TY sir. i will keep that in mind and focus on strikes that are realistic
+[2025-01-31T07:39] FiveDimeClive: I wonder if a way to make the farther OTM strikes work is to make them backratios instead. Buy 2 puts lower than your short and you’ll have more vega to work with than if you just did the debit spread. This is betting on the chain lighting up during some event more so than it being ITM.
+[2025-01-31T07:52] FiveDimeClive: May try to automate this at some point using TDEX values as a trigger
+I’ve been mulling over procrastinating doing TDEX for equities for precisely this strat , and you’re just now making me realize I can start  testing using actual TDEX and spy or something.
+[2025-01-31T10:34] nybhh: Anyone looked at NDX for this?  Volatility in the chain may look a look a lot more like NVDA than SPX.   I’m allergic to commissions and prefer the $600k in notional for $1.65 in commissions (and 1256 treatment of SPX)  but you all are right that individual names are going to have more outsized moves than the indexes and presumably a little less VRP baked in.  There is also something to be said for cash settlement on a strategy like this when they go ITM though. (edited)
+Friday, January 31, 2025 at 3:36 PM
+[2025-01-31T16:56] thetagangalwayswins: Also, could this be done with TSLA too?
+[2025-01-31T16:58] PandarBear: What is the width you’re doing?
+A large variety of widths haha, basically just spreading all the bets across the board since I assume no edge
+[2025-01-31T16:58] PandarBear (cont): Dunno what the stock price is going to do
+[2025-01-31T16:59] PandarBear: Also, could this be done with TSLA too?
+It is probably possible with TSLA, but I haven't been able to make it work yet
+[2025-01-31T17:03] PandarBear (cont): NVDA call tails expanding a lot at the moment
+[2025-01-31T17:05] LoveOfProfit: NVDA call tails expanding a lot at the moment
+oh wow so they are
+[2025-01-31T17:05] TheTwaddler: going to get gov funding for NVDA after the Trump meeting?
+[2025-01-31T17:05] LoveOfProfit: puts also expanding tho
+[2025-01-31T17:06] PandarBear: puts also expanding tho
+The puts are still a little underpriced imo. I wouldn't sell too many at this price
+[2025-01-31T17:07] PandarBear (cont): Maybe I would sell next week's puts since they will decay faster
+[2025-01-31T17:07] Cris: spammed some NVDA calls for now
+[2025-01-31T17:16] thetagangalwayswins: NVDA call tails expanding a lot at the moment
+Do you do it call side?
+[2025-01-31T17:18] PandarBear: Do you do it call side?
+Only when calls are overpriced like right now. Mainly do put side because I want the downside protection for portfolio
+[2025-01-31T17:20] TheTwaddler: which strikes/expiration are you looking at? Feb seems like you can sell some good ones, but curious what you are looking at as "reasonable" strikes on the call side
+[2025-01-31T17:21] PandarBear: I am just doing Feb 7 expiration
+[2025-01-31T17:21] PandarBear (cont): That is the most overpriced compared to all the other expirations
+[2025-01-31T17:22] PandarBear (cont): At 190+
+[2025-01-31T17:22] PandarBear (cont): They likely to crush a lot after the weekend
+[2025-01-31T17:25] PandarBear: which strikes/expiration are you looking at? Feb seems like you can sell some good ones, but curious what you are looking at as "reasonable" strikes on the call side
+The call side I am only selling naked OTM at the moment because I am not that bullish to want to spend money on long call spreads
+[2025-01-31T17:25] TheTwaddler: gotcha. so just collecting this "free" premium here
+[2025-01-31T17:25] PandarBear: Sizing so that if NVDA hits 190 next week, I am not at PNR and can hold to expiration
+[2025-01-31T17:36] Cris: @PandarBear from your experience, when is a good time to buy the long leg of the spread after the short side has decayed? for example, buy the long leg after the short leg has decayed 50%?
+[2025-01-31T17:37] Cris (cont): or do you make it in to a spread as soon as you can make it for free
+[2025-01-31T17:39] PandarBear: If I don't have many long legs, then I will be more aggressive in buying long legs. Once I have a lot, then I will be more selective and wait till puts are "inexpensive"
+Also if the annualized return on BP is a lot lower than what I sold it for, and if there are better opportunities elsewhere I will decide to buy long legs as well
+[2025-01-31T17:40] PandarBear (cont): So if I sold at 120% return on BP on X DTE, and buy back at a cost of 30% return on BP at Y DTE, I will just consider that a good trade and take risk off the table
+[2025-01-31T17:40] PandarBear (cont): + the "free long spread" that comes with that trade
+[2025-01-31T17:42] PandarBear (cont): Also, if you are doing ratios, I would look at the EPR/PNR reqs and then double your safety factor on that lol. That way you can actually monetize the longs if there is a large drop
+[2025-01-31T17:42] PandarBear (cont): And you never have to buy back at elevated prices to get out of PNR and can sell even more lol
+[2025-01-31T18:39] nybhh: lol, another pair added today.  Longs in the AM, shorts in the PM (edited)
+Friday, January 31, 2025 at 7:39 PM
+[2025-01-31T18:39] Cris: Glad i put some longs on right before the news
+[2025-01-31T19:27] PandarBear: NVDA call expansion again, particularly Feb 7
+[2025-01-31T19:34] thetagangalwayswins: NVDA call expansion again, particularly Feb 7
+how far out do you go with puts in terms of weeks?
+[2025-01-31T19:34] PandarBear: Next two mopex usually
+[2025-01-31T19:36] thetagangalwayswins: Thanks
+[2025-01-31T19:36] thetagangalwayswins (cont): let me know when they look attractive
+[2025-01-31T19:47] PandarBear: Puts expanded further, I think I would sell some now
+[2025-01-31T19:48] PandarBear (cont): For 2/7 and 2/14
+[2025-01-31T19:54] PandarBear: Size conservatively because never know what kind of surprises there may be in store, and you don't want to have to buy them back at elevated prices
+[2025-01-31T19:58] LoveOfProfit: NVDA calls still expanding
+[2025-01-31T19:58] LoveOfProfit (cont): 2/7 are 5c now up to like 180c
+[2025-02-02T03:59] Cris: Im long 105Ps, but short 100, 95, 90 and 80. Wonder how its going to play out at open
+[2025-02-02T03:59] Cris (cont): Not enough 105s to cover all of those tho
+[2025-02-03T02:58] bravo_liquidatemore: you know the real reason for the sell off is everyone started this strat last week right
+[2025-02-03T03:00] thetagangalwayswins: bro I couldn't if I wanted to
+[2025-02-03T03:00] thetagangalwayswins (cont): I tried
+[2025-02-03T03:01] bravo_liquidatemore: how come? haha
+[2025-02-03T03:01] TheTwaddler: Can't wait to see my NVDA short puts tomorrow
+[2025-02-03T03:01] thetagangalwayswins: options were too expensive so I couldn't get any longs
+[2025-02-03T03:03] bravo_liquidatemore: yea i have a few naked right now
+[2025-02-03T03:03] nybhh: At least it seems like most people started with longs rather than loading up on shorts first which would be the normal way we kick off a new strat
+[2025-02-03T03:03] bravo_liquidatemore: but im sized to assign em
+[2025-02-03T03:03] bravo_liquidatemore (cont): im in the 70s tho
+[2025-02-03T03:05] TheTwaddler: I'm in some 90-95s. Was hoping Jensen meeting with Trump would save it
+[2025-02-03T03:14] PandarBear: options were too expensive so I couldn't get any longs
+Yeah  There was only 1 day last week that was somewhat decent for buying longs, but still quite expensive
+
+Have to buy during calmer times when market is complacent and seemingly underpricing risk
+[2025-02-03T03:15] thetagangalwayswins: yeah I was really hoping for NVDA to calm down with spx at ath but it never happened
+[2025-02-03T03:15] Cris: yea the only time i was able to buy it was friday before the tariff news
+[2025-02-03T03:15] Cris (cont): thank god i did
+[2025-02-03T03:25] thetagangalwayswins: even then they were very expensive.
+[2025-02-03T03:26] TheTwaddler: Holding okay around this 113 area at least
+[2025-02-03T03:26] TheTwaddler (cont): Knock on wood
+[2025-02-03T03:26] thetagangalwayswins: yeah I mean who knows what happens overnight though
+[2025-02-03T03:27] thetagangalwayswins (cont): NVDA is literally in a bear market and spx is 2% off highs lmao
+[2025-02-03T03:27] thetagangalwayswins (cont): I am so annoyed that we gapped on those shitty ERs last week
+[2025-02-03T03:30] bravo_liquidatemore: I am so annoyed that we gapped on those shitty ERs last week
+blow off top
+[2025-02-03T04:22] thetagangalwayswins: @PandarBear You said you buy puts first right? Have you ever bought them and not been able to spread them?
+[2025-02-03T05:45] throwawayoptions: My friend's 100p are safe right? He's from r/thetagang. He says he likes the stock at 100 but doesn't want to get assigned just yet.
+[2025-02-03T09:50] PandarBear: @PandarBear You said you buy puts first right? Have you ever bought them and not been able to spread them?
+Yeah, I personally bought the long put first, but definitely many times where buying the long first loses some money, so I am reluctant to recommend that as the opening trade since it takes more timing/luck
+
+Those times I just consider it a cost of maintaining the portfolio downside hedge. I was actually wondering if this strategy might be over after Jan mopex because the puts kept crushing and less significant expansions were happening lol
+
+I think easier/safer for most to just consider it a normal naked tail selling strategy just with aggressive profit taking to turn into spread
+
+Probably wouldn't recommend buying the longs for the next few weeks though except for taking profit on naked short puts or if you really needed to manage risk/pnr/bp, since market is now shocked back into reality again. Have to wait until/if we V again and euphoria comes back for this strategy to be more worth doing.
+
+The longer and higher market goes up, the better risk/reward this strategy has, since you can buy wider spreads for less cost and the market risk is more to the downside. Downside is more limited now that NVDA has already dropped and there is fear in the markets
+[2025-02-03T14:34] bravo_liquidatemore: NVDA tails not too blown out
+[2025-02-03T14:44] thetagangalwayswins: yeah surprised
+[2025-02-03T15:52] bravo_liquidatemore: tails super crushewd
+[2025-02-03T16:59] igr: I closed 2 spreads for net 0 but feels unsatisfactory.  I want 19k of them
+[2025-02-03T23:21] thetagangalwayswins: NVDA puts really going to crush tomorrow. Let us know when they are cheap pandar
+[2025-02-04T16:06] Cris: @PandarBear thoughts on selling puts now for the earnings week? or do you avoid earning entirely (edited)
+Tuesday, February 4, 2025 at 5:06 PM
+[2025-02-04T16:06] PandarBear: @PandarBear thoughts on selling puts now for the earnings week? or do you avoid earning entirely (edited)
+Tuesday, February 4, 2025 at 5:06 PM
+I generally don't sell many options going into earnings
+
+For NVDA, the annualized premium didn't look that much more attractive than the nearer DTE currently for the additional risk
+
+If I were to sell the earnings, I'd prob do it the week before
+[2025-02-05T16:51] TheTwaddler: When you convert a short put to a spread, do you have a credit you're looking to keep? Like I have some Feb 21 short puts that I could add a long to for a net credit, but it's like 0.05
+[2025-02-06T16:54] thetagangalwayswins: when are we buying puts pandar
+[2025-02-07T16:54] PandarBear: Somewhat decent put tail expansion for selling 2/14
+[2025-02-07T16:56] PandarBear: When you convert a short put to a spread, do you have a credit you're looking to keep? Like I have some Feb 21 short puts that I could add a long to for a net credit, but it's like 0.05
+Besides from trading when things seem inexpensive/expensive, I usually look at annualized return on BP when selling or buying back (selling for higher annualized than buying back). For naked short puts, look at your risk tolerance as well and EPR/PNR safety margin
+[2025-02-07T17:08] thetagangalwayswins: Somewhat decent put tail expansion for selling 2/14
+You do opex though right? (edited)
+Friday, February 7, 2025 at 6:08 PM
+[2025-02-07T17:08] PandarBear: You do opex though right? (edited)
+Friday, February 7, 2025 at 6:08 PM
+Yeah, for the majority of trades
+[2025-02-07T17:36] Sarvesh: No, 5-deltaish.
+If i understand this correctly, in this case, if both the legs go ITM, you will make 1000 (Difference in spread)+ 10 (Premium received) ?
+[2025-02-07T17:43] Sarvesh: Somewhat decent put tail expansion for selling 2/14
+NVDA?
+[2025-02-07T17:43] nybhh: If i understand this correctly, in this case, if both the legs go ITM, you will make 1000 (Difference in spread)+ 10 (Premium received) ?
+Mostly correct.  Spread (10) * Multiplier (100)  = $1000 per position if both legs settle ITM.  I'm targeting at least $1 (x100 multiplier) so $100 per position in premium difference between the long and short legs, although I'm averaging a little better than that (around $200) per spread.  A wider spread would be better from a profit perspective if they settle ITM but the wider spreads get more difficult to put on for a profit, or even breakeven. (edited)
+Friday, February 7, 2025 at 6:45 PM
+[2025-02-07T17:45] Sarvesh: Mostly correct.  Spread (10) * Multiplier (100)  = $1000 per position if both legs settle ITM.  I'm targeting at least $1 (x100 multiplier) so $100 per position in premium difference between the long and short legs, although I'm averaging a little better than that (around $200) per spread.  A wider spread would be better from a profit perspective if they settle ITM but the wider spreads get more difficult to put on for a profit, or even breakeven. (edited)
+Friday, February 7, 2025 at 6:45 PM
+Is my calculation correct? 4980 -> You paid 1690. Currently trading at 1520 = -170. 4970 -> You received 1700. Currently trading at 1500 = +200. Current Profit is 30$.  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1337482788445753476/image.png?ex=6a82a329&is=6a8151a9&hm=05fad7de6fbcbb1bb3c7595e5de11ff8cae72d69b998dc86500f07e388ef6365&', 'text': ''}]]
+[2025-02-07T18:07] nybhh: Is my calculation correct? 4980 -> You paid 1690. Currently trading at 1520 = -170. 4970 -> You received 1700. Currently trading at 1500 = +200. Current Profit is 30$.
+Yes, for that first pair.  I now have 3 of each of those (at different prices) and 2x 5000/5010s.
+[2025-02-07T18:12] Sarvesh: Yes, for that first pair.  I now have 3 of each of those (at different prices) and 2x 5000/5010s.
+Great. So you are buying first. Then selling the lower strike for a price >  what you paid for buying the put. Outcome => Getting paid for a downside hedge (if we can successfully execute the spread for a credit)
+[2025-02-07T18:13] nybhh: Great. So you are buying first. Then selling the lower strike for a price >  what you paid for buying the put. Outcome => Getting paid for a downside hedge (if we can successfully execute the spread for a credit)
+I'm just using GTC limit orders
+[2025-02-07T18:15] Sarvesh: I'm just using GTC limit orders
+How do you choose the strikes for SPX and DTE?
+[2025-02-07T18:20] nybhh: How do you choose the strikes for SPX and DTE?
+I'm experimenting with that.  The higher DTE prices aren't as noisy so more difficult to complete the spreads but you want enough time with them.  What I'm trying now is accumulate from 90dte down to 60dte and then let them marinate for 60 days while I move out a month and start accumulating at 90dte again.  I moved up to 5,000 strike last Sunday night as the round numbers tend to have better liquidity AH when I was trying to get some fills on panic (I did at around $28).  My short 5000p have an average price of 28.58 while my long 5010p have an average price of 19.77 (edited)
+Friday, February 7, 2025 at 7:22 PM
+[2025-02-07T18:22] Sarvesh: I'm experimenting with that.  The higher DTE prices aren't as noisy so more difficult to complete the spreads but you want enough time with them.  What I'm trying now is accumulate from 90dte down to 60dte and then let them marinate for 60 days while I move out a month and start accumulating at 90dte again.  I moved up to 5,000 strike last Sunday night as the round numbers tend to have better liquidity AH when I was trying to get some fills on panic (I did at around $28).  My short 5000p have an average price of 28.58 while my long 5010p have an average price of 19.77 (edited)
+Friday, February 7, 2025 at 7:22 PM
+Nice. I am going to try this too. Thanks for explaining.
+[2025-02-07T18:22] ph33rl355: I'm experimenting with that.  The higher DTE prices aren't as noisy so more difficult to complete the spreads but you want enough time with them.  What I'm trying now is accumulate from 90dte down to 60dte and then let them marinate for 60 days while I move out a month and start accumulating at 90dte again.  I moved up to 5,000 strike last Sunday night as the round numbers tend to have better liquidity AH when I was trying to get some fills on panic (I did at around $28).  My short 5000p have an average price of 28.58 while my long 5010p have an average price of 19.77 (edited)
+Friday, February 7, 2025 at 7:22 PM
+did you move up to 5000 strike after seeing the vol surface map? you're still working on that?
+[2025-02-07T19:40] PandarBear: NVDA tails crushed a bit from earlier if yall are wanting to turn into spreads/derisk
+[2025-02-07T19:41] PandarBear (cont): Particularly the 2/14 ones
+[2025-02-07T19:57] Sarvesh: @PandarBear  - Can you please share the strikes you are looking at.
+[2025-02-07T20:06] PandarBear: @PandarBear  - Can you please share the strikes you are looking at.
+Hmm, it depends on where you sold the short puts. You want to convert to spread for credit or close to no out of pocket cost. I have positions on almost every strike, but long leg I am usually looking at 90+ because that is the bottom range of what is statistically possible for 2/14, 2/21
+[2025-02-08T03:19] nybhh: did you move up to 5000 strike after seeing the vol surface map? you're still working on that?
+I am still working on it.  I have the code running to process everything and storing in a dbase.  Starting to design a website ui, charting, etc.  I’ll post a link for some feedback when I get the bones pulled together.
+[2025-02-12T21:24] bravo_liquidatemore: lil experiment working on today, tracking the long strike of the $5 wide spread that costs $0.10 on NVDA  [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1339346463808815306/image.png?ex=6a82d358&is=6a8181d8&hm=2cba2a537c0aff0ee051f2e64159aa98ba74a7b0762aed6e613e83cc3614efb4&', 'text': ''}]]
+[2025-02-12T21:25] bravo_liquidatemore (cont): see if ill be able to visualize the vol expansion on the next monthly
+[2025-02-12T21:25] bravo_liquidatemore (cont): new chatgpt model was nice to work with
+[2025-02-12T21:26] PandarBear: lil experiment working on today, tracking the long strike of the $5 wide spread that costs $0.10 on NVDA
+That is a useful visualization!
+[2025-02-14T14:35] thetagangalwayswins: Good time to buy pandar?
+[2025-02-14T14:38] PandarBear: Good time to buy pandar?
+Medium, not seeing that great of prices for buying at the moment
+[2025-02-14T14:39] PandarBear (cont): I am selling a bit of my spreads actually
+[2025-02-14T14:39] thetagangalwayswins: must be ER
+[2025-02-20T16:55] thetagangalwayswins: Medium, not seeing that great of prices for buying at the moment
+I’ve been spreading my puts. They seem really cheap for ER. Are you buying yet?
+[2025-02-21T15:56] PandarBear: I’ve been spreading my puts. They seem really cheap for ER. Are you buying yet?
+NVDA earnings tails expanding now
+[2025-02-21T15:57] thetagangalwayswins: NVDA earnings tails expanding now
+yeah I got a lot of spreads off before ER
+[2025-02-21T16:02] Cris: sell the tails now and then buy the longs next week?
+[2025-02-21T16:03] thetagangalwayswins: unless there is an ER blowout
+[2025-02-21T17:20] PandarBear: sell the tails now and then buy the longs next week?
+Yeah, be conservative or at a price/qty you would okay being assigned
+[2025-02-24T15:31] PandarBear: sell the tails now and then buy the longs next week?
+The tails crushed a decent bit over weekend if any want to take profit/turn into spreads going into earnings
+[2025-02-24T15:32] thetagangalwayswins: I want to know when you buy them!
+[2025-02-24T15:34] PandarBear: I am buying some right now haha and throughout morning
+[2025-02-24T15:34] Cris: Buying to turn in to spreads?
+[2025-02-24T15:34] Cris (cont): Or to start long puts
+[2025-02-24T15:37] PandarBear: I want to know when you buy them!
+It is kind of different for me though at this point, because I already received the payouts from NVDA tanking a couple of times in past few months, so mentally easier for me to risk wasting money buying the in mass. So I recommend people sell the tails and then buy back higher strikes for credit when can secure decent gains.
+[2025-02-24T15:38] thetagangalwayswins: It is kind of different for me though at this point, because I already received the payouts from NVDA tanking a couple of times in past few months, so mentally easier for me to risk wasting money buying the in mass. So I recommend people sell the tails and then buy back higher strikes for credit when can secure decent gains.
+I get it but I am not going to throw a bunch into longs. I buy SPY hedges so this is the equivalent for me. Buying long tails as a hedge either way
+[2025-02-24T15:43] PandarBear: Buying to turn in to spreads?
+Yeah, buy if you can turn into spread at a profit if you sold the options on Friday
+[2025-02-24T15:57] Cris: alright, bought a bunch of 125s to cover most of the tails
+[2025-02-24T17:21] Cris: @PandarBear thoughts on selling call tails in to earnings?
+[2025-02-24T21:59] PandarBear: @PandarBear thoughts on selling call tails in to earnings?
+The call tails aren't particularly juicy at the moment haha
+[2025-02-24T22:04] PandarBear: @PandarBear thoughts on selling call tails in to earnings?
+They were much higher during many instances in non-earnings periods, so the risk reward doesn't seem that great for me to do much of them.
+[2025-02-25T07:05] throwawayoptions: who's ready to sell the shit out of nvda puts
+[2025-02-25T14:51] Cris: Selling next weeks tails looking good?
+[2025-02-25T15:13] PandarBear: Selling next weeks tails looking good?
+Pretty decent. Can sell some of the ones bought yesterday for a good profit
+[2025-02-25T15:14] PandarBear (cont): NVDA can always go lower of course. Market would probably have to unwind a lot of leverage if NVDA tanks a ton
+[2025-02-27T07:48] sky: Besides from trading when things seem inexpensive/expensive, I usually look at annualized return on BP when selling or buying back (selling for higher annualized than buying back). For naked short puts, look at your risk tolerance as well and EPR/PNR safety margin
+Hi @PandarBear , if the vertical pairs are set up perfectly (e.g no naked shorts), do you still worry about EPR/PNR safety margin in this case? thanks
+[2025-02-27T19:50] Cris: Selling more tails on the move down, closed mine from earnings in the morning
+[2025-02-27T21:10] PandarBear: Hi @PandarBear , if the vertical pairs are set up perfectly (e.g no naked shorts), do you still worry about EPR/PNR safety margin in this case? thanks
+If they are 1:1 vertical pairs, then it doesn't negatively impact EPR/PNR. Have to watch out for margin reqs still though, because on Schwab they increase even though they are long put spreads haha
+[2025-03-03T21:26] bravo_liquidatemore: picked a fun weekend to clean up my NVDA tail trakcer
+[2025-03-03T21:26] bravo_liquidatemore (cont):   [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1346232178828378162/image.png?ex=6a82d3ab&is=6a81822b&hm=9404c49066f848518b696f0898f080fbfdfef256234f96b25908f1c8c724288a&', 'text': ''}]]
+[2025-03-03T23:02] PandarBear: picked a fun weekend to clean up my NVDA tail trakcer
+The tails took quite a while to expand today
+[2025-03-04T14:00] PandarBear: Hope a lot of yalls put spreads are getting near ITM now  . I am going to take profit on a lot of my put spreads throughout the day and then look at buying further OTM cheaper puts (in case of nuke/taiwan invasion) and also buying a small amount of calls on the way down
+[2025-03-04T14:03] PandarBear (cont): I don't think the puts will be worth buying much of in the coming days/weeks as IV is elevated and downside is more limited now that big drops have happened
+[2025-03-04T14:26] Cris: Closed mine yesterday, still having a hard time getting a bunch on for a big payout tho
+[2025-03-05T16:25] PandarBear: NVDA puts a tad bit suppressed right now for next week and opex if anyone needs to close short puts/convert to spreads
+[2025-03-06T14:55] PandarBear: Decent time to sell the ones bought yesterday
+[2025-03-06T14:55] PandarBear (cont): Probably keep some for if they expand more
+[2025-03-10T13:42] PandarBear: NVDA puts seem a little bit underpriced at the moment, I am buying a few
+[2025-03-10T13:52] Cris: NVDA puts seem a little bit underpriced at the moment, I am buying a few
+How far out you looking at
+[2025-03-10T14:23] PandarBear: How far out you looking at
+Next 2-3 weeks, spread out down to 80P
+[2025-03-10T14:24] PandarBear (cont): They expanded again now though, so if didn't buy earlier then it is just an okay opportunity as of 9:23 AM
+[2025-03-11T00:23] Kreisleriana: how about tomorrow morning
+[2025-03-11T00:27] PandarBear: how about tomorrow morning
+Won't know yet until I see
+[2025-03-13T15:09] Cris: @PandarBear would you buy more NVDA puts here?
+[2025-03-13T15:10] Cris (cont): I bought some yesterday after seeing ATM premium get chopped by 50% for the ones like 30 days out
+[2025-03-13T15:10] PandarBear: @PandarBear would you buy more NVDA puts here?
+Hmm, if you don't have short puts to close for profit kind of a gamble. It is pretty suppressed for the broad market move down, and if things stay the same I think they will ramp up a bit tomorrow
+[2025-03-13T15:10] PandarBear (cont): Or even end of day ramp up
+[2025-03-13T15:12] PandarBear: Yeah I would say decent time right now lol. I just worry about bear market rallies to buy too many at the moment (edited)
+Thursday, March 13, 2025 at 4:12 PM
+[2025-03-13T15:12] LoveOfProfit: haha 'market rallies'
+[2025-03-20T12:45] thetagangalwayswins: NVDA premium seems really cheap no?
+[2025-03-20T12:50] PandarBear: NVDA premium seems really cheap no?
+It does haha, I was planning to buy some today if it is still low
+[2025-03-20T12:53] PandarBear (cont): Also been buying call spreads on big down days for NVDA and SPX at the 6k-6.2k ish level. Just in case we moon and "not long enough" rofl
+[2025-03-20T12:54] thetagangalwayswins: yeah even calls are really cheap imo (edited)
+Thursday, March 20, 2025 at 1:54 PM
+[2025-03-20T13:00] TheTwaddler: what expirations are you looking at? April Opex?
+[2025-03-20T13:01] thetagangalwayswins: I was looking weeklies but I will look further out the chain at open
+[2025-03-21T00:40] Kreisleriana: It does haha, I was planning to buy some today if it is still low
+what are your strikes / exp for nvda?
+[2025-03-21T06:12] PandarBear: what are your strikes / exp for nvda?
+Spread out across 115p to 80p, mostly for 4/17 mopex and the weeks before
+[2025-03-21T07:24] sky: Spread out across 115p to 80p, mostly for 4/17 mopex and the weeks before
+curious how you handle the pin risk on the expiration date (esp after market hour) ?
+[2025-03-21T07:30] PandarBear: curious how you handle the pin risk on the expiration date (esp after market hour) ?
+They are long spreads, so I monitor them after hours and then contact broker to "Do Not Exercise" if only the long leg is ITM
+[2025-03-21T07:32] PandarBear (cont): If it is an account I have PM on, then I will short the stock if long leg is ITM to take profit after hours
+[2025-03-21T07:47] sky: They are long spreads, so I monitor them after hours and then contact broker to "Do Not Exercise" if only the long leg is ITM
+when is the deadline for contacting the broker for "do not exercise"? 6pm EST? (edited)
+Friday, March 21, 2025 at 8:48 AM
+[2025-03-21T07:48] PandarBear: when is the deadline for contacting the broker for "do not exercise"? 6pm EST? (edited)
+Friday, March 21, 2025 at 8:48 AM
+Some are 5pm EST, some are 5:30 pm. I just do it by 5pm to be safe
+[2025-03-21T07:56] sky: Some are 5pm EST, some are 5:30 pm. I just do it by 5pm to be safe
+Thank you!
+[2025-03-21T15:54] Cris: @PandarBear nvda puts still cheap here?
+[2025-03-21T15:58] PandarBear: @PandarBear nvda puts still cheap here?
+Hmm, they look low-mid priced right now for buying back. But I am not buying outright at the moment
+[2025-03-21T16:24] PandarBear: Been buying a decent amount of call spreads too on various tickers further out. To hedge against a 15-20%+ year lmao, since doesn't seem like market is expecting that too much at the moment
+[2025-03-21T17:32] Kreisleriana: Been buying a decent amount of call spreads too on various tickers further out. To hedge against a 15-20%+ year lmao, since doesn't seem like market is expecting that too much at the moment
+random pumps happen when no one expects that
+[2025-03-21T17:32] Kreisleriana: I've been selling copius amount of calls but I feel like I should dial it back down
+[2025-03-21T17:32] Kreisleriana (cont): might turn my nvda short calls into spreads
+[2025-03-22T14:34] throwawayoptions: I've been selling copius amount of calls but I feel like I should dial it back down
+solely on nvda?
+[2025-03-22T14:35] Kreisleriana: solely on nvda?
+in genera
+[2025-03-22T14:35] Kreisleriana (cont): but def nvda too
+[2025-03-24T18:19] throwawayoptions: seeing any nvda puts to sell?
+[2025-03-24T18:19] LoveOfProfit: mroe of an NVDA put buying environment at this point no?
+[2025-03-24T19:01] PandarBear: mroe of an NVDA put buying environment at this point no?
+Yeah, been buying some here and there, but nothing in size
+[2025-03-24T19:02] PandarBear (cont): I dunno if lightning will strike twice/thrice again so soon
+[2025-03-24T19:03] PandarBear: Been buying a decent amount of call spreads too on various tickers further out. To hedge against a 15-20%+ year lmao, since doesn't seem like market is expecting that too much at the moment
+Been buying call spreads more so than put spreads past week
+[2025-03-27T19:44] PandarBear: Big tails for tomorrow expiration
+[2025-03-27T19:47] Cris: you selling everything?
+[2025-03-27T19:48] PandarBear: Just selling some 1 DTE tails to recoup some costs for further DTE put spreads
+[2025-03-27T19:48] PandarBear (cont): Since the 1DTE is very elevated
+[2025-03-27T20:18] PandarBear: There was a lot of panic buying of puts the last 20 minutes before close, wonder if someone knows something lol (edited)
+Thursday, March 27, 2025 at 9:25 PM
+[2025-03-27T20:22] Cris: Sold a few of the 1 days to fund 8 day puts
+[2025-03-28T17:12] PandarBear: Going to take profit on on some of the near the money strikes and then spend some of that to buy lower strike spreads
+[2025-03-28T19:43] Cris: I will say NVDA hasn’t moved much today, outperforming the market
+[2025-03-28T20:19] PandarBear: I will say NVDA hasn’t moved much today, outperforming the market
+Yeah, the vol expansion was pretty decent
+[2025-03-29T07:40] throwawayoptions: I will say NVDA hasn’t moved much today, outperforming the market
+i was surprised that nvda barely moved relative to other days. you'd think it would be -7% today
+[2025-04-03T12:47] Yungchaney: Congratulations @PandarBear
+[2025-04-03T12:49] thetagangalwayswins: @PandarBear did you leg into the longs first for spy too?
+[2025-04-03T12:50] PandarBear: @PandarBear did you leg into the longs first for spy too?
+Yeah longs first. Would accumulate a few each time there were the bear market rallies
+[2025-04-03T12:52] PandarBear (cont): This volatile up and down market is good for accumulating spreads both ways. Will be using a portion of profits to accumulate some bull call spreads too in case of tariff resolution or bear market rally
+[2025-04-03T12:52] Yungchaney: What's the running % gain that you're working with?
+[2025-04-03T12:53] Yungchaney (cont): Out of curiosity... since you technically started this whole adventure with what I believe was $1000 as an experiment. (edited)
+Thursday, April 3, 2025 at 2:53 PM
+[2025-04-03T12:53] Yungchaney (cont): Seems like it's nearing +100,000%
+[2025-04-03T13:00] thetagangalwayswins: @PandarBear I am upset I have a meme account in robinhood and received no call outs
+[2025-04-03T13:00] thetagangalwayswins (cont): this account is supposed to go to zero
+[2025-04-03T13:02] PandarBear: What's the running % gain that you're working with?
+Haha, well I did have to deposit more money for buying power. So I dunno if I would consider $1000 as the true initial investment
+[2025-04-03T13:02] thetagangalwayswins: I have 5k
+[2025-04-03T13:03] PandarBear: @PandarBear I am upset I have a meme account in robinhood and received no call outs
+I didn't have much conviction haha
+[2025-04-03T13:03] PandarBear (cont): Don't want to become like chaney and make people lose money
+[2025-04-03T13:04] Cris: Pikachu would never let me down
+[2025-04-03T13:05] fishb🅰️ll: 
+[2025-04-03T13:05] PandarBear: SPY is diff than NVDA because harder to recoup costs lol, since the vol expansion isn't as frequent or large in magnitude
+[2025-04-04T01:42] thetagangalwayswins: @PandarBear what do you size with to start when you had a small account? buy certain percentages of longs, then sell shorts and repeat?
+[2025-04-04T06:58] PandarBear: @PandarBear what do you size with to start when you had a small account? buy certain percentages of longs, then sell shorts and repeat?
+When the account was small last year I only traded NVDA put spreads on it
+[2025-04-04T07:03] PandarBear (cont): I only started doing some of the SPY on that account because IBKR charges $1+ per contract when you are taking liquidity and after a accumulating certain qty of long spreads it starts increasing your margin req by a lot for some reason (concentration/pin risk?)
+[2025-04-04T07:04] sky: I only started doing some of the SPY on that account because IBKR charges $1+ per contract when you are taking liquidity and after a accumulating certain qty of long spreads it starts increasing your margin req by a lot for some reason (concentration/pin risk?)
+did you get 400% again YTD ：） ？
+[2025-04-04T07:05] PandarBear: If you are using for portfolio hedge, since on Schwab I would probably do it on PM account for the bp/margin relief
+[2025-04-04T07:08] Cris: They don’t want to see pandar win
+[2025-04-04T10:12] thetagangalwayswins: When the account was small last year I only traded NVDA put spreads on it
+Yeah but how much when you had the small account? (edited)
+Friday, April 4, 2025 at 1:07 PM
+[2025-04-04T11:07] PandarBear: Yeah but how much when you had the small account? (edited)
+Friday, April 4, 2025 at 1:07 PM
+I mentally allocate part of the gains above SP500 from PM portfolio to hedges
+[2025-04-04T11:32] PandarBear (cont): So the more portfolio is outperforming SP500, the more I spend on hedges
+[2025-04-04T11:38] PandarBear (cont): If not outperforming, then portfolio is just buy and hold with nothing spent on hedges because core holdings are not leveraged up
+[2025-04-04T11:40] thetagangalwayswins: I mentally allocate part of the gains above SP500 from PM portfolio to hedges
+what do you mean?
+[2025-04-04T12:13] PandarBear: what do you mean?
+Main objective is to outperform index with lower volatility. So rough example, if it is end of Jan and portfolio up 8% YTD (say that is 400k) and index is up 4% YTD, I will spend say ~50% of those gains that are over the 4% of SPY on various hedges, which would be ~200k spend on hedges. 
+
+So even if you let all the hedges expire worthless and market doesn't move at all, your portfolio will still be at 6% YTD  vs the 4% YTD of SPY
+[2025-04-04T12:14] PandarBear (cont): If core holdings are leveraged though, the best first hedge is deleveraging haha, since that is guaranteed to work
+[2025-04-04T12:28] PandarBear: My original thesis was that once NLV gets higher capital preservation becomes more important than larger/riskier gains (since marginal utility of each additional dollar gained diminishes after a certain point)
+
+And eventually will make it all back and more when a nuke/invasion/black swan drops. Just didn't expect so many vol events/mini black swans to happen so quickly
+And even if none of the hedges were ever useful, then you just matched/exceeded index gains and will be very well off regardless
+[2025-04-04T13:52] throwawayoptions: i need more classes in here
+[2025-04-04T13:52] throwawayoptions (cont): i was not happy with my 500k portfolio, now i have a new front digit
+[2025-04-04T13:53] throwawayoptions (cont): 
+[2025-04-04T17:40] thetagangalwayswins: My original thesis was that once NLV gets higher capital preservation becomes more important than larger/riskier gains (since marginal utility of each additional dollar gained diminishes after a certain point)  And eventually will make it all back and more when a nuke/invasion/black swan drops. Just didn't expect so many vol events/mini black swans to happen so quickly And even if none of the hedges were ever useful, then you just matched/exceeded index gains and will be very well off regardless
+so how do you know when to add? you stop in short do you instantly buy more longs?
+[2025-04-04T17:51] PandarBear: so how do you know when to add? you stop in short do you instantly buy more longs?
+You keep adding more the more gains you make. If puts are way expensive due to market drop or vol event, then I add less or stop adding
+[2025-04-04T17:52] thetagangalwayswins: You keep adding more the more gains you make. If puts are way expensive due to market drop or vol event, then I add less or stop adding
+gotcha, thanks
+[2025-04-04T17:52] PandarBear: And if taking profit on ITM put spreads, I redeploy to lower strikes for nuke/invasion hedge
+[2025-04-04T17:54] PandarBear (cont): So today I sold the April mopex ones, and then bought some May and June ones between 400 and 475
+[2025-04-04T17:57] PandarBear: gotcha, thanks
+It is of course a big drag on portfolio if you consider the gains above that SP500 gains that you are sure to keep. But I am not confident in having any particular edge in market
+[2025-04-04T18:13] throwawayoptions: what's the summary again?
+
+sell some puts at normal size
+,
+instead of closing for profit turn them into spreads
+,
+keep adding until you are leveraged to the tits with long put spreads
+,
+profit
+,
+[2025-04-04T19:00] Seb: My original thesis was that once NLV gets higher capital preservation becomes more important than larger/riskier gains (since marginal utility of each additional dollar gained diminishes after a certain point)  And eventually will make it all back and more when a nuke/invasion/black swan drops. Just didn't expect so many vol events/mini black swans to happen so quickly And even if none of the hedges were ever useful, then you just matched/exceeded index gains and will be very well off regardless
+god damn you are smart
+[2025-04-04T19:10] throwawayoptions: what do you do if you don't match the market at some point? do you stop putting the extra money into hedges?
+[2025-04-04T20:05] thetagangalwayswins: It is of course a big drag on portfolio if you consider the gains above that SP500 gains that you are sure to keep. But I am not confident in having any particular edge in market
+So where do the spreads come in. You’re buying say 2% NLV why not just stick with long puts.
+[2025-04-04T20:21] PandarBear: So where do the spreads come in. You’re buying say 2% NLV why not just stick with long puts.
+Loss costly to maintain for longer periods of time, less having to be right, and better when IV is not low
+[2025-04-04T20:21] thetagangalwayswins: You buy 2% NLV in puts, then spread to where it’s 0% NLV and do it again?
+[2025-04-04T20:21] thetagangalwayswins: Loss costly to maintain for longer periods of time, less having to be right, and better when IV is not low
+Yeah but explain the process a little more
+[2025-04-04T20:22] PandarBear: If IV is super low, then I will buy some straight up puts too
+[2025-04-04T20:22] PandarBear (cont): Well, first you can decide  what max drawdown you want
+[2025-04-04T20:25] PandarBear (cont): And if you think max index drawdown is 40%, and you only want your portfolio to have a max drawdown of 15%, then you can buy the appropriate qty of put spreads to protect against that 25% difference
+[2025-04-04T20:27] PandarBear (cont): It is not an exact science. If market is high and lots of meme stuff pumping, then maybe you would want to buy more
+[2025-04-04T20:29] Seb: I imagine he's not spending $200k in puts on a single day. he's buying puts when things are flying high, every single day, across multiple expirations and strikes and tickers
+[2025-04-04T20:30] Seb (cont): ensuring reduced drawdowns across the portfolio while outperforming the index
+[2025-04-04T20:30] FiveDimeClive: My original thesis was that once NLV gets higher capital preservation becomes more important than larger/riskier gains (since marginal utility of each additional dollar gained diminishes after a certain point)  And eventually will make it all back and more when a nuke/invasion/black swan drops. Just didn't expect so many vol events/mini black swans to happen so quickly And even if none of the hedges were ever useful, then you just matched/exceeded index gains and will be very well off regardless
+what about buying calls? like let's assume the risk-reversal premium holds true, calls would be underpriced, and turning them into spreads could be another strategy
+[2025-04-04T20:30] Seb: it just happens that uh, puts were VERY underpriced this year
+[2025-04-04T20:30] thetagangalwayswins: I imagine he's not spending $200k in puts on a single day. he's buying puts when things are flying high, every single day, across multiple expirations and strikes and tickers
+And then you spread them and buy more as we continue to sell off? I’m confused on how he gets the leverage he does
+[2025-04-04T20:31] PandarBear: what about buying calls? like let's assume the risk-reversal premium holds true, calls would be underpriced, and turning them into spreads could be another strategy
+Yeah I have been buying them too now. Though the calls are kind of expensive at the moment prob bc of IV
+[2025-04-04T20:31] PandarBear: And then you spread them and buy more as we continue to sell off? I’m confused on how he gets the leverage he does
+I have been buying them throughout the past many months/year
+[2025-04-04T20:32] PandarBear (cont): So the April puts I had mostly bought in Jan/Feb
+[2025-04-04T20:33] PandarBear (cont): Before the April 2nd thing was announced
+[2025-04-04T20:33] PandarBear (cont): Mostly you have to buy them over time and not when market is already going down a lot
+[2025-04-04T20:34] PandarBear: Now I have not been buying much puts for the next few mopexes because major drops have already happened
+[2025-04-04T20:35] PandarBear (cont): Mostly buying insurance on nuke/invasion/etc now
+[2025-04-04T20:37] PandarBear (cont): But I usually always go back to saying, the least risky and natural way to do this is sell small amt of puts then set resting buy order at diff strikes
+[2025-04-04T20:38] PandarBear (cont): To take profit and create a ton of delta bombs
+[2025-04-04T20:38] PandarBear (cont): Sell puts on safe things* haha (edited)
+Friday, April 4, 2025 at 10:38 PM
+[2025-04-04T20:39] Seb: what are safe things in this market pandar
+[2025-04-04T20:40] PandarBear: what are safe things in this market pandar 
+SP500 hopefully lmao
+[2025-04-04T20:43] PandarBear (cont): Maybe I'll have to write and pin a post about my conservative portfolio thought process lol.
+[2025-04-04T20:44] Seb: haha yeah that'd be cool
+[2025-04-04T20:44] Seb (cont): I'm waiting for a real puke day before selling vol. so far it's still been really orderly selling, and a few liquidations today
+[2025-04-04T20:44] PandarBear: Basically it is becoming the steamroller
+[2025-04-05T21:20] psyche444: Basically it is becoming the steamroller 
+Your strat is clearly the right one for this market. Congrats on conceiving and implementing it.
+[2025-04-13T14:43] LoveOfProfit:   [ATTACH: image.png, image.png]  [LINKS: [{'href': 'https://cdn.discordapp.com/attachments/1319074001439555676/1360988870669238482/image.png?ex=6a831e28&is=6a81cca8&hm=e00c1fda2b4e7fdc090f6b2c6053b9932f43628546d5e8d3e3f750f80e9e22fe&', 'text': ''}]]
+[2025-04-13T14:44] LoveOfProfit (cont): if you scroll down from the pinned post at the beginning he answers a bunch of general questions
+[2025-04-15T04:00] No-Stranger510: Maybe I'll have to write and pin a post about my conservative portfolio thought process lol.
+Are you still planning to write about portfolio? I would love to see it and maybe implement to get a smoother ride. Thanks (edited)
+Tuesday, April 15, 2025 at 6:00 AM
+[2025-04-15T18:08] redrock: Just a quick summary of what I understand so far, for everyone else reading and to save Pandar from more questions (not a guarantee that the below summary is right)
+
+The strategy:
+
+The goal: get a breakeven or cheap hedge / make money on tails expanding and contracting
+
+Process: 
+
+Sell naked puts during tail/vol expansion
+,
+Every week or so, when vol compresses/collapses, try and get a free ride by buying cheaper puts and turning your naked put into a put spread
+,
+(Optional): in the meantime, sell a lot of NVIDIA tails because you have a lot of very low cost spreads protecting you
+,
+
+Notes
+Tails in the <.10c, $5 wide spreads are a primary target (this is not hard and fast/optimized, just what's been happening)
+,
+Track the actual spread width .. i.e it's usually 2c between 85/90, but today it's 3c between strikes
+,
+Fees are very expensive to this strategy, run this on a low-fee account (memeports only)
+,
+
+If you were to nail the most important part of all of this, it certainly seems to be:
+
+tracking tail expansion and compression and understanding what elevated vol looks like
+
+From a meta perspective, probablly the next most important thing is to find a stock that appears to be expanding/compressing frequently so that you can exploit this more certainly + more times. 
+
+Please correct pieces of this that seem wrong!
+[2025-04-15T18:09] thetagangalwayswins: Just a quick summary of what I understand so far, for everyone else reading and to save Pandar from more questions (not a guarantee that the below summary is right)  The strategy:  The goal: get a breakeven or cheap hedge / make money on tails expanding and contracting  Process:  Sell naked puts during tail/vol expansion
+,
+Every week or so, when vol compresses/collapses, try and get a free ride by buying cheaper puts and turning your naked put into a put spread
+,
+(Optional): in the meantime, sell a lot of NVIDIA tails because you have a lot of very low cost spreads protecting you
+,
+ NotesTails in the <.10c, $5 wide spreads are a primary target (this is not hard and fast/optimized, just what's been happening)
+,
+Track the actual spread width .. i.e it's usually 2c between 85/90, but today it's 3c between strikes
+,
+Fees are very expensive to this strategy, run this on a low-fee account (memeports only)
+,
+ If you were to nail the most important part of all of this, it certainly seems to be:  tracking tail expansion and compression and understanding what elevated vol looks like  From a meta perspective, probablly the next most important thing is to find a stock that appears to be expanding/compressing frequently so that you can exploit this more certainly + more times.   Please correct pieces of this that seem wrong!
+while this is correct, pandar likes to start with the long puts
+[2025-05-02T09:39] dynafire: Just read this, this is so awesome. Pandar    (edited)
+Friday, May 2, 2025 at 11:41 AM
+[2025-05-07T15:11] Cris: @PandarBear NVDA puts cheap for FOMC here today?
+[2025-05-07T15:14] PandarBear: @PandarBear NVDA puts cheap for FOMC here today?
+Hmm, yeah they look pretty decent, surprised they are quite low
+[2025-05-07T15:15] Cris: Any strikes that standout? do you prefer something closer to ATM (110s) or more OTM (105s to 100). EDIT: To get long puts. Not interested in selling here (edited)
+Wednesday, May 7, 2025 at 5:24 PM
+[2025-05-07T15:24] PandarBear: Any strikes that standout? do you prefer something closer to ATM (110s) or more OTM (105s to 100). EDIT: To get long puts. Not interested in selling here (edited)
+Wednesday, May 7, 2025 at 5:24 PM
+Hmm, nothing stands out as particularly good. I am going to do get some 106p/104p spreads and 105p/101p
+[2025-05-07T15:29] fishb🅰️ll: i grabbed 105p nice round number, didnt bother with the other leg i wanna see if i get lucky can leg in tomorrow lower
+[2025-05-12T11:39] TheTwaddler: @PandarBear Any particular tickers you are looking at after this rally? Still mostly interested in NVDA?
+[2025-05-12T11:44] PandarBear: @PandarBear Any particular tickers you are looking at after this rally? Still mostly interested in NVDA?
+NVDA chain hasn't been acting as it had previously that allowed for maintaining the hedge for very low cost so haven't been accumulating anything in size yet. Will keep monitoring haha
+[2025-05-14T15:21] psyche444: NVDA chain hasn't been acting as it had previously that allowed for maintaining the hedge for very low cost so haven't been accumulating anything in size yet. Will keep monitoring haha
+I'm curious what is different... is it that the IV and/or skew of the chain means long puts are more expensive than they used to be, and decay faster?
+[2025-05-15T16:47] PandarBear: I'm curious what is different... is it that the IV and/or skew of the chain means long puts are more expensive than they used to be, and decay faster?
+I think the overall market vol has been crushing too fast to outweigh the normal expansions NVDA experiences that allows you to recoup costs well
+[2025-05-15T16:47] PandarBear (cont): It is expanding a bit today though, I am selling a few tails
+[2025-05-15T16:50] psyche444: It is expanding a bit today though, I am selling a few tails
+can I ask how far DTE you are looking at? I was looking at December for a short entry, maybe around 100
+[2025-05-15T16:52] PandarBear: can I ask how far DTE you are looking at? I was looking at December for a short entry, maybe around 100
+I am selling the weekly expirations up till next mopex since those crush the fastest. I don't feel comfortable selling too far out unless wanting assignment
+[2025-05-15T16:54] psyche444: I am selling the weekly expirations up till next mopex since those crush the fastest. I don't feel comfortable selling too far out unless wanting assignment
+oh I see. yeah, that makes sense. I was thinking of selling with the idea of hopefully buying a strike or two up (if possible... later) for a tiny bit cheaper cost.
+[2025-05-15T16:55] psyche444: I am selling the weekly expirations up till next mopex since those crush the fastest. I don't feel comfortable selling too far out unless wanting assignment
+thank you for your thoughts... appreciate it very much
+[2025-05-16T15:03] PandarBear: Some decent expansion today for conservatively selling some puts
+[2025-05-16T15:27] Cris: how much leverage is conservative?
+[2025-05-16T20:37] PandarBear: how much leverage is conservative?
+Hmm, to me conservative is not losing more than 10% of NLV if the NVDA goes to 0
+[2025-05-20T17:30] Kreisleriana: any er plays for nvda next week?
+[2025-05-20T20:30] PandarBear: any er plays for nvda next week?
+I dunno if I have any edge in ERs so nothing in particular. Sold a few 190C and above calls for lunch money haha
+[2025-07-10T17:45] Cris: @PandarBear have you started looking at putting this back on?
+[2025-08-02T02:35] throwawayoptions: @PandarBear how loaded are you with doomsday spreads
+[2025-08-03T22:48] PandarBear: @PandarBear have you started looking at putting this back on?
+Ooh, sorry for late response, hadn't seen the tag
+
+I have mostly been selling off the SPX 6500 spreads from April as we grind up and then reinvesting some of that to buy 7000+ call spreads and small amount of 5800 put spreads 1 year out
+
+Haven't gotten back into NVDA options yet. I wonder if lightning can really strike 3/4 times lol
+[2025-08-03T22:52] PandarBear: @PandarBear how loaded are you with doomsday spreads
+I haven't been buying too many options yet, maybe once we have an extended period of low vol
+[2025-08-03T22:53] throwawayoptions: i want to make money!!
+[2025-08-03T22:53] PandarBear: If vol stays low, then will Kelly criterion in and build up positions more and more  (edited)
+Monday, August 4, 2025 at 12:54 AM
+[2025-08-03T22:54] PandarBear (cont): Since something always eventually happens
+[2025-10-18T10:57] Kreisleriana: Any updates?
+[2025-10-29T06:40] PandarBear: Any updates?
+Ahh sry, just saw the msg. I've been having to travel a bit recently so book is relatively clear
+
+Core holdings are ETFs. Selling premium pretty conservatively, still maintaining some nuke/Taiwan invasion hedges, and have scaling resting sell orders to take profits on the SPX 6500 call spreads
+
+Also trying to convert capital into useful physical goods as a sort of inflation/supply chain/prepper hedge. Ammo and firearms are pretty good price these days so buying to prepare for 2028 for if Democrat gets elected or Trump gets 3rd term. Also stocking up on a couple years food/water supply and LiFePO4 batteries to power home
+[2025-10-29T07:21] PandarBear: IRL tail hedges
+[2026-01-06T04:10] Kreisleriana: Now wouldn't be a bad time for these. How would you set up for hedging?
+[2026-01-06T04:10] Kreisleriana: I haven't been buying too many options yet, maybe once we have an extended period of low vol
+vix is pretty low
+[2026-01-07T03:59] messi1310: Ooh, sorry for late response, hadn't seen the tag  I have mostly been selling off the SPX 6500 spreads from April as we grind up and then reinvesting some of that to buy 7000+ call spreads and small amount of 5800 put spreads 1 year out  Haven't gotten back into NVDA options yet. I wonder if lightning can really strike 3/4 times lol
+When you convert the long put into a spread, are you doing it only after implied vol and skew have clearly compressed, so the lower strike has collapsed more than the one you bought?

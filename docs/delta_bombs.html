@@ -1,0 +1,284 @@
+<title>Planting Delta Bombs</title>
+<style>
+:root{
+  --bg:#F2F3EF; --surface:#FBFBF8; --ink:#1C201E; --ink-2:#4A5350; --ink-3:#7A827E;
+  --rule:#D9DCD5; --put:#8B2F30; --put-soft:#F3E3E2; --call:#2F5F45; --call-soft:#E1EDE5;
+  --note-bg:#1F2422; --note-ink:#E9E6DC; --note-dim:#A9AFA6; --note-accent:#E4B15A;
+  --code-bg:#ECEDE7; --warn:#9A5B10; --warn-soft:#F5EAD6;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15181A; --surface:#1D2124; --ink:#E7E5DE; --ink-2:#B9BDB6; --ink-3:#848A85;
+    --rule:#30363A; --put:#E08A86; --put-soft:#3A2223; --call:#8CC7A2; --call-soft:#1F3328;
+    --note-bg:#0E1113; --note-ink:#E9E6DC; --note-dim:#9AA09A; --note-accent:#E4B15A;
+    --code-bg:#23282B; --warn:#E0A75B; --warn-soft:#332816;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15181A; --surface:#1D2124; --ink:#E7E5DE; --ink-2:#B9BDB6; --ink-3:#848A85;
+  --rule:#30363A; --put:#E08A86; --put-soft:#3A2223; --call:#8CC7A2; --call-soft:#1F3328;
+  --note-bg:#0E1113; --note-ink:#E9E6DC; --note-dim:#9AA09A; --note-accent:#E4B15A;
+  --code-bg:#23282B; --warn:#E0A75B; --warn-soft:#332816;
+}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);margin:0;
+  font-family:"Charter","Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;
+  font-size:17px;line-height:1.55;}
+.wrap{max-width:76ch;margin:0 auto;padding:2.5rem 1.25rem 5rem;}
+h1,h2,h3,h4{font-family:"Charter","Iowan Old Style",Georgia,serif;line-height:1.15;text-wrap:balance;margin:0;}
+h1{font-size:2.6rem;font-weight:700;letter-spacing:-0.01em}
+h2{font-size:1.55rem;font-weight:700;margin-top:3rem;padding-top:1.25rem;border-top:2px solid var(--ink)}
+h3{font-size:1.15rem;font-weight:700;margin-top:1.75rem}
+h4{font-size:1rem;font-weight:700;margin-top:1.25rem;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+p{margin:0.8rem 0}
+.eyebrow{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.72rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.lede{font-size:1.15rem;color:var(--ink-2);margin:1rem 0 0}
+.meta{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.82rem;color:var(--ink-3);margin-top:1.25rem;display:flex;flex-wrap:wrap;gap:0.4rem 1.5rem}
+.sans{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+code,.mono{font-family:"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;font-size:0.86em}
+code{background:var(--code-bg);padding:0.05em 0.35em;border-radius:3px}
+ul,ol{padding-left:1.4rem;margin:0.6rem 0}
+li{margin:0.3rem 0}
+li::marker{color:var(--ink-3)}
+strong{font-weight:700}
+.tldr{background:var(--surface);border:1px solid var(--rule);padding:1.25rem 1.5rem;margin-top:2rem}
+.tldr ol{margin:0.5rem 0 0}
+.tldr li{margin:0.5rem 0}
+.tag{display:inline-block;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.7rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.1em 0.5em;border-radius:2px;vertical-align:middle}
+.tag.put{background:var(--put-soft);color:var(--put)}
+.tag.call{background:var(--call-soft);color:var(--call)}
+.tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tablewrap{overflow-x:auto;margin:1rem 0;border:1px solid var(--rule);background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.88rem;font-variant-numeric:tabular-nums}
+th,td{padding:0.5rem 0.7rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+th{font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--bg)}
+tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-family:"SF Mono",Menlo,Consolas,monospace;font-size:0.84rem}
+td.pos{color:var(--call)} td.neg{color:var(--put)}
+.callout{border-left:3px solid var(--ink-3);padding:0.6rem 1rem;margin:1rem 0;background:var(--surface);color:var(--ink-2)}
+.callout.put{border-color:var(--put)} .callout.call{border-color:var(--call)} .callout.warn{border-color:var(--warn)}
+.quote{margin:1rem 0;padding:0.5rem 1rem;border-left:3px solid var(--rule);color:var(--ink-2);font-style:italic}
+.quote cite{display:block;font-style:normal;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.78rem;color:var(--ink-3);margin-top:0.3rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1rem 0}
+@media (max-width:640px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--rule);padding:1rem 1.25rem}
+.panel h4{margin-top:0}
+.ladder{list-style:none;padding:0;margin:1rem 0;counter-reset:step}
+.ladder li{position:relative;padding:0.7rem 0 0.7rem 3.2rem;border-bottom:1px dashed var(--rule);margin:0}
+.ladder li::before{counter-increment:step;content:"t" counter(step);position:absolute;left:0;top:0.75rem;font-family:"SF Mono",Menlo,monospace;font-size:0.8rem;color:var(--ink-3);border:1px solid var(--rule);padding:0.05em 0.45em;border-radius:2px;background:var(--surface)}
+.ladder li:first-child::before{content:"t0"}
+.ladder .pos{font-family:"SF Mono",Menlo,monospace;font-size:0.82rem;display:block;color:var(--ink-2);margin-top:0.25rem}
+/* Charlie note */
+.note{background:var(--note-bg);color:var(--note-ink);padding:1.5rem 1.75rem;margin:1.5rem 0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.95rem;line-height:1.5}
+.note .hd{display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;border-bottom:1px solid #3a4240;padding-bottom:0.6rem;margin-bottom:1rem;font-family:"SF Mono",Menlo,monospace;font-size:0.74rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--note-dim)}
+.note .hd b{color:var(--note-accent);font-weight:700}
+.note p{margin:0.7rem 0}
+.note strong{color:var(--note-accent);font-weight:700}
+.note ul{margin:0.5rem 0}
+.note li{margin:0.4rem 0}
+.note li::marker{color:var(--note-accent)}
+.note .trade{border-top:1px solid #3a4240;margin-top:1rem;padding-top:0.8rem}
+.note em{color:var(--note-dim)}
+.small{font-size:0.85rem;color:var(--ink-3)}
+hr{border:0;border-top:1px solid var(--rule);margin:2rem 0}
+a{color:inherit}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:0.35rem 1.25rem;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-size:0.9rem;margin:0.75rem 0}
+.kv dt{color:var(--ink-3);font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;font-weight:600;padding-top:0.15rem}
+.kv dd{margin:0}
+</style>
+
+<div class="wrap">
+<div class="eyebrow">Options research · SPX &amp; single-name hedging</div>
+<h1>Planting Delta Bombs</h1>
+<p class="lede">What the "Delta Bomb" actually is, why a debit spread can be entered for a credit, the conditions that have to exist, how the 50Δ/20Δ anchor turns into three bombs, why the call side is harder — and a Charlie McElligott read on the whole thing.</p>
+<div class="meta">
+  <span>Sources: <em>Delta Bombs White Paper</em> (PDF) · PMTraders "Pandar Tail Hedging Master Class" thread, 465 msgs, Dec 18 2024 → Jan 7 2026</span>
+  <span>Compiled 2026-08-16</span>
+</div>
+
+<div class="tldr">
+  <div class="eyebrow">The premise in six lines</div>
+  <ol>
+    <li>A Delta Bomb is a <strong>vertical put debit spread</strong> (long the higher strike, short the lower strike, same expiry) that ends up in your book for a <strong>net credit</strong> because you <strong>legged in</strong>: sold the lower strike when puts were rich (dip / vol pop) and bought the higher strike when puts were cheap (bounce / vol crush).</li>
+    <li>It works because a 5-pt SPX put spread at ~15–20Δ is only worth <strong>~$0.75</strong>, while each leg moves <strong>~$1.35 per 5 SPX points</strong> and <strong>~$5 per vol point</strong>. A modest intraday round-trip between the two fills is enough to flip a $0.75 debit into a credit. Negative spot–vol correlation (dip → IV up, bounce → IV down) helps <em>both</em> legs on the put side.</li>
+    <li>Once planted, the spread has zero further downside, uses no buying power (at most brokers), and pays $5 × 100 per contract if SPX settles below the short strike. Hold as a hedge, or close as a unit when it inflates (median 1.45, GTC at ~2.90 on a 5-wide, per the paper's 57-trade sample).</li>
+    <li><strong>The only real risk is the leg</strong>: between fills you are naked long or naked short one put. 95% plant (median 7 min); the 5% that "get away" are the cost — average 60 min hold before cutting. The 50/20 anchor and the "synthetic spread" cover exist to cap that.</li>
+    <li>Two lineages: the <strong>white paper</strong> (SPX, 20–40 DTE, 5-wide, ~1σ OTM, intraday legging, resting orders) and <strong>PandarBear's</strong> (NVDA/SPY/SPX, deep-OTM $5-wide spreads for ≤$0.10, legged over days–weeks off tail-vol expansion/compression, funded by outperformance vs SPX). Same idea, different clock speeds.</li>
+    <li><strong>Calls</strong> mirror the structure but fight the spot–vol correlation on both legs, so they plant less often; they work in "spot-up/vol-up" tapes (call skew bid — squeezes, AI names, earnings), and Pandar's right-tail use is different again: buy far-OTM call spreads on puke days, sell them into the V.</li>
+  </ol>
+</div>
+
+<h2>1 · Who said what — the two sources aren't the same trade</h2>
+<p>The Discord thread is PandarBear's, and it's a <em>tail-vol cycling</em> trade that happens to leave you holding debit spreads. The white paper (author unstated; the "planting"/"bomb" language, /MES hedging and 7-minute fills point to a member of the same community formalizing an SPX intraday version) is a <em>legging-for-credit</em> trade. A third member, nybhh, runs a 90-DTE SPX resting-order variant. Keep them separate in your head:</p>
+<div class="tablewrap"><table>
+<tr><th></th><th>White paper (SPX)</th><th>PandarBear (NVDA → SPY/SPX)</th><th>nybhh (SPX)</th></tr>
+<tr><td><b>Underlying</b></td><td>SPX (cash-settled, 1256)</td><td>NVDA first ("cycles between 'so over' and 'we're so back'"), SMH; SPY/SPX added 2025</td><td>SPX, ~$600k notional per contract for $1.65 comm</td></tr>
+<tr><td><b>DTE</b></td><td>20–40</td><td>Current + next monthly opex; weeklies opportunistically; sells 1-DTE tails to fund further-out spreads</td><td>Accumulate 90→60 DTE, then "marinate" 60 days</td></tr>
+<tr><td><b>Strike / delta</b></td><td>~1σ OTM (≈15–20Δ); example short 30Δ / long 10Δ</td><td>Deep OTM: strikes "within the realm of possibility in a black-swan-ish case" (NVDA 90 hit on 8/5/24 → buys 80–115P); SPY 400–475 (–15/–30%) for "nuke/invasion"; not delta-driven</td><td>~5Δ, round-number strikes (5000) for AH liquidity</td></tr>
+<tr><td><b>Width</b></td><td>5 pts ("speed of entry")</td><td>$5 default, wider "if chain seems too flat/inexpensive"; every reasonable strike, no informational edge assumed</td><td>10 pts</td></tr>
+<tr><td><b>Leg order</b></td><td>Bearish tape: long first, sell further-OTM on the dip. Bullish/neutral: short first, buy further-ITM on the bounce</td><td>He buys long first; <b>recommends everyone else sell the tail first</b>, sized to be assigned, then buy the higher strike when it's cheap</td><td>Long first, then GTC STO on the lower strike $1 above the long's cost</td></tr>
+<tr><td><b>Time between legs</b></td><td>Minutes (median 7)</td><td>Days to weeks (tail expansion → compression)</td><td>Hours to days (fills "at 3:41 during that dump")</td></tr>
+<tr><td><b>Target</b></td><td>Any net credit (Fig 3 models $0.10/bomb); close as unit ~2.90 or hold to expiry</td><td>Spread cost ≤ $0.10; sell into any expansion if inventory large; roll near-DTE to further DTE for smallest loss</td><td>≥ $1.00 credit per 10-wide, averaging ~$2</td></tr>
+<tr><td><b>Purpose</b></td><td>Hedge a delta-long book (preferred) or alpha</td><td>Cap portfolio DD (e.g. index –40% → port –15%); "spend ~50% of gains above SPX on hedges"</td><td>Replace paid 90-DTE long puts with rent-free ones</td></tr>
+<tr><td><b>Fees</b></td><td>Not discussed</td><td>Critical — run on a zero-commission account; IBKR/Schwab raise margin on large long-vertical inventories</td><td>"Allergic to commissions" → SPX</td></tr>
+</table></div>
+
+<h2>2 · Why a debit spread can be bought for a credit</h2>
+<p>A put debit spread (long K<sub>hi</sub>, short K<sub>lo</sub>) is normally a debit because the higher-strike put is worth more. You get a credit only by <strong>separating the two fills in time</strong> and letting the market hand you a better price on each: sell K<sub>lo</sub> when it's rich, buy K<sub>hi</sub> when it's cheap. Three things make that realistic in the SPX wings:</p>
+<ul>
+  <li><strong>The spread is thin.</strong> Black-Scholes, SPX 5450, 30 DTE, ATM IV 14% with normal put skew: the 5450P is ~$78.5 (46Δ), the 5250P ~$29.4 (20Δ), the 5255P ~$30.2. The <strong>5255/5250 spread is worth ~$0.73</strong>. That's the whole hurdle, plus bid/ask (~$0.20–0.50 per leg on SPX at that delta).</li>
+  <li><strong>The legs are fat.</strong> The 20Δ put moves ~$2.7 per 10 SPX points from delta alone, and ~$5.3 per vol point. SPX wobbles 10–15 points many times a day; wing IV wobbles 0.3–0.5 vol on the same wobble.</li>
+  <li><strong>Spot–vol correlation stacks the deck on the put side.</strong> The dip that makes you sell K<sub>lo</sub> also lifts IV; the bounce that lets you buy K<sub>hi</sub> also crushes IV. Vanna works for you on both legs. (On calls it works against you on both legs — see §6.)</li>
+</ul>
+<div class="tablewrap"><table>
+<tr><th>Scenario (SPX 5450, 30 DTE)</th><th class="num">5255P</th><th class="num">5250P</th><th>Read</th></tr>
+<tr><td>At rest</td><td class="num">30.15</td><td class="num">29.42</td><td>Spread fair ≈ 0.73 debit</td></tr>
+<tr><td>–15 pts, IV +0.5</td><td class="num">34.52</td><td class="num">33.71</td><td>Sell 5250P here</td></tr>
+<tr><td>+15 pts, IV –0.5</td><td class="num">26.13</td><td class="num">25.48</td><td>Buy 5255P here → 33.71 – 26.13 ≈ <b>+7.6 credit</b> on a full round-trip</td></tr>
+<tr><td>±5 pts only, no vol change</td><td class="num">≈ ±1.4</td><td class="num">≈ ±1.4</td><td>Even a 5-pt wobble each way ≈ $2.7 of edge vs $0.73 hurdle</td></tr>
+</table></div>
+<p class="small">Idealised: real fills catch a fraction of the swing and pay the spread. The paper's own hedging model (Fig 3) assumes <b>$0.10 credit per bomb</b>, which is a truer picture of the per-bomb edge than the table above. The edge is not the credit — it's that you now own convexity you didn't pay for.</p>
+
+<h3>What you actually own after planting</h3>
+<ul>
+  <li>Max value at expiry: width × 100 ($500 on a 5-wide) if SPX ≤ K<sub>lo</sub>; zero if SPX ≥ K<sub>hi</sub>. Plus the credit you kept.</li>
+  <li>Buying power: a long vertical held for a credit needs no margin at most brokers ("restored buying power"). Pandar's caveat: IBKR and Schwab both increased margin on him once the inventory of long verticals got large (concentration/pin logic).</li>
+  <li>Probability of Touch ≈ 2 × delta: a 20Δ short strike is touched ~40% of the time before expiry — that's the alpha-mode thesis. The paper's 57 closed bombs: median exit 1.45, upper 2.90, outliers 3.90 on a 5-wide.</li>
+</ul>
+
+<h2>3 · SPX put bombs — conditions and playbook <span class="tag put">put side</span></h2>
+<h3>Conditions that need to exist</h3>
+<div class="grid2">
+<div class="panel"><h4>Tape / regime</h4>
+<ul>
+  <li><b>Two-way, mean-reverting intraday movement.</b> The trade is dead in a one-directional day (either direction). Best in a pinned / dealer long-gamma tape.</li>
+  <li><b>Not already sold off.</b> Pandar: "the longer and higher the market goes up, the better the risk/reward"; after a big drop, IV is elevated and downside is "used up" — he stops buying and instead sells the ITM winners and rolls to lower strikes.</li>
+  <li><b>Buy legs into complacency, sell legs into panic.</b> "Have to buy during calmer times when the market is complacent and seemingly underpricing risk." Sell tails when they're "expanded": underlying up, IV down, and the put still pricier than two days ago = mispriced tail.</li>
+</ul></div>
+<div class="panel"><h4>Contract</h4>
+<ul>
+  <li><b>DTE</b> 20–40 (paper) — enough time for the touch, fast enough decay on the short leg. Pandar: current + next monthly.</li>
+  <li><b>Strike</b> ~1σ OTM (≈16Δ at 30 DTE) for the intraday version; short 30Δ / long 10Δ is the paper's PoT example. For a doomsday hedge go where a black swan actually lands (–15/–30%).</li>
+  <li><b>Width</b> 5 pts on SPX for speed of fill; wider only when the chain is flat/cheap.</li>
+  <li>SPX over SPY: cash settlement (no DNE calls at 5pm, no pin/assignment), 1256 tax, tiny commission per notional.</li>
+</ul></div>
+</div>
+
+<h3>Two ways to plant</h3>
+<div class="grid2">
+<div class="panel"><h4>A · Short leg first <span class="small">(bullish/neutral tape; the community's "reliable" version)</span></h4>
+<ol>
+  <li>On a dip / vol pop, <code>STO</code> the K<sub>lo</sub> put (~15–20Δ, or deep OTM Pandar-style) at a size you could carry naked or be assigned on.</li>
+  <li>Immediately rest a <code>GTC BTO</code> on K<sub>hi</sub> = K<sub>lo</sub>+5 at (short fill – target credit). nybhh: "$1 more than the long was bought for", i.e. $1 better than the other leg.</li>
+  <li>Bounce / IV crush fills the long → bomb planted, credit kept.</li>
+  <li>If it doesn't bounce: you're short a put — Pandar's rule is to size so that's fine and treat it as normal tail selling with "aggressive profit taking to turn into a spread".</li>
+</ol></div>
+<div class="panel"><h4>B · Long leg first <span class="small">(bearish tape; hedgers who need protection on immediately)</span></h4>
+<ol>
+  <li>On a bounce / calm, <code>BTO</code> the K<sub>hi</sub> put.</li>
+  <li>Rest a <code>GTC STO</code> on K<sub>lo</sub> at (long fill + target credit).</li>
+  <li>The next dip fills the short. Long portfolio offsets the interim mark on the long put ("initiate long legs when hedging a long portfolio").</li>
+  <li>If it rallies away and won't fill: cut it or accept it as the "cost of maintaining the hedge" (Pandar's words). Median failed-plant hold was 60 min — put a clock on it.</li>
+</ol></div>
+</div>
+
+<h3>Exits</h3>
+<ul>
+  <li><b>Hedge mode (paper's preference):</b> hold to expiration; the book of bombs is a free put spread ladder against your delta.</li>
+  <li><b>Alpha mode:</b> exit <b>as a unit</b> (never leg out — you'd re-open the leg risk); standing GTC close ~2.90 on a 5-wide; median 1.45. Pandar sells into any expansion once inventory is large, and rolls near-DTE spreads to further DTE for the smallest loss.</li>
+  <li><b>ITM winners:</b> take profit and redeploy into lower strikes for the next leg down ("sold the April mopex ones, bought May/June 400–475").</li>
+</ul>
+
+<h3>Risk rules that appear in both sources</h3>
+<ul>
+  <li>Narrow width → faster fills → less time naked.</li>
+  <li>Time stop on unplanted legs (paper: failed plants held ~60 min avg — that's the tell).</li>
+  <li><b>Synthetic-spread cover (§2.1c):</b> if only your long is on and the market runs away, sell a further-OTM put <em>now</em> to cap it; you now hold a wide debit spread you can later split into two bombs.</li>
+  <li><b>50/20 anchor (§2.1b):</b> hold an ATM long put while you plant, so any short you add is always covered. Walkthrough next.</li>
+  <li>Sizing: Pandar's "conservative" for naked tails = lose ≤10% NLV if the underlying goes to zero; hedge budget = a slice (he says ~50%) of gains above the index; if core holdings are levered, "the best first hedge is deleveraging".</li>
+</ul>
+
+<h2>4 · How a 50/20 turns into three bombs</h2>
+<p>The white paper (§2.1b) says: buy a 50Δ/20Δ put spread as a protected anchor, use the 20Δ short "as a base to plant additional Delta Bombs", end the day with one 50Δ put and several 20Δ debit spreads, then close the 50Δ put. It never spells out the order sequence, so here it is — the ATM long put is what lets you <em>sell first, repeatedly,</em> without ever being naked short. Same numbers as §2 (SPX 5450, 30 DTE).</p>
+<ol class="ladder">
+  <li><b>Anchor.</b> <code>BTO 5450P @ 78.50</code>, <code>STO 5250P @ 29.40</code>. Debit 49.10, defined risk ($4,910). You're a 5450/5250 put debit spread — that <em>is</em> a hedge already.<span class="pos">Book: +1 5450P · –1 5250P</span></li>
+  <li><b>Bounce (+15, IV –0.5).</b> <code>BTO 5255P @ 26.15</code>. Against the 5250 short you sold at 29.40 that's a 5255/5250 spread carried at <b>+3.25 credit</b> — bomb #1. The 5450P is now an unpaired long.<span class="pos">Book: +1 5450P · [+5255P / –5250P]₁</span></li>
+  <li><b>Dip (–15, IV +0.5).</b> <code>STO 5250P @ 33.70</code>. Not naked — the 5450P covers it as a 200-wide debit spread. Defined risk again.<span class="pos">Book: +1 5450P · –1 5250P · [bomb]₁</span></li>
+  <li><b>Bounce.</b> <code>BTO 5255P @ 27.50</code> → bomb #2 at <b>+6.20 credit</b>.<span class="pos">Book: +1 5450P · [bomb]₁ · [bomb]₂</span></li>
+  <li><b>Dip.</b> <code>STO 5250P @ 32.00</code> — covered by the 5450P.<span class="pos">Book: +1 5450P · –1 5250P · [bomb]₁₂</span></li>
+  <li><b>Bounce.</b> <code>BTO 5255P @ 28.00</code> → bomb #3 at <b>+4.00 credit</b>.<span class="pos">Book: +1 5450P · [bomb]₁₂₃</span></li>
+  <li><b>Close the anchor.</b> <code>STC 5450P @ ~76</code>. It lost ~2.5 over the day (drift + theta) — <em>that</em> is the real price of the three bombs. Net: three 5255/5250 put spreads (max $1,500 at expiry) carried at ≈ +13.45 – 2.50 credit, zero margin, no naked exposure at any point.<span class="pos">Book: [bomb]₁₂₃</span></li>
+</ol>
+<div class="callout put">The rhythm is <b>sell the base strike on dips, buy the strike above on bounces</b>, one pair at a time, with the ATM long as the backstop for whichever short is momentarily unpaired. "If the market rallies, the long legs of new spreads become cheaper" — that's steps t1/t3/t5. "If the market falls, the trader remains protected by the 50/20 put spread" — that's t2/t4, where you're a wide debit spread, not a naked short. Only ever add <b>one</b> short per anchor put; a second unpaired short is naked below the anchor's coverage.</div>
+<p class="small">The credits above are generous (full ±15-pt round-trips with vol moving your way). Real days give you smaller swings, wider bid/ask, and fills on only some of the pairs; the paper's realistic per-bomb credit is pennies. The structural point stands: the anchor converts "leg risk" into "an ATM put's day P&amp;L", which is knowable and small.</p>
+
+<h2>5 · Pandar's version — the tail-vol cycle</h2>
+<p>PandarBear ran this on NVDA from ~Sept 2024 (a ~$1k Robinhood "meme account" plus buying-power top-ups → $530k by Dec 18 2024, +403% YTD screenshot; ~19k NVDA contracts at one point), then SPY/SPX into the Feb–Apr 2025 drawdown. His account of <em>why</em> it worked and the rules he actually stated:</p>
+<ul>
+  <li><b>The engine is single-name wing IV oscillating</b>: "NVDA options expand and then crush… cycle between 'it's so over' and 'we're so back' relatively frequently", high volume, tight bid/ask. Deep-OTM $5-wide spreads that cost $0.05–0.10 in calm and $0.30+ in a scare.</li>
+  <li><b>He buys the long first</b> (long puts on calm days, spread later), but tells everyone else to <b>sell the tail first</b> during expansion, "at a price/qty you'd be okay being assigned", then "aggressively take profit by buying the higher strike" when the tail crushes — "the most certain part of the trade is selling when tails are elevated". Result: a free (or credit) spread instead of a closed short.</li>
+  <li><b>Recognising an "expanded" tail</b> is the core skill: underlying up, IV down, and the put still pricier than 2 days ago; 1-DTE far richer than further out; a specific expiry (e.g. Feb 7 2025 NVDA 190C) rich vs neighbours. He keeps the chain up all day and tracks "what spread width you can normally buy for $X"; bravo built a tracker of the strike where a $5-wide costs $0.10.</li>
+  <li><b>Sell weeklies up to the next monthly</b> (they crush fastest); don't sell far-dated unless you want assignment; don't sell into earnings (a week before if at all).</li>
+  <li><b>Buy across strikes and expiries</b>, no edge assumed on price; long legs at strikes a real black swan reaches (NVDA 90+ after 8/5/24; later 80–115P over 4/17 mopex).</li>
+  <li><b>Sizing/allocation</b>: goal is index-beating returns with lower vol; "spend ~50% of gains above SPX YTD on hedges" so even if all expire worthless you still beat the index; add more the more you outperform, add less/stop when puts get expensive after a drop; keep PNR/EPR cushion.</li>
+  <li><b>Monetise</b>: take profit on ITM/near-ITM spreads during a drop, redeploy to lower strikes ("nuke/Taiwan"), buy a few calls on the way down.</li>
+  <li><b>When it stops working</b> — his own words: it "wouldn't have worked in 2023 because NVDA was on a roll" (puts too expensive, decayed fast); after the April 2025 V "market vol has been crushing too fast to outweigh the normal expansions NVDA experiences" (May 2025) — he stopped accumulating; by Aug 2025 he'd wait for "an extended period of low vol" then "Kelly in" because "something always eventually happens".</li>
+</ul>
+<div class="quote">"Sell some puts at normal size — instead of closing for profit turn them into spreads — keep adding until you are leveraged to the tits with long put spreads — profit."<cite>throwawayoptions' summary, Apr 4 2025 (Pandar didn't object)</cite></div>
+
+<h2>6 · Upside calls <span class="tag call">call side</span></h2>
+<h3>The mirror structure</h3>
+<p>Call bomb = long K<sub>lo</sub> call / short K<sub>hi</sub> call, planted for a credit. Bullish tape: buy the call, then sell the further-OTM call into the rip. Bearish/neutral: sell the OTM call into a rip, then buy the nearer call on the pullback. Payoff: width × 100 if SPX settles above K<sub>hi</sub>.</p>
+<h3>Why it plants less often</h3>
+<ul>
+  <li><b>Vanna is against you on both legs.</b> The rip that should make K<sub>hi</sub> rich also <em>drops</em> IV; the pullback that should make K<sub>lo</sub> cheap <em>lifts</em> IV. Delta and vega fight each other, whereas on puts they add.</li>
+  <li><b>Flat/inverted call skew</b> — the far call isn't overpriced the way the far put is, so there's less premium to sell.</li>
+  <li><b>Index up-moves are grinds, not gaps</b> — the paper: call-side delta "increases more gradually", OTM call strikes get touched less, so both the intraday planting edge and the PoT-driven exit edge are smaller.</li>
+</ul>
+<h3>When calls do work (from the thread)</h3>
+<ul>
+  <li><b>Call-skew events on single names</b>: Jan 31 2025 NVDA — "call tails expanding a lot", specifically Feb 7 190C+ "most overpriced vs other expirations, likely to crush after the weekend"; Pandar sold naked, Cris "spammed" call sales, Kreisleriana turned NVDA short calls into spreads. Sell the far call into the grab, buy the nearer call once it collapses. Seb: MSTR call side. Rule stays: only when calls are overpriced; Pandar won't pay for long call spreads unless he's bullish.</li>
+  <li><b>Right-tail hedge, bought in panic</b> (this is not legging — it's cheap convexity): Mar 20 2025 "buying call spreads on big down days for NVDA and SPX at the 6k–6.2k level, in case we moon and 'not long enough'"; Mar 21 "call spreads on various tickers further out to hedge against a 15–20%+ year"; Apr 2025 6500 SPX call spreads; then Aug 2025 "selling off the SPX 6500 spreads as we grind up, reinvesting in 7000+ call spreads and a small amount of 5800 put spreads 1 year out". Rationale (FiveDimeClive): if the risk-reversal premium holds, calls are structurally underpriced.</li>
+</ul>
+<div class="callout call">Practical read: for SPX, treat call bombs as opportunistic — plant them when the upside is what's bidding vol (squeeze days, "spot-up/vol-up" tape, mega-cap event skew), and otherwise use Pandar's approach: buy far-OTM call spreads with a slice of put-bomb profits on capitulation days, sell them into the V.</div>
+
+<h2>7 · What works best — the evidence, and when it dies</h2>
+<div class="kv">
+  <dt>Paper sample</dt><dd>80 placements: 95% planted, median 7 min; failed plants held ~60 min before exit; 57 closed as spreads: median 1.45, upper 2.90, outliers 3.90 (5-wide). Fig 3 hedge model: 80 bombs × $0.10 credit vs $81,750 /MES notional — small losses on small dips (bombs still OTM), "explosive" below the short strikes.</dd>
+  <dt>Pandar</dt><dd>NVDA meme account +403% YTD by mid-Dec 2024 (screenshot); PM account ~40% YTD at &lt;0.7 beta ("relatively smooth"); paid out on Aug 5 2024, DeepSeek Jan 27 2025, and Mar–Apr 2025 (SPY spreads legged long-first "on the bear market rallies").</dd>
+  <dt>Consensus ranking</dt><dd>(1) Sell expanded tails, convert to spreads on the crush — reliable, low-luck. (2) Buy longs first in complacent tape — higher payoff, more timing/luck, "not an exact science". (3) Intraday legging around 1σ with resting orders — high plant rate, small per-bomb credit, real leg risk.</dd>
+  <dt>Best environments</dt><dd>Grinding-up / complacent index with periodic scares; a range-bound high-vol single name whose wings expand and crush weekly (NVDA Jun–Dec 2024); volatile up-and-down markets ("good for accumulating spreads both ways").</dd>
+  <dt>Dies when</dt><dd>One-way trend (2023 NVDA: puts too dear, decayed to nothing); post-crash elevated IV (buying side); vol crushing too fast after a V (May 2025 onward — the "expansions" stopped exceeding the decay); commissions and wide fills (Robinhood: "hitting both bid and ask and still won't fill"); earnings on single names; margin quirks on large long-vertical inventories.</dd>
+</div>
+<div class="callout warn"><span class="tag warn">honesty check on the paper</span> "Zero downside risk" and "restored buying power" are true <em>after</em> planting; the strategy's entire risk sits in the leg and in the ~5% of plants that fail. n=80 with no dates or drawdown stats, almost certainly drawn from H1 2025 — a near-ideal regime (grind, then a violent two-way crash). PoT ≈ 2Δ is a Black-Scholes heuristic that overstates touch odds for deep-OTM puts under skew and drift. And you can't both close at 1.45 for alpha and still be hedged — pick which book each bomb belongs to.</div>
+
+<h2>8 · Charlie McElligott's read</h2>
+<div class="note">
+  <div class="hd"><span><b>Cross-Asset Desk Note</b> · Nomura · McElligott</span><span>re: "Delta Bombs" — SPX put spreads legged for credit</span></div>
+  <p><strong>Bottom line: this is a long-gamma-regime harvesting strategy that pays out in the short-gamma regime — the same dealer plumbing that lets you leg a put spread for a CREDIT in seven minutes is the plumbing that makes the eventual break violent enough to put your short strikes deep ITM. Which is elegant — and it's also exactly where the risk hides.</strong></p>
+  <p>Mechanically what's happening: in a "long Gamma" tape (dealers long, spot pinned between the walls, sell-rips / buy-dips), SPX oscillates ±10/15 handles intraday with almost no drift, and vol wobbles with it — dip = IV bid, bounce = IV offered — so on the PUT side vanna and delta stack in your favor on BOTH legs, and a 5-wide at ~1σ that's "worth" ~75c can be crossed for a credit inside the noise. That's the edge — not the dime you keep — the edge is you're building INVENTORY of downside convexity while the regime is dampened, at zero carry, and the payoff is contingent on the regime flip: gamma flip breached → dealers short gamma → CTAs hit triggers → vol-control de-grosses over the next 3–5 sessions → LevETF rebal sells more the lower it goes → your 20Δ shorts get "touched" (PoT ~2× delta is just the polite way of saying the wings get visited when the tape goes one-way) → the ladder is worth 3–5x its width in mark before expiry.</p>
+  <p>The tell on the risk is IN the paper's own numbers — 7 minutes median to plant, 60 minutes median hold on the ones that failed. Translation: the failed plants are the days the tape STOPPED being two-way — you sold the K<sub>lo</sub> put on the "dip" that turned out to be the first leg of a real de-gross, or you bought the K<sub>hi</sub> put on the "bounce" that was a squeeze. So the leg risk isn't random noise — it's regime-shift risk concentrated into the exact minutes you're naked one leg. Manage it accordingly:</p>
+  <ul>
+    <li><strong>Plant inside the walls.</strong> Short-first only while spot is ABOVE the gamma flip / vol trigger and inside the put wall–call wall range; below the flip you're selling puts into "the dark side" and expecting a bounce that the plumbing is now working AGAINST. Long-first below the flip is fine — that's the leg you WANT to be stuck with.</li>
+    <li><strong>Respect the clock.</strong> Don't initiate the short leg into the 3:30–4:00pm window on a down day (LevETF rebal is pro-cyclical — it sells more the lower it goes) or into an OpEx afternoon where charm/vanna are unwinding the pin. And DON'T sit in a failed plant for an hour hoping — that hour is where the "zero downside" claim goes to die.</li>
+    <li><strong>The 50/20 anchor is a VaR-down.</strong> Correct instinct — you carry the ATM put so the interim short is always a wide debit spread, never naked, and the anchor's day P&amp;L is your honest cost-of-planting. Only ever one unpaired short per anchor.</li>
+    <li><strong>Sizing = "spend the alpha."</strong> Pandar's rule (a slice of outperformance vs Spooz funds the hedge book) is the right frame — it makes the convexity book self-funding out of the same regime that's making you money, so you're accumulating hedges INTO the euphoria instead of chasing them after the puke, when skew's 100%ile and everyone's forced to grab.</li>
+  </ul>
+  <p>On <strong>calls</strong>: the paper's right that the mirror image is weaker but it under-explains WHY — negative spot/vol correlation means the rip that should richen your short call is also OFFERING vol, and the pullback that should cheapen your long call is BIDDING it — vanna against you both ways, plus flat call skew, plus grind-not-gap price action. The exception is the regime I keep flagging: <strong>"Spot Up, Vol Up"</strong> — Call Skew at 100%ile, put skew dead, the ONLY vol bid is upside-grab in single-name mega-cap Tech (the Jan-31-2025 NVDA 190C episode in the thread is textbook) — THAT's when you sell the far call into the grab and buy the nearer strike when it "collapses under the weight of its own $Delta." And Pandar's OTHER call use is different and also right: buying 6000/6200/6500 SPX call spreads on puke days in Mar–Apr 2025 when nobody wanted upside is "the only tail we fear is the right-tail crash-UP" priced at 25%-OTM lottery levels — feed the ducks into the V, roll to 7000+.</p>
+  <p>Where the NVDA machine broke — May 2025 — is also the most instructive part of the thread: post-V, realized vol collapsed, vol-control re-levered ("slingshot"), wing IV stopped expanding enough on the scares to beat the decay, and the tail-cycle edge went away. Which is a MINSKY set-up, not a strategy failure — "stability sets the table for instability" — the low-vol, high-gross, crowded-long tape is precisely when you accumulate cheap convexity, and Pandar's Aug-2025 "wait for an extended period of low vol then Kelly in, because something always eventually happens" is the correct sequencing.</p>
+  <p><em>Nits on the white paper: n=80, one regime, no P&amp;L distribution on the failed legs, "restored buying power" isn't free once your broker notices the inventory, and PoT ≈ 2Δ overstates the touch odds for skewed deep-OTM puts. None of it changes the mechanism.</em></p>
+  <p class="trade"><strong>So the trade is:</strong> in a low-vol / long-gamma / crowded-long tape, systematically leg 20–40 DTE 5-wide SPX put spreads at ~1σ for a credit — short-first above the flip with a resting long $1 better, long-first below it, 50Δ anchor if you're stacking — funded out of outperformance, held as a hedge ladder with a standing 2.90 unit-exit on the tranche you're willing to monetize; run call bombs ONLY into "spot-up/vol-up" call-skew episodes; and buy the far-OTM call spreads on the puke days when the right tail is priced as impossible. Skew low, VIX low, gross high — that's not the reason to wait, that's the set-up.</p>
+</div>
+
+<h2>9 · What the sources don't answer</h2>
+<ul>
+  <li>The paper's fill/exit distributions have no dates, no regime split, and no P&amp;L on the 5% failed plants — the number that decides whether "credit hedging" is net positive.</li>
+  <li>How much of the "credit" survives realistic SPX wing bid/ask. nybhh's ~$2 on a 10-wide at 5Δ/90 DTE, and the paper's $0.10 modelling assumption, bracket it.</li>
+  <li>Whether the 50/20 anchor was ever run with more than one unpaired short per anchor (the paper's language allows it; the risk doesn't).</li>
+  <li>The Pandar NVDA edge depended on a specific chain personality (frequent wing expansion + fast crush) that he himself says disappeared in mid-2025 — no one in the thread has shown it working on SPX at the same efficiency; his SPY spreads paid because he'd been buying long legs "throughout the past many months" before April 2, not because of quick legging.</li>
+  <li>The last messages (Jan 6–7 2026: "VIX is pretty low, now wouldn't be a bad time" and "do you convert only after IV and skew have compressed?") went unanswered.</li>
+</ul>
+
+<hr>
+<p class="small sans">Glossary: <b>PoT</b> probability of touch (≈2×delta) · <b>PNR/EPR</b> Schwab portfolio-margin risk metrics (point of no return / expected price range) · <b>mopex</b> monthly opex · <b>DNE</b> do-not-exercise instruction (single-name/ETF, by ~5pm ET) · <b>1256</b> 60/40 tax treatment for SPX · <b>synthetic spread</b> selling a further-OTM put against a stranded long to cap risk (§2.1c). Message references are by date in the PMTraders thread export (<span class="mono">manual_extract_20260816_175931/discord_messages.json</span>).</p>
+</div>
