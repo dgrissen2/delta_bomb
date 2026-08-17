@@ -650,6 +650,31 @@ a{color:inherit}
 <tr><td>May 14–20 (any expiry)</td><td class="num">220–236</td><td>+11–24% calls</td><td class="num">1.6–3.0</td><td class="neg">never (13 of 14)</td><td>premium gone</td><td></td><td>the top: RR 0, call-skew 100, front wing 99–100</td></tr>
 </table></div>
 
+<div class="panel" style="margin:1rem 0">
+<h4>Worked example for a thinkBack replay — Chase A, entry Mon 4 May 2026, NVDA Jun-18 235/240 call bomb</h4>
+<div class="tablewrap"><table>
+<tr><th>Step</th><th>When</th><th class="num">NVDA</th><th>What you do</th><th>Quotes at that moment</th><th>Position after</th></tr>
+<tr><td>1</td><td>Mon May 4, 15:55</td><td class="num">198.40</td><td><b>BTO 1 NVDA Jun-18 235C @ 1.81</b> (pay the offer). Rest <b>STO 1 Jun-18 240C, limit 1.91, GTC</b> (= cost + 0.10).</td><td>235C 1.77/1.81 (0.135Δ, IV 40%, +18% OTM) · 240C 1.35/1.39 (0.107Δ)</td><td>long 1 × 235C; risk = 1.81</td></tr>
+<tr><td>2</td><td>Tue May 5</td><td class="num">196.5 close</td><td>Nothing fills. 240C bid never above 1.48 (09:47).</td><td>close: 235C 1.62/1.67 · 240C 1.26/1.29</td><td>long 235C, marked −0.15</td></tr>
+<tr><td>3</td><td><b>Wed May 6, 09:45</b></td><td class="num">201.28</td><td>Gap and rip: 240C bid crosses 1.91 → <b>your resting sell fills @ 1.91</b> (bid was 1.98 that minute; marketable would be 1.98).</td><td>240C 1.98/2.00 · 235C 2.52/2.55</td><td><b>long 235/240 call spread, net credit +0.10</b> — zero risk from here, max value 5.00</td></tr>
+<tr><td>4</td><td>Wed May 6 close</td><td class="num">207.66</td><td>Rest scale-out sells on the spread: 1.00 / 2.00 / 3.00 (sell 235C, buy 240C).</td><td>235C 3.95/4.05 · 240C 3.15/3.20 → spread sells for 0.75</td><td></td></tr>
+<tr><td>5</td><td>Thu May 7, 10:27</td><td class="num">213.87</td><td>Spread first sells for <b>1.05</b> (close 0.90). First scale-out hits.</td><td>235C 4.65/4.70 · 240C 3.65/3.75 at the close</td><td></td></tr>
+<tr><td>6</td><td>Mon May 11 – Wed May 13</td><td class="num">219 → 226</td><td>Spread 1.25 → 1.55 at the closes; intraday 1.45 / 1.45 / 1.75.</td><td>May 13 close: 235C 9.70/9.85 · 240C 8.00/8.15</td><td></td></tr>
+<tr><td>7</td><td><b>Thu May 14, 11:42</b></td><td class="num">236.36</td><td>The blow-off: spread sells for <b>2.25</b> (close 2.15). Second scale-out (2.00) hits. NVDA is <em>at</em> your long strike — this is the top.</td><td>close: 235C 14.50/14.60 · 240C 12.25/12.35</td><td></td></tr>
+<tr><td>8</td><td>May 15 → Jun 18</td><td class="num">225 → 212</td><td>Anything not sold bleeds: 1.60 (May 15) → 0.68 (May 22) → 1.15 (Jun 1 gap) → 0.13 (Jun 5) → <b>0.00 at expiry</b> (NVDA 212 &lt; 235). 3.00 never traded.</td><td></td><td>expired worthless; you keep the +0.10</td></tr>
+</table></div>
+<div class="tablewrap"><table>
+<tr><th>Exit rule (per spread, ×100, before commissions)</th><th class="num">Sale</th><th class="num">+ entry credit</th><th class="num">P&amp;L</th></tr>
+<tr><td>Sold at the first 1.00 (May 7)</td><td class="num">1.00</td><td class="num">0.10</td><td class="num pos"><b>+$110</b></td></tr>
+<tr><td>Sold at 2.00 (May 14, first minute ≥ 2.00)</td><td class="num">2.00</td><td class="num">0.10</td><td class="num pos"><b>+$210</b></td></tr>
+<tr><td>Sold at the intraday max (May 14 11:42) / at the May 14 close</td><td class="num">2.25 / 2.15</td><td class="num">0.10</td><td class="num pos">+$235 / +$225</td></tr>
+<tr><td>Three spreads with 1.00 / 2.00 / 3.00 scale-outs (third never fills, expires)</td><td class="num">1.00 + 2.00 + 0</td><td class="num">0.30</td><td class="num pos">+$330 on 3 = +$110 avg</td></tr>
+<tr><td>Held to Jun 18 expiry</td><td class="num">0.00</td><td class="num">0.10</td><td class="num">+$10</td></tr>
+<tr><td>Comparison: bought the 235/240 spread outright May 4 (0.46 ask-side), sold May 14 close</td><td class="num">2.15</td><td class="num">−0.46</td><td class="num">+$169 (but 0.46 at risk if it never moved)</td></tr>
+</table></div>
+<p class="small">What buy-first bought you: 1.81 at risk for 1½ sessions (marked −0.15 at the May 5 close) in exchange for selling the 240C at 1.91 on the rip instead of 1.35 the day before — a spread for +0.10 instead of −0.46. thinkBack is end-of-day only: it will show the May 6 close (240C 3.15 bid) far through your 1.91 limit — book the fill at 1.91 (resting) or 1.98 (if you assume you were watching at 09:45), not at the close. Commissions on ToS at $0.65/contract are $2.60 per spread round-trip — real money against a $10 credit, negligible against a $200 exit.</p>
+</div>
+
 <h4>Chase B — May 22–29 (212–216, −9/−10%) → the Jun 1 gap to 224</h4>
 <div class="tablewrap"><table>
 <tr><th>Entry</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Paired</th><th>Free spread max</th><th class="num">At expiry</th><th>Screen</th></tr>
