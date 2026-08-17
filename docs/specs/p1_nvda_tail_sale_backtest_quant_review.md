@@ -1,0 +1,29 @@
+## Codex Strategy Review — Senior Quant Researcher
+**Verdict**: FAIL (10 findings)
+
+### Persona Lens
+
+A generic reviewer may accept the strategy narrative. A quant reviewer notices that timestamp leakage, split-unit errors, non-tradable calibration targets, clustered observations, and omitted jump-risk economics can invalidate an otherwise plausible backtest.
+
+### Findings
+
+| # | Finding | Severity | Category | Details |
+|---|---------|----------|----------|---------|
+| 1 | Signal uses future information | CRITICAL | Temporal integrity | §1 evaluates the signal at day *t* close but executes at 15:55 on the same day. The closing ORATS surface is not available at 15:55. This directly contaminates every trade. Use a timestamped 15:55 surface or enter no earlier than *t+1*. |
+| 2 | Split normalization creates a 10× exposure discontinuity | CRITICAL | Units / accounting | Dividing pre-split premiums by 10 and multiplying the contract multiplier by 10 preserves the P&L of one historical 100-share contract, but that contract represents ten post-split 100-share units. “Per-contract” P&L, fees, worst months, and sizing therefore become incomparable across 2024-06-10. Normalize to constant share/notional exposure and handle adjusted contracts separately. |
+| 3 | The proposed trigger is not validated as Pandar’s trigger | HIGH | Construct validity | The 10-day 5Δ wing and 30-day kink ranks are newly invented proxies. They omit the documented expiry-specific richness, recent option-price behavior, spot/vol interaction, and distinct call-grab versus put-tail contexts. The supplied white paper cannot validate them because it concerns SPX, 20–40 DTE, approximately 1σ options, and minute-scale legging. A labeled set of Pandar entries and deliberate non-entries is needed. |
+| 4 | The cooldown and exit rules do not simulate the book | HIGH | Strategy fidelity | §4 permits only one position per side/expiry while it remains open, apparently including a completed spread. That prevents repeated tail sales after naked risk has been removed—the mechanism by which the spread inventory was accumulated. Likewise, holding every completed spread to expiry while merely recording inflation opportunities omits monetization and rolling. Test a single-cycle strategy and the actual inventory-building book separately. |
+| 5 | The fill proxy is structurally biased and cannot govern promotion | HIGH | Execution modeling | The buy order begins only next session, although it is supposedly rested immediately; close-ask fills miss opens and intraday touches. Validation covers only recent 2026 sessions and is applied merely as a caveat, while the biased EOD result still drives the 60% pass threshold. Calibrate both entry and buyback fills by regime, DTE, moneyness, and time of day, then require the decision to survive plausible fill models. |
+| 6 | Instrument selection silently changes the hypothesis | HIGH | Instrument definition | A 4Δ contract and a 25%-OTM fallback are not equivalent; missing greeks would create a non-random strategy change. “One listed strike nearer” also produces materially different widths across price regimes and split-adjusted chains despite the $5-wide claim. Finally, bid ≥ $0.05 permits `L = sale − 0.10 ≤ 0`, making the baseline buyback impossible. Fix one invariant definition and require a positive, tick-valid limit. |
+| 7 | Threshold fitting optimizes the wrong outcome | HIGH | Calibration | Maximizing five-session wing-IV compression does not maximize short-option P&L: IV can collapse while spot runs toward or through the strike. The objective also selects mean reversion in the same variable used to trigger, while “12 signals/year” ignores clustered, overlapping observations. Fit against executable trade P&L—or treat thresholds as pre-registered hypotheses—and cluster by independent tail-expansion episode. |
+| 8 | The design cannot identify incremental edge | HIGH | Falsification | There is no mandatory comparison with the same short held naked, an immediately purchased vertical, matched non-signal dates, or a simple delta/DTE tail-sale rule. Positive results could be ordinary theta or variance-risk-premium harvesting rather than value from the trigger or buyback mechanism. These counterfactuals are necessary before attributing edge. |
+| 9 | Naked-tail sizing is not a risk model | CRITICAL | Tail risk / feasibility | A 10%-of-NLV scenario per trade does not aggregate concurrent expiries or both sides, model dynamic NLV and broker margin, or prevent forced liquidation before expiry. “Stock doubles” is an arbitrary finite scenario for an unbounded short call. Cash-intrinsic settlement also removes assignment, pin, and after-hours stock risk. Paper promotion requires portfolio-level exposure, margin, jump/vol shocks, and expected-shortfall analysis. |
+| 10 | Pass criteria are arbitrary and partly undefined | HIGH | Decision governance | The 60% fill rate is not tied to expectancy; “trailing-12-month median income” lacks a precise definition; four unequal, post hoc regimes are not independent samples; and a sign-only fill-bias test can still change the fill-rate verdict. “Baseline” is also ambiguous between 85/70 and the fitted pair. Require exact formulas, minimum effective sample sizes, confidence intervals, tail-loss limits, and separate side/archetype decisions. |
+
+### Blind Spots And Missing Work
+
+- Ground-truth reconstruction of actual Pandar trades and non-trades, especially asymmetric call behavior.
+- Split-neutral exposure, transaction-level fees, portfolio margin, assignment, and overlapping-position accounting.
+- Counterfactuals isolating trigger value, buyback value, and free-spread monetization value.
+- Historical intraday calibration of entry and buyback execution beyond the 2026 sample.
+- Block-bootstrap or episode-level uncertainty estimates, walk-forward validation, and synthetic jump/volatility stresses outside the short historical window.

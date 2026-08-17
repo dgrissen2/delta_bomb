@@ -235,3 +235,30 @@ faded — that's the cost of the rule; some wouldn't — that's its benefit. The
 rule earns its place or doesn't. The simplification: "5% toward the strike" and "wing still rising" are one
 reasonable definition of "this is a move"; the test may show a different line is better, and if no line beats
 "just size small," that's a real answer too.
+
+## 16. Codex adversarial review (2026-08-17) — panel FAIL, 14 findings — and v0.2 dispositions
+
+Full output: `docs/specs/p1_codex_strategy_review_2026-08-17.md` (generic + Charlie McElligott + Senior Quant lenses; the
+panel was given the white paper as context, not the Discord transcript, so its "fidelity" finding is partly an artefact
+of what it was shown — the reconstruction lives in `docs/sources/discord_transcript_clean.txt` and report §5f).
+
+| # | Finding (severity) | Disposition for v0.2 |
+|---|---|---|
+| 1 | Look-ahead: close-of-day surface used for a 15:55 entry (CRITICAL) | **Accept.** Signal at close *t* → entry at **t+1 open** (first EOD bid of t+1 as proxy; 09:31 NBBO where 1-min exists). All fills/marks from t+1 onward. |
+| 2 | Fidelity to Pandar not established by the supplied context (HIGH) | **Accept as scoping.** Retitle: "a mechanised tail-sale-with-buyback variant reconstructed from the thread"; add §5f quotes as an appendix; add a "known Pandar callouts" test set (12/19/24, 12/20/24 SMH, 1/31/25 calls, 2/7/25, 3/27/25 1-DTE, 5/15/25) and report whether the trigger fires on those dates. |
+| 3 | Trigger is a constant-maturity fixed-delta surface point, not the traded contract (HIGH) | **Accept.** Keep the ORATS surface as the *screen*, but require confirmation on the traded contract from ThetaData EOD greeks: the selected option's IV − the same-expiry ATM IV must itself be ≥ its own 252-day 85th pct (computed on the EOD store). Report both. |
+| 4 | One trigger pools flow archetypes (HIGH) | **Accept** (= Charlie #2): archetype tag a/b at entry; all metrics split; promotion decided per side × archetype. |
+| 5 | Threshold fitting on wing-crush; overfitting; clustered signals (HIGH) | **Accept.** Objective = ex-post 5-session P&L of the short; observations clustered by *episode* (signals within 5 sessions = one episode); pre-register 85/70 as the primary hypothesis; the grid is reported as sensitivity only, never used to pick the headline. |
+| 6 | Instrument not invariant; negative buy limits at nickel sales; variable width (HIGH) | **Accept.** One rule: strike = nearest listed to **|Δ| 0.04** from EOD greeks (no OTM fallback; skip if greeks missing). Require **sale ≥ 0.20**; `L = sale − c` with `c = min(0.10, 0.5 × sale)`. Record realised width; report per-width. |
+| 7 | Fill model biased: order live only t+1; close-ask; queue/size (HIGH) | **Accept.** Order live from t+1 open. Fill test = EOD **low ≤ L** (primary), close-ask ≤ L (bound); 1-min truth-check for 2026; the decision must hold under both. State size/queue assumptions explicitly (fill assumed if touched; 1 contract). |
+| 8 | 2026 intraday sample can't validate 2023–25 fills; "171 sessions" wrong (HIGH) | **Accept.** Wording fixed (73 sessions, 171 expiry-session files). Add: pull 1-min for the **10 largest 2023–25 tail episodes** (~30 sessions) as an out-of-window fill check. Fill bias reported per regime, not as one scalar. |
+| 9 | "Free spread" ignores opportunity cost vs same-time buy-to-close (HIGH) | **Accept — important.** Mandatory comparator: at the buyback minute, the far short's own buy-to-close price. Report the cash given up to keep the vertical vs the vertical's later payoff. |
+| 10 | Cooldown blocks the inventory-building mechanism (HIGH) | **Accept.** Cooldown applies to *unpaired* shorts only; a completed spread does not block a new sale on the same side/expiry. Also add the "single-cycle" variant for a clean read. |
+| 11 | Naked-call / portfolio tail risk not controlled (CRITICAL) | **Accept.** Add portfolio-level accounting: concurrent positions, both sides, worst overnight gap ±15% / ±25% through strikes on the whole book, expected shortfall; forced-liquidation proxy = margin > 80% NLV. Sizing rule restated as book-level, not per-trade. Enters pass/fail (see 13). |
+| 12 | Split normalisation mixes exposure units (CRITICAL) | **Accept.** Normalise to constant **share exposure**: one pre-split contract = 10 post-split units; report P&L per 100 post-split shares throughout; fees per executed leg on that unit. |
+| 13 | Pass gates arbitrary/underdefined (CRITICAL) | **Accept.** Replace with: pre-registered, per side × archetype: (i) mean P&L per unit > 0 with a block-bootstrap (episode-level) 90% CI excluding 0; (ii) expected shortfall (5%) of monthly P&L ≤ 1.5 × median monthly income; (iii) both fill models agree on sign; (iv) survives leave-one-shock-out; (v) book-level gap stress does not breach margin. Combined book reported but never used to pass a failing side. |
+| 14 | Cannot isolate signal skill vs generic short-vol carry (HIGH) | **Accept.** Controls: (a) same instrument sold on **all** eligible days (unconditional), (b) matched non-signal dates, (c) naked-to-expiry, (d) immediate vertical at entry, (e) same-time buy-to-close (=9). Edge = signal minus (a); buyback value = P1 minus (c) and (e). |
+
+Status after review: **v0.1 is not runnable as a decision test.** v0.2 = this table applied. The Charlie items (§14) that
+overlap (fill proxy, archetypes, breakout stop, counterfactual, moneyness grid, P&L objective) are covered by 4, 5, 7, 9,
+14 above; the breakout stop (Charlie #4) stays as a named variant.
