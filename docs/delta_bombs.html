@@ -580,6 +580,62 @@ a{color:inherit}
 <div class="callout call"><b>Read-through.</b> Bought into the Jul 29 puke (RR 75th pct, call wing flat, −10.6% off the highs, −8% under the 50-day), every rung of the ladder planted as a free spread on the <em>next morning's</em> +3% bounce, and was worth 3–4× cost two weeks later. The screen's strict ivRank ≤ 50 gate would have missed it — on the puke day IV <em>is</em> the puke — so treat "big down day" as its own entry type: off-20-day-high ≤ −8%, RR25 pct ≥ 60, 25Δ call-skew pct ≤ 40, ivRank allowed to ~65, and size by the dollar cost of the 20–35% OTM 5-wide (Pandar's real gate). Jun 5–26 is the counter-example: a 14% drop with RR stuck in the teens (calls still bid) — the screen said no, and it was right.</div>
 
 
+<h3>5d · Full buy-first cycles on NVDA, May → August 2026 (1-min, both sides, monthly + weekly)</h3>
+<p>Rule for every row: at 15:55 on the entry day, <b>BTO the ~15Δ option</b> in the named expiry at the ask; <b>rest the sale of the strike 5 away at cost + 0.10</b>; scan every minute of every later session for the fill; then track what the free spread could be <em>sold</em> for (bid-side) each day. Chains: 171 sessions of NVDA 1-min NBBO across Jun-18 / Jul-17 / Aug-21 / Sep-18 monthlies and the May-29 / Jun-05 weeklies (<span class="mono">scripts/nvda_cycles.py</span>).</p>
+
+<h4>Cycle 1 — the May blow-off: puts were cheap <em>relative to calls</em> and it still mostly failed</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry (15:55)</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Rested</th><th>Paired</th><th>Free spread after pairing</th></tr>
+<tr><td>May 11–13, Jun-18</td><td class="num">219–225</td><td>190–195P (−13%)</td><td class="num">2.72–2.86</td><td>−5 strike @ +0.10</td><td class="neg">never</td><td>long expired 0.01 (NVDA 210 on Jun 18)</td></tr>
+<tr><td><b>May 14</b> (the top), Jun-18</td><td class="num">235.8</td><td>205P (−13%)</td><td class="num">3.05</td><td>200P @ 3.15</td><td class="pos">May 15 09:34, next morning</td><td>hit 1.00 May 15, 2.00 Jun 5, <b>max 2.75</b>; 0.01 at expiry</td></tr>
+<tr><td>May 15–19, Jun-18</td><td class="num">220–225</td><td>193–195P</td><td class="num">2.40–2.77</td><td></td><td class="neg">never</td><td>long → 0.01</td></tr>
+<tr><td>May 20, Jun-18</td><td class="num">223.3</td><td>195P</td><td class="num">2.13</td><td>190P @ 2.23</td><td class="pos">Jun 9 12:40 (13 sessions)</td><td>hit 1.00 Jun 9, max 1.33; −0.01 at expiry</td></tr>
+<tr><td>May 11–15, <b>May-29 weekly</b></td><td class="num">219–236</td><td>195–212.5P (−10%)</td><td class="num">1.93–2.43</td><td></td><td>only the May 14 entry (next morning; max 2.74, 0.63 at expiry)</td><td></td></tr>
+<tr><td>May 18–22, <b>Jun-05 weekly</b></td><td class="num">216–223</td><td>197.5–202.5P</td><td class="num">1.43–2.15</td><td></td><td class="neg">never</td><td>longs → 0.01–0.02</td></tr>
+</table></div>
+<p>NVDA went 235 → 210 by Jun 18 and 192 by Jun 26, and 10 of 12 monthly/weekly buy-first puts <b>never paired</b>. Why: RR25 at the 0–1st percentile said "puts cheap vs calls," but the puts were <em>absolutely</em> expensive — IV30 45–49% (ivRank 30–64) with <b>earnings inside the Jun-18 expiry</b> (May 20 raw IV30 45.1 vs ex-earnings 36.6). The stock fell and vol still crushed; the strike-below put never got back to cost + 0.10. The screen's ivRank/event gates were saying no; the sell-first wing tell was saying sell. <b>Buy-first needs absolute cheapness, not just relative.</b> The one that worked was the blow-off top itself (paired on the −4% gap next morning; the free 205/200 ran to 2.75 three weeks later — and to 0.01 if held to expiry).</p>
+
+<h4>Cycle 2 — the June selloff: buy-first puts on the Jun 15–18 bounce (ivRank 34–44, RR 7–13, no event) — this is what a clean cycle looks like</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry, Jul-17 monthly</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Paired</th><th class="num">Sessions</th><th>Free spread: first ≥1.00 · max</th><th class="num">At expiry (Jul 17, NVDA 202.7)</th></tr>
+<tr><td>Jun 15</td><td class="num">212.0</td><td>190P @ 2.06 (−10%)</td><td class="num">2.06</td><td>Jun 17 15:40, NVDA 203.9</td><td class="num">2</td><td>Jun 23 · <b>1.90</b> (Jun 26, NVDA 192.5)</td><td class="num">−0.01</td></tr>
+<tr><td>Jun 16</td><td class="num">208.8</td><td>190P @ 2.29</td><td class="num">2.29</td><td>Jun 23 09:34, 200.2</td><td class="num">4</td><td>Jun 23 · 1.90</td><td class="num">−0.01</td></tr>
+<tr><td>Jun 17</td><td class="num">203.6</td><td>185P @ 2.29</td><td class="num">2.29</td><td>Jun 25 09:55, 193.5</td><td class="num">5</td><td>Jun 25 · 1.29</td><td class="num">−0.01</td></tr>
+<tr><td>Jun 18</td><td class="num">211.1</td><td>190P @ 1.93</td><td class="num">1.93</td><td>Jun 23 09:31, 200.7</td><td class="num">2</td><td>Jun 23 · 1.90</td><td class="num">−0.01</td></tr>
+<tr><td>Jun 12 (control, dip day)</td><td class="num">204.8</td><td>180P @ 1.94 (−12%)</td><td class="num">1.94</td><td class="neg">never</td><td></td><td>long → 0.01</td><td></td></tr>
+</table></div>
+<p>Bought on the bounce (not the dip — the Jun 12 dip entry never paired), paired inside a week, and the free 190/185 was worth <b>1.90 on Jun 26</b> when NVDA touched 192.5 — never ITM. Sold there: +1.90 + 0.10 credit on zero risk. Held to Jul 17: NVDA back to 203, spread −0.01, you keep the dime. <b>That is the whole "how do you profit if it never goes ITM" answer in one row.</b></p>
+
+<h4>Cycle 3 — the July fade: buy-first puts on the Jul 10–15 bounce (RR 14–20) — same shape</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry, Aug-21 monthly</th><th class="num">NVDA</th><th>Bought</th><th>Paired</th><th>Free spread max</th><th class="num">Aug 14 (NVDA 225)</th></tr>
+<tr><td>Jul 10 / 14 / 15</td><td class="num">210–212</td><td>185P @ 2.66 / 2.33 / 2.16 (−12%)</td><td>Jul 17 09:31–09:32, NVDA 202 (2–5 sessions)</td><td><b>1.55</b> (Jul 29, NVDA 190)</td><td class="num">0.01</td></tr>
+<tr><td>Jul 8 (dip day)</td><td class="num">204.6</td><td>175P @ 2.38 (−14%)</td><td class="neg">never</td><td>long → 0.03</td><td></td></tr>
+</table></div>
+
+<h4>Cycle 4 — the July puke: buy-first calls (RR 60–75, call skew 26–37 — the screen's zone) — the one that went to max</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry, Aug-21 monthly</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Paired</th><th class="num">Sessions</th><th>≥1.00 · ≥2.00 · ≥3.00</th><th class="num">Max</th><th class="num">Aug 14</th></tr>
+<tr><td>Jul 17</td><td class="num">203.5</td><td>235C (+16%)</td><td class="num">1.61</td><td>Jul 22 11:13, 212.9</td><td class="num">3</td><td>Aug 6 · — · —</td><td class="num">1.01</td><td class="num">0.41</td></tr>
+<tr><td>Jul 21</td><td class="num">207.2</td><td>235C (+13%)</td><td class="num">1.39</td><td>Jul 22 11:09, 211.6</td><td class="num">1</td><td>Aug 6 · — · —</td><td class="num">1.01</td><td class="num">0.41</td></tr>
+<tr><td>Jul 24</td><td class="num">206.0</td><td>230C (+12%)</td><td class="num">1.60</td><td>Aug 5 09:31, 217.9</td><td class="num">8</td><td>Aug 5 · — · —</td><td class="num">1.50</td><td class="num">1.02</td></tr>
+<tr><td><b>Jul 27</b></td><td class="num">197.1</td><td>220C (+12%)</td><td class="num">1.54</td><td>Aug 3 11:04, 206.8</td><td class="num">5</td><td>Aug 3 · Aug 5 · Aug 13</td><td class="num"><b>3.30</b></td><td class="num">2.95</td></tr>
+<tr><td><b>Jul 29</b></td><td class="num">191.4</td><td>215C (+12%)</td><td class="num">1.36</td><td>Jul 31 09:36, 199.8</td><td class="num">2</td><td>Jul 31 · Aug 5 · Aug 6</td><td class="num"><b>4.05</b></td><td class="num">3.85</td></tr>
+<tr><td colspan="9" class="small">Sep-18 (51 DTE) versions from §5c: 230/235 and 235/240 paired Jul 30 – Aug 3, max 1.65–1.95.</td></tr>
+</table></div>
+
+<h4>Control — buy-first calls in June while calls were rich (RR ≤ 20, call skew ≥ 80): what the screen was protecting you from</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry, Jul-17</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Paired</th><th>Free spread</th></tr>
+<tr><td>Jun 5</td><td class="num">206.2</td><td>240C (+16%)</td><td class="num">2.36</td><td class="neg">never</td><td>premium gone</td></tr>
+<tr><td>Jun 10</td><td class="num">201.3</td><td>235C (+17%)</td><td class="num">1.83</td><td>Jun 15 (3 sessions)</td><td>max 0.68, expired −0.01</td></tr>
+<tr><td>Jun 23</td><td class="num">201.1</td><td>222.5C (+11%)</td><td class="num">1.61</td><td class="neg">never</td><td>premium gone</td></tr>
+<tr><td>Jun 26 (the June low)</td><td class="num">193.1</td><td>212.5C (+10%)</td><td class="num">1.45</td><td>Jul 10 (9 sessions)</td><td>max 1.87 on Jul 10, 0 at expiry</td></tr>
+</table></div>
+
+<div class="callout call"><b>What a full buy-first cycle is, from the data:</b> (1) buy the ~15Δ leg <em>on the bounce/rip against you</em> when the screen says that side is absolutely cheap (ivRank ≤ ~45, that side's skew low, no event inside the expiry) — the dip-day entries in the "wrong" regime never paired; (2) it pairs in <b>1–5 sessions</b> on the first move your way, leaving a 5-wide spread carried at +0.10; (3) the spread inflates to <b>1.3–1.9 (puts) / 1.5–4.0 (calls)</b> within 1–2 weeks as the move extends — usually without going ITM; (4) <b>sell it there</b> (rest scale-outs at 1.00 / 2.00 / 3.00) — every June/July put spread that hit 1.5–1.9 was worth 0.00 at expiry once the stock reversed; the two July call spreads that were still 3–4 on Aug 14 are the ITM exception, and you'd scale those too. Then go back to step 1 on the next bounce. Shorter tenors: the 2–3-week weeklies in May had no room to pair against earnings-inflated IV; use them only when the move is already underway (they pair on the same next-morning gap as the monthly, and decay faster if it isn't).</div>
+
+
 <h2>6 · Upside calls <span class="tag call">call side</span></h2>
 <h3>The mirror structure</h3>
 <p>Call bomb = long K<sub>lo</sub> call / short K<sub>hi</sub> call, planted for a credit. Bullish tape: buy the call, then sell the further-OTM call into the rip. Bearish/neutral: sell the OTM call into a rip, then buy the nearer call on the pullback. Payoff: width × 100 if SPX settles above K<sub>hi</sub>.</p>
