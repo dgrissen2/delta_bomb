@@ -177,3 +177,61 @@ required before code:
 
 Disposition: incorporate 1–8 into v0.2 (fill rule, archetype tags, stress section, breakout variant, moneyness grid,
 P&L objective, counterfactual, earnings rule); 9 becomes a stated limitation.
+
+## 15. In plain terms — what review points #2 and #4 mean
+
+### 15a. For the CIO
+
+**#2 — "split the two archetypes."** The screen says "the far wing is unusually expensive, sell it." But there are two
+different reasons a far wing gets expensive, and they fail in opposite ways:
+
+- **(a) The grab.** The stock is ripping and the crowd is paying up for far *calls* only (or, mirror image, dumping and
+  paying up for far *puts* only). One side of the smile is lifted; the other is not. If we sell that side and it keeps
+  going, the loss is a *breakout*: the stock runs at our strike and the option we sold at 60¢ is worth $3–5.
+- **(b) The post-shock smile.** Something just happened (DeepSeek, a tariff headline); *both* far wings are expensive
+  because everyone is paying for lottery tickets in both directions and overall vol is very high. If we sell the far
+  call here and it fails, it isn't a breakout — it's a *second leg down* (our sold call is fine; it's the naked put we
+  might also have sold that hurts, or the portfolio around it).
+
+Same order ticket, different disaster. If we throw both kinds of trade into one P&L column, the many quiet
+post-shock sales (b) will produce a healthy-looking average that hides the few (a) trades that blow up in a melt-up.
+So: stamp each trade "a" or "b" at entry using the surface (a = that side's wing high AND that side of the
+risk-reversal at its extreme AND spot moving that way; b = both wings high AND overall front vol high), and report
+every statistic for a and b separately. Decision consequence: we might promote (b) and shelve (a), or size them
+differently — we cannot know unless they're separated.
+
+**#4 — "the breakout stop."** Pandar's protection was *sizing*: sell few enough that if the stock reaches the strike
+you can hold to expiry. Fine for a $1M PM account; brutal in a 2023-type melt-up. The variant adds a *tell*: after
+we sell, if the wing keeps getting *more* expensive AND the stock has already moved 5% toward our strike, that's no
+longer a grab that will fade — it's a trend — so we cover (or buy a further-out option to cap it). We run the
+backtest both ways. The difference between the two P&Ls is the *price of the tell*: what we give up in premium
+(covering grabs that would have faded) versus what we save in the ones that didn't. If the tell costs more than it
+saves, we drop it and keep sizing as the only defence; if it saves more, it becomes part of the rule.
+
+### 15b. From first principles
+
+Look at what you actually sold: a ticket that pays only if NVDA is above, say, 300 in two weeks. You sold it for 62¢
+because on that day people were unusually eager to own it. Now ask *why* they were eager — because there are two very
+different reasons, and the reason tells you what can go wrong.
+
+Reason one: the stock has been screaming higher for a week and buyers are chasing *up* — they want the far calls and
+they don't care about the far puts. That is a crowd leaning one way. It usually tires; the ticket goes back to 11¢
+and you keep 50¢. But sometimes the crowd is right and the stock keeps running, straight at your 300 line — then the
+ticket you sold for 62¢ becomes worth $3, $5, more. Reason two: something scary just happened, prices are jumping
+around, and people are buying far tickets in *both* directions — up and down — because they simply don't know. That
+crowd isn't leaning; it's flinching. Your far-call ticket almost always dies quietly here, because a scared market
+rarely runs 27% higher in two weeks; the danger from a flinching market is the *other* direction. Same 62¢ ticket,
+sold into two different crowds, with two different ways of losing. If you pour both into one jar and average, the
+many quiet flinch-sales make the jar look calm, and the rare leaning-crowd sale that ran you over is invisible in
+the average — until it isn't. So we label each sale by which crowd we sold to, and we look at the two jars
+separately. That is all #2 says.
+
+#4 is about what to do when the leaning crowd turns out to be right. The stock keeps going and the far tickets get
+*more* expensive, not less — that combination is the market telling you "this isn't a mood, it's a move." Pandar's
+answer was to sell so few tickets that being run over doesn't matter. Ours can be the same, plus one rule: if the
+tickets are still getting pricier and the stock has already covered a third of the distance to your line, buy the
+ticket back (or buy the next one out to cap it) and stop arguing. Then measure it. Some grabs you cover would have
+faded — that's the cost of the rule; some wouldn't — that's its benefit. The backtest reports both numbers so the
+rule earns its place or doesn't. The simplification: "5% toward the strike" and "wing still rising" are one
+reasonable definition of "this is a move"; the test may show a different line is better, and if no line beats
+"just size small," that's a real answer too.
