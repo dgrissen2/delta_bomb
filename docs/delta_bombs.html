@@ -893,6 +893,36 @@ a{color:inherit}
   <li>The last messages (Jan 6–7 2026: "VIX is pretty low, now wouldn't be a bad time" and "do you convert only after IV and skew have compressed?") went unanswered.</li>
 </ul>
 
+<h2>10 · CIO memo — what the two "Pandar" programs would actually do</h2>
+<div class="panel">
+<div class="eyebrow">Memo · to: desk · re: modelling PandarBear's book (not the white paper) — two programs, plain terms, and what a backtest has to show before anything is deployed</div>
+<h4>What we would be running</h4>
+<p><b>Program 1 — the tail-sale book with buybacks ("sell the scare, keep the free spread").</b> Every day the screen looks at one name (NVDA first) and asks: is the far wing of the <em>front</em> expiry unusually rich right now — the 5Δ option's implied vol sitting well above the at-the-money vol, high versus its own last year, and higher than the same wing one month out? When yes, we sell that far option (a put on a scare, a call on a squeeze) in the front weekly, in a quantity chosen so that if the stock actually reaches the strike we are still inside our margin cushion. The moment it's sold we rest a buy order on the strike one notch nearer, priced 5–10¢ under what we sold for. Two things can then happen: the scare fades (usual), the wing crushes, our buy fills — we've taken most of the premium and are left holding a $5-wide spread we were paid to own; or the scare extends, the buy doesn't fill, and we sit on a short far-OTM option sized to be held to expiry. Income comes from the crush; the leftover spreads are free lottery tickets that pay $500 each if the stock ever goes through them.</p>
+<p><b>Program 2 — the penny-spread inventory ("buy the tail when nobody wants it").</b> On calm, complacent days (vol rank low, the wing flat), buy $5-wide spreads 25%+ out of the money in the current and next monthly, only when they cost 10¢ or less; hold them as inventory; rest sell orders at 3–5× cost. Most expire worthless (that's the cost of the hedge, sized as a slice of profits); some inflate 3–5× on a scare and get sold; once in a while the stock goes through them and the whole inventory pays 50×. This is the hedge book. It funds nothing; Program 1 funds it.</p>
+<h4>What each one does to the P&amp;L, in plain terms</h4>
+<ul>
+  <li><b>Program 1</b> looks like an insurance seller with a discipline for taking profit early. Many small wins (the 300C sold at 0.62 in May, bought back / spread at +0.22 to +0.40), occasional flat weeks, and a left tail we cap by sizing rather than by structure. The free spreads it leaves behind are the only convexity in it.</li>
+  <li><b>Program 2</b> looks like buying lottery tickets on a budget: steady small bleed, punctuated by 3–5× sales into scares and, rarely, a very large payoff. It's the reason the tail-selling can be run without fear.</li>
+  <li>Together: a short-vol income line with a long-tail inventory bought out of the income. That is Pandar's "steamroller with a hedge book," and it is <em>not</em> the white paper's intraday SPX legging (a separate, capital-heavy, minutes-scale device).</li>
+</ul>
+<h4>What we would be committing to (judgment calls, labelled)</h4>
+<div class="tablewrap"><table>
+<tr><th>Knob</th><th>Program 1</th><th>Program 2</th><th>Status</th></tr>
+<tr><td>Trigger</td><td>front 5Δ wing IV − ATM ≥ 85th pct (1y) and wing kink vs 30d ≥ 70th pct; ex-earnings series; no print inside the expiry</td><td>ivRank ≤ 35, that side's 25Δ skew ≤ 25th pct, RR pct in the "that side is cheap" half; 5-wide ≥ 25% OTM at ≤ 0.10</td><td>thresholds are judgment until the backtest sets them from the distribution</td></tr>
+<tr><td>Instrument</td><td>front weekly (≤ next monthly), 3–5Δ, single option; buyback one strike nearer at sale − 0.05/0.10</td><td>current + next monthly, $5 wide, both legs at once</td><td>from the thread</td></tr>
+<tr><td>Size</td><td>loss ≤ 10% NLV if the name goes to zero / squeezes to the strike; PNR cushion kept</td><td>spend ≤ a fixed slice of trailing outperformance</td><td>Pandar's stated rules</td></tr>
+<tr><td>Exit</td><td>buyback fill, or expiry; if the wing keeps expanding, cover / synthetic-spread</td><td>resting sells at 3× / 5×; roll near-DTE to further DTE; hold to expiry as hedge</td><td>from the thread</td></tr>
+</table></div>
+<h4>What the backtest has to show before this changes anything</h4>
+<ol>
+  <li><b>Program 1:</b> on the 2018–2026 ORATS surface + the 2026 1-min chains: how often the trigger fires per month; how often the buyback fills within 5 sessions and at what average credit; the distribution of days it doesn't fill and the mark-to-market on those; the worst month at the stated size; and whether the free spreads left behind ever paid (count, size). If the left tail is bigger than the trigger's income over any 12-month window, it's research-only.</li>
+  <li><b>Program 2:</b> cost per month at the stated budget; how often a spread reaches 3× / 5× before expiry; the fraction expiring worthless; and the payoff on the real shocks in-sample (Aug 5 2024, Jan 27 2025, Apr 2025). If the 3–5× sales don't cover ≥ half the bleed outside shock months, the budget is too high or the trigger too loose.</li>
+  <li><b>Both:</b> out-of-sample split (fit thresholds on 2018–2023, test 2024–2026), regime split (2023 trend, 2024–25 chop, 2026 grind), and the fee sensitivity — a 10¢ spread with $0.65/contract fees is 6.5% each way; this lives or dies on execution cost.</li>
+</ol>
+<p><b>Management action:</b> fund the backtest of both programs on the data already in the store (no new acquisitions needed for the daily surface; the 1-min chains cover the 2026 fill mechanics). Nothing is deployed on the strength of the thread's anecdotes or the white paper's n=80. Hold the §5e 15Δ buy-first structure as research-only — it is a directional trade with a different capital profile and does not belong in either program.</p>
+</div>
+
+
 <hr>
 <p class="small sans">Glossary: <b>PoT</b> probability of touch (≈2×delta) · <b>PNR/EPR</b> Schwab portfolio-margin risk metrics (point of no return / expected price range) · <b>mopex</b> monthly opex · <b>DNE</b> do-not-exercise instruction (single-name/ETF, by ~5pm ET) · <b>1256</b> 60/40 tax treatment for SPX · <b>synthetic spread</b> selling a further-OTM put against a stranded long to cap risk (§2.1c). Message references are by date in the PMTraders thread export (<span class="mono">manual_extract_20260816_175931/discord_messages.json</span>).</p>
 </div>
