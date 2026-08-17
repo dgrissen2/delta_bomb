@@ -636,6 +636,61 @@ a{color:inherit}
 <div class="callout call"><b>What a full buy-first cycle is, from the data:</b> (1) buy the ~15Δ leg <em>on the bounce/rip against you</em> when the screen says that side is absolutely cheap (ivRank ≤ ~45, that side's skew low, no event inside the expiry) — the dip-day entries in the "wrong" regime never paired; (2) it pairs in <b>1–5 sessions</b> on the first move your way, leaving a 5-wide spread carried at +0.10; (3) the spread inflates to <b>1.3–1.9 (puts) / 1.5–4.0 (calls)</b> within 1–2 weeks as the move extends — usually without going ITM; (4) <b>sell it there</b> (rest scale-outs at 1.00 / 2.00 / 3.00) — every June/July put spread that hit 1.5–1.9 was worth 0.00 at expiry once the stock reversed; the two July call spreads that were still 3–4 on Aug 14 are the ITM exception, and you'd scale those too. Then go back to step 1 on the next bounce. Shorter tenors: the 2–3-week weeklies in May had no room to pair against earnings-inflated IV; use them only when the move is already underway (they pair on the same next-morning gap as the monthly, and decay faster if it isn't).</div>
 
 
+<h3>5e · Only the upside chase: every buy-first CALL entry since May, all expiries</h3>
+<p>Every session May 4 → Aug 7 as an entry day: 15:55 BTO the ~15Δ call at the ask, rest STO the +5 strike at cost + 0.10, 1-min scan for the fill, then the free spread's bid-side value. Expiries: May-29 and Jun-05 weeklies, Jun-18 / Jul-17 / Aug-21 / Sep-18 monthlies — 130 cycles (<span class="mono">docs/replay/nvda_call_buyfirst_cycles_may_aug.csv</span>). Four chases fell out of the data; everything else either never paired or paired late for pennies.</p>
+
+<h4>Chase A — May 4–5 (NVDA 196–198, −8/−9% off the 20-day high) → the May 14 blow-off at 235.8</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry</th><th class="num">NVDA</th><th>Bought (Jun-18)</th><th class="num">Cost</th><th>Paired</th><th>Free spread: ≥1.00 · ≥2.00 · max</th><th class="num">At expiry (Jun 18, 212)</th><th>Screen that day</th></tr>
+<tr><td><b>May 4</b></td><td class="num">198.4</td><td>235C (+18%)</td><td class="num">1.80</td><td>May 6 09:45 (2 sessions)</td><td>May 7 · May 14 · <b>2.20</b> (May 14, NVDA at the 235 strike)</td><td class="num">0.00</td><td>ivRank 26, RR 15, call-skew 70</td></tr>
+<tr><td><b>May 5</b></td><td class="num">196.3</td><td>230C (+17%)</td><td class="num">2.20</td><td>May 6 09:33 (1)</td><td>May 7 · May 13 · <b>2.50</b></td><td class="num">0.00</td><td>ivRank 31, RR 13, call-skew 78</td></tr>
+<tr><td>May 6–8</td><td class="num">207–215</td><td>245–255C (+18%)</td><td class="num">2.3–2.5</td><td>next morning</td><td>May 11–14 · — · 1.2–1.6</td><td class="num">0.00</td><td>RR 0–2, call-skew 98 (grab already on)</td></tr>
+<tr><td>May 11–13</td><td class="num">219–225</td><td>260–270C</td><td class="num">2.2–2.4</td><td>next morning</td><td>— · — · 0.6–1.0</td><td class="num">0.00</td><td>RR 0, call-skew 99–100</td></tr>
+<tr><td>May 11–13, <b>May-29 weekly</b></td><td class="num">219–225</td><td>250–255C (+13%)</td><td class="num">1.9–2.3</td><td>next morning</td><td>May 14 · — · 1.0–1.2</td><td class="num">0.00</td><td></td></tr>
+<tr><td>May 14–20 (any expiry)</td><td class="num">220–236</td><td>+11–24% calls</td><td class="num">1.6–3.0</td><td class="neg">never (13 of 14)</td><td>premium gone</td><td></td><td>the top: RR 0, call-skew 100, front wing 99–100</td></tr>
+</table></div>
+
+<h4>Chase B — May 22–29 (212–216, −9/−10%) → the Jun 1 gap to 224</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Paired</th><th>Free spread max</th><th class="num">At expiry</th><th>Screen</th></tr>
+<tr><td>May 26–29, <b>Jun-05 weekly</b></td><td class="num">212–214</td><td>227.5–230C (+7%)</td><td class="num">0.9–1.2</td><td>Jun 1 09:33–13:54 (1–4)</td><td>≥2.00 on Jun 2 · <b>2.0–2.4</b></td><td class="num">0.00 (Jun 5, 205)</td><td>ivRank 45–53, RR 0–3, call-skew 98–100</td></tr>
+<tr><td>May 22–29, Jun-18</td><td class="num">212–216</td><td>237.5–242.5C (+12%)</td><td class="num">1.4–1.7</td><td>May 29 – Jun 1 (1–5)</td><td>1.2–1.4</td><td class="num">0.00</td><td></td></tr>
+<tr><td>May 21–29, Jul-17</td><td class="num">212–220</td><td>250–265C (+18–21%)</td><td class="num">2.3–2.5</td><td>May 29 – Jun 2 (1–7)</td><td>0.6–1.2</td><td class="num">0.00</td><td></td></tr>
+<tr><td>Jun 2–4, any</td><td class="num">215–222</td><td></td><td></td><td class="neg">never / Jun 4 for 0.5</td><td></td><td></td><td>after the gap</td></tr>
+</table></div>
+
+<h4>Chase C — Jun 24 – Jul 7 (193–200, −8/−14%) → the Jul 8–10 bounce to 210</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry</th><th class="num">NVDA</th><th>Bought</th><th class="num">Cost</th><th>Paired</th><th>Free spread max</th><th class="num">Later</th><th>Screen</th></tr>
+<tr><td>Jul 2 / 6 / 7, Jul-17</td><td class="num">195–196</td><td>210C (+7–8%)</td><td class="num">1.1–1.2</td><td>Jul 8 13:21–13:24 (1–3)</td><td>≥2.00 Jul 10 · <b>2.5</b></td><td class="num">0.00 (Jul 17, 202.7)</td><td>ivRank 48–61, RR 17–22, call-skew 76–81</td></tr>
+<tr><td>Jun 26 / 29, Jul-17</td><td class="num">193–195</td><td>212.5C (+9–10%)</td><td class="num">1.3–1.4</td><td>Jul 8–10 (6–9)</td><td>1.9</td><td class="num">0.00</td><td>RR 10–13, call-skew 88</td></tr>
+<tr><td>Jun 26 – Jul 7, <b>Aug-21</b></td><td class="num">193–200</td><td>230–235C (+17–20%)</td><td class="num">2.0–2.6</td><td>Jul 8–10 (1–11)</td><td>1.5 (Jul 10)</td><td class="num">0.4–1.0 on Aug 14 (still alive)</td><td></td></tr>
+<tr><td>Jun 5–23 (before the low), any</td><td class="num">201–208</td><td></td><td></td><td class="neg">mostly never; Jun 10/12/17 paired for 0.7–0.9</td><td></td><td></td><td>calls rich, no turn for 2–3 weeks</td></tr>
+</table></div>
+
+<h4>Chase D — Jul 27–31 (191–202, −5/−11%) → the August V to 226 — the only one the screen actually endorsed, and the only one that went to max</h4>
+<div class="tablewrap"><table>
+<tr><th>Entry</th><th class="num">NVDA</th><th>Bought (Aug-21)</th><th class="num">Cost</th><th>Paired</th><th>≥1 · ≥2 · ≥3</th><th class="num">Max</th><th class="num">Aug 14</th><th>Screen</th></tr>
+<tr><td><b>Jul 29</b></td><td class="num">191.4</td><td>215C (+12%)</td><td class="num">1.36</td><td>Jul 31 09:36 (2)</td><td>Jul 31 · Aug 5 · Aug 6</td><td class="num"><b>4.05</b></td><td class="num">3.85</td><td>ivRank 56, <b>RR 75</b>, call-skew 26</td></tr>
+<tr><td>Jul 30</td><td class="num">195.1</td><td>215C (+10%)</td><td class="num">1.50</td><td>Jul 31 15:53 (1)</td><td>Aug 3 · Aug 5 · Aug 6</td><td class="num">4.05</td><td class="num">3.85</td><td>ivRank 40, RR 57, call-skew 43</td></tr>
+<tr><td><b>Jul 27 / 28</b></td><td class="num">197–198</td><td>220C (+11–12%)</td><td class="num">1.5–1.6</td><td>Aug 3 11:04–11:21 (4–5)</td><td>Aug 3 · Aug 5 · Aug 13</td><td class="num">3.30</td><td class="num">2.95</td><td>RR 63–72, call-skew 33–37</td></tr>
+<tr><td>Jul 31</td><td class="num">201.8</td><td>222.5C (+10%)</td><td class="num">1.30</td><td>Aug 3 13:24 (1)</td><td>Aug 4 · Aug 5 · —</td><td class="num">2.80</td><td class="num">2.50</td><td>RR 40</td></tr>
+<tr><td>Aug 3</td><td class="num">206.2</td><td>227.5C (+10%)</td><td class="num">1.30</td><td>Aug 4 13:47 (1)</td><td>Aug 5 · — · —</td><td class="num">1.80</td><td class="num">1.50</td><td>RR 22 (calls re-bid)</td></tr>
+<tr><td>Jul 20–24</td><td class="num">203–212</td><td>230–235C (+12–15%)</td><td class="num">1.4–1.6</td><td>Jul 22 or Aug 5 (1–9)</td><td>Jul 22 / Aug 5–6 · — · —</td><td class="num">1.0–1.5</td><td class="num">0.4–1.0</td><td>RR 60–74 but a week early / one strike too far</td></tr>
+<tr><td>Jul 27–31, <b>Sep-18</b></td><td class="num">191–202</td><td>230–240C (+19–20%)</td><td class="num">1.9–2.5</td><td>Jul 30 – Aug 3 (1–5)</td><td>Aug 3–5 · — · —</td><td class="num">1.3–2.0</td><td class="num">1.1–1.8</td><td>longer tenor, further strike = less pop</td></tr>
+<tr><td>Aug 5–7 (after the rip)</td><td class="num">219–223</td><td>240–260C</td><td class="num">1.0–2.4</td><td class="neg">not by Aug 14</td><td></td><td></td><td></td><td>RR back to 12–21, call-skew 73–84</td></tr>
+</table></div>
+
+<div class="callout call"><b>What the four chases have in common — the pattern to model:</b>
+<ol>
+  <li><b>Buy in the last 1–3 sessions before the turn, at the low, on the puke</b> (May 4–5, May 26–29, Jul 2–7, Jul 27–30 — every one was −8% to −14% off the 20-day high). Every entry more than a week before the turn (May 14–20, Jun 2–23, Jul 14–16, Aug 5–7) never paired or paired late for &lt;1.00 and the premium was the loss.</li>
+  <li><b>It pairs on the first ripping morning</b> — almost always a gap: May 6 09:33, Jun 1 09:32–09:38, Jul 8 13:20, Jul 31 09:36 / Aug 3 — 1–5 sessions after entry.</li>
+  <li><b>The free spread peaks at the local top 1–2 weeks later</b> — 2.2–2.5 (May 13–14), 2.0–2.4 (Jun 1–2, weekly), 2.5 (Jul 10), 3.3–4.05 (Aug 5–13) — and <b>every one held to expiry from chases A–C was worth 0.00</b> (Jun 18: 212, Jun 5: 205, Jul 17: 203). Only chase D is still 3–4 on Aug 14 (Aug-21 hasn't expired). Rest the scale-outs at 1.00 / 2.00 / 3.00 the moment you're paired.</li>
+  <li><b>The screen decides magnitude and cost, not whether it pairs.</b> Chases A–C happened with RR at 0–22 (calls rich): the longs cost 1.0–2.5, paired anyway because the rip came inside a week, and the free spread topped at 1.2–2.5. Chase D — the only entry with RR 60–75 / call skew 25–43 — bought at 1.3–1.6 and ran to 3.3–4.05, near max, and is the one still paying.</li>
+  <li><b>Strike/tenor:</b> +7–12% OTM on the front monthly (25–35 DTE) is where the pop was; +17–24% or 50+ DTE (Sep-18, Jul-17 from May) paired just as fast but topped at 0.6–1.6. Weeklies (Jun-05 from May 26–29: 2.0–2.4) pop hardest when the gap comes inside days and go to zero fastest when it doesn't.</li>
+</ol></div>
+
+
 <h2>6 · Upside calls <span class="tag call">call side</span></h2>
 <h3>The mirror structure</h3>
 <p>Call bomb = long K<sub>lo</sub> call / short K<sub>hi</sub> call, planted for a credit. Bullish tape: buy the call, then sell the further-OTM call into the rip. Bearish/neutral: sell the OTM call into a rip, then buy the nearer call on the pullback. Payoff: width × 100 if SPX settles above K<sub>hi</sub>.</p>

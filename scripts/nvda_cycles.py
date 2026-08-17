@@ -10,6 +10,8 @@ import glob, os, sys
 import pandas as pd
 sys.path.insert(0, __file__.rsplit("/", 1)[0])
 from nvda_load import load, ROOT
+_CACHE = {}
+def clear_cache(): _CACHE.clear()
 
 def sessions_for(exp: str):
     e = exp.replace("-", "")
@@ -18,10 +20,12 @@ def sessions_for(exp: str):
 def cycle(right, exp, entry_date, entry_time="15:55", target_delta=0.15, width=5.0, credit=0.10, strike=None, verbose=True):
     sess = [d for d in sessions_for(exp) if d >= entry_date]
     if not sess or sess[0] != entry_date: return None
-    G = {}
     def g(d):
-        if d not in G: G[d] = load(exp, d)
-        return G[d]
+        key = (exp, d)
+        if key not in _CACHE:
+            df = load(exp, d)
+            _CACHE[key] = df[["strike", "right", "t", "timestamp", "bid", "ask", "delta", "underlying_price"]]
+        return _CACHE[key]
     g0 = g(entry_date); b = g0[(g0.t == entry_time) & (g0.right == right)]
     if b.empty: return None
     if strike is None:
