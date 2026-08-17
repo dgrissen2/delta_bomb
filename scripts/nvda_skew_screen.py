@@ -12,14 +12,14 @@ Ranks: rolling 252-trading-day percentile (share of prior 252 days below today) 
 """
 from __future__ import annotations
 import pandas as pd
-BASE = '/Users/dgrissen/Dev/central_trade_data/oos_validation_v4_b3/'
+BASE = '/Users/dgrissen/Dev/central_trade_data/orats/delta_bomb_refresh_2026-08-17/'  # full history through 2026-08-14
 OUT = '/Users/dgrissen/Dev/delta_bomb/docs/replay/nvda_skew_daily.parquet'
 
 def pct252(s): return s.rolling(252, min_periods=126).apply(lambda w: (w[:-1] < w[-1]).mean() * 100, raw=True)
 def z252(s): return (s - s.rolling(252, min_periods=126).mean()) / s.rolling(252, min_periods=126).std()
 
 def build(ticker='NVDA'):
-    c = pd.read_parquet(f'{BASE}cores_full_history/{ticker}.parquet'); r = pd.read_parquet(f'{BASE}ivrank_full_history/{ticker}.parquet')
+    c = pd.read_parquet(f'{BASE}{ticker}_cores.parquet'); r = pd.read_parquet(f'{BASE}{ticker}_ivrank.parquet')
     c['tradeDate'] = pd.to_datetime(c.tradeDate); r['tradeDate'] = pd.to_datetime(r.tradeDate)
     d = c.merge(r[['tradeDate', 'ivRank1y', 'ivPct1y', 'ivRank1m', 'ivPct1m']], on='tradeDate', how='left').sort_values('tradeDate').set_index('tradeDate')
     d = d[d.iv30d < 200]  # drop corrupt ticks (e.g. 2025-04-04 = 381%)

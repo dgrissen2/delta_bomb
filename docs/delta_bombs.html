@@ -537,6 +537,49 @@ a{color:inherit}
 <div class="callout put"><b>One-line version:</b> on SPX the bomb is legged in <em>minutes</em> around 20Δ because the 5-wide is thin relative to the intraday wiggle; on NVDA the same structure is legged over <em>hours-to-days</em> at 5–15Δ because the 5-wide is fat and it's the wing IV, not the intraday delta, that swings the legs. Both are "sell the leg when it's rich, buy it when it's cheap, keep the spread you're left holding". The anchor/50-20 machinery is an SPX intraday device; on NVDA the backstop is sizing.</div>
 
 
+<h3>5c · Recent NVDA call-spread entries — the screen Jun–Aug 2026, and the exact Jul 29 → Aug 14 sequence <span class="tag call">calls</span></h3>
+<p>ORATS refreshed through 2026-08-14 (<span class="mono">orats/delta_bomb_refresh_2026-08-17</span>) and ThetaData 1-min added for Jul 27–31 (Sep-18 and Dec-18 expiries). Screen fields as in 8c.</p>
+<div class="tablewrap"><table>
+<tr><th>Date</th><th class="num">NVDA</th><th class="num">vs 50d</th><th class="num">off 20d high</th><th class="num">ivRank1y</th><th class="num">RR25 pct</th><th class="num">25Δ call-skew pct</th><th class="num">5Δc−ATM 30d</th><th>Read</th></tr>
+<tr><td>Jun 01–04</td><td class="num">224 → 219</td><td class="num">+12 → +8%</td><td class="num">−5 → −7%</td><td class="num">52–62</td><td class="num"><b>1–2</b></td><td class="num"><b>97–99</b></td><td class="num">+8 to +9.5</td><td>Spot-up/vol-up hangover: calls extremely bid vs puts, far wing +9 vols. Sell-first territory, not buy-first.</td></tr>
+<tr><td>Jun 05–26</td><td class="num">205 → 192</td><td class="num">+1 → −8%</td><td class="num">−9 → −14%</td><td class="num">32–63</td><td class="num">7–18</td><td class="num">79–93</td><td class="num">+2 to +6</td><td>NVDA fell 14% and calls <em>stayed</em> bid relative to puts. RR never rose → the buy-first screen correctly stayed off (a call spread bought Jun 10 at 200 got one 6% bounce then bled).</td></tr>
+<tr><td>Jul 17–24</td><td class="num">203 → 207</td><td class="num">−3 → −1%</td><td class="num">−4 → −3%</td><td class="num">47–61</td><td class="num"><b>60–74</b></td><td class="num"><b>26–37</b></td><td class="num">−0.9 to +1.0</td><td>RR finally rises, call wing sags to flat. <b>Jul 21 = "good"</b> (ivRank 47 / RR 66 / call-skew 32).</td></tr>
+<tr><td><b>Jul 27–29</b></td><td class="num">196.5 → <b>190.1</b></td><td class="num">−6 → −8%</td><td class="num">−7.5 → <b>−10.6%</b></td><td class="num">52–60</td><td class="num"><b>72–75</b></td><td class="num"><b>26–33</b></td><td class="num">0 to +2.8</td><td><b>The puke.</b> RR high, call wing flat, but ivRank &gt; 50 → the strict tier says no. This is Pandar's "big down day" — his rule ignores IV rank in favour of what a 5-wide 20–35% OTM costs in dollars.</td></tr>
+<tr><td>Aug 03–14</td><td class="num">207 → 225</td><td class="num">0 → +9%</td><td class="num">−3 → 0%</td><td class="num">41 → 0</td><td class="num">10–22</td><td class="num">70–87</td><td class="num">+2 to +4</td><td>The V. Calls re-bid immediately (RR back to teens by Aug 4). Sell into it.</td></tr>
+</table></div>
+
+<h4>How far out on the wing Pandar buys — from the thread</h4>
+<ul>
+  <li>Mar 20 2025 (SPX ~5,650): call spreads "at the 6k–6.2k level" = <b>+6–10% OTM</b>, ~1–2 months. Mar 21: "on various tickers further out, to hedge against a 15–20%+ year" = strikes <b>15–20% up, months out</b>.</li>
+  <li>Apr 2025 (SPX ~5,100–5,400): the <b>6,500</b> spreads = <b>+20–27% OTM</b>, held Apr → Aug (4 months); sold "as we grind up" with <b>scaling resting sell orders</b>. Aug 2025 (SPX ~6,350): rolled into <b>7,000+</b> = +10%, and 5,800 puts <b>1 year out</b>.</li>
+  <li>Width $5; cost target the same as his puts — pennies to a few dimes for a 5-wide; bought <b>on the big down days</b>, not legged; exit = scale-out into the rip (2–4× cost) or hold as the melt-up hedge.</li>
+</ul>
+<p>Translated to NVDA at 190 on the Jul 29 close (Sep-18, 51 DTE): the 5-wide call spreads 20–37% OTM cost <b>0.09–0.48</b> ask-side; at 42–53% OTM, 0.06–0.10. Dec-18 (142 DTE) at the same strikes cost 0.5–1.1 (and its far strikes had wide, unreliable closing markets).</p>
+
+<h4>The exact sequence</h4>
+<div class="tablewrap"><table>
+<tr><th>Bought Jul 29 15:59 (NVDA 190.06)</th><th class="num">OTM</th><th class="num">Cost (ask-side)</th><th class="num">Jul 31</th><th class="num">Aug 05</th><th class="num">Aug 07</th><th class="num">Aug 14</th><th class="num">Multiple</th></tr>
+<tr><td>Sep-18 220/225C</td><td class="num">+16%</td><td class="num">0.82</td><td class="num">1.20</td><td class="num">2.20</td><td class="num">2.45</td><td class="num">2.55</td><td class="num">3.1×</td></tr>
+<tr><td>Sep-18 230/235C</td><td class="num">+21%</td><td class="num">0.48</td><td class="num">0.70</td><td class="num">1.65</td><td class="num">1.75</td><td class="num">1.85</td><td class="num">3.9×</td></tr>
+<tr><td>Sep-18 240/245C</td><td class="num">+26%</td><td class="num">0.28</td><td class="num">0.41</td><td class="num">1.10</td><td class="num">1.15</td><td class="num">1.15</td><td class="num">4.1×</td></tr>
+<tr><td>Sep-18 250/255C</td><td class="num">+32%</td><td class="num">0.16</td><td class="num">0.22</td><td class="num">0.67</td><td class="num">0.71</td><td class="num">0.68</td><td class="num">4.3×</td></tr>
+<tr><td>Sep-18 260/265C</td><td class="num">+37%</td><td class="num">0.09</td><td class="num">0.11</td><td class="num">0.42</td><td class="num">0.40</td><td class="num">0.36</td><td class="num">4.0×</td></tr>
+<tr><td>Dec-18 250/255C</td><td class="num">+32%</td><td class="num">0.85</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">1.25</td><td class="num">1.5×</td></tr>
+</table></div>
+<p class="small">Values are bid-side (what you could actually sell the spread for) at 15:45; the intraday highs ran ~0.1 higher. Pandar's scale-out (rest sells at 2×, 3×, 4× cost) would have been hit Aug 4–7 across the ladder. The Dec-18 spreads moved less per dollar — longer-dated is the "moon" hedge, not the V trade.</p>
+
+<h4>The same entries as buy-first bombs (leg-in, 1-min fills)</h4>
+<div class="tablewrap"><table>
+<tr><th>Jul 29 15:59</th><th>Rested</th><th>Filled</th><th>Result</th></tr>
+<tr><td>BTO 220C @ 3.35 (0.21Δ)</td><td>STO 225C @ 3.45</td><td>Jul 30 10:00, NVDA 195.5</td><td>220/225 for +0.10; worth 2.55 on Aug 14</td></tr>
+<tr><td>BTO 230C @ 1.98 (0.14Δ)</td><td>STO 235C @ 2.08</td><td>Jul 30 10:01 (bid 2.14)</td><td>230/235 for +0.10; worth 1.85</td></tr>
+<tr><td>BTO 240C @ 1.20 (0.09Δ)</td><td>STO 245C @ 1.30</td><td>Jul 30 10:02 (bid 1.33)</td><td>240/245 for +0.10; worth 1.15</td></tr>
+<tr><td>BTO 250C @ 0.77 (0.06Δ)</td><td>STO 255C @ 0.87</td><td>Jul 30 10:25</td><td>250/255 for +0.10; worth 0.68</td></tr>
+<tr><td>BTO 260C @ 0.54 (0.04Δ)</td><td>STO 265C @ 0.64</td><td>Aug 03 10:06, NVDA 202.9</td><td>260/265 for +0.10; worth 0.36</td></tr>
+</table></div>
+<div class="callout call"><b>Read-through.</b> Bought into the Jul 29 puke (RR 75th pct, call wing flat, −10.6% off the highs, −8% under the 50-day), every rung of the ladder planted as a free spread on the <em>next morning's</em> +3% bounce, and was worth 3–4× cost two weeks later. The screen's strict ivRank ≤ 50 gate would have missed it — on the puke day IV <em>is</em> the puke — so treat "big down day" as its own entry type: off-20-day-high ≤ −8%, RR25 pct ≥ 60, 25Δ call-skew pct ≤ 40, ivRank allowed to ~65, and size by the dollar cost of the 20–35% OTM 5-wide (Pandar's real gate). Jun 5–26 is the counter-example: a 14% drop with RR stuck in the teens (calls still bid) — the screen said no, and it was right.</div>
+
+
 <h2>6 · Upside calls <span class="tag call">call side</span></h2>
 <h3>The mirror structure</h3>
 <p>Call bomb = long K<sub>lo</sub> call / short K<sub>hi</sub> call, planted for a credit. Bullish tape: buy the call, then sell the further-OTM call into the rip. Bearish/neutral: sell the OTM call into a rip, then buy the nearer call on the pullback. Payoff: width × 100 if SPX settles above K<sub>hi</sub>.</p>
