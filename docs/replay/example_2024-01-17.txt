@@ -1,0 +1,12 @@
+
+=== 2024-01-17  exp 2024-02-16 (30 DTE)  anchor 4750P  base 4575P  width 5.0  target credit 0.25
+SPX open 4728.04 lo 4716.0 hi 4743.84 last 4733.4
+  09:35  SPX  4728.04  BTO 4750P (anchor, -0.50d)             @   70.50   bid/ask 70.2/70.5                                       book: +4750P
+  09:35  SPX  4728.04  STO 4575P (-0.20d)                     @   24.40   bid/ask 24.400000000000002/24.7                         book: +4750P -4575P
+  10:10  SPX  4734.44  BTO 4580P  (limit 24.15, ask 24.0)     @   24.15   bomb #1 planted: 4580/4575 for +0.25 credit             book: +4750P + 1 bombs
+  13:25  SPX  4722.56  STO 4575P  (limit 24.40, bid 25.1)     @   24.40   covered by anchor (wide debit spread) until the K+5 fills book: +4750P -4575P + 1 bombs
+  14:40  SPX  4729.05  BTO 4580P  (limit 24.15, ask 24.1)     @   24.15   bomb #2 planted: 4580/4575 for +0.25 credit             book: +4750P + 2 bombs
+  15:15  SPX  4723.48  STO 4575P  (limit 24.40, bid 24.5)     @   24.40   covered by anchor (wide debit spread) until the K+5 fills book: +4750P -4575P + 2 bombs
+  15:35  SPX  4728.43  BTO 4580P  (limit 24.15, ask 24.1)     @   24.15   bomb #3 planted: 4580/4575 for +0.25 credit             book: +4750P + 3 bombs
+  15:50  SPX   4733.4  STC 4750P (anchor)                     @   66.30   anchor P&L -4.20                                        book: 3 bombs
+bombs 3  credits [0.25, 0.25, 0.25]  total 0.75  anchor P&L -4.2  bomb mark @15:50 0.7  unpaired short: False
