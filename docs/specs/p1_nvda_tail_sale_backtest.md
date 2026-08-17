@@ -1,158 +1,184 @@
-# Spec — P1 "Tail-sale book with buybacks" backtest, NVDA, 2023 → present
+# Spec — P1 "Tail-sale with buyback" backtest, NVDA, 2023 → present
 
-Version 0.1 · 2026-08-17 · owner: delta_bomb · status: draft for review
+Version **0.2** · 2026-08-17 · owner: delta_bomb · status: for annotation
+(v0.1 + Charlie review §14 + Codex panel §16 dispositions applied; change log in §17)
 
 ## 0. What this is and what decision it informs
 
-P1 is PandarBear's core NVDA book as reconstructed from the PMTraders thread (§5f of `docs/delta_bombs.html`):
-**sell a far-OTM option in the front expiry when that wing is unusually rich, sized to be held to expiry; immediately
-rest a buy on the strike one notch nearer at (sale − c); if it fills you keep most of the premium and are left long a
-$5-wide spread carried at a credit ("the free long spread"); if it never fills you hold the short to expiry.**
+P1 is a **mechanised variant of the tail-sale-with-buyback book reconstructed from PandarBear's PMTraders thread**
+(`docs/sources/discord_transcript_clean.txt`; report §5f). The white paper is *not* the source for P1 — it describes an
+SPX intraday legging device. What is being tested:
 
-Decision this backtest informs (CIO memo, §10): whether P1 is promoted to paper-trading on NVDA, held as research-only,
-or dropped. Pass/fail criteria are in §9. Nothing else (SPX legging, penny-spread inventory P2, the §5e 15Δ buy-first
-structure) is in scope.
+> When the far wing of NVDA's front expiry is unusually rich, sell one far-OTM option there, sized at book level to be
+> held to expiry. Rest a buy on the strike one notch nearer at (sale − c). If it fills, keep the premium difference and
+> hold the resulting long vertical carried at a credit; if it never fills, hold the short to expiry.
 
-## 1. Universe and window
+Decision informed (CIO memo, report §10): **promote to paper-trading, hold research-only, or stop — decided
+separately per side (put/call) and per archetype (grab / post-shock smile), never on the combined book.**
+Out of scope: SPX legging, P2 penny-spread inventory, the report's §5e 15Δ buy-first structure, portfolio-margin
+optimisation, exit-timing optimisation.
+
+## 1. Universe, window, timing
 
 - Underlying: **NVDA only.**
-- Signal history: ORATS daily surface 2018-01-02 → 2026-08-14 (thresholds are *fitted* on 2018–2022, *tested* on
-  2023-01-03 → 2026-08-14). Trades are simulated only from **2023-01-03** forward (option quotes start there).
-- Sessions: NYSE calendar. Signal evaluated at the close of day *t*; entry executed at day *t* 15:55 (EOD proxy) or,
-  where 1-min data exist, at 15:55 exactly.
-- 10:1 split 2024-06-10: all strikes and premiums are **normalized to post-split units** (pre-split ÷ 10; contract
-  multiplier ×10 for P&L equivalence). ORATS `clsPx` is already split-adjusted; ThetaData quotes are as-traded and must
-  be normalized in the loader.
+- Signal history: ORATS daily surface 2018-01-02 → 2026-08-14. Thresholds are pre-registered (§8) and checked on
+  2018–2022 (surface only). Trades simulated **2023-01-03 → 2026-08-14** (option-quote history starts 2023).
+- **Timing (no look-ahead):** the signal is computed from the ORATS close of session *t*; the trade is entered at the
+  **open of session t+1** (EOD proxy: t+1 opening bid; where 1-min data exist, the 09:31 NBBO). All buyback checks and
+  marks start at t+1.
+- **Split (2024-06-10, 10:1):** all results in **constant share exposure** — the unit is 100 post-split shares. One
+  pre-split contract = 10 units; pre-split strikes/premiums ÷ 10; fees charged per executed *leg per unit*. ORATS
+  `clsPx` is already split-adjusted; ThetaData quotes are as-traded and normalised in the loader.
 
 ## 2. Data
 
-| Need | Source (all in `~/Dev/central_trade_data`) | Notes |
+| Need | Source (`~/Dev/central_trade_data`) | Notes |
 |---|---|---|
-| Daily surface for the trigger | `orats/delta_bomb_refresh_2026-08-17/NVDA_cores.parquet` (+ `NVDA_ivrank`, `NVDA_dailies`) | fields below; corrupt tick 2025-04-04 (`iv30d`=381) filtered |
-| Earnings dates | `orats/earnings/earnings_long.parquet` (`ticker==NVDA`, `earnDate`, `affected_trading_day`) | expiries containing an earnings date are **excluded** |
-| Option quotes for entry / buyback / marks | **to acquire:** ThetaData `option/history/eod` for NVDA, every listed expiration with 1–35 DTE, 2023-01-03 → 2026-08-14 (close bid/ask, all strikes, both rights) — one call per expiration; est. ~190 calls, ~200 MB | store as `thetadata/nvda_p1_eod_<date>-v1/eod/NVDA_<exp>.parquet` + manifest; dictionary + changelog entries |
-| Intraday fill validation | `thetadata/nvda_delta_bomb_1m_2026-08-17-v1/greeks/` (171 sessions, May–Aug 2026, 1-min NBBO) | used only to measure EOD-fill bias (§7) |
+| Daily surface (screen) | `orats/delta_bomb_refresh_2026-08-17/NVDA_cores.parquet`, `NVDA_ivrank.parquet`, `NVDA_dailies.parquet` | corrupt tick 2025-04-04 (`iv30d`=381) filtered |
+| Earnings dates | `orats/earnings/earnings_long.parquet` (`ticker==NVDA`) | exclusion rule §5 |
+| Option EOD quotes + greeks (entry, buyback, marks, contract-level confirmation) | **to acquire:** ThetaData `option/history/eod` **and** `option/history/greeks/eod` for NVDA, every expiration with 1–35 DTE, 2023-01-03 → 2026-08-14 (open/high/low/close trade, close bid/ask, delta, IV; all strikes/rights); one call per (endpoint, expiration) ≈ 380 calls | store `thetadata/nvda_p1_eod_2026-08-17-v1/{eod,greeks}/NVDA_<exp>.parquet` + manifest; dictionary + changelog entries |
+| Intraday fill truth-check | existing `thetadata/nvda_delta_bomb_1m_2026-08-17-v1/greeks/` (73 sessions, 2026-05-04 → 08-14; 171 expiry-session files) **plus to acquire:** 1-min greeks for the **10 largest 2023–2025 tail episodes** (~30 sessions, front expiry) | §7 |
+| Known Pandar callouts (fidelity set) | transcript dates: 2024-12-19, 2024-12-20 (SMH), 2025-01-27, 2025-01-31 (calls), 2025-02-07, 2025-02-21, 2025-03-27 (1-DTE), 2025-05-15, 2025-05-20 (calls) | §9.0 |
 
-Fields (ORATS cores, all 10-day tenor unless noted): `iv10d`, `dlt5Iv10d` (5Δ call), `dlt95Iv10d` (5Δ put),
-`dlt5Iv30d`, `dlt95Iv30d`, `iv30d`, `exErnIv30d`, `exErnDlt25Iv30d`, `exErnDlt75Iv30d`, `ivRank1y`, `clsPx`.
-Convention: ORATS `dltXX` = IV at XX **call** delta.
+ORATS fields: `iv10d`, `dlt5Iv10d` (5Δ **call**), `dlt95Iv10d` (5Δ put), `dlt5Iv30d`, `dlt95Iv30d`, `iv30d`,
+`exErnIv30d`, `exErnDlt25Iv30d`, `exErnDlt75Iv30d`, `ivRank1y`, `clsPx`. Convention: `dltXX` = IV at XX call delta.
 
 ## 3. Definitions
 
 ```
-call_wing_10  = dlt5Iv10d  - iv10d            # front far-call wing over ATM (vol pts)
-put_wing_10   = dlt95Iv10d - iv10d            # front far-put wing over ATM
-call_kink     = dlt5Iv10d  - dlt5Iv30d        # front far-call vs 30d far-call
-put_kink      = dlt95Iv10d - dlt95Iv30d
-pct252(x)     = share of the prior 252 sessions with x below today's value (×100); min 126 obs
+call_wing_10 = dlt5Iv10d  - iv10d          put_wing_10 = dlt95Iv10d - iv10d
+call_kink    = dlt5Iv10d  - dlt5Iv30d      put_kink    = dlt95Iv10d - dlt95Iv30d
+RR25         = exErnDlt75Iv30d - exErnDlt25Iv30d      (25Δ put IV − 25Δ call IV; high = puts rich vs calls)
+pct252(x)    = share of the prior 252 sessions with x below today's value ×100 (min 126 obs)
+episode      = a run of signal days on one side separated by < 5 sessions (unit for clustering, §8/§9)
 ```
-Ranks are computed on the raw 10-day series (there is no `exErn` variant of the 10-day wing fields); the earnings
-exclusion in §5 handles the event ramp.
 
-## 4. Trigger (evaluated at each close, per side)
+## 4. Trigger (at close of *t*, per side), with archetype tag
 
-- **Sell-put signal** at close *t* if `pct252(put_wing_10) ≥ P_thr` **and** `pct252(put_kink) ≥ K_thr`.
-- **Sell-call signal** at close *t* if `pct252(call_wing_10) ≥ P_thr` **and** `pct252(call_kink) ≥ K_thr`.
-- Baseline `P_thr = 85`, `K_thr = 70` (the values used in §8b/8c). These are **judgment values**; §8 sets them from
-  the fitted distribution and reports the sensitivity grid.
-- Cool-down: at most one new position per side per expiry; a new signal while a position on that side/expiry is
-  open adds nothing.
-- Regime tag stored with every signal: `ivRank1y`, `RR25_pct` (from the 30d ex-earn series), `clsPx` vs 50-day
-  SMA, drawdown from 20-day high — for the regime splits, not for gating.
+**Screen (ORATS):**
+- Sell-put candidate: `pct252(put_wing_10) ≥ P_thr` and `pct252(put_kink) ≥ K_thr`.
+- Sell-call candidate: `pct252(call_wing_10) ≥ P_thr` and `pct252(call_kink) ≥ K_thr`.
+- Pre-registered `P_thr = 85`, `K_thr = 70` (§8).
 
-## 5. Instrument selection
+**Contract-level confirmation (ThetaData EOD greeks, same close):** the *selected* option's IV minus the same-expiry
+ATM IV must be ≥ its own 252-session 85th percentile (computed on the EOD store for that DTE band). No confirmation →
+no trade (logged as "screen-only").
 
-- Expiry: the **nearest listed expiration with 5 ≤ DTE ≤ 12** at signal (front weekly; if none, nearest ≤ 19 DTE).
-  Skip the signal if the chosen expiry contains an NVDA earnings date (`earnDate` ≤ expiry and `earnDate` ≥ t).
-- Strike: the far option on the signalled side with **delta closest to 0.04 (|Δ| in [0.02, 0.06])** using the
-  ThetaData EOD greeks if present, else the strike nearest **25% OTM**; must have bid ≥ 0.05 and ask−bid ≤ 0.10.
-  Record moneyness (% OTM), delta, IV.
-- Buyback strike: **one listed strike nearer to the money** (5.00 spacing above ~$180 post-split, 2.50 below; use the
-  chain as listed). Record the width actually available.
+**Archetype tag (stored, drives the split):**
+- **(a) grab** — one-sided: that side's wing ≥ P_thr, the *other* wing's pct < 70, that side of RR extreme
+  (calls: `pct252(RR25) ≤ 10`; puts: `≥ 90`), and spot moved that way over the prior 5 sessions.
+- **(b) post-shock smile** — both wings ≥ P_thr and `pct252(iv10d) ≥ 80`.
+- **(c) other** — fires the screen but neither (a) nor (b). Reported, not promoted.
 
-## 6. Entry, buyback, exit
+**Cool-down:** at most one *unpaired* short per side per expiry. A completed spread does **not** block a new sale on
+that side/expiry (inventory building). Variant "single-cycle" (one trade per side per expiry, full stop) also run.
 
-- **Entry (t, 15:55):** STO 1 far option at the **bid**. Fees: $0.65/contract (ToS) and $0.00 (Robinhood-style) both
-  reported.
-- **Resting buyback:** BTO 1 of the nearer strike, limit `L = sale − c`, `c ∈ {0.05, 0.10}` (baseline 0.10). Working
-  from the next session's open until expiry.
-- **Fill rule (EOD proxy):** fills on the first session *s > t* where close **ask** ≤ L, at price L. (Conservative:
-  intraday touches are invisible; §7 measures the bias against the 1-min store.)
-- **After a fill:** book = long nearer / short farther = a debit spread carried at credit `sale − L = c`. Hold to
-  expiry; also record the daily bid-side value (sell nearer at bid, buy farther at ask) and its max, and the first
-  session it reaches 1.00 / 2.00 / 3.00 (for a later "scale-out" variant; the baseline holds).
-- **If never filled:** hold the naked short to expiry. Record daily mark (ask). Terminal = max(0, intrinsic).
-- **Defensive rule (variant, not baseline):** if the far option's ask ≥ 3 × sale at any close, buy the strike one
-  notch *farther* (synthetic spread) and stop. Report with and without.
-- **Expiry settlement:** intrinsic from `clsPx` on the expiration date (equity options: physical; we treat as cash
-  intrinsic).
+**Regime tags stored:** `ivRank1y`, `pct252(RR25)`, `clsPx` vs 50-day SMA, drawdown from 20-day high.
 
-## 7. Fill-bias check (mandatory)
+## 5. Instrument
 
-For every P1 trade dated within the 1-min store's coverage (2026-05-04 → 2026-08-14), recompute the buyback fill with
-1-min NBBO (`ask ≤ L` at any minute) and report: (a) fraction of trades where the 1-min fill occurs but the EOD rule
-misses it, (b) mean days-to-fill EOD vs 1-min, (c) P&L difference. This scalar is applied as a stated caveat to
-the 2023–2026 EOD results, not as an adjustment.
+- Expiry: nearest listed with **5 ≤ DTE ≤ 12** at *t+1*; if none, nearest ≤ 19. **Skip** if an NVDA `earnDate` falls
+  in [t+1, expiry]; on the call side also skip if t+1 is the session before a print.
+- Strike: the far option on the signalled side whose EOD **|Δ| is nearest 0.04** (must be in [0.02, 0.06]) — one rule,
+  no moneyness fallback; **skip if greeks are missing**. Require **bid ≥ 0.20** and ask − bid ≤ 0.10 at entry.
+  Record %OTM, Δ, IV, dollar premium.
+- Buyback strike: **one listed strike nearer** the money. Record realised width (2.5 / 5 / other) and report per width;
+  the headline uses width-normalised P&L (P&L ÷ width × 5).
+- Sensitivity (§8): moneyness rule 25–40% OTM; |Δ| 0.03 / 0.06; DTE 8–19.
 
-## 8. Threshold fitting and sensitivity
+## 6. Entry, buyback, exits, counterfactuals
 
-- Fit window 2018–2022 (surface only, no trades): choose `P_thr, K_thr` as the pair maximizing the *ex-post* 5-session
-  wing-crush (fall in `*_wing_10` from t to t+5) subject to ≥ 12 signals/year/side. Report the objective surface;
-  if the maximum is flat, keep the baseline 85/70 and say so.
-- Test window 2023-01-03 → 2026-08-14 with the fitted thresholds only.
-- Sensitivity grid reported (test window): `P_thr ∈ {75, 85, 90}`, `K_thr ∈ {50, 70, 85}`, `c ∈ {0.05, 0.10}`,
-  target |Δ| ∈ {0.03, 0.04, 0.06}, DTE band ∈ {5–12, 8–19}. Fees on/off.
+- **Entry (t+1 open):** STO 1 unit at the bid. Fees: $0.65 per executed leg per unit (ToS) and $0.00, both reported.
+- **Resting buyback, live from the same minute:** BTO 1 unit of the nearer strike, limit `L = sale − c`,
+  `c = min(0.10, 0.5 × sale)` (baseline; `c = min(0.05, …)` in the grid). L ≥ 0.10 by the bid ≥ 0.20 rule.
+- **Fill test:** primary = first session ≥ t+1 whose EOD **low trade ≤ L** (fill at L); bound = close ask ≤ L. Both
+  P&Ls reported; the decision must hold under both. Assumption stated: 1 unit fills if touched.
+- **After a fill:** book = long nearer / short farther, carried at credit `sale − L`. Baseline holds to expiry.
+  Record daily bid-side value (sell nearer at bid, buy farther at ask), its max, first session ≥ 1.00 / 2.00 / 3.00
+  (scale-out variant: sell at 2.00; reported, not optimised).
+- **Same-time buy-to-close comparator (mandatory):** at the fill session, also record the far short's own ask. Report
+  cash retained by *closing the short* vs *buying the nearer strike*; the difference is the cost of keeping the vertical,
+  set against the vertical's later payoff.
+- **If never filled:** hold to expiry; daily mark at ask; terminal = intrinsic on `clsPx` at expiry (physical delivery
+  and pin/after-hours risk noted as unmodelled).
+- **Breakout stop (named variant, Charlie #4):** after entry, if that side's wing pct has *risen* vs entry and spot has
+  moved ≥ 5% toward the strike at a close → BTC the short (or BTO one strike farther = synthetic spread) and stop.
+  Report with/without; the difference = the price of the tell.
+- **Counterfactuals (mandatory, same dates/instrument):** (i) naked-to-expiry, no buyback; (ii) immediate vertical at
+  entry (sell far, buy nearer at the same open); (iii) **unconditional**: same instrument sold on *every* eligible
+  session; (iv) matched non-signal sessions (same DTE/Δ, nearest non-signal day). Edge of the screen = P1 − (iii);
+  value of the buyback = P1 − (i) and P1 − same-time BTC.
 
-## 9. Metrics and pass criteria (from the CIO memo)
+## 7. Fill truth-check
 
-Per side and combined, test window:
+Recompute every buyback (and entry) fill with 1-min NBBO wherever the 1-min store covers the trade — the 2026 window
+plus the acquired 2023–25 episode set — and report **per regime**: share of trades whose fill status differs
+(naked ↔ spread), days-to-fill, P&L difference. Not a scalar caveat: the promotion decision (§9) is evaluated under
+the primary EOD rule, the conservative EOD rule, and, where available, the 1-min truth; all three must agree on sign
+per side × archetype.
 
-1. Signals per month; trades per month after exclusions.
-2. Buyback fill rate within 5 sessions; median credit kept (`sale − L` at fill, i.e. `c`) and median premium
-   collected (`sale`).
-3. Distribution of **unfilled** trades: count, days held, terminal P&L, worst single, and their mark-to-market path.
-4. P&L per contract: mean, median, worst month, worst 12-month rolling; hit rate.
-5. **Free-spread payoff:** of spreads left after a fill, how many finished ITM (any intrinsic) and how much; the
-   distribution of max bid-side value before expiry (the "sell the inflation" opportunity).
-6. Regime split: 2023 (trend), 2024-H1 (grind), 2024-H2 → 2025 (chop, two shocks: 2024-08-05, 2025-01-27, and the
-   Apr-2025 crash), 2026 (grind + May blow-off).
-7. Fee sensitivity: results at $0.65 and $0.00 per contract.
+## 8. Thresholds and sensitivity
 
-**Pass (→ promote to paper-trading):** in the test window, on the baseline settings, (a) fill rate within 5 sessions
-≥ 60%, (b) worst rolling-12-month P&L ≥ −0.5 × trailing-12-month median income, (c) results at $0.65 fees remain
-positive in ≥ 3 of the 4 regimes, (d) the fill-bias check does not flip the sign of any regime.
-**Hold research-only:** any of (a)–(d) fails but the combined P&L is positive.
-**Stop:** combined P&L negative at $0.00 fees, or the unfilled tail alone exceeds total income in the test window.
+- `P_thr = 85`, `K_thr = 70`, `c = min(0.10, 0.5×sale)`, |Δ| 0.04, DTE 5–12 are **pre-registered** as the primary
+  hypothesis (from report §8b/8c). They are checked, not fitted, on 2018–2022 (surface only): report signal counts and
+  ex-post 5-session P&L of a synthetic 4Δ short (from the surface) per episode; if the pre-registered pair is not in
+  the top quartile of the grid there, say so — do not move it.
+- Sensitivity grid (test window, reported only): `P_thr ∈ {75, 85, 90}`, `K_thr ∈ {50, 70, 85}`, `c ∈ {0.05, 0.10}`
+  caps, |Δ| ∈ {0.03, 0.04, 0.06}, DTE ∈ {5–12, 8–19}, moneyness rule, fees on/off. **Observations are episodes**, not
+  days.
 
-## 10. Sizing note (out of scope for pass/fail, reported)
+## 9. Metrics and pass criteria (per side × archetype; combined book reported, never used to pass)
 
-All results are per 1 contract. Report the notional at risk per trade under Pandar's stated rule (loss if the stock
-goes to zero on puts / doubles on calls ≤ 10% NLV) for a $250k and a $1M account, i.e. the contract count that rule
-allows, so the per-contract P&L can be scaled honestly.
+**9.0 Fidelity set:** does the trigger fire on the known Pandar callout dates (§2)? Report hits/misses with the
+surface values that day. Misses are findings, not failures.
 
-## 11. Deliverables
+Metrics: signals/month, trades/month after exclusions; fill rate within 5 sessions (both fill rules); premium
+collected; unfilled trades — count, days held, terminal, worst, MTM path; P&L per unit — mean, median, worst month,
+worst rolling-12; hit rate; free-spread payoff (ITM count and size; max bid-side value distribution) *and* the
+same-time BTC comparator; counterfactuals (i)–(iv); breakout-stop delta; regime split (2023 trend / 2024-H1 grind /
+2024-H2–2025 chop incl. 2024-08-05, 2025-01-27, Apr-2025 / 2026 grind + May blow-off); fees on/off.
 
-- `scripts/p1_fetch_eod.py` (acquisition + manifest + dictionary/changelog entries), `scripts/p1_backtest.py`
-  (signals → trades → metrics), `docs/replay/p1_trades.csv`, `docs/replay/p1_summary.md`, and a section §11 in the
-  report with the tables above.
-- Every number in the deliverable is reproducible from the store with one command.
+**Portfolio-level (enters pass/fail):** concurrent positions on both sides across expiries; book **gap stress**:
+overnight ±15% and ±25% through strikes on the whole book at each session; expected shortfall (5%) of monthly P&L;
+margin proxy = broker-style naked-option requirement summed across the book; **forced-liquidation flag** if margin
+> 80% of a $250k / $1M NLV. Sizing rule restated at book level: units chosen so the ±25% gap loss on the whole
+book ≤ 10% NLV.
 
-## 12. Non-goals
+**Pass (→ paper-trading), per side × archetype:** (i) mean P&L per unit > 0 with an episode-level block-bootstrap
+90% CI excluding 0; (ii) ES(5%) of monthly P&L ≤ 1.5 × median monthly income; (iii) sign agrees under both EOD fill
+rules and the 1-min truth-check where available; (iv) survives leave-one-shock-out (each of the three shocks removed);
+(v) book gap stress never trips the forced-liquidation flag at the stated size; (vi) P1 − unconditional (iii) > 0
+with CI excluding 0 (the screen adds something).
+**Hold research-only:** positive mean but any of (i)–(vi) fails. **Stop:** mean ≤ 0 at $0.00 fees, or unfilled-tail
+loss > total income, on that side × archetype.
 
-- No SPX; no P2 (penny-spread inventory); no §5e buy-first calls; no intraday planting; no portfolio-level margin
-  simulation (PNR) beyond the sizing note; no optimisation of exit timing (the scale-out variant is recorded, not
-  optimised).
+## 10. Deliverables
 
-## 13. Open questions for review
+`scripts/p1_fetch_eod.py` (acquisition, manifest, dictionary/changelog), `scripts/p1_backtest.py`
+(signals → trades → counterfactuals → metrics), `docs/replay/p1_trades.csv`, `docs/replay/p1_summary.md`, report §11.
+One command reproduces every number.
 
-1. Is `|Δ| ≈ 0.04` in the 5–12 DTE weekly the right instrument, or should the far option be defined by moneyness
-   (25–40% OTM) as Pandar describes ("$5-wide under $0.10", "80P with the stock at 135")?
-2. Is "one strike nearer" always the right buyback, or should the buyback be "the nearest strike whose ask ≤ L"
-   (which is what a resting ladder of bids would actually do)?
-3. Should the trigger require the *other* wing to be non-extreme (i.e. a genuine one-sided grab) or accept both-wing
-   blow-outs (post-shock smile, Jan 31 2025)? Both are Pandar sales in the record.
-4. EOD fill proxy: is a "close ask ≤ L" rule too conservative to be decision-useful, given the 1-min store shows the
-   fills are gap-open events?
+## 11. Stated limitations (not modelled)
+
+Dealer gamma / call-OI stacking (the amplifier for archetype (a)); assignment, pin and after-hours stock risk;
+quote size / queue position (fill assumed if touched, 1 unit); ~3.6 test years in one name cannot estimate the ruin
+probability of repeated 4Δ naked shorts — the gap stress and ES bounds are the substitute, and the pass criteria are
+per side × archetype so a call-side tail cannot hide behind put income.
+
+## 12. Open questions for annotation
+
+1. Contract-level confirmation (§4) — is a 252-session percentile of "selected option IV − same-expiry ATM IV"
+   computable robustly from EOD greeks across the split and strike-listing changes, or should the confirmation be a
+   simpler *dollar* test (premium ≥ 3× its 60-session median for that Δ/DTE)?
+2. `c = min(0.10, 0.5 × sale)` — right cap? Pandar's examples ("buy back at a profit", 0.62 → 0.40) suggest the credit
+   kept is often larger and the buyback price is what's rested; alternative: rest at 0.6 × sale.
+3. Archetype (c) "other" — drop, or promote as its own bucket if it turns out to be most of the signals?
+4. Book-level sizing rule (±25% gap ≤ 10% NLV) — too loose / too tight for a 4Δ front-weekly short on NVDA?
+5. Should the fidelity set (9.0) be a hard gate (must fire on ≥ 6 of 9 callouts) rather than a report?
+
+---
+
+## 13. (reserved)
 
 ## 14. Review — Charlie McElligott (2026-08-17)
 
@@ -177,6 +203,8 @@ required before code:
 
 Disposition: incorporate 1–8 into v0.2 (fill rule, archetype tags, stress section, breakout variant, moneyness grid,
 P&L objective, counterfactual, earnings rule); 9 becomes a stated limitation.
+
+Disposition: 1–8 applied in v0.2 (§4–§9); 9 is §11.
 
 ## 15. In plain terms — what review points #2 and #4 mean
 
@@ -236,29 +264,36 @@ rule earns its place or doesn't. The simplification: "5% toward the strike" and 
 reasonable definition of "this is a move"; the test may show a different line is better, and if no line beats
 "just size small," that's a real answer too.
 
-## 16. Codex adversarial review (2026-08-17) — panel FAIL, 14 findings — and v0.2 dispositions
+## 16. Codex adversarial review (2026-08-17) — panel FAIL, 14 findings — dispositions
 
 Full output: `docs/specs/p1_codex_strategy_review_2026-08-17.md` (generic + Charlie McElligott + Senior Quant lenses; the
 panel was given the white paper as context, not the Discord transcript, so its "fidelity" finding is partly an artefact
 of what it was shown — the reconstruction lives in `docs/sources/discord_transcript_clean.txt` and report §5f).
 
-| # | Finding (severity) | Disposition for v0.2 |
+| # | Finding (severity) | Applied in v0.2 |
 |---|---|---|
-| 1 | Look-ahead: close-of-day surface used for a 15:55 entry (CRITICAL) | **Accept.** Signal at close *t* → entry at **t+1 open** (first EOD bid of t+1 as proxy; 09:31 NBBO where 1-min exists). All fills/marks from t+1 onward. |
-| 2 | Fidelity to Pandar not established by the supplied context (HIGH) | **Accept as scoping.** Retitle: "a mechanised tail-sale-with-buyback variant reconstructed from the thread"; add §5f quotes as an appendix; add a "known Pandar callouts" test set (12/19/24, 12/20/24 SMH, 1/31/25 calls, 2/7/25, 3/27/25 1-DTE, 5/15/25) and report whether the trigger fires on those dates. |
-| 3 | Trigger is a constant-maturity fixed-delta surface point, not the traded contract (HIGH) | **Accept.** Keep the ORATS surface as the *screen*, but require confirmation on the traded contract from ThetaData EOD greeks: the selected option's IV − the same-expiry ATM IV must itself be ≥ its own 252-day 85th pct (computed on the EOD store). Report both. |
-| 4 | One trigger pools flow archetypes (HIGH) | **Accept** (= Charlie #2): archetype tag a/b at entry; all metrics split; promotion decided per side × archetype. |
-| 5 | Threshold fitting on wing-crush; overfitting; clustered signals (HIGH) | **Accept.** Objective = ex-post 5-session P&L of the short; observations clustered by *episode* (signals within 5 sessions = one episode); pre-register 85/70 as the primary hypothesis; the grid is reported as sensitivity only, never used to pick the headline. |
-| 6 | Instrument not invariant; negative buy limits at nickel sales; variable width (HIGH) | **Accept.** One rule: strike = nearest listed to **|Δ| 0.04** from EOD greeks (no OTM fallback; skip if greeks missing). Require **sale ≥ 0.20**; `L = sale − c` with `c = min(0.10, 0.5 × sale)`. Record realised width; report per-width. |
-| 7 | Fill model biased: order live only t+1; close-ask; queue/size (HIGH) | **Accept.** Order live from t+1 open. Fill test = EOD **low ≤ L** (primary), close-ask ≤ L (bound); 1-min truth-check for 2026; the decision must hold under both. State size/queue assumptions explicitly (fill assumed if touched; 1 contract). |
-| 8 | 2026 intraday sample can't validate 2023–25 fills; "171 sessions" wrong (HIGH) | **Accept.** Wording fixed (73 sessions, 171 expiry-session files). Add: pull 1-min for the **10 largest 2023–25 tail episodes** (~30 sessions) as an out-of-window fill check. Fill bias reported per regime, not as one scalar. |
-| 9 | "Free spread" ignores opportunity cost vs same-time buy-to-close (HIGH) | **Accept — important.** Mandatory comparator: at the buyback minute, the far short's own buy-to-close price. Report the cash given up to keep the vertical vs the vertical's later payoff. |
-| 10 | Cooldown blocks the inventory-building mechanism (HIGH) | **Accept.** Cooldown applies to *unpaired* shorts only; a completed spread does not block a new sale on the same side/expiry. Also add the "single-cycle" variant for a clean read. |
-| 11 | Naked-call / portfolio tail risk not controlled (CRITICAL) | **Accept.** Add portfolio-level accounting: concurrent positions, both sides, worst overnight gap ±15% / ±25% through strikes on the whole book, expected shortfall; forced-liquidation proxy = margin > 80% NLV. Sizing rule restated as book-level, not per-trade. Enters pass/fail (see 13). |
-| 12 | Split normalisation mixes exposure units (CRITICAL) | **Accept.** Normalise to constant **share exposure**: one pre-split contract = 10 post-split units; report P&L per 100 post-split shares throughout; fees per executed leg on that unit. |
-| 13 | Pass gates arbitrary/underdefined (CRITICAL) | **Accept.** Replace with: pre-registered, per side × archetype: (i) mean P&L per unit > 0 with a block-bootstrap (episode-level) 90% CI excluding 0; (ii) expected shortfall (5%) of monthly P&L ≤ 1.5 × median monthly income; (iii) both fill models agree on sign; (iv) survives leave-one-shock-out; (v) book-level gap stress does not breach margin. Combined book reported but never used to pass a failing side. |
-| 14 | Cannot isolate signal skill vs generic short-vol carry (HIGH) | **Accept.** Controls: (a) same instrument sold on **all** eligible days (unconditional), (b) matched non-signal dates, (c) naked-to-expiry, (d) immediate vertical at entry, (e) same-time buy-to-close (=9). Edge = signal minus (a); buyback value = P1 minus (c) and (e). |
+| 1 | Look-ahead: close-of-day surface used for a 15:55 entry (CRITICAL) | §1: entry at t+1 open; all fills/marks from t+1. |
+| 2 | Fidelity to Pandar not established by supplied context (HIGH) | §0 scoping; §9.0 fidelity set of known callouts. |
+| 3 | Trigger is a surface point, not the traded contract (HIGH) | §4 contract-level confirmation from EOD greeks. |
+| 4 | One trigger pools flow archetypes (HIGH) | §4 archetype tags a/b/c; §9 per side × archetype. |
+| 5 | Fitting on wing-crush; overfitting; clustered signals (HIGH) | §8 pre-registered thresholds, episode clustering, grid as sensitivity only. |
+| 6 | Instrument not invariant; negative buy limits; variable width (HIGH) | §5 one Δ rule, bid ≥ 0.20, `c = min(0.10, 0.5×sale)`, width recorded/normalised. |
+| 7 | Fill model biased: live only t+1; close-ask; queue/size (HIGH) | §6 order live from entry minute; EOD low primary / close-ask bound; assumptions stated. |
+| 8 | 2026 sample can't validate 2023–25 fills; "171 sessions" wrong (HIGH) | §2/§7: wording fixed; 2023–25 episode 1-min set acquired; per-regime truth-check enters pass/fail. |
+| 9 | "Free spread" ignores opportunity cost vs same-time BTC (HIGH) | §6 mandatory same-time buy-to-close comparator. |
+| 10 | Cooldown blocks inventory building (HIGH) | §4 cooldown on unpaired shorts only; single-cycle variant. |
+| 11 | Naked-call / portfolio tail risk uncontrolled (CRITICAL) | §9 book-level gap stress, ES, margin proxy, forced-liquidation flag; sizing restated at book level; enters pass/fail. |
+| 12 | Split normalisation mixes exposure units (CRITICAL) | §1 constant share exposure (100 post-split shares); fees per leg per unit. |
+| 13 | Pass gates arbitrary/underdefined (CRITICAL) | §9 pre-registered per side × archetype: bootstrap CI, ES bound, fill-rule agreement, leave-one-shock-out, gap stress, screen-vs-unconditional. |
+| 14 | Cannot isolate signal skill vs short-vol carry (HIGH) | §6 counterfactuals (i)–(iv) mandatory; §9 (vi). |
 
-Status after review: **v0.1 is not runnable as a decision test.** v0.2 = this table applied. The Charlie items (§14) that
-overlap (fill proxy, archetypes, breakout stop, counterfactual, moneyness grid, P&L objective) are covered by 4, 5, 7, 9,
-14 above; the breakout stop (Charlie #4) stays as a named variant.
+## 17. Change log
+
+- **v0.2 (2026-08-17):** entry moved to t+1 open (no look-ahead); constant share-exposure units across the split;
+  contract-level confirmation of the trigger; archetype tags (grab / smile / other) with per-side × archetype
+  decisions; single Δ instrument rule, bid ≥ 0.20, `c = min(0.10, 0.5×sale)`; buyback live from entry, EOD low as
+  primary fill test with close-ask bound and per-regime 1-min truth-check (2026 + 2023–25 episodes); same-time BTC
+  comparator; cooldown on unpaired shorts only + single-cycle variant; breakout-stop variant; four counterfactuals;
+  pre-registered thresholds with episode clustering; book-level gap stress / ES / margin in pass-fail; fidelity set;
+  stated limitations; open questions for annotation.
+- **v0.1 (2026-08-17):** initial draft; Charlie review (§14); plain-language §15; Codex panel (§16).
