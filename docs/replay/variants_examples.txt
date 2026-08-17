@@ -1,0 +1,291 @@
+
+=== 2024-03-13 anchor  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5200P anchor                           @   72.00
+  09:35  SPX  5172.14  STO 5035P                                  @   22.90
+  15:50  SPX  5168.42  STC 5200P anchor                           @   71.30
+  bombs 0 credits [] anchor_pnl -0.7 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short True  cash 22.2 book@15:50 -23.0 dayPnL -0.8
+
+=== 2024-03-13 anchor_bomb  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5200P anchor                           @   72.00
+  09:35  SPX  5172.14  STO 5035P                                  @   22.90
+  15:50  SPX  5168.42  STC 5200P anchor                           @   71.30
+  bombs 0 credits [] anchor_pnl -0.7 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short True  cash 22.2 book@15:50 -23.0 dayPnL -0.8
+
+=== 2024-03-13 anchor_bomb_late  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5200P anchor                           @   72.00
+  09:35  SPX  5172.14  STO 5035P                                  @   22.90
+  15:50  SPX  5168.42  STC 5200P anchor                           @   71.30
+  bombs 0 credits [] anchor_pnl -0.7 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short True  cash 22.2 book@15:50 -23.0 dayPnL -0.8
+
+=== 2024-03-13 long_first  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5040P                                  @   24.00
+  15:30  SPX  5157.22  STO 5035P                                  @   24.50
+  15:50  SPX  5168.42  BTO 5040P                                  @   24.00
+  bombs 1 credits [0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -0.6 unpaired_short False  cash -23.5 book@15:50 24.2 dayPnL 0.7
+
+=== 2024-03-13 long_atm  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5200P                                  @   72.00
+  10:05  SPX  5166.17  STO 5195P                                  @   72.50
+  10:45  SPX  5173.97  BTO 5200P                                  @   72.00
+  15:30  SPX  5157.22  STO 5195P                                  @   72.50
+  15:50  SPX  5168.42  BTO 5200P                                  @   72.00
+  bombs 2 credits [0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -0.7 unpaired_short False  cash -71.0 book@15:50 76.1 dayPnL 5.1
+
+=== 2024-03-13 ladder3  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5040P                                  @   24.00
+  09:35  SPX  5172.14  BTO 5050P                                  @   25.60
+  09:35  SPX  5172.14  BTO 5060P                                  @   27.50
+  15:30  SPX  5157.22  STO 5035P                                  @   24.50
+  15:30  SPX  5157.22  STO 5045P                                  @   26.10
+  15:30  SPX  5157.22  STO 5055P                                  @   28.00
+  15:50  SPX  5168.42  BTO 5040P                                  @   24.00
+  15:50  SPX  5168.42  BTO 5050P                                  @   25.60
+  15:50  SPX  5168.42  BTO 5060P                                  @   27.50
+  bombs 3 credits [0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -2.0 unpaired_short False  cash -75.6 book@15:50 77.55 dayPnL 1.95
+
+=== 2024-03-13 short3  k50 5200 k20 5035
+  09:35  SPX  5172.14  STO 5035P                                  @   22.90
+  09:35  SPX  5172.14  STO 5045P                                  @   24.50
+  09:35  SPX  5172.14  STO 5055P                                  @   26.20
+  13:55  SPX  5177.37  BTO 5050P                                  @   24.00
+  13:55  SPX  5177.37  BTO 5060P                                  @   25.70
+  15:30  SPX  5157.22  STO 5045P                                  @   24.50
+  15:30  SPX  5157.22  STO 5055P                                  @   26.20
+  bombs 2 credits [0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short True  cash 74.6 book@15:50 -72.45 dayPnL 2.15
+
+=== 2024-03-13 fade  k50 5200 k20 5035
+  09:35  SPX  5172.14  BTO 5200P anchor                           @   72.00
+  10:00  SPX  5166.38  STO 5035P                                  @   24.00
+  13:05  SPX  5173.03  BTO 5040P                                  @   23.50
+  15:30  SPX  5157.22  STO 5035P                                  @   24.00
+  15:50  SPX  5168.42  STC 5200P anchor                           @   71.30
+  bombs 1 credits [0.5] anchor_pnl -0.7 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short True  cash 23.8 book@15:50 -22.2 dayPnL 1.6
+
+=== 2024-04-10 anchor  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 5175P anchor                           @   82.60
+  09:35  SPX  5150.81  STO 4975P                                  @   28.10
+  10:10  SPX  5162.22  BTO 4980P                                  @   27.60
+  13:05  SPX  5145.95  STO 4975P                                  @   28.10
+  13:25  SPX  5165.37  BTO 4980P                                  @   27.60
+  13:35  SPX  5149.47  STO 4975P                                  @   28.10
+  14:05  SPX  5160.49  BTO 4980P                                  @   27.60
+  14:25  SPX  5149.47  STO 4975P                                  @   28.10
+  14:50  SPX  5156.25  BTO 4980P                                  @   27.60
+  15:00  SPX  5143.86  STO 4975P                                  @   28.10
+  15:15  SPX  5157.24  BTO 4980P                                  @   27.60
+  15:50  SPX  5163.86  STC 5175P anchor                           @   74.20
+  bombs 5 credits [0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl -8.4 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short False  cash -5.9 book@15:50 3.5 dayPnL -2.4
+
+=== 2024-04-10 anchor_bomb  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 5175P anchor                           @   82.60
+  09:35  SPX  5150.81  STO 4975P                                  @   28.10
+  10:10  SPX  5162.22  BTO 4980P                                  @   27.60
+  13:05  SPX  5145.95  STO 4975P                                  @   28.10
+  13:25  SPX  5165.37  BTO 4980P                                  @   27.60
+  13:35  SPX  5149.47  STO 4975P                                  @   28.10
+  14:05  SPX  5160.49  BTO 4980P                                  @   27.60
+  14:25  SPX  5149.47  STO 4975P                                  @   28.10
+  14:50  SPX  5156.25  BTO 4980P                                  @   27.60
+  15:00  SPX  5143.86  STO 5170P -> anchor bomb 5175/5170         @   83.10
+  bombs 4 credits [0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed True mark 2.05 leftover_long_pnl 0.0 unpaired_short False  cash 2.5 book@15:50 4.85 dayPnL 7.35
+
+=== 2024-04-10 anchor_bomb_late  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 5175P anchor                           @   82.60
+  09:35  SPX  5150.81  STO 4975P                                  @   28.10
+  10:10  SPX  5162.22  BTO 4980P                                  @   27.60
+  13:05  SPX  5145.95  STO 4975P                                  @   28.10
+  13:25  SPX  5165.37  BTO 4980P                                  @   27.60
+  13:35  SPX  5149.47  STO 4975P                                  @   28.10
+  14:05  SPX  5160.49  BTO 4980P                                  @   27.60
+  14:25  SPX  5149.47  STO 4975P                                  @   28.10
+  14:50  SPX  5156.25  BTO 4980P                                  @   27.60
+  15:00  SPX  5143.86  STO 5170P -> anchor bomb 5175/5170         @   83.10
+  bombs 4 credits [0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed True mark 2.05 leftover_long_pnl 0.0 unpaired_short False  cash 2.5 book@15:50 4.85 dayPnL 7.35
+
+=== 2024-04-10 long_first  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 4980P                                  @   29.40
+  13:10  SPX  5139.21  STO 4975P                                  @   29.90
+  13:20  SPX  5151.85  BTO 4980P                                  @   29.40
+  13:40  SPX  5142.88  STO 4975P                                  @   29.90
+  14:05  SPX  5160.49  BTO 4980P                                  @   29.40
+  bombs 2 credits [0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -4.4 unpaired_short False  cash -28.4 book@15:50 26.4 dayPnL -2.0
+
+=== 2024-04-10 long_atm  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 5175P                                  @   82.60
+  09:50  SPX  5145.16  STO 5170P                                  @   83.10
+  09:55  SPX  5158.31  BTO 5175P                                  @   82.60
+  13:10  SPX  5139.21  STO 5170P                                  @   83.10
+  13:20  SPX  5151.85  BTO 5175P                                  @   82.60
+  13:40  SPX  5142.88  STO 5170P                                  @   83.10
+  14:00  SPX  5155.62  BTO 5175P                                  @   82.60
+  15:00  SPX  5143.86  STO 5170P                                  @   83.10
+  15:15  SPX  5157.24  BTO 5175P                                  @   82.60
+  bombs 4 credits [0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -8.4 unpaired_short False  cash -80.6 book@15:50 82.4 dayPnL 1.8
+
+=== 2024-04-10 ladder3  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 4980P                                  @   29.40
+  09:35  SPX  5150.81  BTO 4990P                                  @   30.90
+  09:35  SPX  5150.81  BTO 5000P                                  @   32.60
+  13:10  SPX  5139.21  STO 4975P                                  @   29.90
+  13:10  SPX  5139.21  STO 4985P                                  @   31.40
+  13:10  SPX  5139.21  STO 4995P                                  @   33.10
+  13:20  SPX  5151.85  BTO 4980P                                  @   29.40
+  13:20  SPX  5151.85  BTO 4990P                                  @   30.90
+  13:20  SPX  5151.85  BTO 5000P                                  @   32.60
+  13:40  SPX  5142.88  STO 4975P                                  @   29.90
+  13:40  SPX  5142.88  STO 4985P                                  @   31.40
+  13:40  SPX  5142.88  STO 4995P                                  @   33.10
+  14:00  SPX  5155.62  BTO 4990P                                  @   30.90
+  14:00  SPX  5155.62  BTO 5000P                                  @   32.60
+  14:05  SPX  5160.49  BTO 4980P                                  @   29.40
+  bombs 6 credits [0.5, 0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -13.4 unpaired_short False  cash -89.9 book@15:50 84.0 dayPnL -5.9
+
+=== 2024-04-10 short3  k50 5175 k20 4975
+  09:35  SPX  5150.81  STO 4975P                                  @   28.10
+  09:35  SPX  5150.81  STO 4985P                                  @   29.70
+  09:35  SPX  5150.81  STO 4995P                                  @   31.30
+  10:10  SPX  5162.22  BTO 4980P                                  @   27.60
+  10:10  SPX  5162.22  BTO 4990P                                  @   29.20
+  10:10  SPX  5162.22  BTO 5000P                                  @   30.80
+  13:05  SPX  5145.95  STO 4975P                                  @   28.10
+  13:05  SPX  5145.95  STO 4985P                                  @   29.70
+  13:05  SPX  5145.95  STO 4995P                                  @   31.30
+  13:25  SPX  5165.37  BTO 4980P                                  @   27.60
+  13:25  SPX  5165.37  BTO 4990P                                  @   29.20
+  13:25  SPX  5165.37  BTO 5000P                                  @   30.80
+  13:35  SPX  5149.47  STO 4975P                                  @   28.10
+  13:35  SPX  5149.47  STO 4985P                                  @   29.70
+  13:35  SPX  5149.47  STO 4995P                                  @   31.30
+  14:05  SPX  5160.49  BTO 4980P                                  @   27.60
+  14:05  SPX  5160.49  BTO 4990P                                  @   29.20
+  14:05  SPX  5160.49  BTO 5000P                                  @   30.80
+  14:25  SPX  5149.47  STO 4975P                                  @   28.10
+  14:25  SPX  5149.47  STO 4985P                                  @   29.70
+  14:25  SPX  5149.47  STO 4995P                                  @   31.30
+  14:50  SPX  5156.25  BTO 4980P                                  @   27.60
+  14:50  SPX  5156.25  BTO 4990P                                  @   29.20
+  14:50  SPX  5156.25  BTO 5000P                                  @   30.80
+  15:00  SPX  5143.86  STO 4975P                                  @   28.10
+  15:00  SPX  5143.86  STO 4985P                                  @   29.70
+  15:00  SPX  5143.86  STO 4995P                                  @   31.30
+  15:15  SPX  5157.24  BTO 4980P                                  @   27.60
+  15:15  SPX  5157.24  BTO 4990P                                  @   29.20
+  15:15  SPX  5157.24  BTO 5000P                                  @   30.80
+  bombs 15 credits [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short False  cash 7.5 book@15:50 11.25 dayPnL 18.75
+
+=== 2024-04-10 fade  k50 5175 k20 4975
+  09:35  SPX  5150.81  BTO 5175P anchor                           @   82.60
+  10:00  SPX  5157.62  BTO 4980P                                  @   28.80
+  13:10  SPX  5139.21  STO 4975P                                  @   29.30
+  13:20  SPX  5151.85  BTO 4980P                                  @   28.80
+  13:40  SPX  5142.88  STO 4975P                                  @   29.30
+  14:05  SPX  5160.49  BTO 4980P                                  @   28.80
+  15:00  SPX  5143.86  STO 4975P                                  @   29.30
+  15:15  SPX  5157.24  BTO 4980P                                  @   28.80
+  15:50  SPX  5163.86  STC 5175P anchor                           @   74.20
+  bombs 3 credits [0.5, 0.5, 0.5] anchor_pnl -8.4 anchor_bombed False mark None leftover_long_pnl -3.8 unpaired_short False  cash -35.7 book@15:50 27.1 dayPnL -8.6
+
+=== 2025-09-17 anchor  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6635P anchor                           @   96.80
+  09:35  SPX  6608.56  STO 6380P                                  @   36.10
+  14:05  SPX  6623.16  BTO 6385P                                  @   35.60
+  14:15  SPX  6586.45  STO 6380P                                  @   36.10
+  15:10  SPX  6602.50  BTO 6385P                                  @   35.60
+  15:15  SPX  6588.88  STO 6380P                                  @   36.10
+  15:20  SPX  6599.14  BTO 6385P                                  @   35.60
+  15:50  SPX  6603.12  STC 6635P anchor                           @   94.00
+  bombs 3 credits [0.5, 0.5, 0.5] anchor_pnl -2.8 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short False  cash -1.3 book@15:50 1.8 dayPnL 0.5
+
+=== 2025-09-17 anchor_bomb  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6635P anchor                           @   96.80
+  09:35  SPX  6608.56  STO 6380P                                  @   36.10
+  14:05  SPX  6623.16  BTO 6385P                                  @   35.60
+  14:15  SPX  6586.45  STO 6630P -> anchor bomb 6635/6630         @   97.30
+  bombs 1 credits [0.5, 0.5] anchor_pnl 0.0 anchor_bombed True mark 2.1 leftover_long_pnl 0.0 unpaired_short False  cash 1.0 book@15:50 2.7 dayPnL 3.7
+
+=== 2025-09-17 anchor_bomb_late  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6635P anchor                           @   96.80
+  09:35  SPX  6608.56  STO 6380P                                  @   36.10
+  14:05  SPX  6623.16  BTO 6385P                                  @   35.60
+  14:15  SPX  6586.45  STO 6380P                                  @   36.10
+  15:10  SPX  6602.50  BTO 6385P                                  @   35.60
+  15:15  SPX  6588.88  STO 6630P -> anchor bomb 6635/6630         @   97.30
+  bombs 2 credits [0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed True mark 2.1 leftover_long_pnl 0.0 unpaired_short False  cash 1.5 book@15:50 3.3 dayPnL 4.8
+
+=== 2025-09-17 long_first  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6385P                                  @   37.10
+  10:05  SPX  6603.09  STO 6380P                                  @   37.60
+  14:05  SPX  6623.16  BTO 6385P                                  @   37.10
+  14:15  SPX  6586.45  STO 6380P                                  @   37.60
+  14:30  SPX  6611.28  BTO 6385P                                  @   37.10
+  14:35  SPX  6591.67  STO 6380P                                  @   37.60
+  15:05  SPX  6596.17  BTO 6385P                                  @   37.10
+  bombs 3 credits [0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -2.2 unpaired_short False  cash -35.6 book@15:50 36.7 dayPnL 1.1
+
+=== 2025-09-17 long_atm  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6635P                                  @   96.80
+  10:05  SPX  6603.09  STO 6630P                                  @   97.30
+  14:05  SPX  6623.16  BTO 6635P                                  @   96.80
+  14:15  SPX  6586.45  STO 6630P                                  @   97.30
+  14:30  SPX  6611.28  BTO 6635P                                  @   96.80
+  14:35  SPX  6591.67  STO 6630P                                  @   97.30
+  15:10  SPX  6602.50  BTO 6635P                                  @   96.80
+  15:15  SPX  6588.88  STO 6630P                                  @   97.30
+  15:25  SPX  6610.17  BTO 6635P                                  @   96.80
+  bombs 4 credits [0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -2.8 unpaired_short False  cash -94.8 book@15:50 102.4 dayPnL 7.6
+
+=== 2025-09-17 ladder3  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6385P                                  @   37.10
+  09:35  SPX  6608.56  BTO 6395P                                  @   38.40
+  09:35  SPX  6608.56  BTO 6405P                                  @   39.70
+  10:00  SPX  6606.09  STO 6400P                                  @   40.20
+  10:05  SPX  6603.09  STO 6380P                                  @   37.60
+  10:05  SPX  6603.09  STO 6390P                                  @   38.90
+  14:05  SPX  6623.16  BTO 6385P                                  @   37.10
+  14:05  SPX  6623.16  BTO 6395P                                  @   38.40
+  14:05  SPX  6623.16  BTO 6405P                                  @   39.70
+  14:15  SPX  6586.45  STO 6380P                                  @   37.60
+  14:15  SPX  6586.45  STO 6390P                                  @   38.90
+  14:15  SPX  6586.45  STO 6400P                                  @   40.20
+  14:30  SPX  6611.28  BTO 6385P                                  @   37.10
+  14:30  SPX  6611.28  BTO 6395P                                  @   38.40
+  14:30  SPX  6611.28  BTO 6405P                                  @   39.70
+  14:35  SPX  6591.67  STO 6380P                                  @   37.60
+  14:35  SPX  6591.67  STO 6390P                                  @   38.90
+  14:35  SPX  6591.67  STO 6400P                                  @   40.20
+  15:05  SPX  6596.17  BTO 6385P                                  @   37.10
+  15:05  SPX  6596.17  BTO 6395P                                  @   38.40
+  15:05  SPX  6596.17  BTO 6405P                                  @   39.70
+  bombs 9 credits [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl -6.6000000000000005 unpaired_short False  cash -110.7 book@15:50 114.45 dayPnL 3.75
+
+=== 2025-09-17 short3  k50 6635 k20 6380
+  09:35  SPX  6608.56  STO 6380P                                  @   36.10
+  09:35  SPX  6608.56  STO 6390P                                  @   37.40
+  09:35  SPX  6608.56  STO 6400P                                  @   38.70
+  14:05  SPX  6623.16  BTO 6385P                                  @   35.60
+  14:05  SPX  6623.16  BTO 6395P                                  @   36.90
+  14:05  SPX  6623.16  BTO 6405P                                  @   38.20
+  14:15  SPX  6586.45  STO 6380P                                  @   36.10
+  14:15  SPX  6586.45  STO 6390P                                  @   37.40
+  14:15  SPX  6586.45  STO 6400P                                  @   38.70
+  15:10  SPX  6602.50  BTO 6385P                                  @   35.60
+  15:10  SPX  6602.50  BTO 6395P                                  @   36.90
+  15:10  SPX  6602.50  BTO 6405P                                  @   38.20
+  15:15  SPX  6588.88  STO 6380P                                  @   36.10
+  15:15  SPX  6588.88  STO 6390P                                  @   37.40
+  15:15  SPX  6588.88  STO 6400P                                  @   38.70
+  15:20  SPX  6599.14  BTO 6385P                                  @   35.60
+  15:20  SPX  6599.14  BTO 6395P                                  @   36.90
+  15:20  SPX  6599.14  BTO 6405P                                  @   38.20
+  bombs 9 credits [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5] anchor_pnl 0.0 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short False  cash 4.5 book@15:50 5.85 dayPnL 10.35
+
+=== 2025-09-17 fade  k50 6635 k20 6380
+  09:35  SPX  6608.56  BTO 6635P anchor                           @   96.80
+  10:00  SPX  6606.09  STO 6380P                                  @   37.50
+  14:05  SPX  6623.16  BTO 6385P                                  @   37.00
+  14:15  SPX  6586.45  STO 6380P                                  @   37.50
+  14:30  SPX  6611.28  BTO 6385P                                  @   37.00
+  14:35  SPX  6591.67  STO 6380P                                  @   37.50
+  15:05  SPX  6596.17  BTO 6385P                                  @   37.00
+  15:50  SPX  6603.12  STC 6635P anchor                           @   94.00
+  bombs 3 credits [0.5, 0.5, 0.5] anchor_pnl -2.8 anchor_bombed False mark None leftover_long_pnl 0.0 unpaired_short False  cash -1.3 book@15:50 1.8 dayPnL 0.5
