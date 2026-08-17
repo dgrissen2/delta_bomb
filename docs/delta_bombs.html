@@ -636,7 +636,7 @@ a{color:inherit}
 <div class="callout call"><b>What a full buy-first cycle is, from the data:</b> (1) buy the ~15Δ leg <em>on the bounce/rip against you</em> when the screen says that side is absolutely cheap (ivRank ≤ ~45, that side's skew low, no event inside the expiry) — the dip-day entries in the "wrong" regime never paired; (2) it pairs in <b>1–5 sessions</b> on the first move your way, leaving a 5-wide spread carried at +0.10; (3) the spread inflates to <b>1.3–1.9 (puts) / 1.5–4.0 (calls)</b> within 1–2 weeks as the move extends — usually without going ITM; (4) <b>sell it there</b> (rest scale-outs at 1.00 / 2.00 / 3.00) — every June/July put spread that hit 1.5–1.9 was worth 0.00 at expiry once the stock reversed; the two July call spreads that were still 3–4 on Aug 14 are the ITM exception, and you'd scale those too. Then go back to step 1 on the next bounce. Shorter tenors: the 2–3-week weeklies in May had no room to pair against earnings-inflated IV; use them only when the move is already underway (they pair on the same next-morning gap as the monthly, and decay faster if it isn't).</div>
 
 
-<h3>5e · Only the upside chase: every buy-first CALL entry since May, all expiries</h3>
+<h3>5e · The paper's call-side mirror at 15Δ — every buy-first CALL entry since May, all expiries <span class="tag warn">not Pandar's trade — see 5f</span></h3>
 <p>Every session May 4 → Aug 7 as an entry day: 15:55 BTO the ~15Δ call at the ask, rest STO the +5 strike at cost + 0.10, 1-min scan for the fill, then the free spread's bid-side value. Expiries: May-29 and Jun-05 weeklies, Jun-18 / Jul-17 / Aug-21 / Sep-18 monthlies — 130 cycles (<span class="mono">docs/replay/nvda_call_buyfirst_cycles_may_aug.csv</span>). Four chases fell out of the data; everything else either never paired or paired late for pennies.</p>
 
 <h4>Chase A — May 4–5 (NVDA 196–198, −8/−9% off the 20-day high) → the May 14 blow-off at 235.8</h4>
@@ -714,6 +714,34 @@ a{color:inherit}
   <li><b>The screen decides magnitude and cost, not whether it pairs.</b> Chases A–C happened with RR at 0–22 (calls rich): the longs cost 1.0–2.5, paired anyway because the rip came inside a week, and the free spread topped at 1.2–2.5. Chase D — the only entry with RR 60–75 / call skew 25–43 — bought at 1.3–1.6 and ran to 3.3–4.05, near max, and is the one still paying.</li>
   <li><b>Strike/tenor:</b> +7–12% OTM on the front monthly (25–35 DTE) is where the pop was; +17–24% or 50+ DTE (Sep-18, Jul-17 from May) paired just as fast but topped at 0.6–1.6. Weeklies (Jun-05 from May 26–29: 2.0–2.4) pop hardest when the gap comes inside days and go to zero fastest when it doesn't.</li>
 </ol></div>
+
+
+<h3>5f · Critical re-read — what §5e is, and what Pandar actually does</h3>
+<div class="callout warn"><span class="tag warn">correction</span> §5e (buy the ~15Δ call at 1.4–2.5, rest the +5 strike at cost + 0.10) is a <b>debit spread with a delayed second leg</b> — the white paper's "call-side mirror", not Pandar. Capital at risk is the whole call (3–5× the spread's 0.45–0.60) for 1–5 sessions, in exchange for filling the short 0.4–0.6 better than the concurrent spread price. It's a one-day directional call trade. Keep it as what it is; don't confuse it with the thread.</div>
+<div class="grid2">
+<div class="panel"><h4>Pandar, from his own lines</h4>
+<ul>
+  <li><b>The engine is tail selling</b>, sized to hold: "selling the puts during NVDA tail expansion is more of a reliable bet, because usually it collapses quickly" (12/19/24); weeklies to next monthly; inside PNR.</li>
+  <li><b>The spread is a by-product of taking profit on the short:</b> "sell tails first, then buy when inexpensive and turn your tail into a spread"; "sell small amt of puts then set resting buy order at diff strikes" (4/4/25); "…+ the <em>free long spread</em> that comes with that trade" (1/31/25). Outlay = the buyback: pennies to dimes.</li>
+  <li><b>His long-first version is penny options:</b> "$5 wide spreads under $0.10"; the NVDA 1/3/25 <b>80P at 0.04–0.05</b> with the stock ~135 (−40% OTM); strikes a real black swan reaches (NVDA 90 on 8/5/24); current + next monthly; "more luck dependent… I wouldn't follow that rule."</li>
+  <li><b>Calls:</b> (a) <b>sells nickel far-front-weekly calls into a grab</b> — 1/31/25 Feb-7 190C+ (+50% OTM at 5¢, "2/7 are 5c now up to like 180c"), "sizing so that if NVDA hits 190 next week I am not at PNR and can hold to expiration"; "<b>not that bullish to want to spend money on long call spreads</b>"; 5/20/25 "190C and above for lunch money". (b) <b>buys cheap far-OTM call spreads outright, both legs, on puke days as a moon hedge</b> — 3/20/25 NVDA &amp; SPX 6000–6200, 3/21 "various tickers further out, hedge against a 15–20%+ year", 4/3 "bull call spreads with a portion of profits", 4/4 "calls kind of expensive bc of IV"; SPX 6500 spreads scaled out Aug–Oct 2025, rolled to 7000+. <b>He never legs calls buy-first.</b> The only conversion of short calls into spreads in the thread is Kreisleriana's (3/21/25).</li>
+</ul></div>
+<div class="panel"><h4>The white paper, read critically</h4>
+<ul>
+  <li>It is the SPX intraday version (Seb's): ~1σ, 5-wide, 20–40 DTE, minutes between legs — capital-heavy and fast (a $30 SPX put = $3,000 for minutes long-first; PM margin short-first). Pandar's is capital-light and slow. Same name, different animals.</li>
+  <li>Internal contradictions: the PoT example is "short 30Δ / long 10Δ" (a 100+ pt spread, not 5-wide); "zero downside risk" is post-plant only; Fig 3 assumes a 0.10 credit and <em>averages</em> expiry value with 34-DTE theoretical; n=80, no dates, no failed-leg P&amp;L.</li>
+  <li>The 50/20 anchor and "synthetic spread" are its risk devices for the leg gap; Pandar's risk device is sizing (≤10% NLV if the name goes to zero) and inventory of paid-out spreads.</li>
+</ul></div>
+</div>
+<h4>What "Pandar on NVDA calls" looks like in the 2026 tape</h4>
+<div class="tablewrap"><table>
+<tr><th>Move</th><th>When</th><th>Trade</th><th>What happened</th><th>Capital</th></tr>
+<tr><td><b>Sell the grab</b></td><td>May 14 (NVDA 235.7, call skew 100%ile, front wing 100%ile)</td><td>STO May-29 <b>300C @ 0.62</b> (+27% OTM, 2 weeks); 280C 1.33</td><td>May 20 (223): 300C 0.11, 280C 0.25; May 22: ~0. Held to expiry: <b>+$62/contract</b></td><td>margin only (size so 300 doesn't take you past PNR)</td></tr>
+<tr><td>…and convert on the crush (Kreisleriana)</td><td>May 15</td><td>rest BTO 295C ~0.38–0.40</td><td>295/300 bull call spread carried at ~+0.22 — the "free long spread"</td><td>~$40 for a day</td></tr>
+<tr><td><b>Buy the moon hedge outright, cheap</b></td><td>Jul 29 (NVDA 190, RR 75%ile)</td><td>BTO Sep-18 <b>265/270C @ 0.09</b>; 250/255 @ 0.16; 275/280 @ 0.07</td><td>Aug 5: 0.42 / 0.67 / ~0.15; Aug 14: 0.36 / 0.68. Scale out at 3–5× or let expire</td><td><b>$7–16 per spread</b></td></tr>
+<tr><td>What he does <em>not</em> do</td><td>—</td><td>buy a 15Δ call at 1.4–2.5 and wait to sell the next strike (§5e)</td><td>works when the rip comes inside a week; it's a directional call for 1–5 sessions</td><td>$140–250 per unit</td></tr>
+</table></div>
+<div class="callout call"><b>Corrected picture:</b> in Pandar's book "buy first" only exists when the thing bought costs pennies — a penny put, or a penny <em>spread</em> — and its job is to be the tail hedge that eventually pays 5×–50×. The credits come from the <em>selling</em> side; the spread is what's left after he takes profit on a short by buying the nearer strike back cheaper. On calls he sells the front-weekly wing into grabs and buys far-OTM spreads outright on pukes. The 15Δ buy-first bomb is a legitimate structure (§5e shows exactly when it pays) but it's the paper's device, not his, and its capital profile is the opposite of his.</div>
 
 
 <h2>6 · Upside calls <span class="tag call">call side</span></h2>
