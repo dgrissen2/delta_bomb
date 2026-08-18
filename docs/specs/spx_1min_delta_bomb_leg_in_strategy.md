@@ -172,3 +172,17 @@ Each row states the bar size and lookback the source actually used, the data it 
 6. **Diagnostics logged, not rules:** mature alligator (v3 parameters, SPX-recomputed), ER(10), VWAP flips, 5-min reversal bar, level probes, ATM IV vs 09:35, put-skew change, `emove`/`move935`.
 
 **Test that decides it (`scripts/spx_legin_ev.py`, spec frozen here):** entries at (a) trigger minutes vs (b) every 15-min clock minute 10:00–14:00; instruments = the −0.20Δ 5-wide put pair from the SPXW 5-min greeks store (102 sessions 2024–25) with 1-min quote sequence where available; outcomes per §12 disposition; adoption only if plant rate within 60 min rises ≥ 5 pp **and** unpaired-leg ES₉₅ does not worsen, with day-clustered 90% CIs, on the walk-forward folds; then a 20-session prospective paper log before any size increase.
+
+### 2c. First measurement of the v2 trigger on spot (2026-08-18) — it buys speed, not probability
+
+Quick pass on real SPX 1-min OHLC (845 sessions), leg-open window 10:00–14:00, one fire per 15 min: **trigger** = pullback ≥ 8 pts from the running high since 10:00, running low unbroken for the last 5 completed 1-min bars, latest close > running mean of typical price since that low; outcome measured from the next bar. Output `docs/replay/spx_stall_trigger_quick.parquet` (code inline this session; to be folded into `scripts/spx_legin_ev.py`).
+
+| | stall ∧ TPM-reclaim (n = 8,353; ~10/day) | anytime (n = 14,365) |
+|---|---|---|
+| P(SPX +4 bp within 60 min) | 0.817 | 0.804 |
+| P(adverse > 20 bp before it) | 0.152 | 0.151 |
+| P(adverse > 40 bp before it) | 0.051 | 0.048 |
+| P(the stalled low breaks before the move) | 0.211 | — |
+| median minutes to the +4 bp move | 5 | — |
+
+By pullback size: 8–12 pt → 0.78 fill / 0.31 low breaks; 40+ pt → 0.84 / 0.15 but adverse > 40 bp 0.07. By year 0.78–0.85. **Reading:** the trigger fails the pre-registered +5 pp bar on the spot proxy — it does not raise the odds of the needed move or cut the tail; it shortens time-to-fill to ~5 min because the tape has just turned. One in five stalls is false (low breaks first). Consistent with the trend work: at 1-min scale confirmation arrives after the information is spent. **Status:** keep stall ∧ reclaim as an execution convenience (fast, sensible price), not as an edge; the probability of completion is the tape's oscillation (~80%/hour). Option-level test (plant rate, credit, unpaired-leg P&L, stop frequency on SPXW greeks) still owed before any change of size. Also to add to v2 item 2 (leg order): confirmed intraday trend state from ~10:30 (toolkit Variant B: drift ≥ 0.10 IM, VWAP persistence ≥ 0.8, e5>e9>e20 ≥ 10 bars) → UP: sell-first on pullback stalls; DOWN: long-first on bounce stalls; CHOP: long-first — trend chooses which leg you carry, the stall chooses when.
