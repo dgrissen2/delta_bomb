@@ -186,3 +186,20 @@ Quick pass on real SPX 1-min OHLC (845 sessions), leg-open window 10:00–14:00,
 | median minutes to the +4 bp move | 5 | — |
 
 By pullback size: 8–12 pt → 0.78 fill / 0.31 low breaks; 40+ pt → 0.84 / 0.15 but adverse > 40 bp 0.07. By year 0.78–0.85. **Reading:** the trigger fails the pre-registered +5 pp bar on the spot proxy — it does not raise the odds of the needed move or cut the tail; it shortens time-to-fill to ~5 min because the tape has just turned. One in five stalls is false (low breaks first). Consistent with the trend work: at 1-min scale confirmation arrives after the information is spent. **Status:** keep stall ∧ reclaim as an execution convenience (fast, sensible price), not as an edge; the probability of completion is the tape's oscillation (~80%/hour). Option-level test (plant rate, credit, unpaired-leg P&L, stop frequency on SPXW greeks) still owed before any change of size. Also to add to v2 item 2 (leg order): confirmed intraday trend state from ~10:30 (toolkit Variant B: drift ≥ 0.10 IM, VWAP persistence ≥ 0.8, e5>e9>e20 ≥ 10 bars) → UP: sell-first on pullback stalls; DOWN: long-first on bounce stalls; CHOP: long-first — trend chooses which leg you carry, the stall chooses when.
+
+### 2d. "Chop" conditions, measured (2026-08-18) — efficiency/flips carry nothing; prior-hour range is a vol dial, not a go signal
+
+Causal features over the prior 30/60 min at each start (10:30–14:00, 15-min step, 845 sessions, 12,676 starts; `docs/replay/spx_touch_by_chop.parquet`); outcomes for X = 4 bp within 60 min.
+
+| prior-60-min feature (quartiles) | P(needed move) | P(both directions) | P(round trip) | adverse > 20 bp | > 40 bp |
+|---|---|---|---|---|---|
+| Kaufman efficiency low → high | 0.78 → 0.81 | 0.55 → 0.61 | 0.54 → 0.59 | 0.15 → 0.16 | 0.04 → 0.05 |
+| 5-bar direction flips few → many | 0.81 → 0.79 | 0.60 → 0.55 | 0.58 → 0.54 | ~0.15 | ~0.045 |
+| realized range < 21 bp | 0.72 | 0.43 | 0.42 | 0.11 | 0.025 |
+| 21–31 bp | 0.80 | 0.55 | 0.54 | 0.13 | 0.03 |
+| 31–46 bp | 0.82 | 0.60 | 0.58 | 0.16 | 0.05 |
+| > 46 bp | 0.86 | 0.72 | 0.68 | 0.19 | 0.07 |
+
+ER × range cross-tab: the range effect holds inside every ER tercile; the ER effect is ≤ 2 pp everywhere. Same ordering at N = 120 (round trip 0.58 → 0.77 across range quartiles; adverse > 40 bp 0.054 → 0.094).
+
+**Reading.** (i) The chop gates proposed in §2 (ER, VWAP flips, alligator-as-chop) are uninformative — Codex finding #5 confirmed; dropped for good. (ii) The prior-hour realized range is the one conditioning variable that moves outcomes, and it moves completion **and** the adverse tail together (vol scaling; Pandar's "tails expand and contract"). Fills per tail event: quiet ≈ 0.72/0.11 ≈ 6.5, busy ≈ 0.86/0.19 ≈ 4.5. **Rule for v2 (sizing/expectation, not selection):** compute the prior-60-min SPX range in bp before opening a leg — > 30 bp: expect ~0.6 round trips/hour, half size, tight clock and cap; 21–30 bp: normal; < 21 bp: ~0.4 round trips/hour, small tail — acceptable to let a leg rest longer or wait. Note the required move itself scales mildly with IV (gap/Δ), so the busy-tape edge in fills is slightly overstated here; option-level test still owed.
