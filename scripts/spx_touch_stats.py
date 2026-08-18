@@ -39,19 +39,19 @@ def touch_rows(day: str, g: pd.DataFrame, regime: str) -> list[dict]:
         for X in X_BP:
             up, dn = p0 * (1 + X / 1e4), p0 * (1 - X / 1e4)
             for N in WINDOWS:
-                iN = min(len(m), i0 + N)
+                iN = min(len(m), i0 + 1 + N)   # exactly N future bars
                 H, L = hi[i0 + 1:iN], lo[i0 + 1:iN]
                 iu = int(np.argmax(H >= up)) if (H >= up).any() else -1
                 idn = int(np.argmax(L <= dn)) if (L <= dn).any() else -1
-                seg_u = L[: iu + 1] if iu >= 0 else L
-                seg_d = H[: idn + 1] if idn >= 0 else H
+                seg_u = L[:iu] if iu >= 0 else L   # exclude the touch bar (intrabar order unknown)
+                seg_d = H[:idn] if idn >= 0 else H
                 out.append(
                     dict(
                         day=day, regime=regime, t0=t0, X=X, N=N,
                         up_hit=iu >= 0, dn_hit=idn >= 0,
                         alt=bool((L[iu + 1:] <= up * (1 - X / 1e4)).any()) if iu >= 0 else False,
-                        mae_up=(p0 - seg_u.min()) / p0 * 1e4 if len(seg_u) else 0.0,
-                        mae_dn=(seg_d.max() - p0) / p0 * 1e4 if len(seg_d) else 0.0,
+                        mae_up=max(0.0, (p0 - seg_u.min()) / p0 * 1e4) if len(seg_u) else 0.0,
+                        mae_dn=max(0.0, (seg_d.max() - p0) / p0 * 1e4) if len(seg_d) else 0.0,
                     )
                 )
     return out

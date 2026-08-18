@@ -173,33 +173,40 @@ Each row states the bar size and lookback the source actually used, the data it 
 
 **Test that decides it (`scripts/spx_legin_ev.py`, spec frozen here):** entries at (a) trigger minutes vs (b) every 15-min clock minute 10:00–14:00; instruments = the −0.20Δ 5-wide put pair from the SPXW 5-min greeks store (102 sessions 2024–25) with 1-min quote sequence where available; outcomes per §12 disposition; adoption only if plant rate within 60 min rises ≥ 5 pp **and** unpaired-leg ES₉₅ does not worsen, with day-clustered 90% CIs, on the walk-forward folds; then a 20-session prospective paper log before any size increase.
 
-### 2c. First measurement of the v2 trigger on spot (2026-08-18) — it buys speed, not probability
+### 2c. First measurement of the v2 trigger on spot (2026-08-18, corrected after review) — a small, real, sub-threshold effect; no speed edge
 
-Quick pass on real SPX 1-min OHLC (845 sessions), leg-open window 10:00–14:00, one fire per 15 min: **trigger** = pullback ≥ 8 pts from the running high since 10:00, running low unbroken for the last 5 completed 1-min bars, latest close > running mean of typical price since that low; outcome measured from the next bar. Output `docs/replay/spx_stall_trigger_quick.parquet` (code inline this session; to be folded into `scripts/spx_legin_ev.py`).
+`scripts/spx_legin_ev.py` (defaults) on real SPX 1-min OHLC, 845 sessions, leg-open window 10:00–14:00, one fire per 15 min. **Trigger** = pullback ≥ 8 pts from the running high since 10:00, running low unbroken for the last 5 completed 1-min bars, latest close > running mean of typical price since that low; outcome measured over exactly the next 60 bars from the trigger bar's close. **Baseline** = every minute 10:00–14:00 (203,645 starts), reported uniform **and re-weighted to the trigger's clock distribution**. Adverse excursion excludes the touch bar (intrabar order unknown) and is floored at 0. Artifacts: `docs/replay/spx_legin_trigger_x4_w60_p8_s5.parquet`, `spx_legin_anytime_x4_w60.parquet`.
 
-| | stall ∧ TPM-reclaim (n = 8,353; ~10/day) | anytime (n = 14,365) |
-|---|---|---|
-| P(SPX +4 bp within 60 min) | 0.817 | 0.804 |
-| P(adverse > 20 bp before it) | 0.152 | 0.151 |
-| P(adverse > 40 bp before it) | 0.051 | 0.048 |
-| P(the stalled low breaks before the move) | 0.211 | — |
-| median minutes to the +4 bp move | 5 | — |
+| | trigger (n = 7,337; 8.7/day) | anytime, uniform | anytime, clock-matched |
+|---|---|---|---|
+| P(SPX +4 bp within 60 min) | **0.817** | 0.806 | 0.803 |
+| P(adverse > 20 bp before it) | 0.152 | 0.152 | 0.150 |
+| P(adverse > 40 bp before it) | 0.050 | 0.050 | — |
+| P(hit within 5 min) / within 15 min | 0.416 / 0.642 | 0.401 / 0.622 | 0.389 / — |
+| median minutes to hit (given hit) | 5 | 6 | — |
+| P(the stalled low breaks before the move) | 0.236 | — | — |
 
-By pullback size: 8–12 pt → 0.78 fill / 0.31 low breaks; 40+ pt → 0.84 / 0.15 but adverse > 40 bp 0.07. By year 0.78–0.85. **Reading:** the trigger fails the pre-registered +5 pp bar on the spot proxy — it does not raise the odds of the needed move or cut the tail; it shortens time-to-fill to ~5 min because the tape has just turned. One in five stalls is false (low breaks first). Consistent with the trend work: at 1-min scale confirmation arrives after the information is spent. **Status:** keep stall ∧ reclaim as an execution convenience (fast, sensible price), not as an edge; the probability of completion is the tape's oscillation (~80%/hour). Option-level test (plant rate, credit, unpaired-leg P&L, stop frequency on SPXW greeks) still owed before any change of size. Also to add to v2 item 2 (leg order): confirmed intraday trend state from ~10:30 (toolkit Variant B: drift ≥ 0.10 IM, VWAP persistence ≥ 0.8, e5>e9>e20 ≥ 10 bars) → UP: sell-first on pullback stalls; DOWN: long-first on bounce stalls; CHOP: long-first — trend chooses which leg you carry, the stall chooses when.
+Day-clustered bootstrap of the difference in P(up), trigger − anytime: **+2.6 pp, 90% CI [+1.9, +3.2]**. By pullback size: 8–12 pt → 0.78 fill / 0.33 low breaks; 40+ pt → 0.86 / 0.16 but adverse > 40 bp 0.078.
 
-### 2d. "Chop" conditions, measured (2026-08-18) — efficiency/flips carry nothing; prior-hour range is a vol dial, not a go signal
+**Reading (corrected).** The trigger's effect on the needed move is real but small (+1–3 pp; below the pre-registered +5 pp bar) and it does not touch the adverse tail. It does **not** buy speed: the anytime baseline also fills at a 5–6-minute median, and the within-5-minute rate differs by ~3 pp. One in four "stalls" is false (the low breaks first). Consistent with the trend work: at 1-min scale, confirmation arrives after the information is spent. **Status:** stall ∧ reclaim is kept only as a disciplined way to place the leg at a sensible price after the tape has turned; it is not an edge and not a speed edge. Completion probability is set by the tape's oscillation (~80%/hour). Option-level test (plant rate, credit, unpaired-leg P&L, stop frequency on SPXW greeks) still owed. Trend state → leg order (UP: sell-first on pullback stalls; DOWN: long-first; CHOP: long-first) remains a **hypothesis** — not tested by these tables.
 
-Causal features over the prior 30/60 min at each start (10:30–14:00, 15-min step, 845 sessions, 12,676 starts; `docs/replay/spx_touch_by_chop.parquet`); outcomes for X = 4 bp within 60 min.
+### 2d. "Chop" conditions, measured (2026-08-18, corrected after review) — ER/flips are weak, prior-hour range is a vol effect; neither is a validated selection rule
 
-| prior-60-min feature (quartiles) | P(needed move) | P(both directions) | P(round trip) | adverse > 20 bp | > 40 bp |
+`scripts/spx_legin_ev.py`: causal features over the prior 30/60 bars at each 15-min start 10:30–14:00 (12,675 starts; `docs/replay/spx_legin_chop_x4.parquet`): Kaufman ER (w returns), realized range over exactly w bars (bp), 5-bar direction flips ignoring zero returns. Outcomes for X = 4 bp within 60 min.
+
+| prior-60-bar feature (quartiles) | P(needed move) | P(both directions) | P(round trip) | adverse > 20 bp | > 40 bp |
 |---|---|---|---|---|---|
-| Kaufman efficiency low → high | 0.78 → 0.81 | 0.55 → 0.61 | 0.54 → 0.59 | 0.15 → 0.16 | 0.04 → 0.05 |
-| 5-bar direction flips few → many | 0.81 → 0.79 | 0.60 → 0.55 | 0.58 → 0.54 | ~0.15 | ~0.045 |
-| realized range < 21 bp | 0.72 | 0.43 | 0.42 | 0.11 | 0.025 |
-| 21–31 bp | 0.80 | 0.55 | 0.54 | 0.13 | 0.03 |
-| 31–46 bp | 0.82 | 0.60 | 0.58 | 0.16 | 0.05 |
-| > 46 bp | 0.86 | 0.72 | 0.68 | 0.19 | 0.07 |
+| ER low → high (choppy → directional) | 0.785 → 0.811 | 0.55 → 0.61 | 0.54 → 0.59 | 0.15 → 0.16 | 0.04 → 0.05 |
+| direction flips few → many | 0.809 → 0.791 | 0.60 → 0.56 | 0.58 → 0.55 | ~0.15 | ~0.045 |
+| realized range < 21 bp | 0.73 | 0.44 | 0.43 | 0.11 | 0.026 |
+| 21–30 bp | 0.80 | 0.55 | 0.54 | 0.13 | 0.03 |
+| 30–45 bp | 0.82 | 0.60 | 0.58 | 0.17 | 0.05 |
+| > 45 bp | 0.86 | 0.72 | 0.69 | 0.19 | 0.07 |
 
-ER × range cross-tab: the range effect holds inside every ER tercile; the ER effect is ≤ 2 pp everywhere. Same ordering at N = 120 (round trip 0.58 → 0.77 across range quartiles; adverse > 40 bp 0.054 → 0.094).
+ER × range terciles: range ordering holds inside every ER tercile; the ER effect is 1–3 pp on P(up) in low/high range and up to 5–8 pp in the middle-range tercile (0.825 → 0.769 P(up), 0.590 → 0.513 P(round trip)) — small, not zero, and unstable across cells.
 
-**Reading.** (i) The chop gates proposed in §2 (ER, VWAP flips, alligator-as-chop) are uninformative — Codex finding #5 confirmed; dropped for good. (ii) The prior-hour realized range is the one conditioning variable that moves outcomes, and it moves completion **and** the adverse tail together (vol scaling; Pandar's "tails expand and contract"). Fills per tail event: quiet ≈ 0.72/0.11 ≈ 6.5, busy ≈ 0.86/0.19 ≈ 4.5. **Rule for v2 (sizing/expectation, not selection):** compute the prior-60-min SPX range in bp before opening a leg — > 30 bp: expect ~0.6 round trips/hour, half size, tight clock and cap; 21–30 bp: normal; < 21 bp: ~0.4 round trips/hour, small tail — acceptable to let a leg rest longer or wait. Note the required move itself scales mildly with IV (gap/Δ), so the busy-tape edge in fills is slightly overstated here; option-level test still owed.
+**Reading (corrected).** (i) ER and flip counts are *weak*, not null: 2–6 pp effects, in the direction "slightly more directional prior hour → slightly more fills", with no clustered intervals or holdout, and VWAP-flip / alligator states were **not** measured here (they remain untested diagnostics, not "dropped for good"). (ii) The prior-hour realized range moves completion **and** the adverse tail together — but a fixed 4 bp barrier is mechanically easier to touch when vol is high, so this is largely volatility persistence under a fixed barrier, and the required option move itself grows with IV. It does not by itself say whether to prefer, avoid, or down-size busy tapes; that needs option-level net EV and ES₉₅ by range bucket, raw and vol-normalised. Range is also confounded with time of day (high-range observations cluster at 10:30). **Status:** the "half size above 30 bp / let legs rest longer when quiet" rules stated earlier were policies, not results — withdrawn as rules, kept as hypotheses for the option-level test. Pandar's "tails expand and contract" is the mechanism being described; the sizing response to it is not yet derived from data.
+
+### 2e. Review dispositions for §2c/§2d (2026-08-18)
+
+`/codex-review` on `scripts/spx_legin_ev.py` (FAIL, 7; `spx_legin_ev_codex_review_2026-08-18.md`): all fixed in code — exact-N horizon in both scripts (`spx_touch_stats.py` regenerated), clock-matched baseline added, parametrised self-describing artifacts, argument validation, exact-w range window, zero-return flips excluded, adverse excursion floored at 0 and touch bar excluded. `/codex-strategy-review` on the conclusions (FAIL, 9; `spx_2c2d_codex_strategy_review_2026-08-18.md`): #1 speed claim withdrawn (baseline median also 5–6 min); #2 clock-matched baseline added, "armed-vs-trigger" matched comparison still owed; #3 doc numbers reconciled to the script; #4 day-clustered CI added, walk-forward/holdout and option economics still owed; #5 "ER carries nothing" softened to "weak"; VWAP flips/alligator marked untested; #6/#7 range read restated as vol effect, sizing rules withdrawn to hypotheses; #8 time-of-day confound noted; #9 trend leg-order kept as hypothesis. Net: v2 stays five lines (gate, leg order as hypothesis, arm ≥ 2u, stall ∧ reclaim as placement discipline, execution with one leg / 60-min clock / buy-back cap / no anchor); no rule in it claims a measured probability edge except the tape's own ~80%/hour oscillation.
