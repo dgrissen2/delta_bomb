@@ -74,3 +74,101 @@ Here is why that is exactly what the delta bomb needs. The bomb is two orders th
 So where does the money get lost? Not on the pair — a finished pair is free by construction. It is lost in the gap between the two orders, when you are holding one leg alone. Four times in five the wiggle comes quickly and nothing happens. But about one time in six the market first walks fifteen points the wrong way, and one time in fourteen it walks thirty, before it comes back — and while it walks, your lone leg bleeds, and your resting second order sits further away than ever. That is the whole risk in one sentence: the trade fails not because you were wrong about direction, but because you had to wait, and waiting occasionally costs more than many finished pairs are worth. That is why the rules are about the wait, not the view: one lone leg at a time, a clock on it, a price at which you give up, and no expensive "anchor" put bought to feel safe during the wait — that anchor cost more than the pair it was guarding.
 
 Here is how you could catch me if this picture were wrong. If the index at one-minute scale trended more than it wiggled, the touch table would show the second leg arriving rarely and the adverse excursions dominating — it shows the reverse. If placing legs "at exhaustion" (right after a small move stalls) really helps, then attempts entered at those moments should complete more often, or get run over less, than attempts entered at random minutes; we have not measured that yet, so it stays a hypothesis with a pre-registered test, and if the numbers do not move, we drop it. And here is what I have simplified: the sixty-cent gap is not fixed — it grows when volatility rises and shrinks when it falls, so "three points" is today's number, not a law. The sentence to say back is: I am not betting on where the market goes; I am selling one leg on a dip and buying the other on a bounce, the bounce almost always comes, and the entire job is to make sure the rare times it doesn't come quickly are small.
+
+## 2. The signal stack for planting quickly — assembled from the 1-min evidence (verbatim, 2026-08-18)
+
+Here's the stack, assembled only from what the 1-min work actually measured. Everything below is "confirmed turn", not "knife" — the one lesson that repeated in every worktree (trend timing, VT-reclaim, bottom-detection): **precise-extreme callers were more precise and made less; the confirmed reclaim paid.**
+
+### The signal stack for planting quickly (SPX, 1-min)
+
+**0. Units first (so thresholds don't drift with vol)**
+- `u = max(0.10 × IM, 4 pts)` — the "ruler" from the trend toolkit; grind pullbacks measured ≈ 2.5 u (10–12 pts). Your leg needs ~0.75 u. Alternative unit: `ORspread` = 09:30–09:34 range.
+- ATR(1-min) for bar-shape tests; IM from `im_estimator.py`; VT/CW/PW from `spotgamma_fixed`.
+
+**1. Regime & veto (decides WHETHER and WHICH LEG FIRST — the only things the trend work found survivable)**
+- Veto on any unpaired short: a 1-min **close below VT** (toolkit's live remnant). No SG levels → long-first only.
+- Band position `pos=(O−VT)/(CW−VT)`, `room=(CW−O)/IM`: pos ≥ 0.7 or room ≤ 0.5 → up-move capped → **long-first**; 0.25 < pos < 0.7 & room ≥ 1 → either order; pos ≤ 0.25 (sitting on VT) → coin-flip tape, smallest size.
+- Time window **10:00–14:00**: first touches before 2 pm whip (median 4 episodes, only 25% commit); the last ~1.5 h is where pokes become breaks (25–34% of first touches, single sustained move). Don't open an unpaired leg after ~14:30.
+- Below-VT/sg<0 days: more oscillation ("the close round-trips") but fatter adverse tail (>40 bp 14% vs 10%) → same rules, half size.
+
+**2. Setup — the swing must be *spent*, not starting (arm the leg)**
+- Run from the last swing extreme ≥ **2 u** (≈ 8–12 pts) or ≥ 0.2 IM — that's the measured pullback amplitude; below that you're fading noise, above 3 u you're in a trend leg (efficiency test below).
+- **Mature alligator in the direction you're about to fade** — the v3 gate run as an *exhaustion* detector (its own verdict): `e5<e9<e20`, `(e20−e5)/ATR ≥ 0.8`, 5-bar steepness ≥ 0.5, ≥ 90% of last 10 closes below e5, clean bodies (mean body/range ≥ 0.5). When that prints on a down-move, the sell-put setup is armed; mirror (`e5>e9>e20`) arms the buy-leg.
+- Chop confirmation over the last 10–20 bars: Kaufman ER(10) < ~0.3 or ≥ 4 VWAP flips → oscillating tape (both legs will fill); ER > 0.5 over 60 bars → one-way tape, stand down.
+
+**3. Trigger — the confirmed turn (fire the leg)** — need 2 of 3, all price-only, all from the toolkit/BVT scripts:
+- **Stall:** no new session/swing low for **3–5 one-min bars** (Chart-Analyst roll-over rule, mirrored).
+- **Reclaim:** 1-min close back above the 5-bar TPM ((H+L+C)/3 mean) or e5, and/or a lower-low that fails by < 0.15 ORspread (the "lower swing high" rule inverted).
+- **Reversal bar / failed probe:** bullish version of the 5-min "brutal reversal" (close>open, range ≥ 1.2×ATR, body/range ≥ 0.55, close > prior-2-bar high) **or** a failed probe of a level — low within 0.1–0.25 IM of VT/Put Wall/round strike then close back above (dealer-buy-the-dip signature; pokes are median 2/day, ~7 pts deep, revert ≈ breach by depth so don't try to read depth).
+- Optional vol tell (needs the 1-min IV legs, §35/§36): put-skew **steepening into the flush** → bounce more likely (ρ +0.51); ATM IV **still rising** → stays down (ρ −0.37). If ATM IV is still rising, don't fire.
+
+**4. Execution (the paper's rules with the numbers attached)**
+- On trigger: **sell the put at the bid immediately**, rest the buy 5 higher at sale − 0.10. Clock 60 min (one-way move arrives 80% in 60 vs 86% in 120 — the second hour isn't worth the tail). Cap: unpaired short ≥ sale + 3.5 (~15 pts) → cap with the next-lower strike or buy back. One unpaired leg. No anchor.
+- **Buy leg = the exact mirror** at the top of the bounce: no new high 3–5 bars + close below TPM/e5, or bearish brutal-reversal bar, or failed CW probe (tag CW − 0.1·IM, no new high 3 bars).
+- After a fill, re-anchor the next resting limit to the neighbour's current ask + c, not to the last number.
+
+**5. Anti-signals (what the evidence says to ignore or fear)**
+- Don't classify direction at 09:35–09:45 (AUC 0.52–0.61); don't use EMA crosses as a trend engine (demoted in the toolkit); don't wait for the "clean" alligator to *follow* it (captured −2%).
+- Fast early mover (`emove ≥ 5u` by 09:50) = the day's pop is already priced; treat the first hour as veto/observation, not planting.
+- A brutal-reversal bar *against* your open leg = exit/cap now, don't wait for the clock.
+
+**Status:** every component is measured on its original question; the *combination as a bomb trigger* is not — that's `scripts/spx_legin_ev.py` (trigger = stall + reclaim; baseline = anytime; fit 2022–24, hold out 2025–26; adopt only if P(one-way move in 60 min) +5 pp or P(adverse > 20 bp) −5 pp). All inputs are local: SPX 1-min OHLC (853 d), SPY 1-min w/ volume for VWAP, SG levels, IM estimator, and the BVT/toolkit scripts named above.
+
+### 2b. Timeframes and exact code references per component (added 2026-08-18)
+
+Each row states the bar size and lookback the source actually used, the data it ran on, and the file/function/constant. Where the bomb rule adapts the source (different bar size, mirrored sign, new threshold), it is marked **adaptation**.
+
+| # | Component | Timeframe / lookback in the source | Source data | Code reference | Adaptation for the bomb |
+|---|---|---|---|---|---|
+| 0 | `u = max(0.10 × IM, 4 pts)` ruler | daily IM (prior-day IV), applied to 1-min spot | SG implied move; `im_estimator.py` | `~/Dev/spy_chaser/scripts/tune_S1_rollover.py` (`day["u"]`, `exit_tw`), `scripts/detect_early_movers.py` (`u`), `hypothesis_tracking/uptrend_timing_full_investigation_2026-06-10.md` §5.2–5.3; `.claude/worktrees/worktree-implied-move/scripts/{im_estimator.py, im_common.py}` | none |
+| 0 | `ORspread` | 09:30–09:34 (five 1-min bars) | SPX parity spot 1-min (§34) | `hypothesis_tracking/intraday_timing_trend_toolkit_2026-06-10.md` §A (Chart-Analyst) | none |
+| 1 | VT close-below veto | 1-min **close** vs VT, source window 09:30–09:45 | SG levels `spotgamma_fixed/offset_historical_FIXED_2026-06-14.csv`; parity spot | toolkit §A "VT-hold integrity"; `below_vol_trigger/hypothesis_tracking/h-bvt-001_c-classifier-gate_2026-06-27.md` (`close<vt` regime); `eda/bvt_common.py: anchored_series()` | **adaptation:** applied all session, not just 09:30–09:45 |
+| 1 | Band position `pos`, `room_to_CW` | daily open vs VT/CW/IM | `below_vol_trigger/data/spx_l1_l2_strict_universe_2020-2026.csv` (vt, im, gap_im) | toolkit §A (Brent) cut-points 0.7 / 0.5 / 0.25 / 1.0 | **adaptation:** used for leg order, not trade veto |
+| 1 | Time window 10:00–14:00 | first-touch time-of-day on **5-min** parity underlying, 214 touch days | `thetadata/spx_0dte_intraday_underlying` (§28) | `scripts/run_intraday_touch.py`, `scripts/run_intraday_breach_timing.py` (`feats`, `main`); `hypothesis_tracking/sgi-voltrigger-0dte-call-harvest_2026-06-08.md` §33–35 | **adaptation:** touch stats were for a level above spot; the "last 1.5 h commits" read is transferred, untested for dips |
+| 1 | Below-VT half size | daily regime; my touch table by regime on SPX 1-min | `spotgamma_fixed`; `docs/replay/spx_touch_stats_full.parquet` | `below_vol_trigger/hypothesis_tracking/memo-bvt-below-vt-regime_2026-06-27.md`; this repo `scripts/spx_touch_stats.py` | none |
+| 2 | Run ≥ 2 u from last swing | 1-min parity spot, S1 days 09:45 → peak; pullbacks ≈ 2.5 u | §34 parity spot | `scripts/tune_S1_rollover.py: exit_tw(a, c, cap), exit_ml(L)`; uptrend doc §5.3 | **adaptation:** 2 u arm threshold is proposed, not measured |
+| 2 | Mature alligator (exhaustion) | **SPY 1-min OHLCV**: EMA5/9/20, ATR (1-min), VWAP; rails 10 bars, steepness 5 bars, clean 5 bars, size CV 3 bars | `databento/spy_ohlcv_1m/spy_ohlcv_1m.parquet` | `below_vol_trigger/eda/bvt_ride_v3.py: strong_up()` with `SPREAD_MIN=0.8, STEEP_MIN=0.5, RAIL_N=10, RAIL_FRAC=0.9, CLEAN_N=5, CLEAN_BODY=0.5, SIZE_CV_MAX=0.6`; `eda/bvt_day_chart.py` (`JAW_WIDE=0.30, JAW_MIN=0.15, MID_MIN=0.15, EXPANSION_T=1.6, DISP_ATR=1.0, ADX_MIN=20`) | **adaptation:** run on SPX 1-min (or SPY as proxy) with the sign flipped (down alligator arms the sell) — the source ran it as an entry, found it marked exhaustion |
+| 2 | ER(10) / VWAP flips | 1-min bars, 10-bar Kaufman ER; VWAP-flip count over prior 10 bars; 5-min ER + ADX(14) diagnostic | SPY 1-min | `below_vol_trigger/outputs/chop_avoidance_brief.md` (ER buckets <0.15/0.15–0.30/0.30–0.50/>0.50; ≥6 flips), `eda/bvt_5m_er_compare.py` (`ER_REF=0.40`) | **adaptation:** cut-points 0.3 / 0.5 and 4 flips are proposed |
+| 2 | Efficiency over 60 bars | source computes day-level `efficiency = |close−open| / path` | SPY 1-min | `eda/bvt_r2_clean_trend_days.py: cleanness()` | **adaptation:** rolling 60-bar version is new |
+| 3 | Stall (no new low 3–5 bars) | 1-min: toolkit §B "no new session high for 5 bars (alt 3)"; `exit_ml(L)` = spot < spot[i−L]; early-mover stall = two down closes off a fresh high (09:35–10:15) | parity spot 1-min | toolkit §B; `scripts/tune_S1_rollover.py: exit_ml`; `scripts/detect_early_movers.py: stall_exit()` | mirrored to lows |
+| 3 | Reclaim (TPM / e5 / failed lower-low) | 1-min: TPM = running mean of typical price (persona spec, uptrend doc §5.2); "fresh VWAP loss"; lower swing high < HH − 0.15·ORspread; ride_v3 exit = 2 consecutive closes below e9 | parity spot / SPY 1-min | toolkit §B; `bvt_ride_v3.py: ride()` | mirrored; 5-bar TPM window is proposed |
+| 3 | Reversal bar | **5-min** bars: close<open, range ≥ 1.20×ATR(5-min), body/range ≥ 0.55, close < prior-2-bar low | SPY 5-min aggregated from 1-min | `below_vol_trigger/eda/bvt_5m_brutal_reversal_test.py` (`REVERSAL_RANGE_ATR_MULT=1.20`) | mirrored (bullish) for the sell leg |
+| 3 | Failed level probe | 1-min bars vs SG levels: tag CW − 0.1·IM + no new high 3 bars; touch ≥ CW − 0.25·IM then close back below; poke depth stats on 5-min underlying (median 6.8 pt revert / 7.1 pt breach; 2 pokes/day) | SG levels; §28 5-min underlying | toolkit §B (Brent); sgi doc §33–35; `scripts/run_intraday_touch.py` | mirrored to VT/Put Wall for dips |
+| 3 | IV tell (optional) | **daily** correlations at 10:30 across 104 VT-loss days (put-skew steepening ρ +0.51; ATM IV rising ρ −0.37); 1-min IV legs exist | `thetadata/spx_0dte_1m_iv_vtloss` (§35), `§36` opening IV; `worktree-implied-move/scripts/build_vtday_iv_1m.py` | `hypothesis_tracking/vt_breakdown_recovery_2026-06-11.md` | **adaptation:** intraday use at 1-min is untested |
+| 4 | 60-min clock, cap, one leg | SPX real 1-min OHLC, 845 sessions, starts 10:00–14:30 | `thetadata/spx_index_1m_ohlc` | this repo `scripts/spx_touch_stats.py` → `docs/replay/spx_touch_stats_full{,_dn}.parquet` | cap = sale + 3.5 is proposed |
+| 4 | Buy-leg mirror / re-anchor limit | live quotes | Schwab chain | this repo (session notes; `scripts/replay_50_20.py` fills at limit on 5-min greeks) | — |
+| 5 | AUC / no early direction | features at 09:35, 09:45, 12:00 cuts (`CUTS = open 575, early 585, noon 720`) | SPY 1-min + parity spot | `below_vol_trigger/eda/bvt_r1_features.py`; `h-bvt-019`, `h-bvt-001` | none |
+| 5 | Popper / early mover | 1-min: `emove = (max spot 09:35–09:50 − open)/u`; `move935 = (spot_0935 − open)/u` | parity spot 1-min | `scripts/detect_early_movers.py`, `scripts/popper_935_rule.py` (`GRID 575..660, RIDECAP 630`) | used as veto only |
+
+**Timeframe consistency note.** The sources mix three price series: SPX 0DTE parity spot 1-min (toolkit, poppers, roll-over), SPY 1-min OHLCV (all BVT alligator/ER/VWAP work — SPY, not SPX), and 5-min bars (reversal bar, touch/revert depth). For the bomb, standardise on **real SPX 1-min OHLC** for every price rule, aggregate to 5-min only for the reversal bar, and use SPY 1-min only where volume is required (VWAP). Thresholds ported from SPY (ATR multiples, bp) must be re-derived on SPX before use.
+
+### 2a. Adjustments after `/codex-strategy-review` (2026-08-18; verdict FAIL, 13 findings — full text in `spx_signal_stack_codex_strategy_review_2026-08-18.md`)
+
+§2 and §2b are left as written. The review is accepted on the substance: the stack was assembled from components that were each measured on a *different* question (0DTE calls, SPY bars, positive-gamma days, top-detection), then combined and mirrored without an end-to-end test. Dispositions, then the reduced stack that survives.
+
+| # | Finding | Disposition |
+|---|---|---|
+| 1 | Stack untested as specified; proposed test covers only stall + reclaim | Accepted. The live stack is reduced to what the test covers (below); everything else becomes a diagnostic column in the test, not a rule. |
+| 2 | Evidence transferred across SPY/SPX, 0DTE/32-DTE, positive/negative gamma | Accepted. All price rules re-derived on real SPX 1-min OHLC; SPY used only for VWAP; option-level outcomes measured on SPXW greeks (5-min, 102 days) and 1-min quotes, not inferred from spot. |
+| 3 | `≥ 2u or ≥ 0.2 IM` collapses to the weaker test; 0.75u leg claim unmeasured | Accepted. Arm rule = run ≥ 2u only (u = max(0.10·IM, 4)). "~0.75u per leg" withdrawn; the leg requirement is gap/Δ measured from the chain at the time (≈ 3 pts on 2026-08-17). |
+| 4 | Failed continuation ≠ validated fade; mirrored alligator is a new detector | Accepted. Alligator removed from the live stack; kept as a diagnostic (does a mature down-alligator at trigger time change plant rate / adverse excursion?). |
+| 5 | Chop gate contradicts the chop brief (ER ρ≈0; 6+ flips best) | Accepted. ER / flip-count / rolling-efficiency gates removed from the live stack; ER(10) and flip count logged as diagnostics only. |
+| 6 | Stall/reclaim don't match cited code (`exit_ml`, `stall_exit`, TPM running mean, e9 two-close) | Accepted. Trigger restated to the toolkit's own definitions: no new running low over the last 5 completed 1-min bars **and** a completed-bar close above the **running** TPM (mean of (H+L+C)/3 since the running low). `exit_ml` / `stall_exit` citations withdrawn as definitions (they remain as related code). |
+| 7 | 2-of-3 votes double-count the same bars; discretion in alternatives | Accepted. Single composite trigger (stall ∧ reclaim); the 5-min reversal bar and failed-probe rules are alternative triggers *for the test*, not live votes. |
+| 8 | Look-ahead in "last swing extreme"; fills assumed at bar close/bid | Accepted. Extremes are running (causal) extremes since 10:00 or since the last opposite trigger; execution = first quote **after** the completed trigger bar, sell at that bid; resting-order fills tested against 1-min bid/ask sequence, not bar touch. |
+| 9 | IV veto misstates source (10:30 daily correlations, 0DTE; ATM gate = IV above its 09:35 value) | Accepted. IV rule removed from the live stack; recorded as a diagnostic with the source's definitions. |
+| 10 | Time-window / probe rules are top-side 0DTE transfers; round strikes unsourced | Accepted. Time window kept only as a *conservative* restriction (no unpaired leg after 14:30) pending a dip-side measurement; failed-probe and round-strike rules dropped from live use. |
+| 11 | Cap mixes units; "cap with next-lower strike" makes a bullish credit spread | Accepted. Cap = **buy back** the unpaired short when its mark ≥ sale + 3.5 (planned max loss ≈ $350 + slippage; expected frequency to be measured in option terms — spot proxy 15–17% of attempts see > 20 bp adverse). The next-lower-strike branch is withdrawn. |
+| 12 | Acceptance metrics are spot-path, not economic | Accepted. Test outcomes restated at option level: plant rate within 60 min, net credit at plant, unpaired-leg P&L (mean, ES₉₅), stop frequency, day P&L including leftover legs — same accounting as `scripts/replay_variants.py`. |
+| 13 | 2025–26 holdout contaminated | Accepted. Spec frozen before the run; walk-forward selection inside 2022–2024; 2025–26 reported as *contaminated* out-of-sample; the clean test is a prospective paper log of Schwab fills against the frozen rules; day-clustered bootstrap for intervals. |
+
+**Reduced live stack (v2 — what is actually used until the test reports)**
+
+1. **Gate:** SPX has not closed below the Vol Trigger on a 1-min bar this session; no scheduled macro event; clock 10:00–14:00 for opening a leg, nothing unpaired after 14:30. If SG levels are missing → long-first only.
+2. **Leg order (hypothesis, not gate):** band position pos ≥ 0.7 or room_to_CW ≤ 0.5 → long-first; otherwise sell-first when the down-swing is the one being faded, long-first when the up-swing is. Default when unsure: long-first.
+3. **Arm:** running move from the causal extreme ≥ 2u.
+4. **Trigger (single, causal):** no new running low over the last 5 completed 1-min bars **and** the latest completed 1-min close > running TPM since that low. Mirror for the buy leg (no new running high, close < running TPM).
+5. **Execution:** first quote after the trigger bar; sell at bid; rest the buy 5 higher at sale − 0.10; 60-min clock; buy back if mark ≥ sale + 3.5; one unpaired leg; no anchor; after any fill, re-anchor the next resting limit to the neighbour's current quote + c.
+6. **Diagnostics logged, not rules:** mature alligator (v3 parameters, SPX-recomputed), ER(10), VWAP flips, 5-min reversal bar, level probes, ATM IV vs 09:35, put-skew change, `emove`/`move935`.
+
+**Test that decides it (`scripts/spx_legin_ev.py`, spec frozen here):** entries at (a) trigger minutes vs (b) every 15-min clock minute 10:00–14:00; instruments = the −0.20Δ 5-wide put pair from the SPXW 5-min greeks store (102 sessions 2024–25) with 1-min quote sequence where available; outcomes per §12 disposition; adoption only if plant rate within 60 min rises ≥ 5 pp **and** unpaired-leg ES₉₅ does not worsen, with day-clustered 90% CIs, on the walk-forward folds; then a 20-session prospective paper log before any size increase.
