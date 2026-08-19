@@ -1,4 +1,4 @@
-"""HIRO smooth-trend experiment (v1.1 — trend-local pullback geometry, 2026-08-19) — does an established, smooth HIRO trend raise the odds of filling a delta bomb
+"""HIRO smooth-trend experiment (v1.2 — trend-local geometry, next-open execution, per-horizon risk, episode counts, causal thresholds; 2026-08-19) — does an established, smooth HIRO trend raise the odds of filling a delta bomb
 directionally in the MIDDLE of the trend (sell-first on pullbacks in TREND_UP; long-first on bounces in TREND_DOWN)?
 
 Designed 2026-08-19 with Brent Kochuba / Charlie McElligott persona reviews (see docs/specs/spx_1min_delta_bomb_leg_in_strategy.md §5).
@@ -102,17 +102,27 @@ def features(day: str) -> pd.DataFrame:
             for k in (3, 5, 10):
                 r[f"slope_s{s}_k{k}"] = (e[i] - e[i - k]) / k if i - k >= 0 else np.nan
         # outcomes: fixed-point fills up/down within horizons; adverse before fill
+        # Execution convention (fix 2026-08-19, codex-review #4): features use bars ≤ i; the leg is placed at the NEXT bar's
+        # open (p_entry = open[i+1]); fills/adverse are measured from bar i+1 onward relative to p_entry.
+        if i + 1 >= len(df):
+            continue
+        p_entry = float(df.open.values[i + 1]); r["p_entry"] = p_entry
         for pts in FILL_PTS:
             for H in HORIZONS:
                 h_, l_ = hi[i + 1:i + 1 + H], lo[i + 1:i + 1 + H]
-                iu = int(np.argmax(h_ >= cl[i] + pts)) if (h_ >= cl[i] + pts).any() else -1
-                idn = int(np.argmax(l_ <= cl[i] - pts)) if (l_ <= cl[i] - pts).any() else -1
-                r[f"up{int(pts)}_{H}"] = iu >= 0; r[f"dn{int(pts)}_{H}"] = idn >= 0
-                if H == 60:
-                    r[f"ttf_up{int(pts)}"] = iu + 1 if iu >= 0 else np.nan; r[f"ttf_dn{int(pts)}"] = idn + 1 if idn >= 0 else np.nan
-                    su = l_[:iu] if iu >= 0 else l_; sd = h_[:idn] if idn >= 0 else h_
-                    r[f"advS{int(pts)}"] = max(0.0, cl[i] - su.min()) if len(su) else 0.0   # adverse for a carried short (needs up)
-                    r[f"advL{int(pts)}"] = max(0.0, sd.max() - cl[i]) if len(sd) else 0.0   # adverse for a carried long (needs down)
+                if len(h_) < H:            # (#6) incomplete horizon → outcome undefined
+                    r[f"up{int(pts)}_{H}"] = np.nan; r[f"dn{int(pts)}_{H}"] = np.nan
+                    r[f"ttf_up{int(pts)}_{H}"] = np.nan; r[f"ttf_dn{int(pts)}_{H}"] = np.nan
+                    r[f"advS{int(pts)}_{H}"] = np.nan; r[f"advL{int(pts)}_{H}"] = np.nan
+                    continue
+                iu = int(np.argmax(h_ >= p_entry + pts)) if (h_ >= p_entry + pts).any() else -1
+                idn = int(np.argmax(l_ <= p_entry - pts)) if (l_ <= p_entry - pts).any() else -1
+                r[f"up{int(pts)}_{H}"] = float(iu >= 0); r[f"dn{int(pts)}_{H}"] = float(idn >= 0)
+                # (#1) per-horizon time-to-fill and adverse (touch bar excluded; intrabar order unknown)
+                r[f"ttf_up{int(pts)}_{H}"] = iu + 1 if iu >= 0 else np.nan; r[f"ttf_dn{int(pts)}_{H}"] = idn + 1 if idn >= 0 else np.nan
+                su = l_[:iu] if iu >= 0 else l_; sd = h_[:idn] if idn >= 0 else h_
+                r[f"advS{int(pts)}_{H}"] = max(0.0, p_entry - su.min()) if len(su) else 0.0   # carried short (needs up)
+                r[f"advL{int(pts)}_{H}"] = max(0.0, sd.max() - p_entry) if len(sd) else 0.0   # carried long (needs down)
         rows.append(r)
     out = pd.DataFrame(rows); out["day"] = day
     return out
@@ -137,29 +147,41 @@ def price_trend_state(df: pd.DataFrame, W: int, cons: float, r2: float, mag_pts:
     return np.where(up, "UP", np.where(dn, "DOWN", "NONE"))
 
 
+def episodes(idx: pd.Series) -> int:
+    """Count runs of consecutive qualifying minutes (same day, minute gap ≤ 2) = trend episodes (#7)."""
+    if len(idx) == 0:
+        return 0
+    d = idx.sort_values(["day", "min"])
+    brk = (d.day != d.day.shift()) | (d["min"].diff() > 2)
+    return int(brk.sum())
+
+
 def evaluate(df: pd.DataFrame, st: np.ndarray, p: float, pts: float, H: int) -> dict:
-    """Entries: TREND_UP with pullback ≥ p (sell-first, needs up fill); TREND_DOWN with bounce ≥ p (long-first, needs down)."""
+    """Entries: TREND_UP with trend-local pullback ≥ p (sell-first, needs up fill); TREND_DOWN with bounce ≥ p (long-first, needs down).
+    All outcome columns are horizon-specific. NaN outcomes (incomplete horizon) are excluded. Clock-matched baselines
+    re-weight every minute to the entries' clock distribution."""
     d = df.assign(st=st)
-    up_e = d[(d.st == "UP") & (d.pull_from_hi >= p)]
-    dn_e = d[(d.st == "DOWN") & (d.bounce_from_lo >= p)]
     k = int(pts)
-    res = dict(n_up=len(up_e), n_dn=len(dn_e), days_up=up_e.day.nunique(), days_dn=dn_e.day.nunique())
+    up_e = d[(d.st == "UP") & (d.pull_from_hi >= p) & d[f"up{k}_{H}"].notna()]
+    dn_e = d[(d.st == "DOWN") & (d.bounce_from_lo >= p) & d[f"dn{k}_{H}"].notna()]
+    res = dict(n_up=len(up_e), n_dn=len(dn_e), days_up=up_e.day.nunique(), days_dn=dn_e.day.nunique(),
+               ep_up=episodes(up_e[["day", "min"]]), ep_dn=episodes(dn_e[["day", "min"]]))
     res["fill_up"] = up_e[f"up{k}_{H}"].mean() if len(up_e) else np.nan
     res["fill_dn"] = dn_e[f"dn{k}_{H}"].mean() if len(dn_e) else np.nan
-    res["advS15_up"] = (up_e[f"advS{k}"] > 15).mean() if len(up_e) else np.nan
-    res["advL15_dn"] = (dn_e[f"advL{k}"] > 15).mean() if len(dn_e) else np.nan
-    res["ttf_up"] = up_e[f"ttf_up{k}"].median() if len(up_e) else np.nan
-    res["ttf_dn"] = dn_e[f"ttf_dn{k}"].median() if len(dn_e) else np.nan
-    # clock-matched baselines
-    for lab, e, col, adv in (("up", up_e, f"up{k}_{H}", f"advS{k}"), ("dn", dn_e, f"dn{k}_{H}", f"advL{k}")):
+    res["advS15_up"] = (up_e[f"advS{k}_{H}"] > 15).mean() if len(up_e) else np.nan
+    res["advL15_dn"] = (dn_e[f"advL{k}_{H}"] > 15).mean() if len(dn_e) else np.nan
+    res["ttf_up"] = up_e[f"ttf_up{k}_{H}"].median() if len(up_e) else np.nan
+    res["ttf_dn"] = dn_e[f"ttf_dn{k}_{H}"].median() if len(dn_e) else np.nan
+    for lab, e, col, adv in (("up", up_e, f"up{k}_{H}", f"advS{k}_{H}"), ("dn", dn_e, f"dn{k}_{H}", f"advL{k}_{H}")):
         if len(e):
             w = e["min"].value_counts(normalize=True)
-            b = d[d["min"].isin(w.index)]
+            b = d[d["min"].isin(w.index) & d[col].notna()]
             wt = b["min"].map(w) / b.groupby("min")["min"].transform("size")
             res[f"base_fill_{lab}"] = float(np.average(b[col].astype(float), weights=wt))
             res[f"base_adv15_{lab}"] = float(np.average((b[adv] > 15).astype(float), weights=wt))
         else:
             res[f"base_fill_{lab}"] = np.nan; res[f"base_adv15_{lab}"] = np.nan
+    res["lift_up"] = res["fill_up"] - res["base_fill_up"]; res["lift_dn"] = res["fill_dn"] - res["base_fill_dn"]
     return res
 
 
@@ -177,8 +199,8 @@ def main() -> None:
     for pts in FILL_PTS:
         for H in HORIZONS:
             r = evaluate(df, st, p=3.0, pts=pts, H=H)
-            print(f"  fill +{pts:g} pts in {H} min | UP(sell-first, pullback≥3): n={r['n_up']} days={r['days_up']} fill={r['fill_up']:.3f} base={r['base_fill_up']:.3f} adv>15={r['advS15_up']:.3f} base={r['base_adv15_up']:.3f} ttf={r['ttf_up']}"
-                  f" || DOWN(long-first, bounce≥3): n={r['n_dn']} days={r['days_dn']} fill={r['fill_dn']:.3f} base={r['base_fill_dn']:.3f} adv>15={r['advL15_dn']:.3f} base={r['base_adv15_dn']:.3f} ttf={r['ttf_dn']}")
+            print(f"  fill +{pts:g} pts in {H} min | UP(sell-first, pullback≥3): n={r['n_up']} ep={r['ep_up']} days={r['days_up']} fill={r['fill_up']:.3f} base={r['base_fill_up']:.3f} adv>15={r['advS15_up']:.3f} base={r['base_adv15_up']:.3f} ttf={r['ttf_up']}"
+                  f" || DOWN(long-first, bounce≥3): n={r['n_dn']} ep={r['ep_dn']} days={r['days_dn']} fill={r['fill_dn']:.3f} base={r['base_fill_dn']:.3f} adv>15={r['advL15_dn']:.3f} base={r['base_adv15_dn']:.3f} ttf={r['ttf_dn']}")
     # price-only control at the same cell geometry
     pst = price_trend_state(df, W=30, cons=0.6, r2=0.8, mag_pts=5.0)
     r = evaluate(df, pst, p=3.0, pts=5.0, H=30)
@@ -202,21 +224,23 @@ def main() -> None:
         r = evaluate(df, stx, p=p, pts=5.0, H=30)
         rows.append(dict(W=W, cons=cons, r2=r2, ddn=ddn, mag=mag, cp=cp, nx=nx, pc=pc, p=p, **r))
     res = pd.DataFrame(rows); res.to_csv("docs/replay/hiro/hiro_trend_results.csv", index=False)
-    res["lift_up"] = res.fill_up - res.base_fill_up; res["lift_dn"] = res.fill_dn - res.base_fill_dn
-    ok = res[(res.n_up >= 30) & (res.days_up >= 3)]
+    ok = res[(res.n_up >= 30) & (res.days_up >= 3) & (res.ep_up >= 5)]
     print("\nSWEEP (fill +5 in 30 min) — top UP cells by lift with n≥30, ≥3 days:")
-    print(ok.sort_values("lift_up", ascending=False).head(12)[["W", "cons", "r2", "ddn", "mag", "cp", "nx", "pc", "p", "n_up", "days_up", "fill_up", "base_fill_up", "lift_up", "advS15_up", "base_adv15_up"]].round(3).to_string(index=False))
-    okd = res[(res.n_dn >= 30) & (res.days_dn >= 3)]
+    print(ok.sort_values("lift_up", ascending=False).head(12)[["W", "cons", "r2", "ddn", "mag", "cp", "nx", "pc", "p", "n_up", "days_up", "ep_up", "fill_up", "base_fill_up", "lift_up", "advS15_up", "base_adv15_up"]].round(3).to_string(index=False))
+    okd = res[(res.n_dn >= 30) & (res.days_dn >= 3) & (res.ep_dn >= 5)]
     print("\nSWEEP — top DOWN cells by lift:")
-    print(okd.sort_values("lift_dn", ascending=False).head(12)[["W", "cons", "r2", "ddn", "mag", "cp", "nx", "pc", "p", "n_dn", "days_dn", "fill_dn", "base_fill_dn", "lift_dn", "advL15_dn", "base_adv15_dn"]].round(3).to_string(index=False))
+    print(okd.sort_values("lift_dn", ascending=False).head(12)[["W", "cons", "r2", "ddn", "mag", "cp", "nx", "pc", "p", "n_dn", "days_dn", "ep_dn", "fill_dn", "base_fill_dn", "lift_dn", "advL15_dn", "base_adv15_dn"]].round(3).to_string(index=False))
     print("\nSWEEP distribution of lift_up (cells with n≥30): ", ok.lift_up.describe().round(3).to_dict())
     print("SWEEP distribution of lift_dn (cells with n≥30): ", okd.lift_dn.describe().round(3).to_dict())
     # EMA slope sweep as a standalone state (sign + magnitude above median), fill +5 in 30, pullback≥3
     print("\nEMA-slope-only states (|slope| > 70th pct), fill +5 in 30 min, pullback≥3 / bounce≥3:")
     for s in (3, 5, 8, 13, 21, 34):
         for k in (3, 5, 10):
-            col = f"slope_s{s}_k{k}"; thr = df[col].abs().quantile(0.7)
+            col = f"slope_s{s}_k{k}"
+            # (#5) causal threshold: expanding 70th percentile of |slope| over prior sessions+minutes (min 200 obs)
+            thr = df[col].abs().expanding(min_periods=200).quantile(0.7).shift(1)
             stx = np.where(df[col] > thr, "UP", np.where(df[col] < -thr, "DOWN", "NONE"))
+            stx = np.where(thr.isna() | df[col].isna(), "NONE", stx)
             r = evaluate(df, stx, p=3.0, pts=5.0, H=30)
             print(f"  span {s:2d} k {k:2d}: UP n={r['n_up']:4d} fill={r['fill_up']:.3f} base={r['base_fill_up']:.3f} adv>15={r['advS15_up']:.3f} | DOWN n={r['n_dn']:4d} fill={r['fill_dn']:.3f} base={r['base_fill_dn']:.3f} adv>15={r['advL15_dn']:.3f}")
 

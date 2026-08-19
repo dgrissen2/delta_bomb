@@ -83,7 +83,8 @@ def build() -> pd.DataFrame:
 
 
 def state(df: pd.DataFrame, col: str, thr: float) -> pd.Series:
-    return np.where(df[col] > thr, "UP", np.where(df[col] < -thr, "DOWN", "FLAT"))
+    # (#2) incomplete windows (NaN) are excluded, not treated as FLAT
+    return np.where(df[col].isna(), "NA", np.where(df[col] > thr, "UP", np.where(df[col] < -thr, "DOWN", "FLAT")))
 
 
 def report(df: pd.DataFrame, label: str, st: pd.Series) -> None:
@@ -114,7 +115,12 @@ def main() -> None:
         report(df, f"{grp}: call & put 15-min rolling SAME SIGN", pd.Series(agree))
     a, n = df["all_r15T"], df["nextExp_r15T"]
     agree = np.where((a > 0) & (n > 0), "UP", np.where((a < 0) & (n < 0), "DOWN", "MIXED"))
+    agree = np.where(a.isna() | n.isna(), "NA", agree)
     report(df, "all & nextExp 15-min TOTAL same sign", pd.Series(agree))
+    rt = df["retail_r15T"]   # (#10) retail agreement with all
+    ragree = np.where((a > 0) & (rt > 0), "UP", np.where((a < 0) & (rt < 0), "DOWN", "MIXED"))
+    ragree = np.where(a.isna() | rt.isna(), "NA", ragree)
+    report(df, "all & retail 15-min TOTAL same sign", pd.Series(ragree))
     # strong + agree
     thr_a, thr_n = df.all_r15T.abs().quantile(0.6), df.nextExp_r15T.abs().quantile(0.6)
     strong = np.where((a > thr_a) & (n > thr_n), "UP", np.where((a < -thr_a) & (n < -thr_n), "DOWN", "OTHER"))
@@ -126,7 +132,7 @@ def main() -> None:
     cross = np.where(df.all_ema5T > df.all_ema20T, "UP", "DOWN")
     report(df, "all cumulative TOTAL: EMA5 > EMA20", pd.Series(cross))
     # HIRO vs price divergence: price down over last 15 min but HIRO 15-min up (absorption) etc.
-    df["px15"] = df.groupby("day").px.diff(15) / df.px * 1e4
+    df["px15"] = df.groupby("day").px.diff(15) / df.groupby("day").px.shift(15) * 1e4   # (#9) lagged denominator
     dv = np.where((df.px15 < -4) & (df.all_r15T > 0), "PX_DOWN_HIRO_UP", np.where((df.px15 > 4) & (df.all_r15T < 0), "PX_UP_HIRO_DOWN",
          np.where((df.px15 < -4) & (df.all_r15T < 0), "BOTH_DOWN", np.where((df.px15 > 4) & (df.all_r15T > 0), "BOTH_UP", "OTHER"))))
     report(df, "price 15-min move vs all 15-min HIRO (confirm / diverge)", pd.Series(dv))
