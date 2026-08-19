@@ -1,4 +1,4 @@
-"""HIRO smooth-trend experiment — does an established, smooth HIRO trend raise the odds of filling a delta bomb
+"""HIRO smooth-trend experiment (v1.1 — trend-local pullback geometry, 2026-08-19) — does an established, smooth HIRO trend raise the odds of filling a delta bomb
 directionally in the MIDDLE of the trend (sell-first on pullbacks in TREND_UP; long-first on bounces in TREND_DOWN)?
 
 Designed 2026-08-19 with Brent Kochuba / Charlie McElligott persona reviews (see docs/specs/spx_1min_delta_bomb_leg_in_strategy.md §5).
@@ -62,10 +62,17 @@ def features(day: str) -> pd.DataFrame:
     L = df.all_L.values; Lc = df.all_Lc.values; Lp = df.all_Lp.values; N = df.nextExp_L.values; dT = df.all_dT.values
     cl = df.close.values; hi = df.high.values; lo = df.low.values
     rows = []
+    # TREND-LOCAL extremes (fix 2026-08-19): pullback/bounce measured from the running high/low of CLOSES over the last
+    # PULL_W bars, i.e. inside the trend window — not from the session extreme (the original session-high geometry
+    # selected bounces inside down days and biased the UP branch downward; see doc §5.7).
+    PULL_W = 30
+    cs = pd.Series(cl)
+    loc_hi = cs.rolling(PULL_W, min_periods=5).max().values; loc_lo = cs.rolling(PULL_W, min_periods=5).min().values
     run_hi = np.maximum.accumulate(hi); run_lo = np.minimum.accumulate(lo)
     for i in range(len(df)):
         t = int(df["min"][i])
-        r = dict(min=t, px=cl[i], pull_from_hi=run_hi[i] - cl[i], bounce_from_lo=cl[i] - run_lo[i])
+        r = dict(min=t, px=cl[i], pull_from_hi=loc_hi[i] - cl[i], bounce_from_lo=cl[i] - loc_lo[i],
+                 pull_from_session_hi=run_hi[i] - cl[i], bounce_from_session_lo=cl[i] - run_lo[i])
         for W in (15, 30, 45, 60):
             if i - W < 0:
                 for k_ in ("dL", "cons", "r2", "ddn", "dLc", "dLp", "dN", "dpx", "pcons", "pr2"):
