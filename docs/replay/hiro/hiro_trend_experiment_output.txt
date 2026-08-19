@@ -1,0 +1,69 @@
+minutes 1630 days 5
+
+PRIMARY CELL {'W': 30, 'cons': 0.7, 'r2': 0.8, 'ddn': 0.25, 'mag': 0.5, 'cp_agree': True, 'next_agree': True, 'px_confirm': True} | state counts: {'NONE': 1572, 'UP': 33, 'DOWN': 25}
+  fill +3 pts in 15 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.121 base=0.479 adv>15=0.061 base=0.067 ttf=28.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.286 base=0.371 adv>15=0.000 base=0.000 ttf=20.0
+  fill +3 pts in 30 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.333 base=0.648 adv>15=0.061 base=0.067 ttf=28.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.714 base=0.514 adv>15=0.000 base=0.000 ttf=20.0
+  fill +3 pts in 60 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.515 base=0.709 adv>15=0.061 base=0.067 ttf=28.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.714 base=0.514 adv>15=0.000 base=0.000 ttf=20.0
+  fill +5 pts in 15 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.030 base=0.145 adv>15=0.061 base=0.067 ttf=31.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.000 base=0.257 adv>15=0.000 base=0.000 ttf=30.0
+  fill +5 pts in 30 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.061 base=0.418 adv>15=0.061 base=0.067 ttf=31.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.286 base=0.371 adv>15=0.000 base=0.000 ttf=30.0
+  fill +5 pts in 60 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.152 base=0.509 adv>15=0.061 base=0.067 ttf=31.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.429 base=0.400 adv>15=0.000 base=0.000 ttf=30.0
+  fill +7 pts in 15 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.000 base=0.036 adv>15=0.061 base=0.067 ttf=32.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.000 base=0.229 adv>15=0.000 base=0.000 ttf=37.0
+  fill +7 pts in 30 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.000 base=0.145 adv>15=0.061 base=0.067 ttf=32.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.000 base=0.314 adv>15=0.000 base=0.000 ttf=37.0
+  fill +7 pts in 60 min | UP(sell-first, pullback≥3): n=33 days=3 fill=0.030 base=0.333 adv>15=0.061 base=0.067 ttf=32.0 || DOWN(long-first, bounce≥3): n=7 days=3 fill=0.429 base=0.400 adv>15=0.000 base=0.000 ttf=37.0
+
+PRICE-ONLY TREND CONTROL (W30, cons≥0.6, R²≥0.8, |Δpx|>5):  {'n_up': 42, 'n_dn': 16, 'days_up': 3, 'days_dn': 4, 'fill_up': np.float64(0.405), 'fill_dn': np.float64(0.688), 'advS15_up': np.float64(0.024), 'advL15_dn': np.float64(0.0), 'ttf_up': np.float64(15.0), 'ttf_dn': np.float64(19.0), 'base_fill_up': 0.162, 'base_adv15_up': 0.033, 'base_fill_dn': 0.463, 'base_adv15_dn': 0.0}
+HIRO TREND with price NOT confirming: {'n_up': 6, 'n_dn': 0, 'days_up': 1, 'days_dn': 0, 'fill_up': np.float64(0.0), 'fill_dn': nan, 'advS15_up': np.float64(0.0), 'advL15_dn': nan, 'ttf_up': np.float64(nan), 'ttf_dn': nan, 'base_fill_up': 0.3, 'base_adv15_up': 0.0, 'base_fill_dn': nan, 'base_adv15_dn': nan}
+UP with CALL line only (put line not rising): {'n_up': 0, 'n_dn': 0, 'days_up': 0, 'days_dn': 0, 'fill_up': nan, 'fill_dn': nan, 'advS15_up': nan, 'advL15_dn': nan, 'ttf_up': nan, 'ttf_dn': nan, 'base_fill_up': nan, 'base_adv15_up': nan, 'base_fill_dn': nan, 'base_adv15_dn': nan}
+
+SWEEP (fill +5 in 30 min) — top UP cells by lift with n≥30, ≥3 days:
+ W  cons   r2  ddn  mag    cp    nx    pc   p  n_up  days_up  fill_up  base_fill_up  lift_up  advS15_up  base_adv15_up
+15   0.6 0.85 0.25  2.0 False False  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.25  2.0  True  True False 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.50  2.0 False False  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.50  2.0 False  True  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.50  2.0 False False False 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.50  2.0  True False False 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.25  2.0 False  True False 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.50  2.0  True False  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.25  2.0  True  True  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.25  2.0 False  True  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.50  2.0  True  True False 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+15   0.6 0.85 0.25  2.0  True False  True 8.0    36        4    0.306         0.244    0.061        0.0          0.033
+
+SWEEP — top DOWN cells by lift:
+ W  cons  r2  ddn  mag    cp    nx    pc   p  n_dn  days_dn  fill_dn  base_fill_dn  lift_dn  advL15_dn  base_adv15_dn
+45   0.6 0.7  0.5  1.0 False False  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  0.5 False  True  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  1.0  True False  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  1.0  True False False 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  1.0 False  True  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  1.0 False  True False 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  1.0 False False False 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  0.5  True  True  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  0.5  True  True False 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  0.5  True False  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  1.0  True  True  True 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+45   0.6 0.7  0.5  0.5  True False False 5.0    47        3    0.702         0.272     0.43        0.0            0.0
+
+SWEEP distribution of lift_up (cells with n≥30):  {'count': 1788.0, 'mean': -0.144, 'std': 0.102, 'min': -0.38, '25%': -0.192, '50%': -0.125, '75%': -0.08, 'max': 0.061}
+SWEEP distribution of lift_dn (cells with n≥30):  {'count': 320.0, 'mean': 0.061, 'std': 0.177, 'min': -0.133, '25%': -0.087, '50%': 0.013, '75%': 0.155, 'max': 0.43}
+
+EMA-slope-only states (|slope| > 70th pct), fill +5 in 30 min, pullback≥3 / bounce≥3:
+  span  3 k  3: UP n= 209 fill=0.211 base=0.278 adv>15=0.057 | DOWN n= 164 fill=0.445 base=0.382 adv>15=0.061
+  span  3 k  5: UP n= 217 fill=0.217 base=0.284 adv>15=0.037 | DOWN n= 156 fill=0.462 base=0.399 adv>15=0.058
+  span  3 k 10: UP n= 210 fill=0.181 base=0.282 adv>15=0.029 | DOWN n= 158 fill=0.430 base=0.397 adv>15=0.051
+  span  5 k  3: UP n= 217 fill=0.207 base=0.284 adv>15=0.065 | DOWN n= 152 fill=0.461 base=0.395 adv>15=0.072
+  span  5 k  5: UP n= 220 fill=0.218 base=0.284 adv>15=0.032 | DOWN n= 153 fill=0.451 base=0.396 adv>15=0.059
+  span  5 k 10: UP n= 214 fill=0.187 base=0.279 adv>15=0.042 | DOWN n= 151 fill=0.430 base=0.395 adv>15=0.033
+  span  8 k  3: UP n= 206 fill=0.204 base=0.283 adv>15=0.049 | DOWN n= 156 fill=0.468 base=0.405 adv>15=0.051
+  span  8 k  5: UP n= 213 fill=0.225 base=0.285 adv>15=0.033 | DOWN n= 150 fill=0.440 base=0.396 adv>15=0.047
+  span  8 k 10: UP n= 220 fill=0.186 base=0.283 adv>15=0.045 | DOWN n= 146 fill=0.445 base=0.405 adv>15=0.000
+  span 13 k  3: UP n= 210 fill=0.210 base=0.273 adv>15=0.029 | DOWN n= 146 fill=0.500 base=0.414 adv>15=0.041
+  span 13 k  5: UP n= 212 fill=0.198 base=0.273 adv>15=0.038 | DOWN n= 144 fill=0.479 base=0.419 adv>15=0.035
+  span 13 k 10: UP n= 227 fill=0.203 base=0.285 adv>15=0.048 | DOWN n= 133 fill=0.474 base=0.412 adv>15=0.000
+  span 21 k  3: UP n= 218 fill=0.193 base=0.272 adv>15=0.028 | DOWN n= 133 fill=0.504 base=0.406 adv>15=0.015
+  span 21 k  5: UP n= 227 fill=0.185 base=0.275 adv>15=0.026 | DOWN n= 128 fill=0.531 base=0.413 adv>15=0.000
+  span 21 k 10: UP n= 234 fill=0.205 base=0.285 adv>15=0.034 | DOWN n= 120 fill=0.558 base=0.405 adv>15=0.000
+  span 34 k  3: UP n= 220 fill=0.191 base=0.281 adv>15=0.018 | DOWN n= 123 fill=0.577 base=0.402 adv>15=0.000
+  span 34 k  5: UP n= 221 fill=0.204 base=0.290 adv>15=0.023 | DOWN n= 122 fill=0.598 base=0.418 adv>15=0.000
+  span 34 k 10: UP n= 221 fill=0.222 base=0.296 adv>15=0.009 | DOWN n= 124 fill=0.613 base=0.416 adv>15=0.000
