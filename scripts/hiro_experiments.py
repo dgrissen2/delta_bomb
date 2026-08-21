@@ -74,7 +74,7 @@ def main() -> None:
     put_shock = df.r5p <= exq(df.r5p, 0.10)                       # extreme 5-min put buying (put line falling hard)
     near_level = (abs(df.close - df.vt) <= 15) | (abs(df.close - df.pwall) <= 15)
     no_new_low = df.low > df.groupby("day").low.transform(lambda s: s.rolling(30, min_periods=30).min()).shift(3)
-    shocked = put_shock.rolling(10, min_periods=1).max().astype(bool)   # a put shock within the last 10 min
+    shocked = put_shock.groupby(df.day).transform(lambda s: s.rolling(10, min_periods=1).max()).astype(bool)   # a put shock within the last 10 min
     give = df.dn_dd >= 0.25 * df.dn_run.clip(lower=0.1)                 # down-run giving back ≥ 25%
     reclaim = df.close > df.groupby("day").close.transform(lambda s: (s.rolling(5).max() + s.rolling(5).min()) / 2)
     m1 = ok & shocked & near_level & no_new_low & give & reclaim
@@ -91,7 +91,8 @@ def main() -> None:
           & (df.close < df.groupby("day").close.transform(lambda s: (s.rolling(30, min_periods=30).min() + s.rolling(30, min_periods=30).max()) / 2)))
     e2 = outcome_row(df, epis(m2, df), "long"); e2.to_csv("docs/replay/hiro/exp2_degross_bounce.csv", index=False)
     results.append(report("E2 de-gross bounce failure (long-first)", df, e2, "long"))
-    c2 = ok & hi_rng & (df.r30 < 0) & (df.bounce30 >= 3) & ~((df.r15c > 0) & (df.r15p < 0))
+    below_mid = df.close < df.groupby("day").close.transform(lambda s: (s.rolling(30, min_periods=30).min() + s.rolling(30, min_periods=30).max()) / 2)
+    c2 = ok & hi_rng & (df.r30 < 0) & (df.bounce30 >= 3) & below_mid & ~((df.r15c > 0) & (df.r15p < 0))
     results.append(report("E2-CONTROL bounce, no C/P divergence", df, outcome_row(df, epis(c2, df), "long"), "long"))
 
     # ---- E3: retail divergence fade ---------------------------------------------------------------------------
@@ -110,8 +111,8 @@ def main() -> None:
     # ---- E4: post-shock dealer vacuum -------------------------------------------------------------------------
     new_low = df.low <= df.groupby("day").low.transform(lambda s: s.rolling(30, min_periods=30).min())
     fell3 = df.ret15 <= -3
-    shock_recent = (new_low & fell3).rolling(10, min_periods=1).max().astype(bool)
-    r3c = df.Lc.diff(3); r3p = df.Lp.diff(3)
+    shock_recent = (new_low & fell3).groupby(df.day).transform(lambda s: s.rolling(10, min_periods=1).max()).astype(bool)
+    r3c = df.groupby("day").Lc.diff(3); r3p = df.groupby("day").Lp.diff(3)
     flat = (r3c.abs() <= exq(r3c.abs(), 0.25)) & (r3p.abs() <= exq(r3p.abs(), 0.25))
     no_ext = df.low >= df.groupby("day").low.transform(lambda s: s.rolling(3).min()).shift(1)
     m4 = ok & shock_recent & flat & no_ext

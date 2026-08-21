@@ -87,21 +87,27 @@ def run_day(g: pd.DataFrame, rules: list[int]) -> list[dict]:
             continue
         U = fired; side = SIDE[U]
         S0 = float(g.open.iloc[i + 1]); worst = S0
-        end = min(i + 1 + TIMEOUT[U], n - 1)
-        result, texit, exit_px = "timeout", None, None
+        horizon_end = i + TIMEOUT[U]                      # exactly TIMEOUT bars i+1 .. i+TIMEOUT
+        end = min(horizon_end, n - 2)                     # need j+1 for any next-open exit
+        censored = end < horizon_end
+        result, texit, exit_px = ("censored" if censored else "timeout"), None, None
         for j in range(i + 1, end + 1):
             hi, lo = float(g.high.iloc[j]), float(g.low.iloc[j])
-            worst = min(worst, lo) if side == "sell" else max(worst, hi)
             done = (hi >= S0 + 3) if side == "sell" else (lo <= S0 - 3)
+            if not done:                                   # touch bar excluded from adverse (intrabar order unknown)
+                worst = min(worst, lo) if side == "sell" else max(worst, hi)
             if done:
                 result, texit = "fill", j - i; exit_px = S0 + 3 if side == "sell" else S0 - 3
                 break
             if j > i + 1 and scratch_hit(g, U, i, j, S0):
                 result, texit = "scratch", j - i
-                exit_px = float(g.open.iloc[j + 1]) if j + 1 < n else float(g.close.iloc[j])
+                px_exit = float(g.open.iloc[j + 1])
+                worst = min(worst, px_exit) if side == "sell" else max(worst, px_exit)   # include exit price in risk
+                exit_px = px_exit
                 break
         if texit is None:
-            texit = end - i; exit_px = float(g.close.iloc[end])
+            texit = end - i
+            exit_px = float(g.open.iloc[end + 1]) if end + 1 < n else float(g.close.iloc[end])
         adverse = (S0 - worst) if side == "sell" else (worst - S0)
         pnl_pts = (exit_px - S0) if side == "sell" else (S0 - exit_px)     # leg-level move to exit (proxy)
         trades.append(dict(day=g.day.iloc[0], U=U, side=side, t=t, S0=S0, result=result,
@@ -113,6 +119,10 @@ def run_day(g: pd.DataFrame, rules: list[int]) -> list[dict]:
 def main() -> None:
     df = pd.read_parquet(LAB)
     days = sorted(df.day.unique())
+    bars = df.groupby("day").size()
+    for d, nb in bars.items():
+        if nb < 385:
+            print(f"NOTE: {d} is a PARTIAL session ({nb} bars) — its late-window rules and per-day stats are censored")
     pd.set_option("display.width", 240)
     all_rules = [1, 2, 3, 4, 5, 6]
     # per-rule solo stats
@@ -137,9 +147,12 @@ def main() -> None:
     port = []
     for d in days:
         port += run_day(prep(df[df.day == d]), all_rules)
-    port = pd.DataFrame(port); port.to_csv("docs/replay/hiro/union_trades.csv", index=False)
+    cols = ["day", "U", "side", "t", "S0", "result", "mins", "adverse", "move"]
+    port = pd.DataFrame(port, columns=cols); port.to_csv("docs/replay/hiro/union_trades.csv", index=False)
+    if not len(port):
+        print("PORTFOLIO: no trades fired on any day"); return
     byday = port.groupby("day").agg(n=("U", "size"), fills=("result", lambda s: (s == "fill").sum()),
-                                    scr=("result", lambda s: (s == "scratch").sum()), adv=("adverse", "max"))
+                                    scr=("result", lambda s: (s == "scratch").sum()), adv=("adverse", "max")).reindex(days).fillna({"n": 0, "fills": 0, "scr": 0})
     print("\nPORTFOLIO (U1–U6, one leg, 30-min cooldown):")
     print(byday.to_string())
     f = port[port.result == "fill"]
