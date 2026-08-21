@@ -23,7 +23,7 @@ from plotly.subplots import make_subplots
 V = "/Users/dgrissen/Dev/central_trade_data/spotgamma/hiro/sp500_basket/v1"
 SPX = os.path.expanduser("~/Dev/central_trade_data/thetadata/spx_index_1m_ohlc")
 OUT = "docs/dashboard/hiro_setup_dashboard.html"
-DAYS = ["2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18"]
+DAYS = ["2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17", "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21"]
 REV, DUR_MIN, RATE_MIN, CPR_MIN, SHARE_MIN, PULL_MIN, STEEP_RATE, STEEP_FLOW = 0.6, 10, 2.0, 0.25, 0.5, 3.0, 4.0, 1.0
 FIRST, LAST = 575, 945
 
