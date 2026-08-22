@@ -2,7 +2,7 @@
 
 *v2.2 — 2026-08-22. v2.1 + final plan review (6 blockers, 2 majors → fixed: signal/entry split, R7.0 exit-timing table, controls as deterministic scorecard functions, R13 backtest definitions, best-session re-check enumerated, full-tier source contract, single-backlink rule restored). Prior: v2.0 + red-team audit (31 findings, verdict FAIL → all fixed: controls and metrics defined in R11, verification artifact pinned, chain/SPY sources added, state-flip mapping, price-tier behavior enumerated, boundary and denominator rules). Self-contained: every trading rule is stated in this document with an R-number; acceptance
 criteria reference R-numbers only. Research provenance, evidence and status history: see
-[`delta_bomb_master_playbook.md`](delta_bomb_master_playbook.md) (the only external reference in this spec).*
+[`../specs/delta_bomb_master_playbook.md`](../specs/delta_bomb_master_playbook.md) (the only external reference in this spec).*
 
 ## User Story
 
