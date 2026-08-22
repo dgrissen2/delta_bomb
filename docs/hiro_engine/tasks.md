@@ -1,6 +1,6 @@
 # Implementation Tasks — hiro_engine
 
-*Architect breakdown of `design.md` v1.1 against `requirements.md` v2.2. Order is dependency order; every task
+*Architect breakdown v1.1 of `design.md` v1.1 against `requirements.md` v2.2. CTO first-pass review applied (task 3 split; artifact-rot guard; task-7 HIRO-poll spike; ops task 11; sequencing notes). Order is dependency order; every task
 ends green (tests pass) before the next starts. "Rn" = requirement section in requirements.md. Junior notes are
 inline — when in doubt, the requirement text wins over this file.*
 
@@ -22,17 +22,23 @@ inline — when in doubt, the requirement text wins over this file.*
     - Tests: known day loads bar-for-bar; missing-date refusal lists the dates; stale levels → invalid
     Requirements: R2.1–R2.4, R13.1 (full tier only)
 
-- [ ] 3. FeatureEngine (pure functions — the file a junior should study first)
+- [ ] 3a. FeatureEngine part 1 — HIRO lines & run machine
+    - ARTIFACT-ROT GUARD (do this FIRST): re-run the research pipeline, pin the sha256 of
+      `verification_trades_v1.csv`; rule: the port must MATCH the artifact — any genuine bug found while
+      porting is logged as a spec/artifact issue, never silently fixed
     - HIRO lines L/Lc/Lp/N from the normalized CSV minutes (R3.1); rolling r5/r15/r30/r15n
     - Trough-anchored run machine (R3.2): port from `hiro_setup_dashboard.detect()` VERBATIM, then make
       the dashboard import it from here (delete the copy — DRY ledger)
-    - Price windows (R3.3) incl. strict 30-bar mins/periods, range60_pct via startup replay of stored
+    - Tests: hand-built fixtures for trough/break/re-anchor; run values on one stored day == dashboard parquet
+    Requirements: R3.1, R3.2
+
+- [ ] 3b. FeatureEngine part 2 — price, VWAP, context, episodes
+    - Price windows (R3.3) incl. strict 30-bar min_periods; range60_pct via startup replay of stored
       HIRO-era sessions (log `warmup` below 300 obs)
     - EMA5/9/20, SPY VWAP (cumulative from 09:30), context read at 10:30/13:00 only (R3.4), retained fields
     - Per-branch episode tracker (R3.5)
-    - Tests: hand-built fixtures for trough/break/re-anchor; VWAP against a hand-computed day;
-      context read fixture (UP day, DOWN day, CHOP); warmup path
-    Requirements: R3
+    - Tests: VWAP against a hand-computed day; context fixtures (UP/DOWN/CHOP days); warmup path
+    Requirements: R3.3–R3.5
 
 - [ ] 4. RuleEngine (all judgment lives here; nothing else decides anything)
     - R4 vetoes as pure checks producing VetoChange events on transitions
@@ -63,6 +69,9 @@ inline — when in doubt, the requirement text wins over this file.*
     Requirements: R12, backtest ACs (modes & lifecycle)
 
 - [ ] 7. Live plumbing + degraded mode
+    - SPIKE FIRST (half-day, schedule risk lives here): poll the HIRO payload once a minute via CDP for a
+      full session; measure latency + failure rate. The pull has only ever run as a daily batch — if minutely
+      polling doesn't hold, STOP and revisit the design before building anything on top
     - LiveFeed: ThetaData SPX bars; HIRO snapshot via the CDP session (import the pull from
       HIRO_finder backfill code — do not copy it); Schwab chain (R2.5); SPY bars
     - Session health machine: OK/HIRO_DOWN/SPX_STALLED/DEGRADED_VWAP; outage minutes; recovery lines;
@@ -99,5 +108,13 @@ inline — when in doubt, the requirement text wins over this file.*
     - Then: run the two live shakedown sessions (spec acceptance); fix only defects, never thresholds
     Requirements: spec acceptance, R5 boundaries, non-functional
 
-Estimated shape: tasks 1–6 are the core (must be perfect); 7 is plumbing; 8–9 are offline analytics; 10 is
-verification. If time-boxed, nothing ships until task 6's golden gate passes.
+- [ ] 11. Daily operations (the [OPS] items get an owner)
+    - Morning script: HIRO backfill freshness check, SPX 1-min refresh, levels CSV date check —
+      one command, green/red output, referenced from the RUNBOOK
+    - Evening script: append session logs, verify partition + manifest hashes, flag partial captures
+    - RUNBOOK entries for both
+    Requirements: R2 [OPS] items, R10.3 inputs
+
+Estimated shape (CTO-adjusted): tasks 1–6 ≈ 60% of real effort (the '80% done' trap lives here); task 7's
+spike is the schedule risk — run it the first morning of task 7; 8–9 offline analytics; 10–11 verification and
+ops. Do NOT parallelize tasks 4 and 5 (shared state contract). Nothing ships until task 6's golden gate passes.
