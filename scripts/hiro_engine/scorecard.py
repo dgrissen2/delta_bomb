@@ -42,7 +42,8 @@ def _read_sessions(path: Path) -> pd.DataFrame:
 def stage1_filter(cfg: Config, log: pd.DataFrame, sessions: pd.DataFrame,
                   rehearsal: bool, d_from: Optional[str], d_to: Optional[str]) -> pd.DataFrame:
     mode = "backtest" if rehearsal else "live"
-    df = log[log["mode"] == mode].copy()
+    df = log[(log["mode"] == mode) & (log["tier"] == "full")].copy()   # R9 is a
+    # full-rule exam: price-tier rows can never enter the scorecard
     if d_from:
         df = df[df.session_date >= d_from]
     if d_to:

@@ -1,2 +1,2 @@
-A_entries,A_fills,A_fill_rate,A_censored,B_entries,B_fills,B_fill_rate,B_censored,ALL_entries,ALL_fills,ALL_fill_rate,ALL_censored,median_scratch_loss,would_have_filled_scratches,adverse_gt10_n,adverse_gt10_frac
-12,4,0.3333333333333333,0,6,2,0.3333333333333333,0,18,6,0.3333333333333333,0,0.9950000000003456,9,1,0.05555555555555555
+A_entries,A_fills,A_fill_rate,A_censored,B_entries,B_fills,B_fill_rate,B_censored,ALL_entries,ALL_fills,ALL_fill_rate,ALL_censored,median_scratch_loss,would_have_filled_scratches,adverse_gt10_n,adverse_gt10_frac,one_leg_violations
+12,4,0.3333333333333333,0,6,2,0.3333333333333333,0,18,6,0.3333333333333333,0,0.9950000000003456,9,1,0.05555555555555555,0

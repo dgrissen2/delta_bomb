@@ -32,7 +32,8 @@ def test_weighting_equals_research_form():
 
 def test_research_scripts_import_engine_weighting():
     import sys
-    sys.path.insert(0, "scripts")
+    from hiro_engine.config import REPO_ROOT
+    sys.path.insert(0, str(REPO_ROOT / "scripts"))
     import inspect
     import hiro_uptrend_confirm as huc
     import hiro_experiments as he

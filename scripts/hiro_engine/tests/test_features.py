@@ -52,7 +52,8 @@ def test_incremental_equals_frame_function(config):
 
 def test_run_values_match_dashboard_parquet(config):
     """Engine features on a stored day == the research dashboard parquet (task 3a golden)."""
-    ref = pd.read_parquet(f"docs/dashboard/hiro_setup_{DAY}.parquet")
+    from hiro_engine.config import REPO_ROOT
+    ref = pd.read_parquet(REPO_ROOT / f"docs/dashboard/hiro_setup_{DAY}.parquet")
     feed = ReplayFeed(config, [DAY])
     eng = FeatureEngine(config, TIER_FULL, range60_history=[0.0] * 300)
     rows = [eng.update(t.bar, t.hiro, t.spy_bar) for t in feed.iter_day(DAY)]

@@ -4,7 +4,8 @@ qualifying signals on >=7/10 sessions,7/7,>=7 of 10,PASS
 >=8 fills total,6,>=8,FAIL
 >=1 fill on 6/10 sessions,4/7,>=6 of 10,FAIL
 <=3 entries/session,3,<=3,PASS
-Branch B qualifying signals,26,>=20 (else INCONCLUSIVE),PASS
+one leg at a time,0,0 overlapping entries,PASS
+Branch B qualifying signals,28,>=20 (else INCONCLUSIVE),PASS
 Branch B fill rate,0.333,>=0.45,FAIL
 Branch B vs clock-matched control,0.333 vs 0.771,not below control,FAIL
 Branch A qualifying episodes,22,>=8 (else INCONCLUSIVE),PASS
