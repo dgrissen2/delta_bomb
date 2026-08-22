@@ -1,6 +1,6 @@
 # Requirements — Delta Bomb Signal Engine ("hiro_engine")
 
-*v1.0 — 2026-08-22. Derived from `delta_bomb_master_playbook.md` v1.3 (the playbook is normative for all trading
+*v1.1 — 2026-08-22 (v1.0 + backtesting grill: all three backtest purposes; two data tiers; whitelist-knob sweeps, one knob at a time; exact-match verification; verbose single-day replay). Derived from `delta_bomb_master_playbook.md` v1.3 (the playbook is normative for all trading
 logic; this spec covers the software). Decisions taken in the grill session: mode (c) engine+alerts with silent
 paper executor · console-only output, unified live/backtest · degraded mode (a)+(c) · no human-trade capture (for
 now) · scorecard in scope · two uncounted shakedown sessions · manual morning start.*
@@ -18,8 +18,9 @@ without human fudging — whether this strategy earns the next stage (option-lev
 
 - **In:** live signal evaluation (playbook §3 precedence, §4 Branches A/B, §5 exits, §6 limits); silent paper
   executor; console event stream; session logs (`docs/replay/hiro/paper_log.csv`, playbook Appendix A schema);
-  backtest mode over any stored sessions; `scorecard` command implementing playbook §8 including frozen controls;
-  config freeze via hash.
+  backtesting in three roles — verification harness, research tool (whitelist-knob sweeps), scorecard rehearsal —
+  over two data tiers (full = HIRO sessions; price = the 845+-session SPX archive); `scorecard` command implementing
+  playbook §8 including frozen controls; config freeze via hash.
 - **Out (this build):** any order placement; human-fill capture/reconciliation; Branch C signals; push/mobile
   alerts; the NVDA P1 program; the SPXW quote-level replay; live sizing (hard-coded 1 lot, paper).
 
@@ -43,7 +44,33 @@ PARTIAL SESSION = any session with a HIRO or SPX-bar outage > 15 min inside 10:0
 **THE SYSTEM SHALL** print `EVENT DAY — STAND DOWN`, evaluate nothing, and log the session as `event_standdown`.
 
 **WHEN** the operator runs `hiro_engine backtest --from D1 --to D2`
-**THE SYSTEM SHALL** replay stored HIRO partitions and SPX 1-min files through the identical rule code, emitting the identical event stream with replay timestamps, and SHALL refuse dates lacking either data source (listing them) rather than silently skipping.
+**THE SYSTEM SHALL** replay stored sessions through the identical rule module used live (one code path, no duplicated logic), emitting the identical console event stream with replay timestamps, and SHALL refuse dates lacking a required data source (listing them) rather than silently skipping.
+
+### Backtesting
+
+**WHEN** backtest runs with `--tier full` (default)
+**THE SYSTEM SHALL** use HIRO partitions + SPX 1-min and evaluate the complete rule set (both branches, all HIRO features), and SHALL only accept dates with both sources present.
+
+**WHEN** backtest runs with `--tier price`
+**THE SYSTEM SHALL** run over the full SPX 1-min archive (845+ sessions) with every HIRO-dependent condition disabled or explicitly stubbed, and SHALL stamp every output row and summary `tier=price` so a price-tier number can never be quoted as a full-rule result.
+
+**WHEN** backtest runs with the frozen config over the stored HIRO sessions (verification harness)
+**THE SYSTEM SHALL** reproduce the reviewed research trade list EXACTLY — same entry minutes, branches and exit types as the corrected sequential result — and SHALL report any discrepancy as a defect, not a tolerance.
+
+**WHEN** the operator runs `hiro_engine backtest --day <date> --verbose`
+**THE SYSTEM SHALL** print the full live-format console stream for that day (state banners, veto changes, arms, gate evaluations, entries, heartbeats, exits) so any single day can be cross-checked bar-by-bar against the dashboards.
+
+**WHEN** the operator supplies `--config <file>` to a backtest
+**THE SYSTEM SHALL** run with those overrides, stamp all outputs with that config's hash, and the scorecard SHALL never count any backtest row toward the live acceptance test regardless of hash.
+
+**WHEN** the operator runs `hiro_engine sweep <knob>`
+**THE SYSTEM SHALL** sweep exactly ONE knob at a time from the fixed whitelist — scratch drop {−0.2…−0.6 $B}, scratch window {2…5 min}, pullback {3, 5, 8 pts}, cap {3.0…4.0}, clock {45, 60, 75 min} — holding all other parameters at the frozen values, and SHALL reject any knob not on the whitelist (extending the whitelist requires editing this spec).
+
+**WHEN** any backtest or sweep summarizes results
+**THE SYSTEM SHALL** report, per variant: trade AND episode counts, days covered, the matched control for the entry type (clock-matched or midpoint-matched, reusing the reviewed control logic), a day-clustered bootstrap 90% CI on the headline fill rate, and censored trades counted separately; sweep leaderboards SHALL print the number of cells examined at the top and SHALL grey out (not rank) cells with n < 15 trades or < 4 days.
+
+**WHEN** the operator runs `hiro_engine scorecard --rehearsal --from D1 --to D2`
+**THE SYSTEM SHALL** grade historical sessions with the full §8 logic as a dry run, clearly labeled REHEARSAL and excluded from the live test record.
 
 ### Evaluation & signals
 
@@ -128,6 +155,5 @@ recovery: on restart mid-session, reload today's log and resume state (open simu
 entry row). The rule code SHALL be one module shared verbatim between live and backtest (no duplicated logic).
 
 ## Acceptance of this spec
-Backtest of the 8 stored sessions reproduces the corrected §6.3/§7 numbers (18-trade sequential result within
-rounding); two shakedown sessions run clean (no crash, no unexplained divergence between console and log); then
+Verification backtest reproduces the corrected 18-trade sequential result exactly (trade-list match); two shakedown sessions run clean (no crash, no unexplained divergence between console and log); then
 the 10-session clock starts.
