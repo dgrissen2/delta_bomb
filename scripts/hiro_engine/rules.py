@@ -194,13 +194,15 @@ class RuleEngine:
                              side="long_first", signal_min=m, episode=row.episode_a,
                              notes="SIGNAL A LONG-FIRST"))
             out.append(Event(event_type="pending_entry", rule_id="R6.1", branch="A",
-                             side="long_first", signal_min=m, episode=row.episode_a))
+                             side="long_first", signal_min=m, episode=row.episode_a,
+                             bh_level=row.bh_level))
         elif chosen == "B":
             out.append(Event(event_type="signal", rule_id="R6.2", branch="B",
                              side="sell_first", signal_min=m, episode=row.episode_b,
                              notes="SIGNAL B SELL-FIRST"))
             out.append(Event(event_type="pending_entry", rule_id="R6.2", branch="B",
-                             side="sell_first", signal_min=m, episode=row.episode_b))
+                             side="sell_first", signal_min=m, episode=row.episode_b,
+                             entry_L=row.L))
         return out
 
     # -- exits ------------------------------------------------------------------

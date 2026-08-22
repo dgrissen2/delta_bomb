@@ -82,6 +82,7 @@ class FeatureRow:
     bounce30: Optional[float]
     mid30: Optional[float]
     ref_low_bar: Optional[int]      # bar min of the 30-bar close low (Branch A BH anchor)
+    bh_level: Optional[float]       # highest HIGH from ref_low_bar through this bar (R7.2 A)
     range60: Optional[float]
     range60_pct: Optional[float]
     warmup: bool
@@ -116,6 +117,8 @@ class PendingEntry:
     expiry: Optional[str] = None
     strike_hint: Optional[str] = None
     chain_quote_ts: Optional[str] = None
+    bh_level: Optional[float] = None    # Branch A scratch anchor, fixed at signal time (R7.2)
+    entry_L: Optional[float] = None     # Branch B flow anchor = L at the SIGNAL bar (research L0)
 
 
 @dataclass

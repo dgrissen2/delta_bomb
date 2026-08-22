@@ -133,6 +133,7 @@ class FeatureEngine:
         self.vwap_bars = cfg.i("r3_derived", "context_vwap_bars")
         self.rm = RunMachine(self.rev)
         self.closes: list[float] = []
+        self.highs: list[float] = []
         self.mins: list[int] = []
         self.Ls: list[float] = []
         self.Ns: list[float] = []
@@ -181,6 +182,7 @@ class FeatureEngine:
             self.open_0930 = bar.open
         self.mins.append(m)
         self.closes.append(bar.close)
+        self.highs.append(bar.high)
         # EMAs (1-min closes, adjust=False semantics)
         for span in self.ema:
             a = 2.0 / (span + 1)
@@ -216,12 +218,15 @@ class FeatureEngine:
         # R3.3 price windows (strict 30-bar)
         pull30 = bounce30 = mid30 = None
         ref_low_bar = None
+        bh_level = None
         if len(self.closes) >= self.roll:
             w = self.closes[-self.roll:]
             pull30 = max(w) - bar.close
             bounce30 = bar.close - min(w)
             mid30 = (max(w) + min(w)) / 2.0
-            ref_low_bar = self.mins[len(self.closes) - self.roll + int(np.argmin(w))]
+            ref_idx = len(self.closes) - self.roll + int(np.argmin(w))
+            ref_low_bar = self.mins[ref_idx]
+            bh_level = max(self.highs[ref_idx:])   # highest HIGH from the 30-bar low through this bar
         range60 = None
         if len(self.closes) > self.r60w:
             # prior-60-min high - low (the 60 bars BEFORE this one)
@@ -266,6 +271,7 @@ class FeatureEngine:
             dN=rm["dN"], weak_side=rm["weak_side"], share=rm["share"],
             drawdown=rm["dd"], run_broke=rm["broke"],
             pull30=pull30, bounce30=bounce30, mid30=mid30, ref_low_bar=ref_low_bar,
+            bh_level=bh_level,
             range60=range60, range60_pct=range60_pct, warmup=warmup,
             ema5=self.ema[5], ema9=self.ema[9], ema20=self.ema[20],
             vwap=vwap, spy_close=(spy_bar.close if spy_bar else None), vwap_share10=vshare,
