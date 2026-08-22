@@ -1,6 +1,6 @@
 # Requirements — Delta Bomb Signal Engine ("hiro_engine")
 
-*v1.1 — 2026-08-22 (v1.0 + backtesting grill: all three backtest purposes; two data tiers; whitelist-knob sweeps, one knob at a time; exact-match verification; verbose single-day replay). Derived from `delta_bomb_master_playbook.md` v1.3 (the playbook is normative for all trading
+*v1.2 — 2026-08-22 (v1.1 + codex-plan-review alignment fixes: entry-window gates, carrying-short veto exit, 15:30 resolution behavior, serial pricing, state classifier encoded, heartbeats logged). Prior: (v1.0 + backtesting grill: all three backtest purposes; two data tiers; whitelist-knob sweeps, one knob at a time; exact-match verification; verbose single-day replay). Derived from `delta_bomb_master_playbook.md` v1.3 (the playbook is normative for all trading
 logic; this spec covers the software). Decisions taken in the grill session: mode (c) engine+alerts with silent
 paper executor · console-only output, unified live/backtest · degraded mode (a)+(c) · no human-trade capture (for
 now) · scorecard in scope · two uncounted shakedown sessions · manual morning start.*
@@ -77,6 +77,12 @@ PARTIAL SESSION = any session with a HIRO or SPX-bar outage > 15 min inside 10:0
 **WHEN** a 1-min SPX bar completes during 09:30–16:00
 **THE SYSTEM SHALL** within 5 seconds re-pull the HIRO S&P 500 payload, recompute all features (playbook §4 conditions, Appendix A definitions), and evaluate P0 → P1 → P2 in that order.
 
+**WHEN** the time is before 10:00 (observe-only window), or after 14:30
+**THE SYSTEM SHALL** track state and print veto/state changes but SHALL NOT emit any entry signal nor open any simulated trade (Branch A additionally requires ≥ 10:35 for its 60-bar history; Branch B's own gate is ≤ 14:30).
+
+**WHEN** the clock reaches 10:30 and again at 13:00
+**THE SYSTEM SHALL** compute and print the leg-order context read exactly as playbook §3 defines it — UP = drift from open ≥ +0.10 IM ∧ ≥ 80% of the last 10 bars above VWAP (SPY volume-VWAP proxy) ∧ EMA5>EMA9>EMA20; DOWN = mirror; else CHOP — and retain the result for the state-flip exit.
+
 **WHEN** a Branch A signal fires (all four §4A conditions true, ≥ 10:35, no P0 block, flat, < 3 entries today, new episode)
 **THE SYSTEM SHALL** print one entry line: `ENTRY A LONG-FIRST | t | S0=<next-open ref> | buy ~20Δ put (strike hint if chain available) | rest SELL K−5 @ cost+0.10 | reason: <condition values>`, and open a simulated long-first trade at the next bar's open.
 
@@ -106,14 +112,26 @@ PARTIAL SESSION = any session with a HIRO or SPX-bar outage > 15 min inside 10:0
 **WHEN** a sell-first trade is open and within 3 minutes of entry the HIRO all-line drops ≥ 0.3 $B below its entry level or the run breaks, before +3 prints
 **THE SYSTEM SHALL** record `scratch` at the next bar's open (long-first mirror: bounce-high re-take).
 
+**WHEN** a short leg is being carried and the P0 flow veto ACTIVATES (15-min all ∧ nextExp both < −0.8 $B)
+**THE SYSTEM SHALL** treat it as an exit instruction, not merely an entry block: scratch the carried short at the next bar's open, recorded `veto_exit` (distinct from the 3-minute entry scratch).
+
+**WHEN** the 13:00 context read is the OPPOSITE of the state that justified a leg still being carried
+**THE SYSTEM SHALL** exit that lone leg at the next bar's open, recorded `state_flip` (per the playbook, this can only affect a leg opened 12:00–13:00; exit precedence: fill > scratch > cap > state flip > clock > resolution).
+
 **WHEN** the carried leg's mid moves 3.5 pts against entry
 **THE SYSTEM SHALL** record `cap` (mid = (bid+ask)/2 when a chain feed is present; spot ±15-pt proxy otherwise, and the log SHALL say which was used).
 
-**WHEN** 60 minutes pass unfilled, or 15:30 arrives
-**THE SYSTEM SHALL** record `timeout` / `resolution` respectively; a horizon truncated by session end SHALL be recorded `censored`, never `timeout`.
+**WHEN** 60 minutes pass unfilled
+**THE SYSTEM SHALL** record `timeout` and close the lone leg; a horizon truncated by session end SHALL be recorded `censored`, never `timeout`.
+
+**WHEN** 15:30 arrives with a simulated leg still open
+**THE SYSTEM SHALL** apply the playbook resolution: complete the pair as a debit spread only if the implied debit ≤ 0.50 (recorded `resolution_debit` with the debit), otherwise close the lone leg (recorded `resolution_close`); in either case nothing survives past 15:30.
+
+**WHEN** a second or third entry of the day fires (always on a fresh Branch A/B signal)
+**THE SYSTEM SHALL** print the serial-pricing instruction with the signal — resting sell priced at the neighbour strike's live bid + 0.10, resting buy at its live ask − 0.10 (never reusing the earlier bomb's prices) — while the simulation itself continues to score the standard ±3-pt spot proxy.
 
 **WHEN** a trade is open
-**THE SYSTEM SHALL** print a one-line status heartbeat every 5 minutes (state, clock remaining, current adverse).
+**THE SYSTEM SHALL** print a one-line status heartbeat every 5 minutes (state, clock remaining, current adverse), and heartbeats SHALL be logged like every other event — the console stream and the log file are the same stream in both live and backtest modes (Decision 3).
 
 ### Degraded mode
 
@@ -128,7 +146,7 @@ PARTIAL SESSION = any session with a HIRO or SPX-bar outage > 15 min inside 10:0
 
 ### Logging & config freeze
 
-**WHEN** any event occurs (signal, entry, exit, veto change, skip with reason, outage, heartbeat suppressed from file)
+**WHEN** any event occurs (signal, entry, exit, veto change, skip with reason, outage, heartbeat)
 **THE SYSTEM SHALL** append one row to `docs/replay/hiro/paper_log.csv` in the Appendix A schema, stamped with CONFIG_HASH, session date, and mode (live/backtest/shakedown).
 
 **WHEN** the engine starts with CONFIG whose hash differs from the previous session's
