@@ -1,6 +1,6 @@
 # Requirements — Delta Bomb Signal Engine ("hiro_engine")
 
-*v2.1 — 2026-08-22. v2.0 + red-team audit (31 findings, verdict FAIL → all fixed: controls and metrics defined in R11, verification artifact pinned, chain/SPY sources added, state-flip mapping, price-tier behavior enumerated, boundary and denominator rules). Self-contained: every trading rule is stated in this document with an R-number; acceptance
+*v2.2 — 2026-08-22. v2.1 + final plan review (6 blockers, 2 majors → fixed: signal/entry split, R7.0 exit-timing table, controls as deterministic scorecard functions, R13 backtest definitions, best-session re-check enumerated, full-tier source contract, single-backlink rule restored). Prior: v2.0 + red-team audit (31 findings, verdict FAIL → all fixed: controls and metrics defined in R11, verification artifact pinned, chain/SPY sources added, state-flip mapping, price-tier behavior enumerated, boundary and denominator rules). Self-contained: every trading rule is stated in this document with an R-number; acceptance
 criteria reference R-numbers only. Research provenance, evidence and status history: see
 [`delta_bomb_master_playbook.md`](delta_bomb_master_playbook.md) (the only external reference in this spec).*
 
@@ -34,8 +34,7 @@ without human fudging — whether this strategy earns the next stage**.
 - **R1.3** Size = 1 contract, paper, always (this build).
 - **R1.4** Completion proxy (simulation): the second leg is deemed filled when SPX touches S0 + 3.0 (sell-first)
   / S0 − 3.0 (long-first). **S0 = the open of the EXECUTION bar** — the bar immediately after the signal bar;
-  "entry bar" always means the execution bar. (Real-world required move measures 3.0–3.8 pts —
-  `docs/replay/gap_delta_stress.csv`; 3.0 is the frozen simulation threshold.)
+  "entry bar" always means the execution bar. (Real-world required move measures 3.0–3.8 pts per the stress test recorded in the playbook; 3.0 is the frozen simulation threshold.)
 
 ## R2. Data inputs
 - **R2.1** SPX 1-min OHLC bars, live (ThetaData terminal) and stored (`~/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/`).
@@ -100,7 +99,12 @@ without human fudging — whether this strategy earns the next stage**.
   signal line quotes its current bid/ask so the resting limit ((cost + 0.10) / (sale − 0.10)) is anchored to
   live prices.
 
-## R7. Exits (precedence: fill > scratch > cap > veto/state exits > clock > resolution; first to fire wins)
+## R7. Exits (precedence: fill > scratch > cap > veto_exit > state_flip > clock > resolution; first to fire wins)
+- **R7.0 Timing & prices (applies to every exit):** each exit condition is evaluated at the close of bar j.
+  Execution price: fills = the touch level S0 ± 3.0 at the touch bar; every other exit = the OPEN of bar j+1;
+  if no bar j+1 exists (session end), the close of bar j. The 15:30 resolution evaluates at the 15:30 bar and
+  executes at its open. R11.2 adverse excursion runs over bars from the execution bar through the exit's
+  execution price inclusive (fills: touch bar excluded).
 - **R7.1** Fill: SPX touches S0 + 3.0 (sell-first) / S0 − 3.0 (long-first) → completed; record minutes-to-fill.
 - **R7.2** Flow-shutoff scratch (Branch B): within 3 minutes of entry, L drops ≥ 0.3 $B below its entry value OR
   the run breaks, before the fill touch → scratch at the next bar's open. Branch A analogue: define BH = the highest high from the bar of the trade's reference 30-bar low through the signal bar; a bar's high > BH before the fill touch → scratch.
@@ -123,7 +127,8 @@ without human fudging — whether this strategy earns the next stage**.
   outage, heartbeat — is one row in `docs/replay/hiro/paper_log.csv`: ts, mode (live/backtest/shakedown), tier,
   branch, event, rule id, S0, strikes, run/rate/ΔC/ΔP/share/r15, outcome (fill mins / scratch pts / timeout /
   censored), adverse, CONFIG_HASH, session date. The console stream and the log are the SAME stream.
-- **R8.2** CONFIG = the frozen thresholds file (every numeric in R1–R7); CONFIG_HASH = its SHA-256 on every row.
+- **R8.2** CONFIG = the frozen thresholds file: every numeric in R1–R7, plus the R11.4/R11.5 control-dataset
+  identifier (path + data hash) and the R12.1 artifact hash. CONFIG_HASH = its SHA-256 on every row.
   A hash change vs the prior session prints a loud reset warning.
 
 ## R9. Acceptance test (the frozen 10-session exam; graded by `scorecard`; all terms per R11)
@@ -135,8 +140,11 @@ control (R11.4) · Branch A ≥ 8 qualifying episodes with fill rate ≥ 0.70 an
 midpoint-matched control (R11.5) · branches reported separately; a minute qualifying for both counts once (as A)
 · adverse excursion (R11.2) > 10 pts on ≤ 10% of executable entries, max one such trade · median scratch loss
 (R11.3) ≤ 3 pts · ≤ 1 scratch whose fill touch would have printed within its 60-min horizon absent the scratch ·
-all risk criteria still hold excluding the best session (by fills). A branch below its sample minimum is
-INCONCLUSIVE. Any rule change resets the test.
+the RISK RE-CHECK holds: with the best session removed (best = most fills; ties → highest summed R11.3 pnl;
+ties → earliest date), recompute over the remaining sessions' entries — adverse > 10 pts still ≤ 10% of the
+reduced entry count AND ≤ 1 trade; median scratch loss still ≤ 3 pts; would-have-completed scratches still ≤ 1;
+thresholds unchanged, denominators reduced. A branch below its sample minimum is INCONCLUSIVE. Any rule change
+resets the test.
 
 ## R11. Metric & control definitions (everything R9 needs, computable from this document)
 - **R11.1 Qualifying signal / episode / executable entry:** Branch B qualifying signal = a minute satisfying
@@ -149,14 +157,31 @@ INCONCLUSIVE. Any rule change resets the test.
 - **R11.3 Leg P&L proxy / scratch loss:** pnl = (exit reference − S0) for sell-first and (S0 − exit reference)
   for long-first, in SPX points; exit reference = S0 ± 3.0 for fills, otherwise the exit bar's next-bar open
   (or close at session end). Scratch loss = −pnl of a scratch.
-- **R11.4 Frozen clock-matched control (Branch B):** over the eight research sessions 2026-08-12..21, take every
-  minute 10:00–14:30 with a complete 60-min horizon; weight minutes to match the clock-minute distribution of
-  the branch's executable entries; control = weighted mean of the R7.1 fill-touch indicator. The resulting
-  constant lives in CONFIG with its provenance; `scorecard` compares against the constant.
-- **R11.5 Frozen midpoint-matched control (Branch A):** same eight sessions; candidate minutes satisfy R6.1
-  conditions (i), (iii), (iv) but FAIL (ii) (r30 ≥ 0); same weighting and indicator; constant in CONFIG.
+- **R11.4 Frozen clock-matched control (Branch B):** a deterministic FUNCTION computed by `scorecard` at grading
+  time: over the frozen control dataset (the eight research sessions 2026-08-12..21, fixed forever, identified
+  in CONFIG by path + data hash), take every minute 10:00–14:30 with a complete 60-min horizon; weight minutes
+  to match the clock-minute distribution of the test's Branch-B executable entries; control = weighted mean of
+  the R7.1 fill-touch indicator. Deterministic given the test log; no stored constant needed.
+- **R11.5 Frozen midpoint-matched control (Branch A):** same deterministic-function form over the same frozen
+  dataset; candidate minutes satisfy R6.1 conditions (i), (iii), (iv) but FAIL (ii) (r30 ≥ 0); same weighting
+  and indicator.
 - **R11.6 Fill rate:** fills ÷ executable entries with non-censored horizons (censored excluded from the
   denominator; scratches and timeouts remain in it).
+
+## R13. Backtesting definitions
+- **R13.1 Tiers:** `full` requires HIRO + SPX 1-min per date (missing → date refused and listed); `price` runs
+  the whole SPX archive with: Branch B disabled; Branch A as "price-A" (R6.1 (i), (iii), (iv) only); R4.3 and
+  R7.2 disabled (BH scratch retained); all else identical; every output stamped `tier=price`.
+- **R13.2 Sweep whitelist (fully enumerated; one knob per run; all else frozen):** scratch drop magnitude
+  {0.2, 0.3, 0.4, 0.5, 0.6 $B below entry L} · scratch window {2, 3, 4, 5 min} · pullback {3, 5, 8 pts} ·
+  cap {3.0, 3.25, 3.5, 3.75, 4.0} · clock {45, 60, 75 min}. Any other knob is rejected; changing this list
+  means editing this spec.
+- **R13.3 Summary contract (every backtest/sweep output):** per variant — trade count, episode count, days
+  covered, matched control per entry type (R11.4 form for sell-first-style, R11.5 form for long-first-style,
+  computed over the run's own dataset), day-clustered bootstrap 90% CI on the fill rate (resample days with
+  replacement, 2,000 draws, seed 42), censored trades reported separately.
+- **R13.4 Leaderboards:** print the number of cells examined at the top; cells with < 15 trades or < 4 days are
+  displayed greyed out and excluded from ranking.
 
 ## R12. Verification artifact
 - **R12.1** The normative verification target is `docs/replay/hiro/verification_trades_v1.csv` — the 27-trade
@@ -194,17 +219,17 @@ INCONCLUSIVE. Any rule change resets the test.
 **WHEN** a 1-min SPX bar completes during 09:30–16:00
 **THE SYSTEM SHALL** within 5 seconds re-pull the HIRO payload (R2.2), recompute R3, and evaluate R4 → R6.1 → R6.2 in that order.
 
-**WHEN** the time is inside an observe-only or post-entry window (R5.1, R5.2)
+**WHEN** the time is OUTSIDE the R5.2 entry window (i.e., during R5.1 observe-only, or after 14:30)
 **THE SYSTEM SHALL** track and print state changes but emit no entry signals and open no simulated trades.
 
 **WHEN** the clock reaches 10:30 and 13:00
 **THE SYSTEM SHALL** compute and print the R3.4 context read and retain it for R7.4.
 
-**WHEN** a Branch A signal fires (R6.1, R6.4, R5.2 all satisfied)
-**THE SYSTEM SHALL** print `ENTRY A LONG-FIRST | t | S0 | strike (R1.2) | rest SELL K−5 @ cost+0.10 | <condition values>` and open a simulated long-first trade at the next bar's open.
+**WHEN** a Branch A signal fires (R6.1, R6.4, R5.2 all satisfied) at a bar close
+**THE SYSTEM SHALL** print `SIGNAL A LONG-FIRST | t | strike (R1.2) | <condition values>` immediately, and at the next bar's open print `ENTRY A | S0=<that open> | rest SELL K−5 @ cost+0.10` and open the simulated long-first trade (S0 is unknowable at signal time and never appears on a SIGNAL line).
 
 **WHEN** a Branch B signal fires (R6.2 arm + gates, no R4 block, R6.4, R5.2)
-**THE SYSTEM SHALL** print the equivalent `ENTRY B SELL-FIRST` line and open a simulated sell-first trade at the next bar's open.
+**THE SYSTEM SHALL** print the equivalent `SIGNAL B SELL-FIRST` line immediately and the `ENTRY B | S0=<next open> | rest BUY K+5 @ sale−0.10` line at execution, opening the simulated sell-first trade.
 
 **WHEN** Branch A and Branch B fire on the same bar
 **THE SYSTEM SHALL** take only Branch A (R6.4).
@@ -260,10 +285,10 @@ INCONCLUSIVE. Any rule change resets the test.
 ### Backtesting
 
 **WHEN** backtest runs with `--tier full` (default)
-**THE SYSTEM SHALL** use HIRO partitions + SPX 1-min and evaluate R1–R7 completely, accepting only dates with both sources.
+**THE SYSTEM SHALL** require HIRO partitions + SPX 1-min (a date lacking either is refused and listed per R13.1); SPY 1-min and levels are used when present and degrade exactly per the live rules when absent (no SPY → R3.4 returns CHOP, logged `degraded_vwap`; invalid levels → R4.2), evaluating R1–R7 under the R2.5 backtest proxies.
 
 **WHEN** backtest runs with `--tier price`
-**THE SYSTEM SHALL** run over the full SPX 1-min archive with this exact per-rule behavior — Branch B disabled entirely; Branch A runs as "price-A" (conditions (i), (iii), (iv) only; (ii) dropped); R4.3 disabled; R7.2 disabled (Branch A's BH scratch retained); everything else identical — stamping every output `tier=price` so a price-tier number can never be quoted as a full-rule result.
+**THE SYSTEM SHALL** apply R13.1's price-tier behavior exactly, stamping every output `tier=price` so a price-tier number can never be quoted as a full-rule result.
 
 **WHEN** backtest runs the frozen config over the stored HIRO sessions (verification)
 **THE SYSTEM SHALL** reproduce `docs/replay/hiro/verification_trades_v1.csv` (R12.1) row-for-row — same entry minutes, sides, exit types — reporting any discrepancy as a defect, not a tolerance.
@@ -275,10 +300,10 @@ INCONCLUSIVE. Any rule change resets the test.
 **THE SYSTEM SHALL** run with those overrides, stamp outputs with that config's hash, and never count any backtest row toward the live test.
 
 **WHEN** the operator runs `hiro_engine sweep <knob>`
-**THE SYSTEM SHALL** sweep exactly ONE knob from the fixed, fully enumerated whitelist — scratch drop magnitude {0.2, 0.3, 0.4, 0.5, 0.6 $B below the entry L}, scratch window {2, 3, 4, 5 min}, pullback {3, 5, 8 pts}, cap {3.0, 3.25, 3.5, 3.75, 4.0}, clock {45, 60, 75 min} — holding all else frozen, rejecting any knob not listed (whitelist changes require editing this spec).
+**THE SYSTEM SHALL** sweep exactly ONE knob per R13.2, holding all else frozen and rejecting unlisted knobs.
 
 **WHEN** any backtest or sweep summarizes results
-**THE SYSTEM SHALL** report per variant: trade AND episode counts, days covered, the matched control for the entry type (clock-matched for Branch B-style entries, midpoint-matched for Branch A-style), a day-clustered bootstrap 90% CI on the headline fill rate, censored trades separately; sweep leaderboards SHALL print the number of cells examined and grey out (not rank) cells with n < 15 trades or < 4 days.
+**THE SYSTEM SHALL** emit the R13.3 summary contract; sweep leaderboards SHALL follow R13.4.
 
 **WHEN** the operator runs `hiro_engine scorecard --rehearsal --from D1 --to D2`
 **THE SYSTEM SHALL** grade historical sessions with the full R9 logic, labeled REHEARSAL, excluded from the live record.
