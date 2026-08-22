@@ -91,11 +91,13 @@ def build_control_frame(cfg: Config, check_hash: bool = True,
         n = len(g)
         up = np.full(n, np.nan); dn = np.full(n, np.nan)
         for i in range(n):
-            if i + 1 + HORIZON > n:
+            # engine fill window = execution bar .. entry+60 (fill beats clock on
+            # the timeout bar) = rows i+1 .. i+1+HORIZON inclusive
+            if i + 2 + HORIZON > n:
                 continue                       # incomplete horizon -> excluded
             p = o[i + 1]
-            up[i] = float((hi[i + 1:i + 1 + HORIZON] >= p + fill).any())
-            dn[i] = float((lo[i + 1:i + 1 + HORIZON] <= p - fill).any())
+            up[i] = float((hi[i + 1:i + 2 + HORIZON] >= p + fill).any())
+            dn[i] = float((lo[i + 1:i + 2 + HORIZON] <= p - fill).any())
         g["touch_up"], g["touch_dn"] = up, dn
         frames.append(g)
     df = pd.concat(frames).reset_index(drop=True)

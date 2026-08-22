@@ -266,11 +266,16 @@ class RuleEngine:
 
         # R7.3 cap: chain path uses the option-mid move Session attaches live;
         # proxy path uses SPX vs S0 at the bar close
+        adverse_move = (tr.s0 - bar.close) if sell else (bar.close - tr.s0)
         if tr.cap_source == "chain":
-            if row.option_mid_move is not None and row.option_mid_move >= tr.cap_value:
-                return ev("cap", "R7.3", cap_source="chain")
+            if row.option_mid_move is not None:
+                if row.option_mid_move >= tr.cap_value:
+                    return ev("cap", "R7.3", cap_source="chain")
+            elif adverse_move >= self.e7["cap_spot_pts"]:
+                # chain quote unavailable this bar -> spot-proxy fallback so a
+                # live trade is NEVER capless (R2.5 "chain call fails" path)
+                return ev("cap", "R7.3", cap_source="proxy_fallback")
         else:
-            adverse_move = (tr.s0 - bar.close) if sell else (bar.close - tr.s0)
             if adverse_move >= tr.cap_value:
                 return ev("cap", "R7.3", cap_source="proxy")
         # R7.4 veto exit / state flip (veto_exit before state_flip on ties)

@@ -50,8 +50,10 @@ def cmd_backtest(args) -> int:
         days = available_spx_days(cfg, args.date_from, args.date_to)
         if not days:
             print("no stored SPX sessions in range"); return 2
-    log = EventLog(Path(args.log) if args.log else _log_path(cfg, "paper_log").with_name(
-        "paper_log_backtest.csv"), echo=True)   # AC: identical console stream, always
+    log_path = Path(args.log) if args.log else _log_path(cfg, "paper_log").with_name(
+        "paper_log_backtest.csv")
+    offset = log_path.stat().st_size if log_path.exists() else 0
+    log = EventLog(log_path, echo=True)         # AC: identical console stream, always
     rows = run_backtest(cfg, tier, days, log)
     log.close()
     print(f"\nbacktest done | tier={tier.tier_stamp} | {len(rows)} sessions | "
@@ -59,11 +61,17 @@ def cmd_backtest(args) -> int:
     for r in rows:
         print(f"  {r.date}  {r.disposition}  outage={r.outage_min}m")
     # R13.3: every backtest output carries the summary contract
+    import io as _io
     import pandas as pd
+    from .models import EVENT_FIELDS
     from .scorecard import stage2_entries, stage3_qualify
     from .summarize import print_summary, summarize
-    ev = pd.read_csv(log.csv_path, dtype={"session_date": str})
-    ev = ev[(ev.config_hash == cfg.config_hash) & ev.session_date.isin(days)]
+    with open(log_path) as fh:                 # THIS run's rows only (append-only file)
+        fh.seek(offset)
+        tail_txt = fh.read()
+    ev = pd.read_csv(_io.StringIO(",".join(EVENT_FIELDS) + "\n" + tail_txt)
+                     if offset else _io.StringIO(tail_txt),
+                     dtype={"session_date": str})
     print_summary(summarize(cfg, stage2_entries(ev), stage3_qualify(ev), days,
                             variant=f"backtest {days[0]}..{days[-1]} tier={tier.tier_stamp}"))
     if args.config:

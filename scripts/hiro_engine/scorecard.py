@@ -54,6 +54,11 @@ def stage1_filter(cfg: Config, log: pd.DataFrame, sessions: pd.DataFrame,
         raise ScorecardError(
             "refusing to combine sessions with different CONFIG_HASHes (R9 reset rule): "
             + ", ".join(h[:12] + "…" for h in hashes))
+    if hashes and hashes[0] != cfg.config_hash:
+        print("!" * 78)
+        print(f"!! WARNING: grading sessions of hash {hashes[0][:12]}… but the CURRENT "
+              f"config hash is {cfg.config_hash[:12]}… — a config edit resets the R9 test")
+        print("!" * 78)
     sess = sessions[sessions["mode"] == mode]
     countable = set(sess[sess.disposition == "countable"].date)
     dispo = dict(zip(sess.date, sess.disposition))
@@ -63,6 +68,22 @@ def stage1_filter(cfg: Config, log: pd.DataFrame, sessions: pd.DataFrame,
         raise ScorecardError("no countable sessions (dispositions: "
                              + str(sorted(set(dispo.values()))) + ")")
     return df
+
+
+def one_leg_violations(rows: pd.DataFrame) -> int:
+    """R9 'one leg at a time': count entries appearing while a trade is open,
+    scanning the append-ordered log per session."""
+    v = 0
+    for _, g in rows.groupby("session_date", sort=False):
+        open_trade = False
+        for r in g.itertuples():
+            if r.event_type == "entry":
+                if open_trade:
+                    v += 1
+                open_trade = True
+            elif r.event_type == "exit":
+                open_trade = False
+    return v
 
 
 def stage2_entries(rows: pd.DataFrame) -> pd.DataFrame:
@@ -191,6 +212,8 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
          (fills_by_day > 0).sum() >= 6)
     max_per_day = int(e_per_day.max()) if len(e_per_day) else 0
     crit("<=3 entries/session", max_per_day, "<=3", max_per_day <= 3)
+    crit("one leg at a time", metrics.get("one_leg_violations", 0),
+         "0 overlapping entries", metrics.get("one_leg_violations", 0) == 0)
 
     qb = int((qualify.branch == "B").sum()) if len(qualify) else 0
     b_inc = qb < 20
@@ -280,6 +303,7 @@ def run_scorecard(cfg: Config, rehearsal: bool = False,
     qualify = stage3_qualify(rows)
     qualify.to_csv(outdir / "stage3_qualify.csv", index=False)
     metrics = stage4_metrics(cfg, entries)
+    metrics["one_leg_violations"] = one_leg_violations(rows)
     pd.DataFrame([{k: v for k, v in metrics.items() if not isinstance(v, list)}]).to_csv(
         outdir / "stage4_metrics.csv", index=False)
     controls = stage5_controls(cfg, entries)

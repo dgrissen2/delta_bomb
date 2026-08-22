@@ -40,7 +40,11 @@ def hiro_minute_frame(h: pd.DataFrame) -> pd.DataFrame:
     for col in ("all_L", "all_Lc", "all_Lp", "nextExp_L"):
         if col not in out.columns:
             raise FeedError(f"HIRO series lacks {col}")
-    return out
+    # truncate at the last minute with actual payload rows: the reindexed grid
+    # would otherwise extend flat to 16:00 and make staleness undetectable
+    # (red-team bp2 finding 6 — hiro_fresh was vacuously true)
+    last_data_min = int(h["min"].max()) if len(h) else GRID_START
+    return out[out["min"] <= last_data_min].reset_index(drop=True)
 
 
 def load_hiro_day(hiro_root: Path, day: str) -> pd.DataFrame:

@@ -44,7 +44,7 @@ def test_golden_control_values(config, frame):
     """Pinned values over the frozen dataset with the 27 verification-trade
     minutes as weights (deterministic; any drift = data or logic change)."""
     ref = pd.read_csv(str(config.verification_artifact))
-    assert clock_matched(config, ref.t, frame) == pytest.approx(0.7102, abs=5e-4)
+    assert clock_matched(config, ref.t, frame) == pytest.approx(0.7081, abs=5e-4)  # repinned after fill-window alignment (red-team bp2 #10)
     assert midpoint_matched(config, ref.t, frame) == pytest.approx(1.0, abs=1e-9)
 
 

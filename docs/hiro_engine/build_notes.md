@@ -119,3 +119,19 @@ one reclassified:
   chain feed…", R2.5 proxies). live now prints a loud NO CHAIN FEED banner;
   wiring Schwab (option-mid cap, debit resolution, IM straddle) remains open
   work that needs a live session to validate.
+
+Red-team bp2 (same milestone, ran in parallel with codex): findings 1–3 and
+8–9 were already covered by the codex-round fixes. Additionally applied:
+- **hiro_fresh was vacuously true** — the minute-frame reindex extended flat to
+  16:00, so a stale-but-successful live payload looked healthy. The frame now
+  truncates at the last RAW payload minute; staleness → HIRO_DOWN + outage.
+- **Chain cap can never go capless**: if the option mid is unavailable on a bar
+  of a chain-mode trade, the 15-pt spot proxy applies (`cap_source=proxy_fallback`).
+- **Control fill window aligned to the engine** (entry..entry+60 incl. the
+  timeout bar, where fill beats clock): golden B control repinned 0.7102 → 0.7081.
+- Scorecard: one-leg-at-a-time criterion row added (chronological log scan);
+  loud warning when the graded log's hash differs from the CURRENT config hash.
+- Control r30 row-offset concern: verified all 8 frozen sessions are minute-
+  gapless, so row offset == minute offset on the control dataset (no change).
+- Chain wiring (Schwab option-mid cap / debit resolution / IM straddle) remains
+  OPEN, needs a live session; live runs proxy-mode with a loud banner until then.
