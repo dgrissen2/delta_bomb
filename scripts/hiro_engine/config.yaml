@@ -1,0 +1,77 @@
+# hiro_engine frozen configuration — every numeric in R1-R7 of docs/hiro_engine/requirements.md.
+# CONFIG_HASH = sha256 of this file's bytes (R8.2). Editing ANY byte changes the hash and
+# resets the 10-session acceptance test (R9). Do not touch during the test.
+
+r1_instruments:
+  width_strikes: 5            # R1.1 vertical width in strike points
+  dte_target: 30              # R1.1 expiry nearest 30 DTE
+  dte_min: 20                 # R1.1 window low
+  dte_max: 40                 # R1.1 window high
+  delta_target: -0.20         # R1.2 base strike delta
+  size_contracts: 1           # R1.3 paper, always
+  fill_touch_pts: 3.0         # R1.4 completion proxy from S0
+
+r3_derived:
+  run_break_dd: 0.6           # R3.2 run-break drawdown ($B)
+  roll_window: 30             # R3.3 pull30/bounce30/mid30 window (strict min_periods)
+  range60_window: 60          # R3.3 prior-60-min range
+  range60_pctile: 0.75        # R3.3 expanding percentile
+  range60_min_obs: 300        # R3.3 warmup floor
+  context_im_frac: 0.10       # R3.4 |close - open0930| >= 0.10 * IM
+  context_vwap_share: 0.80    # R3.4 share of last 10 bars vs VWAP
+  context_vwap_bars: 10       # R3.4 lookback bars
+  context_reads_min: [630, 780]   # R3.4 10:30 and 13:00 ET (minutes since midnight)
+  episode_lapse_min: 3        # R3.5 conditions lapse >= 3 consecutive minutes
+
+r4_vetoes:
+  flow_veto_bps: -0.8         # R4.3 r15 AND r15n both below this ($B)
+
+r5_clock:
+  observe_end_min: 600        # R5.1 09:30-10:00 observe only
+  entry_end_min: 870          # R5.2 no new unpaired leg after 14:30
+  branch_a_start_min: 635     # R5.2 Branch A additionally >= 10:35
+  clock_minutes: 60           # R5.3 per-leg clock
+  resolution_min: 930         # R5.4 15:30 hard resolution
+  session_end_min: 960        # 16:00 tracking stops
+
+r6_entries:
+  a_bounce_min_pts: 3.0       # R6.1(iii)
+  b_pull_min_pts: 3.0         # R6.2 arm pullback
+  b_dur_min: 10               # R6.2 run duration (min)
+  b_rate_min: 2.0             # R6.2 run rate ($B/hr)
+  b_cpr_min: 0.25             # R6.2 min/max of dC,dP
+  b_share_min: 0.5            # R6.2 nextExp share of run
+  b_weak_side_min: 0.15       # R6.2 gate: min(dC,dP) ($B)
+  late_rate: 4.0              # R6.3 suppression rate ($B/hr)
+  late_r30: 1.0               # R6.3 suppression 30-min flow ($B)
+  entries_per_day: 3          # R6.4
+  rest_offset: 0.10           # R6.1/R6.2 resting-limit offset vs first leg
+
+r7_exits:
+  scratch_drop_bps: 0.3       # R7.2 L drop below entry value ($B)
+  scratch_window_min: 3       # R7.2 within 3 minutes of entry
+  cap_option_pts: 3.5         # R7.3 option-mid move against entry
+  cap_spot_pts: 15.0          # R7.3 spot proxy (no chain)
+  resolution_debit_max: 0.50  # R7.6 complete the pair at/below this debit
+  heartbeat_min: 5            # AC: heartbeat cadence while a trade is open
+
+data:
+  spx_dir: ~/Dev/central_trade_data/thetadata/spx_index_1m_ohlc
+  hiro_root: ~/Dev/central_trade_data/spotgamma/hiro/sp500_basket/v1
+  spy_parquet: ~/Dev/central_trade_data/databento/spy_ohlcv_1m/spy_ohlcv_1m.parquet
+  levels_csv: ~/Dev/core_spotgamma_spx_vix_data/offset_historical_spotgamma_data.csv
+  calendar_csv: docs/hiro_engine/event_calendar.csv
+  hiro_era_start: "2026-08-12"   # R3.3 pooled range60 history starts here
+
+control_dataset:               # R11.4 / R11.5 frozen control dataset (R8.2)
+  days: ["2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17",
+         "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21"]
+  data_hash: "0b167b71ab39cdf10a4722b9e18a62ff35af305d2b6a19d233aebae71bb4ac24"
+
+verification:                  # R12.1
+  artifact: docs/replay/hiro/verification_trades_v1.csv
+  artifact_hash: "a95ffe33cd75df9f05cd57f4612ee0dfac857c7028bcf29b853da7e10e3a9630"
+
+logging:
+  paper_log: docs/replay/hiro/paper_log.csv
+  sessions_log: docs/replay/hiro/sessions.csv
