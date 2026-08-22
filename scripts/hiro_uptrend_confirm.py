@@ -73,10 +73,8 @@ def invalidated(fr: pd.DataFrame, r: pd.Series) -> bool:
 
 
 def clock_matched(fr: pd.DataFrame, e: pd.DataFrame, col: str) -> float:
-    w = e["min"].value_counts(normalize=True)
-    b = fr[fr["min"].isin(w.index) & fr[col].notna()]
-    wt = b["min"].map(w) / b.groupby("min")["min"].transform("size")
-    return float(np.average(b[col].astype(float), weights=wt))
+    from hiro_engine.control import clock_weighted_mean   # single home of the weighting (DRY)
+    return clock_weighted_mean(fr, e["min"], col)
 
 
 def main() -> None:

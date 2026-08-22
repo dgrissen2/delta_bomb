@@ -40,12 +40,11 @@ def outcome_row(df: pd.DataFrame, idx: pd.Index, side: str) -> pd.DataFrame:
 
 
 def cm_base(df: pd.DataFrame, e: pd.DataFrame, side: str) -> dict:
+    from hiro_engine.control import clock_weighted_mean   # single home of the weighting (DRY)
     col3, col5, adv = ("u3_60", "u5_60", "advS") if side == "sell" else ("d3_60", "d5_60", "advL")
-    w = e["min"].value_counts(normalize=True)
-    b = df[df["min"].isin(w.index) & df[col3].notna()]
-    wt = b["min"].map(w) / b.groupby("min")["min"].transform("size")
-    return dict(b3=float(np.average(b[col3], weights=wt)), b5=float(np.average(b[col5], weights=wt)),
-                badv=float(np.average((b[adv] > 10).astype(float), weights=wt)))
+    b = df[df[col3].notna()].assign(_adv10=lambda x: (x[adv] > 10).astype(float))
+    return dict(b3=clock_weighted_mean(b, e["min"], col3), b5=clock_weighted_mean(b, e["min"], col5),
+                badv=clock_weighted_mean(b, e["min"], "_adv10"))
 
 
 def report(name: str, df: pd.DataFrame, e: pd.DataFrame, side: str) -> dict:
