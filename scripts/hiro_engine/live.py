@@ -150,33 +150,65 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
             resume_rows = False
     processed_min = 569
     if resume_rows:
-        print(f"[resume] found today's rows in {log_p.name} — warm replaying…")
+        # last minute that actually made it into the log — bars after it
+        # completed during downtime and MUST be processed live (logged), never muted
+        today_rows = prior[prior.session_date == day]
+        logged_ts = today_rows.ts.dropna().astype(str)
+        logged_mins = [int(t[-5:-3]) * 60 + int(t[-2:]) for t in logged_ts
+                       if len(t) >= 5 and t[-5:-3].isdigit() and t[-2:].isdigit()]
+        last_logged = max(logged_mins) if logged_mins else 569
+        print(f"[resume] warm replaying through last logged bar "
+              f"{last_logged // 60:02d}:{last_logged % 60:02d}…")
         spx = spx_bars_today(day)
         spy = spy_bars_today(day)
         hframe = hiro.frame(day)
         spy_map = {int(r.min): SpyBar(int(r.min), r.open, r.high, r.low, r.close, r.volume)
                    for r in spy.itertuples()}
-        ticks = []
+        warm, catchup = [], []
         for r in spx.itertuples():
             m = int(r.min)
             if 570 <= m <= 960:
-                ticks.append(ReplayTick(Bar(m, r.open, r.high, r.low, r.close),
-                                        spy_map.get(m), hframe[hframe["min"] <= m]))
-        session.warm_replay(ticks)
+                t = ReplayTick(Bar(m, r.open, r.high, r.low, r.close),
+                               spy_map.get(m), hframe[hframe["min"] <= m])
+                (warm if m <= last_logged else catchup).append(t)
+        session.warm_replay(warm)
+        for t in catchup:                      # downtime bars: evaluated AND logged
+            session.process_tick(t)
         processed_min = session.last_bar_min or 569
-        print(f"[resume] warm state rebuilt through {processed_min // 60:02d}:{processed_min % 60:02d}")
+        print(f"[resume] state rebuilt through {processed_min // 60:02d}:{processed_min % 60:02d} "
+              f"({len(catchup)} downtime bar(s) processed live)")
     else:
         log.emit(session._stamp(session.startup_events(), None))
         if session.calendar.is_event_day:
             session.finish(event_standdown=True)
             return 0
 
+    if not chain.available:
+        log.emit(session._stamp([Event(event_type="banner", rule_id="R2.5",
+            notes="NO CHAIN FEED — proxy mode: strike hints only, cap = 15-pt spot "
+                  "proxy, 15:30 always resolution_close, IM missing -> context CHOP")],
+            None))
     print(f"[live] session {day} | shakedown={shakedown} | chain={chain.available} "
           f"| CONFIG_HASH {cfg.config_hash[:12]}…")
     while True:
         now = dt.datetime.now(ET)
         now_min = now.hour * 60 + now.minute
         if now_min >= cfg.i("r5_clock", "session_end_min"):
+            try:                                  # final catch-up: the 15:59 bar
+                spx = spx_bars_today(day)
+                hframe = hiro.frame(day)
+                spy = spy_bars_today(day)
+                spy_map = {int(r.min): SpyBar(int(r.min), r.open, r.high, r.low,
+                                              r.close, r.volume) for r in spy.itertuples()}
+                tail = spx[(spx["min"] > processed_min) & (spx["min"] <= 959)]
+                for r in tail.itertuples():
+                    m = int(r.min)
+                    session.process_tick(ReplayTick(
+                        Bar(m, r.open, r.high, r.low, r.close), spy_map.get(m),
+                        hframe[hframe["min"] <= m] if hframe is not None else None))
+                    processed_min = m
+            except Exception as e:
+                print(f"[live] final catch-up failed: {e}")
             session.finish()
             print("[live] 16:00 — session closed")
             return 0

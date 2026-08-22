@@ -45,6 +45,8 @@ def main() -> int:
     line(norm.exists(), "HIRO partition", str(norm) if norm.exists()
          else f"MISSING — run the backfill before the vendor window closes")
     manifest_p = Path(root) / "manifest.json"
+    if not manifest_p.exists():
+        line(False, "manifest", f"{manifest_p} MISSING — store integrity unverifiable")
     if norm.exists() and manifest_p.exists():
         m = json.load(open(manifest_p))
         sess = (m.get("sessions") or {}).get(day)

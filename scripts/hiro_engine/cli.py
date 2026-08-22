@@ -58,6 +58,14 @@ def cmd_backtest(args) -> int:
           f"CONFIG_HASH {cfg.config_hash[:12]}…")
     for r in rows:
         print(f"  {r.date}  {r.disposition}  outage={r.outage_min}m")
+    # R13.3: every backtest output carries the summary contract
+    import pandas as pd
+    from .scorecard import stage2_entries, stage3_qualify
+    from .summarize import print_summary, summarize
+    ev = pd.read_csv(log.csv_path, dtype={"session_date": str})
+    ev = ev[(ev.config_hash == cfg.config_hash) & ev.session_date.isin(days)]
+    print_summary(summarize(cfg, stage2_entries(ev), stage3_qualify(ev), days,
+                            variant=f"backtest {days[0]}..{days[-1]} tier={tier.tier_stamp}"))
     if args.config:
         print("NOTE: --config override active — outputs stamped with that hash; "
               "never counted toward the live test.")

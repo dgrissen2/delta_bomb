@@ -124,7 +124,9 @@ class Session:
 
     # -- health -----------------------------------------------------------------------
     def _health(self, tick) -> str:
-        if self.tier.requires_hiro and (tick.hiro is None or not len(tick.hiro)):
+        if self.tier.requires_hiro and (
+                tick.hiro is None or not len(tick.hiro)
+                or int(tick.hiro["min"].max()) < tick.bar.min - 2):   # stale payload
             return "HIRO_DOWN"
         if tick.spy_bar is None:
             return "DEGRADED_VWAP"
@@ -137,12 +139,18 @@ class Session:
     # -- the per-bar contract -------------------------------------------------------------
     def process_tick(self, tick) -> None:
         bar = tick.bar
+        stall_events: list[Event] = []
         if self.last_bar_min is not None and bar.min - self.last_bar_min > 1:
             gap = bar.min - self.last_bar_min - 1
             lo = max(self.last_bar_min + 1, self.cfg.i("r5_clock", "observe_end_min"))
             hi = min(bar.min - 1, self.cfg.i("r5_clock", "entry_end_min"))
             if hi >= lo:
                 self.outage_min += hi - lo + 1
+            if gap > 2:
+                stall_events.append(Event(
+                    event_type="outage", rule_id="R10.2",
+                    notes=f"SPX_STALLED: {gap}m gap before this bar | "
+                          f"outage so far {self.outage_min}m"))
         entry_events = self.executor.execute_pending(bar, self.state)          # (1)
         row = self.features.update(bar, tick.hiro, tick.spy_bar)               # (2)
         prev_health = self.health
@@ -178,7 +186,7 @@ class Session:
                     kept.append(ev)
             rule_events = kept
         trade_events = self.executor.apply(rule_events, row, self.state)       # (5)
-        self.log.emit(self._stamp(entry_events + health_events + rule_events
+        self.log.emit(self._stamp(stall_events + entry_events + health_events + rule_events
                                   + trade_events, bar.min))                    # (6)
         self.last_bar = bar
         self.last_bar_min = bar.min

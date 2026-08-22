@@ -65,7 +65,7 @@ def main() -> int:
         line(last_bar >= 955, "SPX capture completeness",
              f"{latest_spx[-1]} ends {last_bar // 60:02d}:{last_bar % 60:02d} "
              + ("" if last_bar >= 955 else "-> INCOMPLETE, refresh from ThetaData "
-                "(backtests will mark it PARTIAL)"), warn_only=True)
+                "(feeds the live range60 pool!)"))
     lv = LevelsLoader(cfg.path_of("levels_csv")).load(str(today))
     line(lv.valid, "SG levels", f"row for {today}: "
          + (f"VT={lv.vt} CW={lv.cw}" if lv.valid

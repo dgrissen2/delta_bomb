@@ -87,7 +87,7 @@ def stage2_entries(rows: pd.DataFrame) -> pd.DataFrame:
 
 
 def stage3_qualify(rows: pd.DataFrame) -> pd.DataFrame:
-    ev = rows[rows.event_type.isin(["signal", "skip"])].copy()
+    ev = rows[rows.event_type.isin(["signal", "skip", "late_no_entry"])].copy()
     keep = []
     for r in ev.itertuples():
         notes = str(r.notes or "")
@@ -114,7 +114,7 @@ def _would_have_filled(cfg: Config, tr) -> Optional[bool]:
         return None
     fill = cfg.num("r1_instruments", "fill_touch_pts")
     clock = cfg.i("r5_clock", "clock_minutes")
-    seg = spx[(spx["min"] >= tr.entry_min) & (spx["min"] < tr.entry_min + clock)]
+    seg = spx[(spx["min"] >= tr.entry_min) & (spx["min"] <= tr.entry_min + clock)]
     if tr.side == "sell_first":
         return bool((seg.high >= tr.s0 + fill).any())
     return bool((seg.low <= tr.s0 - fill).any())
@@ -195,7 +195,7 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
     qb = int((qualify.branch == "B").sum()) if len(qualify) else 0
     b_inc = qb < 20
     crit("Branch B qualifying signals", qb, ">=20 (else INCONCLUSIVE)", qb >= 20,
-         inconclusive=False)
+         inconclusive=b_inc)
     crit("Branch B fill rate", round(metrics["B_fill_rate"], 3) if metrics["B_fill_rate"] == metrics["B_fill_rate"] else "n/a",
          ">=0.45", metrics["B_fill_rate"] >= 0.45 if not b_inc else False, inconclusive=b_inc)
     crit("Branch B vs clock-matched control",
@@ -206,7 +206,8 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
          inconclusive=b_inc)
     qa = int((qualify.branch == "A").sum()) if len(qualify) else 0
     a_inc = qa < 8
-    crit("Branch A qualifying episodes", qa, ">=8 (else INCONCLUSIVE)", qa >= 8)
+    crit("Branch A qualifying episodes", qa, ">=8 (else INCONCLUSIVE)", qa >= 8,
+         inconclusive=a_inc)
     crit("Branch A fill rate", round(metrics["A_fill_rate"], 3) if metrics["A_fill_rate"] == metrics["A_fill_rate"] else "n/a",
          ">=0.70", metrics["A_fill_rate"] >= 0.70 if not a_inc else False, inconclusive=a_inc)
     crit("Branch A vs midpoint-matched control (+10pp)",

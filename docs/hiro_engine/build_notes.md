@@ -88,3 +88,34 @@ Red-team-auditor: FAIL (1 blocker, 3 majors, 6 minors). Codex review: FAIL
   (Session attaches it live — wired in task 7).
 - exit precedence now tested for EVERY feasible simultaneous pair (20 cases;
   clock+resolution and state_flip+resolution are infeasible by construction).
+
+## Break point 2 review (2026-08-22, after tasks 7–11)
+
+Codex: FAIL (2 blockers, 12 majors). Eleven applied; two declined with cause;
+one reclassified:
+
+- **Applied**: resume now warm-replays only bars ≤ the last LOGGED minute and
+  processes downtime bars live (they are evaluated AND logged, never muted);
+  16:00 shutdown does a final catch-up pull so 15:59 is always processed; HIRO
+  stale-but-nonempty payload (max minute < bar − 2) is HIRO_DOWN with outage
+  minutes; SPX gaps > 2 min emit an R10.2 SPX_STALLED outage row; scorecard
+  below-minimum branch rows are INCONCLUSIVE (never FAIL); would-have-filled
+  window includes the timeout bar (fill beats clock there); ordinary backtests
+  print the R13.3 summary; morning incomplete-SPX and missing-manifest checks
+  are RED, not warnings; spike script exits nonzero on FAIL.
+- **Decision flipped** (spec letter wins): R6.3 late-suppressed episodes DO
+  count as qualifying (R11.1's arm+gates are satisfied; suppression only blocks
+  the entry) — stage3 now consumes late_no_entry events too.
+- **Declined — veto_exit is not an R11.3 "scratch"**: R7.4 uses "scratch it" as
+  the verb but assigns the distinct outcome `veto_exit`; R11.3/R9 "scratch"
+  metrics bind to the R7.2 outcome. Counting veto exits as scratches would mix
+  a veto-driven exit into a flow-shutoff quality metric.
+- **Declined — cap sweep scales the spot proxy**: in backtests the option-mid
+  cap is structurally dead (R2.5 proxies); sweeping cap_option_pts alone would
+  be a literal no-op and the R13.2 cap knob meaningless. The proxy scales by
+  the frozen 15.0/3.5 ratio; both values are stamped into the variant's
+  CONFIG_HASH so nothing is hidden.
+- **Chain adapter**: chain-less operation is a spec-defined mode (R1.2 "if no
+  chain feed…", R2.5 proxies). live now prints a loud NO CHAIN FEED banner;
+  wiring Schwab (option-mid cap, debit resolution, IM straddle) remains open
+  work that needs a live session to validate.
