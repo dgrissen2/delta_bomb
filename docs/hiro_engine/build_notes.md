@@ -55,3 +55,36 @@ threshold; thresholds live only in `scripts/hiro_engine/config.yaml`.*
 - **Event calendar CSV ships empty for CPI/FOMC** (fabricating release dates is
   worse than warning); NFP/quarterly-opex/month-end are computed. The morning
   ops script warns when the current month has no CPI/FOMC rows.
+
+## Break point 1 review (2026-08-22, after tasks 1–6 + 8–9)
+
+Red-team-auditor: FAIL (1 blocker, 3 majors, 6 minors). Codex review: FAIL
+(1 blocker, 7 majors; two overlapped the red team). ALL applied:
+
+- **range60 definition (blocker)**: was closes-range excl. current bar; now the
+  researched rolling-60 HIGHmax − LOWmin INCLUDING the current bar
+  (hiro_lab.py:77); threshold (expanding p75) stays shifted one bar. Fixed in
+  features/session/control.
+- **price tier ≠ HIRO outage (blocker)**: TierPolicy.requires_hiro; price-tier
+  archive runs no longer flag HIRO_DOWN/partial or skip price-A entries.
+- **crash-resume**: `Session.warm_replay` rebuilds ALL warm state (features,
+  vt_broken, episodes, rule dedup, executor) by muted deterministic replay,
+  cross-checked against the log-derived state (RESUME WARNING on divergence);
+  test proves resumed stream == uninterrupted stream.
+- **resolution adverse** stops at the 15:30 OPEN (the bar's later range never
+  counts); **r5/r15/r30/r15n** are true MINUTE diffs (bisect on minute), equal
+  to row offsets on a gapless grid, correct across stalls.
+- **A-episode window (R11.1)**: an A episode only fires if its FIRST minute is
+  ≥ 10:35 (episode start minutes now tracked).
+- **range60 pool** for day D = ALL stored sessions in [pool_start, D),
+  independent of the run's requested dates (test: 08-21 solo == 08-21 in a
+  gapped pair). pool_start = hiro_era_start (full) / archive start (price).
+- signal/skip/gate/late events now carry run/rate/ΔC/ΔP/share/r15/pull30/
+  bounce30 + the R1.2 strike hint; skips dedupe per (branch, episode, reason);
+  scratch_unavailable is a real logged line owned by rules; backtest sessions
+  write sessions_backtest.csv and the R8.2 hash warning reads live rows only;
+  backtests always echo; NFP first-Friday can be overridden (reason `none`
+  clears a computed event day); chain-path cap reads row.option_mid_move
+  (Session attaches it live — wired in task 7).
+- exit precedence now tested for EVERY feasible simultaneous pair (20 cases;
+  clock+resolution and state_flip+resolution are infeasible by construction).

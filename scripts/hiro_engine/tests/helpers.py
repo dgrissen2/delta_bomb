@@ -18,7 +18,8 @@ def mk_row(m: int, *, close: float = 100.0, open_: float | None = None,
         range60=5.0, range60_pct=3.0, warmup=False,
         ema5=100.0, ema9=100.0, ema20=100.0, vwap=100.0, spy_close=100.0,
         vwap_share10=0.9, context_1030=None, context_1300=None,
-        episode_a=None, episode_b=None, a_conditions=False, b_armed=False,
+        episode_a=None, episode_b=None, episode_a_start=None, episode_b_start=None,
+        a_conditions=False, b_armed=False,
         b_gates=False, late_state=False, hiro_fresh=True,
         vetoes=Vetoes(), health="OK",
     )
@@ -27,12 +28,13 @@ def mk_row(m: int, *, close: float = 100.0, open_: float | None = None,
 
 
 def b_fire_row(m: int, episode: int = 1, **kw) -> FeatureRow:
-    base = dict(b_armed=True, b_gates=True, episode_b=episode, r15=0.5, weak_side=0.4)
+    base = dict(b_armed=True, b_gates=True, episode_b=episode, episode_b_start=m,
+                r15=0.5, weak_side=0.4)
     base.update(kw)
     return mk_row(m, **base)
 
 
 def a_fire_row(m: int, episode: int = 1, **kw) -> FeatureRow:
-    base = dict(a_conditions=True, episode_a=episode, r30=-0.5)
+    base = dict(a_conditions=True, episode_a=episode, episode_a_start=m, r30=-0.5)
     base.update(kw)
     return mk_row(m, **base)

@@ -84,8 +84,8 @@ def build_control_frame(cfg: Config, check_hash: bool = True,
         g["bounce30"] = c - c.rolling(roll, min_periods=roll).min()
         g["mid30"] = (c.rolling(roll, min_periods=roll).max()
                       + c.rolling(roll, min_periods=roll).min()) / 2
-        g["range60"] = (c.rolling(r60w, min_periods=r60w).max()
-                        - c.rolling(r60w, min_periods=r60w).min()).shift(1)
+        g["range60"] = (g.high.rolling(r60w, min_periods=r60w).max()
+                        - g.low.rolling(r60w, min_periods=r60w).min())
         # R7.1 fill-touch indicators from the NEXT bar's open, complete horizons only
         o, hi, lo = g.open.values, g.high.values, g.low.values
         n = len(g)

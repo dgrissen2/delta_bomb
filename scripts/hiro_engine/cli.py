@@ -28,7 +28,8 @@ def _hash_warning(cfg) -> None:
     last = None
     with open(p, newline="") as fh:
         for row in csv.DictReader(fh):
-            last = row
+            if row.get("mode") in ("live", "shakedown"):
+                last = row
     if last and last.get("config_hash") and last["config_hash"] != cfg.config_hash:
         print("\n" + "!" * 78)
         print("!! CONFIG_HASH CHANGED vs the previous session.")
@@ -50,7 +51,7 @@ def cmd_backtest(args) -> int:
         if not days:
             print("no stored SPX sessions in range"); return 2
     log = EventLog(Path(args.log) if args.log else _log_path(cfg, "paper_log").with_name(
-        "paper_log_backtest.csv"), echo=args.verbose or bool(args.day))
+        "paper_log_backtest.csv"), echo=True)   # AC: identical console stream, always
     rows = run_backtest(cfg, tier, days, log)
     log.close()
     print(f"\nbacktest done | tier={tier.tier_stamp} | {len(rows)} sessions | "

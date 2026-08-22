@@ -29,6 +29,14 @@ from .models import Event, EngineState, SessionRow, TierPolicy, Vetoes
 from .rules import RuleEngine
 
 
+class _NullLog:
+    """Muted log used during warm crash-resume replay (rows already on disk)."""
+    csv_path = None
+
+    def emit(self, events):
+        return None
+
+
 def build_range60_history(cfg: Config, tier: TierPolicy, days_before: list[str]) -> list[float]:
     """Causal pooled range60 history (R3.3): replay prior stored SPX sessions
     through the same window math — one code path, no lookahead."""
@@ -39,10 +47,11 @@ def build_range60_history(cfg: Config, tier: TierPolicy, days_before: list[str])
             spx = load_spx_day(cfg.path_of("spx_dir"), d)
         except Exception:
             continue
-        closes = [float(c) for c in spx[(spx["min"] >= 570) & (spx["min"] <= 960)].close]
-        for i in range(w, len(closes)):
-            seg = closes[i - w:i]
-            hist.append(max(seg) - min(seg))
+        g = spx[(spx["min"] >= 570) & (spx["min"] <= 960)]
+        highs = [float(x) for x in g.high]
+        lows = [float(x) for x in g.low]
+        for i in range(w - 1, len(highs)):
+            hist.append(max(highs[i - w + 1:i + 1]) - min(lows[i - w + 1:i + 1]))
     return hist
 
 
@@ -60,7 +69,7 @@ class Session:
         self.calendar = CalendarLoader(cfg.path_of("calendar_csv")).check(day)
         self.features = FeatureEngine(cfg, tier, range60_history=range60_history,
                                       im=self.levels.im)
-        self.rules = RuleEngine(cfg, tier)
+        self.rules = RuleEngine(cfg, tier, selector=InstrumentSelector(cfg))
         self.executor = Executor(cfg, InstrumentSelector(cfg), chain_available=chain_available)
         self.state = rebuild_state(log.csv_path, day) if resume else EngineState()
         self.vt_broken = False
@@ -115,7 +124,7 @@ class Session:
 
     # -- health -----------------------------------------------------------------------
     def _health(self, tick) -> str:
-        if tick.hiro is None or not len(tick.hiro):
+        if self.tier.requires_hiro and (tick.hiro is None or not len(tick.hiro)):
             return "HIRO_DOWN"
         if tick.spy_bar is None:
             return "DEGRADED_VWAP"
@@ -174,6 +183,36 @@ class Session:
         self.last_bar = bar
         self.last_bar_min = bar.min
 
+    # -- crash-resume ------------------------------------------------------------------
+    def warm_replay(self, ticks) -> None:
+        """Crash-resume (spec NFR): rebuild ALL warm state — FeatureEngine
+        windows/EMAs/VWAP/open_0930, run machine, episode trackers, RuleEngine
+        per-episode dedup, Session.vt_broken, Executor state — by re-processing
+        today's bars with the log MUTED (their rows are already on disk).
+        The engine is deterministic, so the replayed state equals the pre-crash
+        state; the log-derived EngineState is cross-checked and any divergence
+        prints a loud RESUME WARNING."""
+        real_log, self.log = self.log, _NullLog()
+        try:
+            for t in ticks:
+                self.process_tick(t)
+        finally:
+            self.log = real_log
+        if real_log.csv_path is not None:
+            ref = rebuild_state(real_log.csv_path, self.day)
+            a, b = self.state.open_trade, ref.open_trade
+            diverged = ((a is None) != (b is None)
+                        or (a is not None and b is not None
+                            and (a.id != b.id or a.entry_min != b.entry_min
+                                 or a.s0 != b.s0))
+                        or self.state.entries_today != ref.entries_today)
+            if diverged:
+                self.log.emit(self._stamp([Event(
+                    event_type="banner", rule_id="NFR",
+                    notes="RESUME WARNING: replayed state diverges from the logged "
+                          "state — inspect paper_log before trusting signals")],
+                    self.last_bar_min))
+
     # -- lifecycle ------------------------------------------------------------------------
     def run_replay(self, feed: ReplayFeed) -> SessionRow:
         self.log.emit(self._stamp(self.startup_events(), None))
@@ -209,6 +248,8 @@ class Session:
         if not p.is_absolute():
             from .config import REPO_ROOT
             p = REPO_ROOT / p
+        if self.mode == "backtest":
+            p = p.with_name("sessions_backtest.csv")   # never contaminate the live record
         p.parent.mkdir(parents=True, exist_ok=True)
         new = not p.exists() or p.stat().st_size == 0
         with open(p, "a", newline="") as fh:

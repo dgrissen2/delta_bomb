@@ -88,20 +88,23 @@ class RunMachine:
 # ---------------------------------------------------------------------------
 @dataclass
 class _EpisodeTracker:
-    """R3.5 — one tracker per branch."""
+    """R3.5 — one tracker per branch. Tracks each episode's first minute (R11.1)."""
     lapse_min: int
     next_id: int = 1
     active: Optional[int] = None
+    start_min: Optional[int] = None
     false_streak: int = 0
 
-    def update(self, conditions_true: bool, hard_break: bool = False) -> Optional[int]:
+    def update(self, conditions_true: bool, m: int, hard_break: bool = False) -> Optional[int]:
         if hard_break:
             self.active = None
+            self.start_min = None
             self.false_streak = 0
-            return self.active if conditions_true else None
+            return None
         if conditions_true:
             if self.active is None:
                 self.active = self.next_id
+                self.start_min = m
                 self.next_id += 1
             self.false_streak = 0
         else:
@@ -109,6 +112,7 @@ class _EpisodeTracker:
                 self.false_streak += 1
                 if self.false_streak >= self.lapse_min:
                     self.active = None
+                    self.start_min = None
                     self.false_streak = 0
         return self.active
 
@@ -134,6 +138,7 @@ class FeatureEngine:
         self.rm = RunMachine(self.rev)
         self.closes: list[float] = []
         self.highs: list[float] = []
+        self.lows: list[float] = []
         self.mins: list[int] = []
         self.Ls: list[float] = []
         self.Ns: list[float] = []
@@ -154,8 +159,16 @@ class FeatureEngine:
 
     # -- helpers -------------------------------------------------------------
     def _diff(self, series: list[float], k: int) -> Optional[float]:
+        """k-MINUTE change: current value minus the value at the last bar whose
+        minute <= now - k (equal to a row offset on a gapless grid; correct
+        across SPX stalls — codex review 2026-08-22 finding 4)."""
+        import bisect
         i = len(series) - 1
-        return series[i] - series[i - k] if i >= k else None
+        target = self.mins[i] - k
+        j = bisect.bisect_right(self.mins, target) - 1
+        if j < 0:
+            return None
+        return series[i] - series[j]
 
     def _context(self, bar: Bar) -> str:
         """R3.4 at read minutes only. IM missing -> CHOP. SPY VWAP missing -> CHOP."""
@@ -183,6 +196,7 @@ class FeatureEngine:
         self.mins.append(m)
         self.closes.append(bar.close)
         self.highs.append(bar.high)
+        self.lows.append(bar.low)
         # EMAs (1-min closes, adjust=False semantics)
         for span in self.ema:
             a = 2.0 / (span + 1)
@@ -228,10 +242,10 @@ class FeatureEngine:
             ref_low_bar = self.mins[ref_idx]
             bh_level = max(self.highs[ref_idx:])   # highest HIGH from the 30-bar low through this bar
         range60 = None
-        if len(self.closes) > self.r60w:
-            # prior-60-min high - low (the 60 bars BEFORE this one)
-            w60 = self.closes[-self.r60w - 1:-1]
-            range60 = max(w60) - min(w60)
+        if len(self.closes) >= self.r60w:
+            # researched definition (hiro_lab.py): rolling-60 HIGH max - LOW min,
+            # current bar INCLUDED; only the percentile threshold is shifted
+            range60 = max(self.highs[-self.r60w:]) - min(self.lows[-self.r60w:])
         # causal expanding percentile, shifted one bar (history excludes current range60)
         pool = self.r60_history + self.r60_today
         warmup = len(pool) < self.r60_min_obs
@@ -259,8 +273,8 @@ class FeatureEngine:
         b_armed = _rules.b_arm(core, self.cfg) if self.tier.branch_b_enabled else False
         b_gates = _rules.b_gates(core, self.cfg) if b_armed else False
         late_state = _rules.late_state(core, self.cfg)
-        episode_a = self.ep_a.update(a_conditions)
-        episode_b = self.ep_b.update(b_armed, hard_break=rm["broke"])
+        episode_a = self.ep_a.update(a_conditions, m)
+        episode_b = self.ep_b.update(b_armed, m, hard_break=rm["broke"])
         n10 = min(self.vwap_bars, len(self.spy_closes))
         vshare = (sum(1 for c, v in zip(self.spy_closes[-n10:], self.vwaps[-n10:]) if c > v) / n10
                   if n10 else None)
@@ -277,6 +291,7 @@ class FeatureEngine:
             vwap=vwap, spy_close=(spy_bar.close if spy_bar else None), vwap_share10=vshare,
             context_1030=self.context_1030, context_1300=self.context_1300,
             episode_a=episode_a, episode_b=episode_b,
+            episode_a_start=self.ep_a.start_min, episode_b_start=self.ep_b.start_min,
             a_conditions=a_conditions, b_armed=b_armed, b_gates=b_gates,
             late_state=late_state, hiro_fresh=hiro_fresh,
         )

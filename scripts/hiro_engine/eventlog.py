@@ -32,9 +32,11 @@ def format_console(ev: Event) -> str:
     if ev.s0 is not None:
         bits.append(f"S0={ev.s0:.2f}")
     if ev.run is not None:
-        bits.append(f"run={ev.run:.2f}$B rate={ev.rate:.1f} dC={ev.dC:.2f} dP={ev.dP:.2f} "
-                    f"share={('%.2f' % ev.share) if ev.share is not None else '—'} "
-                    f"r15={('%.2f' % ev.r15) if ev.r15 is not None else '—'}")
+        def _f(v, fmt):
+            return (fmt % v) if v is not None else "—"
+        bits.append(f"run={_f(ev.run, '%.2f')}$B rate={_f(ev.rate, '%.1f')} "
+                    f"dC={_f(ev.dC, '%.2f')} dP={_f(ev.dP, '%.2f')} "
+                    f"share={_f(ev.share, '%.2f')} r15={_f(ev.r15, '%.2f')}")
     if ev.outcome_type:
         bits.append(f"-> {ev.outcome_type}"
                     + (f" in {ev.outcome_minutes:.0f}m" if ev.outcome_minutes is not None else ""))

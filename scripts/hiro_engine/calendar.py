@@ -50,7 +50,12 @@ class CalendarLoader:
         y, m, d = (int(x) for x in session_date.split("-"))
         dt = _date(y, m, d)
         if session_date in self.manual:
-            return CalendarDay(session_date, True, self.manual[session_date])
+            reason = self.manual[session_date]
+            if reason.lower() in ("none", "clear", "not_event"):
+                return CalendarDay(session_date, False, "")   # operator override:
+                # the computed rule (e.g. first-Friday NFP shifted by a holiday)
+                # does not apply this date
+            return CalendarDay(session_date, True, reason)
         if dt == _first_friday(y, m):
             return CalendarDay(session_date, True, "nfp")
         if m in (3, 6, 9, 12) and dt == _third_friday(y, m):

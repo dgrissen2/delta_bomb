@@ -21,20 +21,22 @@ def available_spx_days(cfg: Config, d_from: str, d_to: str) -> list[str]:
 
 def run_backtest(cfg: Config, tier: TierPolicy, days: list[str], log: EventLog,
                  mode: str = "backtest") -> list[SessionRow]:
-    """Runs sessions in date order with a causal pooled range60 history:
-    full tier seeds from stored HIRO-era sessions before the first day;
-    price tier accumulates over the run's own days (documented interpretation
-    of R3.3 for pre-HIRO-era dates)."""
+    """Runs sessions in date order. The causal pooled range60 history for day D
+    is built from ALL stored sessions in [pool_start, D) — independent of which
+    dates the run requests (codex review 2026-08-22 finding 6). pool_start =
+    hiro_era_start for the full tier (R3.3); the archive start for price tier
+    (documented interpretation, build_notes.md)."""
     feed = ReplayFeed(cfg, days, tier=tier.name)      # refuses+lists missing (R13.1)
     era_start = str(cfg.get("data", "hiro_era_start"))
+    pool_start = era_start if tier.name == "full" else "0000-00-00"
+    stored = available_spx_days(cfg, pool_start, "9999-99-99")
     hist: list[float] = []
-    if tier.name == "full" and days:
-        prior = [d for d in available_spx_days(cfg, era_start, max(era_start, days[0]))
-                 if d < days[0]]
-        hist = build_range60_history(cfg, tier, prior)
+    pooled_upto = 0                                    # index into `stored`
     out: list[SessionRow] = []
     for day in sorted(days):
+        while pooled_upto < len(stored) and stored[pooled_upto] < day:
+            hist.extend(build_range60_history(cfg, tier, [stored[pooled_upto]]))
+            pooled_upto += 1
         s = Session(cfg, tier, day, mode, log, range60_history=list(hist))
         out.append(s.run_replay(feed))
-        hist.extend(s.features.r60_today)             # causal accumulation across days
     return out

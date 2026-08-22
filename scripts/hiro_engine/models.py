@@ -98,6 +98,8 @@ class FeatureRow:
     # R3.5 episodes (id increments per new episode of that branch; None = no active episode)
     episode_a: Optional[int]
     episode_b: Optional[int]
+    episode_a_start: Optional[int]  # first minute of the active A episode (R11.1)
+    episode_b_start: Optional[int]
     a_conditions: bool              # R6.1 (i)-(iv) all true this bar
     b_armed: bool                   # R6.2 arm set true this bar (pre-gates)
     b_gates: bool                   # R6.2 gates true this bar
@@ -106,6 +108,7 @@ class FeatureRow:
     # attached by Session:
     vetoes: Vetoes = field(default=Vetoes())
     health: str = "OK"              # OK|HIRO_DOWN|SPX_STALLED|DEGRADED_VWAP
+    option_mid_move: Optional[float] = None   # live+chain: |mid - entry mid| against the leg (R7.3)
 
 
 @dataclass(frozen=True)
@@ -156,13 +159,16 @@ class TierPolicy:
     price_a_conditions: bool        # True => Branch A uses (i),(iii),(iv) only
     r43_enabled: bool               # flow veto
     r72_enabled: bool               # flow-shutoff scratch (BH scratch always retained)
+    requires_hiro: bool             # False => missing HIRO is NOT an outage (price tier)
     tier_stamp: str
 
 
 TIER_FULL = TierPolicy("full", branch_b_enabled=True, price_a_conditions=False,
-                       r43_enabled=True, r72_enabled=True, tier_stamp="full")
+                       r43_enabled=True, r72_enabled=True, requires_hiro=True,
+                       tier_stamp="full")
 TIER_PRICE = TierPolicy("price", branch_b_enabled=False, price_a_conditions=True,
-                        r43_enabled=False, r72_enabled=False, tier_stamp="price")
+                        r43_enabled=False, r72_enabled=False, requires_hiro=False,
+                        tier_stamp="price")
 TIERS = {"full": TIER_FULL, "price": TIER_PRICE}
 
 

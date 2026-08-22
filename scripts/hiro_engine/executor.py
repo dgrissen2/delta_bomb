@@ -121,7 +121,10 @@ class Executor:
         tr = state.open_trade
         if tr is not None:
             is_fill = exit_ev is not None and exit_ev.outcome_type == "fill"
-            if not is_fill:
+            is_resolution = exit_ev is not None and exit_ev.outcome_type == "resolution"
+            # fills: touch bar excluded (R11.2); resolution: executes at this bar's
+            # OPEN, so this bar's range past the open never counts (R7.0)
+            if not is_fill and not is_resolution:
                 # R11.2 adverse: include this bar (execution bar included; touch bar excluded)
                 move = (tr.s0 - row.bar.low) if tr.side == "sell_first" else (row.bar.high - tr.s0)
                 tr.adverse = max(tr.adverse, move)

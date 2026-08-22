@@ -85,7 +85,7 @@ def b_gates(c: Core, cfg: Config) -> bool:
     """R6.2 GATES: r15 > 0; time <= 14:30; weak side >= 0.15."""
     e = cfg.section("r6_entries")
     return bool(c.r15 is not None and c.r15 > 0
-                and c.min <= 870
+                and c.min <= cfg.i("r5_clock", "entry_end_min")
                 and c.weak_side >= e["b_weak_side_min"])
 
 
@@ -107,16 +107,20 @@ class RuleEngine:
     Session attached vetoes/health to the row and after the Executor executed
     any pending entry at this bar's open."""
 
-    def __init__(self, cfg: Config, tier: TierPolicy):
+    def __init__(self, cfg: Config, tier: TierPolicy, selector=None):
         self.cfg = cfg
         self.tier = tier
-        self.k = cfg.section("r5_clock")
+        self.selector = selector           # InstrumentSelector for R1.2 hints (optional)
+        self.k = dict(cfg.section("r5_clock"))
+        self.reads = [int(x) for x in cfg.get("r3_derived", "context_reads_min")]
         self.e6 = cfg.section("r6_entries")
         self.e7 = cfg.section("r7_exits")
         self._last_vetoes = None
         self._late_logged_episode: Optional[int] = None
         self._gatefail_logged_episode: Optional[int] = None
         self._warmup_logged = False
+        self._skip_logged: set = set()             # (branch, episode, reason) dedup
+        self._scratch_unavail_trade: Optional[int] = None
 
     # -- entries --------------------------------------------------------------
     def _entry_events(self, row: FeatureRow, state: EngineState) -> list[Event]:
@@ -127,8 +131,12 @@ class RuleEngine:
         short_blocked = (row.vetoes.vt_broken or row.vetoes.levels_invalid
                          or (row.vetoes.flow_veto and self.tier.r43_enabled))
 
+        # R11.1: an A episode qualifies only if its FIRST minute is inside the
+        # A window (>= 10:35); an episode that started earlier never fires
         a_fires = (row.a_conditions and row.episode_a is not None
-                   and state.entered_episode_a != row.episode_a and in_window and a_ok_time)
+                   and state.entered_episode_a != row.episode_a and in_window and a_ok_time
+                   and row.episode_a_start is not None
+                   and row.episode_a_start >= self.k["branch_a_start_min"])
         b_qualifies = (self.tier.branch_b_enabled and row.b_armed and row.b_gates
                        and row.episode_b is not None
                        and state.entered_episode_b != row.episode_b and in_window)
@@ -136,8 +144,10 @@ class RuleEngine:
         if (self.tier.branch_b_enabled and row.b_armed and row.late_state
                 and row.episode_b is not None
                 and self._late_logged_episode != row.episode_b and in_window):
-            out.append(Event(event_type="late_no_entry", rule_id="R6.3", branch="B",
-                             episode=row.episode_b, notes="LATE — NO ENTRY"))
+            ev = Event(event_type="late_no_entry", rule_id="R6.3", branch="B",
+                       episode=row.episode_b, signal_min=m, notes="LATE — NO ENTRY")
+            ev.run, ev.rate, ev.r15 = row.run, row.rate, row.r15
+            out.append(ev)
             self._late_logged_episode = row.episode_b
         # armed-episode gate failure: one line per episode (R8.1)
         if (self.tier.branch_b_enabled and row.b_armed and not row.b_gates
@@ -146,19 +156,33 @@ class RuleEngine:
             fails = []
             if not (row.r15 is not None and row.r15 > 0):
                 fails.append("r15<=0")
-            if m > 870:
+            if m > self.k["entry_end_min"]:
                 fails.append("t>14:30")
             if row.weak_side < self.e6["b_weak_side_min"]:
                 fails.append("weak_side<0.15")
-            out.append(Event(event_type="gate_fail", rule_id="R6.2", branch="B",
-                             episode=row.episode_b, notes="gates failed: " + ",".join(fails)))
+            ev = Event(event_type="gate_fail", rule_id="R6.2", branch="B",
+                       episode=row.episode_b, signal_min=m,
+                       notes="gates failed: " + ",".join(fails))
+            ev.run, ev.rate, ev.dC, ev.dP, ev.share, ev.r15 =                 row.run, row.rate, row.dC, row.dP, row.share, row.r15
+            out.append(ev)
             self._gatefail_logged_episode = row.episode_b
 
         b_fires = b_qualifies and not row.late_state and not short_blocked
 
-        def _skip(branch: str, episode: Optional[int], reason: str) -> Event:
-            return Event(event_type="skip", rule_id="R6.4", branch=branch,
-                         episode=episode, notes=f"skip: {reason}")
+        def _stamp_conditions(ev: Event) -> Event:
+            ev.run, ev.rate, ev.dC, ev.dP = row.run, row.rate, row.dC, row.dP
+            ev.share, ev.r15 = row.share, row.r15
+            ev.pull30, ev.bounce30 = row.pull30, row.bounce30
+            return ev
+
+        def _skip(branch: str, episode: Optional[int], reason: str) -> Optional[Event]:
+            key = (branch, episode, reason)
+            if key in self._skip_logged:
+                return None
+            self._skip_logged.add(key)
+            return _stamp_conditions(Event(event_type="skip", rule_id="R6.4", branch=branch,
+                                           episode=episode, signal_min=m,
+                                           notes=f"skip: {reason}"))
 
         # blocking reasons shared by both branches
         def _blocked_reason() -> Optional[str]:
@@ -172,34 +196,46 @@ class RuleEngine:
         if a_fires:
             reason = _blocked_reason()
             if reason:
-                out.append(_skip("A", row.episode_a, reason))
+                ev = _skip("A", row.episode_a, reason)
+                if ev: out.append(ev)
             else:
                 chosen = "A"
         if b_qualifies and chosen != "A":
             if b_fires:
                 reason = _blocked_reason()
                 if reason:
-                    out.append(_skip("B", row.episode_b, reason))
+                    ev = _skip("B", row.episode_b, reason)
+                    if ev: out.append(ev)
                 else:
                     chosen = "B"
             elif short_blocked:
                 why = ("vt_broken" if row.vetoes.vt_broken else
                        "levels_invalid" if row.vetoes.levels_invalid else "flow_veto")
-                out.append(_skip("B", row.episode_b, f"short blocked: {why} (R4)"))
+                ev = _skip("B", row.episode_b, f"short blocked: {why} (R4)")
+                if ev: out.append(ev)
         elif b_fires and chosen == "A":
-            out.append(_skip("B", row.episode_b, "A beats B on the same bar"))
+            ev = _skip("B", row.episode_b, "A beats B on the same bar")
+            if ev: out.append(ev)
 
         if chosen == "A":
-            out.append(Event(event_type="signal", rule_id="R6.1", branch="A",
-                             side="long_first", signal_min=m, episode=row.episode_a,
-                             notes="SIGNAL A LONG-FIRST"))
+            hint = f" | {self.selector.hint('long_first')}" if self.selector else ""
+            out.append(_stamp_conditions(Event(
+                event_type="signal", rule_id="R6.1", branch="A",
+                side="long_first", signal_min=m, episode=row.episode_a,
+                notes=(f"SIGNAL A LONG-FIRST{hint} | range60={row.range60:.2f}"
+                       f">=p75 {row.range60_pct:.2f} r30={row.r30:.2f} "
+                       f"bounce30={row.bounce30:.2f} close<mid30={row.mid30:.2f}"))))
             out.append(Event(event_type="pending_entry", rule_id="R6.1", branch="A",
                              side="long_first", signal_min=m, episode=row.episode_a,
                              bh_level=row.bh_level))
         elif chosen == "B":
-            out.append(Event(event_type="signal", rule_id="R6.2", branch="B",
-                             side="sell_first", signal_min=m, episode=row.episode_b,
-                             notes="SIGNAL B SELL-FIRST"))
+            hint = f" | {self.selector.hint('sell_first')}" if self.selector else ""
+            out.append(_stamp_conditions(Event(
+                event_type="signal", rule_id="R6.2", branch="B",
+                side="sell_first", signal_min=m, episode=row.episode_b,
+                notes=(f"SIGNAL B SELL-FIRST{hint} | run={row.run:.2f}$B/"
+                       f"{row.dur:.0f}m rate={row.rate:.1f} weak={row.weak_side:.2f} "
+                       f"share={row.share:.2f} r15={row.r15:.2f} pull30={row.pull30:.2f}"))))
             out.append(Event(event_type="pending_entry", rule_id="R6.2", branch="B",
                              side="sell_first", signal_min=m, episode=row.episode_b,
                              entry_L=row.L))
@@ -227,18 +263,20 @@ class RuleEngine:
                     return ev("scratch", "R7.2")
         if tr.branch == "A" and tr.bh_level is not None and bar.high > tr.bh_level:
             return ev("scratch", "R7.2")
-        if (tr.branch == "B" and self.tier.r72_enabled and not row.hiro_fresh
-                and (m - tr.entry_min) <= self.e7["scratch_window_min"]):
-            # inputs missing -> log only (R10.1)
-            pass
-        # R7.3 cap (spot proxy uses bar close; chain path priced by executor/live)
-        adverse_move = (tr.s0 - bar.close) if sell else (bar.close - tr.s0)
-        if tr.cap_source == "proxy" and adverse_move >= tr.cap_value:
-            return ev("cap", "R7.3", cap_source="proxy")
+
+        # R7.3 cap: chain path uses the option-mid move Session attaches live;
+        # proxy path uses SPX vs S0 at the bar close
+        if tr.cap_source == "chain":
+            if row.option_mid_move is not None and row.option_mid_move >= tr.cap_value:
+                return ev("cap", "R7.3", cap_source="chain")
+        else:
+            adverse_move = (tr.s0 - bar.close) if sell else (bar.close - tr.s0)
+            if adverse_move >= tr.cap_value:
+                return ev("cap", "R7.3", cap_source="proxy")
         # R7.4 veto exit / state flip (veto_exit before state_flip on ties)
         if sell and row.vetoes.flow_veto and self.tier.r43_enabled:
             return ev("veto_exit", "R7.4")
-        if m == 780 and row.context_1300 is not None:
+        if m == self.reads[1] and row.context_1300 is not None:
             if sell and row.context_1300 == "DOWN":
                 return ev("state_flip", "R7.4")
             if not sell and row.context_1300 == "UP":
@@ -268,12 +306,20 @@ class RuleEngine:
             out.append(Event(event_type="state_line", rule_id="R3.3", notes="warmup: range60_pct history below min obs — Branch A inactive"))
             self._warmup_logged = True
         # context reads
-        if row.min == 630 and row.context_1030 is not None:
+        if row.min == self.reads[0] and row.context_1030 is not None:
             out.append(Event(event_type="state_line", rule_id="R3.4", context=row.context_1030,
                              notes=f"10:30 context read: {row.context_1030}"))
-        if row.min == 780 and row.context_1300 is not None:
+        if row.min == self.reads[1] and row.context_1300 is not None:
             out.append(Event(event_type="state_line", rule_id="R3.4", context=row.context_1300,
                              notes=f"13:00 context read: {row.context_1300}"))
+        # R10.1: flow-exit inputs missing while a B short is carried -> one line per trade
+        tr0 = state.open_trade
+        if (tr0 is not None and tr0.branch == "B" and self.tier.r72_enabled
+                and not row.hiro_fresh and self._scratch_unavail_trade != tr0.id
+                and (row.min - tr0.entry_min) <= self.e7["scratch_window_min"]):
+            out.append(Event(event_type="state_line", rule_id="R10.1", trade_id=tr0.id,
+                             notes="scratch_unavailable (HIRO down)"))
+            self._scratch_unavail_trade = tr0.id
         # exits first (they apply to the open trade before new entries can matter;
         # entry evaluation below still sees the trade as open this bar — one leg at a time)
         exit_ev = self._exit_decision(row, state)
