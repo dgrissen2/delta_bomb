@@ -1,6 +1,6 @@
 # Implementation Tasks — hiro_engine
 
-*Architect breakdown v1.1 of `design.md` v1.1 against `requirements.md` v2.2. CTO first-pass review applied (task 3 split; artifact-rot guard; task-7 HIRO-poll spike; ops task 11; sequencing notes). Order is dependency order; every task
+*Architect breakdown v1.2 (v1.1 + architect codex-plan-review: FAIL 8 findings → applied: InstrumentSelector task, event-schema completeness test, Session task, TierPolicy moved before the CLI, event-type test matrix, FeatureRow ownership note, ops before shakedown, readiness vs shakedown gates split; review: `tasks_review_2026-08-22.md`). Prior: v1.1 of `design.md` v1.1 against `requirements.md` v2.2. CTO first-pass review applied (task 3 split; artifact-rot guard; task-7 HIRO-poll spike; ops task 11; sequencing notes). Order is dependency order; every task
 ends green (tests pass) before the next starts. "Rn" = requirement section in requirements.md. Junior notes are
 inline — when in doubt, the requirement text wins over this file.*
 
@@ -37,6 +37,8 @@ inline — when in doubt, the requirement text wins over this file.*
       HIRO-era sessions (log `warmup` below 300 obs)
     - EMA5/9/20, SPY VWAP (cumulative from 09:30), context read at 10:30/13:00 only (R3.4), retained fields
     - Per-branch episode tracker (R3.5)
+    - Ownership note (junior): FeatureEngine computes ONLY market-derived fields. `vetoes` and `health` on
+      FeatureRow are immutable inputs attached by Session (task 5b) — FeatureEngine never populates them
     - Tests: VWAP against a hand-computed day; context fixtures (UP/DOWN/CHOP days); warmup path
     Requirements: R3.3–R3.5
 
@@ -49,20 +51,45 @@ inline — when in doubt, the requirement text wins over this file.*
       entry blocked by each veto; one-entry-per-episode
     Requirements: R4, R5, R6, R7
 
+- [ ] 4b. InstrumentSelector (owns R1.1–R1.3 — previously orphaned)
+    - Expiry selection: listed expiry nearest 30 DTE within 20–40 (tie → shorter)
+    - Strike selection: put closest to −0.20 delta (tie → lower strike); 5-wide partner strike
+    - Sizing: hard-coded 1 contract, paper (R1.3)
+    - No-chain fallback: emit "nearest −0.20Δ" hint text (R1.2)
+    - Tests: expiry picker across month boundaries; delta tie-break; width always 5 strike points; size fixed
+    Requirements: R1.1–R1.3
+
 - [ ] 5. Executor + EventLog (state and prices, no judgment)
     - `execute_pending()` at bar open (S0 = that open, R1.4); `apply()` prices exits per R7.0
     - SimTrade with every field from design.md; all fields persisted in ENTRY/EXIT events
-    - Event schema v1 (explicit columns, no catch-all); ONE formatter → console line == CSV row
+    - Event schema v1 (explicit columns, no catch-all) — MUST include every SimTrade field (incl.
+      resting_limit_ref, target, bh_level, entry_L, cap_value, cap_source, state, resolution_debit);
+      test: serialize ENTRY+EXIT for a fixture trade, replay, assert SimTrade == original field-for-field
+    - ONE formatter → console line == CSV row
     - Crash-resume: on start, replay today's CSV to rebuild EngineState; kill/restart test must
       reconstruct the open SimTrade field-for-field
+    - RuleEngine owns ALL event generation incl. `skip` (with reason), armed-episode gate failures, and
+      periodic state lines; test matrix: one formatter/schema test per R8.1 event type and reason
     - Tests: property (≤1 open trade; ≤3 entries/day; PendingEntry executes exactly once at next open);
       console/CSV identity per event type; round-trip resume
     Requirements: R1.4, R7.0, R8.1, non-functional (crash recovery)
 
+- [ ] 5b. Session (the orchestrator — the per-bar contract lives here, nowhere else)
+    - Lifecycle: startup (config, loaders, banner) → per bar: (1) executor.execute_pending at open,
+      (2) features.update, (3) Session attaches vetoes/health to the row, (4) rules.evaluate at close,
+      (5) executor.apply, (6) log.emit → end-of-session (disposition SessionRow)
+    - Health transitions (moved here from task 7's scope creep): the state machine shell, fed by feed
+      exceptions; task 7 supplies only the live feed that raises them
+    - Tests: ordering test (a scripted day asserts the exact call sequence and that entries execute at the
+      bar AFTER their signal); disposition written exactly once
+    Requirements: design "Main loop", R10 shell, non-functional
+
 - [ ] 6. Backtest CLI + THE verification milestone
+    - TierPolicy objects (`full`, `price`) defined HERE (moved up from task 9) and threaded through
+      ReplayFeed/features/rules; task 2's ReplayFeed refactored to consume TierPolicy instead of a flag
     - `cli.py backtest --from --to [--day --verbose] [--tier] [--config]`
     - Determinism test: same day twice → byte-identical streams
-    - **GOLDEN GATE: full-tier frozen-config backtest over the 8 stored sessions reproduces
+    - **GOLDEN GATE (runs under TierPolicy `full`): frozen-config backtest over the 8 stored sessions reproduces
       `docs/replay/hiro/verification_trades_v1.csv` row-for-row (R12.1). Do not proceed past this task
       until it passes — every later task builds on trusted rule code.**
     - `--day 2026-08-18 --verbose` manually checked against the entry carousel
@@ -92,8 +119,7 @@ inline — when in doubt, the requirement text wins over this file.*
       exercise qualifying-vs-executable, censored denominators, A-over-B dedupe, every tie-break)
     Requirements: R9, R11, shakedown & scorecard ACs
 
-- [ ] 9. Price tier + sweep + summarizer
-    - TierPolicy objects (`full`, `price`) consumed by features/rules; tier stamp on every row
+- [ ] 9. Sweep + summarizer (TierPolicy already exists from task 6; this task adds price-tier TESTS + tools)
     - `summarize.py`: one summarizer (R13.3) incl. day-clustered bootstrap (2,000 draws, default_rng(42))
     - `sweep.py`: whitelist dict literally from R13.2; one knob per run; leaderboard per R13.4
     - Tests: same fixture day under full vs price shows exactly the enumerated R13.1 differences;
@@ -105,16 +131,22 @@ inline — when in doubt, the requirement text wins over this file.*
     - End-to-end: two full replayed sessions live-style (wall-clock compressed) with a forced crash+resume
     - Docs: one-page RUNBOOK.md (morning start checklist, what each console line means, what to do on
       each banner) — written for the trader, not the engineer
-    - Then: run the two live shakedown sessions (spec acceptance); fix only defects, never thresholds
-    Requirements: spec acceptance, R5 boundaries, non-functional
+    - READINESS GATE (deterministic, market-independent): all tests green, golden gates pass, crash-resume
+      demo, runbook reviewed — this gate completes task 10
+    Requirements: spec acceptance (readiness), R5 boundaries, non-functional
 
-- [ ] 11. Daily operations (the [OPS] items get an owner)
+- [ ] 11. Daily operations (BEFORE shakedown — the live sessions depend on these)
     - Morning script: HIRO backfill freshness check, SPX 1-min refresh, levels CSV date check —
       one command, green/red output, referenced from the RUNBOOK
     - Evening script: append session logs, verify partition + manifest hashes, flag partial captures
     - RUNBOOK entries for both
     Requirements: R2 [OPS] items, R10.3 inputs
 
-Estimated shape (CTO-adjusted): tasks 1–6 ≈ 60% of real effort (the '80% done' trap lives here); task 7's
+- [ ] 12. Shakedown (operational acceptance — market-dependent, after tasks 10 AND 11)
+    - Run the two live `--shakedown` sessions; pass = no crash, no unexplained console/log divergence,
+      dispositions written, ops scripts green both days; fix only defects, never thresholds
+    Requirements: spec acceptance (shakedown)
+
+Estimated shape (CTO-adjusted): tasks 1–6 (incl. 3a/3b, 4b, 5b) ≈ 60% of real effort (the '80% done' trap lives here); task 7's
 spike is the schedule risk — run it the first morning of task 7; 8–9 offline analytics; 10–11 verification and
 ops. Do NOT parallelize tasks 4 and 5 (shared state contract). Nothing ships until task 6's golden gate passes.
