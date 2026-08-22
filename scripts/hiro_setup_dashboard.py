@@ -49,22 +49,8 @@ def load_day(day: str) -> pd.DataFrame:
 
 
 def detect(df: pd.DataFrame) -> pd.DataFrame:
-    L, Lc, Lp, N, t = df.all_L.values, df.all_Lc.values, df.all_Lp.values, df.nextExp_L.values, df["min"].values
-    lo = hi = 0
-    run = np.zeros(len(df)); dur = np.zeros(len(df)); dC = np.zeros(len(df)); dP = np.zeros(len(df)); dN = np.zeros(len(df)); dd = np.zeros(len(df)); broke = np.zeros(len(df), bool)
-    for i in range(len(df)):
-        if L[i] < L[lo]:
-            lo = hi = i
-        if L[i] > L[hi]:
-            hi = i
-        d = L[hi] - L[i]
-        if d >= REV:
-            lo = hi = i; d = 0.0; broke[i] = True
-        run[i] = L[i] - L[lo]; dur[i] = t[i] - t[lo]; dC[i] = Lc[i] - Lc[lo]; dP[i] = Lp[i] - Lp[lo]; dN[i] = N[i] - N[lo]; dd[i] = d
-    df = df.assign(run=run, dur=dur, dC=dC, dP=dP, dN=dN, dd=dd, broke=broke)
-    df["rate"] = df.run / df.dur.clip(lower=1) * 60
-    df["cpr"] = np.minimum(df.dC, df.dP) / np.maximum(df.dC, df.dP).replace(0, np.nan)
-    df["share"] = df.dN / df.run.replace(0, np.nan)
+    from hiro_engine.features import apply_run_machine  # single home of the run machine (DRY ledger)
+    df = apply_run_machine(df, REV)
     aligned = (df.dur >= DUR_MIN) & (df.rate >= RATE_MIN) & (df.dC > 0) & (df.dP > 0) & (df.cpr >= CPR_MIN) & (df.dN > 0) & (df.share >= SHARE_MIN) & (df.dd < REV)
     df["steep"] = aligned & (df.rate >= STEEP_RATE) & (df.r30 >= STEEP_FLOW)
     df["fire"] = aligned & (df.pull >= PULL_MIN) & (df["min"] >= FIRST) & (df["min"] <= LAST)
