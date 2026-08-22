@@ -22,12 +22,10 @@ class FeedError(Exception):
     pass
 
 
-def load_hiro_day(hiro_root: Path, day: str) -> pd.DataFrame:
-    """Minute frame indexed 570..960 with columns all_L/all_Lc/all_Lp/nextExp_L ($B, cumulative)."""
-    f = Path(hiro_root) / f"date={day}" / "normalized" / "hiro_series.csv"
-    if not f.exists():
-        raise FeedError(f"missing HIRO partition: {f}")
-    h = pd.read_csv(f)
+def hiro_minute_frame(h: pd.DataFrame) -> pd.DataFrame:
+    """Minute frame 570..960 with all_L/all_Lc/all_Lp/nextExp_L ($B, cumulative)
+    from normalized series rows (series_group, utc_iso, delta_*). ONE transform
+    shared by ReplayFeed (stored CSV) and LiveFeed (fresh CDP payload)."""
     ts = pd.to_datetime(h.utc_iso, utc=True).dt.tz_convert("America/New_York")
     h = h.assign(min=ts.dt.hour * 60 + ts.dt.minute)
     h = h[(h["min"] >= GRID_START) & (h["min"] <= GRID_END)]
@@ -41,8 +39,15 @@ def load_hiro_day(hiro_root: Path, day: str) -> pd.DataFrame:
         out[f"{grp}_Lp"] = mm.dP.cumsum().values
     for col in ("all_L", "all_Lc", "all_Lp", "nextExp_L"):
         if col not in out.columns:
-            raise FeedError(f"HIRO partition {day} lacks series for {col}")
+            raise FeedError(f"HIRO series lacks {col}")
     return out
+
+
+def load_hiro_day(hiro_root: Path, day: str) -> pd.DataFrame:
+    f = Path(hiro_root) / f"date={day}" / "normalized" / "hiro_series.csv"
+    if not f.exists():
+        raise FeedError(f"missing HIRO partition: {f}")
+    return hiro_minute_frame(pd.read_csv(f))
 
 
 def load_spx_day(spx_dir: Path, day: str) -> pd.DataFrame:

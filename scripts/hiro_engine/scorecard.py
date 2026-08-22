@@ -261,6 +261,8 @@ def run_scorecard(cfg: Config, rehearsal: bool = False,
                     else _p("paper_log"))
     if sessions_path is None:
         sessions_path = _p("sessions_log")
+        if rehearsal:
+            sessions_path = sessions_path.with_name("sessions_backtest.csv")
     if outdir is None:
         outdir = _p("paper_log").parent / ("scorecard_rehearsal" if rehearsal else "scorecard")
     outdir.mkdir(parents=True, exist_ok=True)
