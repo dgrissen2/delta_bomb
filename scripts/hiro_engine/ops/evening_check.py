@@ -90,6 +90,10 @@ def main() -> int:
                  warn_only=True)
     else:
         line(False, "paper_log", "no log file yet", warn_only=True)
+    sc = Path(f"docs/replay/hiro/live_quotes_{day}.parquet")
+    line(sc.exists(), "snapshot sidecar (live parity/resume)",
+         str(sc.name) if sc.exists() else "missing (fine if today was not a live session)",
+         warn_only=True)
     import pandas as pd
     spy = pd.read_parquet(cfg.path_of("spy_parquet"), columns=["date"])
     line(str(spy.date.max()) >= day, "SPY 1-min store",

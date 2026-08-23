@@ -217,3 +217,58 @@ def real_cache_sanity(cd: ChainDay) -> list[str]:
     if len(missing) > 30:
         problems.append(f"{len(missing)} session minutes absent from the chain frame")
     return problems
+
+
+class LiveChains:
+    """Live minute snapshots via the SDK (validated by the task-14 spike; the
+    cli live interlock refuses to start without a spike PASS artifact).
+    Presents the same interface as ChainStore for Session."""
+
+    def __init__(self, cfg: Config):
+        self.cfg = cfg
+        self._expiry: dict[str, str] = {}
+        self._last_ok: Optional[int] = None
+        self._snap_cache: dict[tuple, pd.DataFrame] = {}
+
+    def expiry_of(self, day: str) -> str:
+        if day not in self._expiry:
+            self._expiry[day] = str(friday_expiry_for(day))
+        return self._expiry[day]
+
+    def _snapshot(self, day: str) -> Optional[pd.DataFrame]:
+        from .live import theta_client, _pull
+        try:
+            r = _pull(theta_client().option_snapshot_greeks_first_order,
+                      symbol=SYMBOL, expiration=dt.date.fromisoformat(self.expiry_of(day)),
+                      strike="*", right="put")
+            df = r.to_pandas() if hasattr(r, "to_pandas") else pd.DataFrame(r)
+            return df[["strike", "bid", "ask", "delta"]]
+        except Exception:
+            return None
+
+    def signal_snapshot(self, day: str, minute: int):
+        key = (day, minute)
+        if key not in self._snap_cache:
+            snap = self._snapshot(day)
+            if snap is None:
+                snap = pd.DataFrame(columns=["strike", "bid", "ask", "delta"])
+            else:
+                self._last_ok = minute
+            self._snap_cache = {key: snap}          # keep only the latest minute
+        return self._snap_cache[key]
+
+    def quote_view(self, day: str, minute: int, k1, k2) -> QuoteView:
+        snap = self.signal_snapshot(day, minute)
+        def q(k):
+            if k is None or not len(snap):
+                return None
+            row = snap[snap.strike == k]
+            if not len(row):
+                return None
+            bid, ask = float(row.bid.iloc[0]), float(row.ask.iloc[0])
+            return QuoteSnap(strike=k, bid=bid, ask=ask, valid=(bid > 0 and ask >= bid))
+        return QuoteView(minute=minute, leg1=q(k1), leg2=q(k2))
+
+    def feed_ok(self, day: str, minute: int) -> bool:
+        self.signal_snapshot(day, minute)
+        return self._last_ok == minute

@@ -205,11 +205,12 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
         sidecar_path.with_suffix(".probe").unlink()
     except OSError as e:
         raise SystemExit(f"live REFUSED: sidecar path not writable ({e}).")
-    raise SystemExit(
-        "live mode wiring for v3.0 quotes lands with the spike validation — "
-        "interlocks passed structurally but the quote loop is not yet enabled.")
+    from .chains import LiveChains
+    from .eventlog import QuoteSidecar
+    live_chains = LiveChains(cfg)
+    sidecar = QuoteSidecar(sidecar_path)
     session = Session(cfg, TIER_FULL, day, "live", log, range60_history=hist,
-                      shakedown=shakedown, chain_available=chain.available, im=im)
+                      shakedown=shakedown, im=im, chains=live_chains, sidecar=sidecar)
     hiro = HiroPull()
 
     # crash-resume: rows for today already logged -> warm replay (muted)
@@ -293,6 +294,8 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
                         hframe[hframe["min"] <= m] if hframe is not None else None))
                     processed_min = m
             session.finish()
+            if session.sidecar is not None:
+                session.sidecar.flush()
             print("[live] 16:00 — session closed")
             return 0
         # wait for the next minute boundary + 2s (bar completion + vendor lag)
@@ -324,6 +327,8 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
                               hframe[hframe["min"] <= m] if hframe is not None else None)
             session.process_tick(tick)
             processed_min = m
+        if session.sidecar is not None and session.sidecar.rows:
+            session.sidecar.flush()                       # crash-safe capture
         lat = time.monotonic() - t0
         if lat > 5.0:
             log.emit(session._stamp([Event(event_type="state_line", rule_id="NFR",

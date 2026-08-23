@@ -187,7 +187,8 @@ def rebuild_state(csv_path: Path, session_date: str) -> EngineState:
                 if tr.limit is not None:
                     tr.limit.status = "canceled"
                     tr.limit.cancel_reason = ev.limit_cancel_reason or "quote_gap"
-                tr.data_invalid = True
+                if ev.limit_cancel_reason == "quote_gap":
+                    tr.data_invalid = True          # ONLY quote_gap unscores (BP2 F11)
             elif ev.event_type in ("heartbeat", "quote_gap") and state.open_trade is not None:
                 tr = state.open_trade
                 if ev.quote_gap_streak is not None:
@@ -211,8 +212,10 @@ def rebuild_state(csv_path: Path, session_date: str) -> EngineState:
 # limit is live; doubles as the parity-gate capture and the live-resume quote
 # source (logged decisions stay authoritative).
 # =============================================================================
-SIDECAR_COLUMNS = ["minute", "strike", "bid", "ask", "limit_price", "marketable",
-                   "decision"]
+# CONTRACT AMENDMENT 2026-08-23 (pre-shakedown, no captures exist): +"side"
+# ("buy"|"sell", the RESTING limit's side) — parity needs it (codex BP2 F3).
+SIDECAR_COLUMNS = ["minute", "strike", "side", "bid", "ask", "limit_price",
+                   "marketable", "decision"]
 
 
 class QuoteSidecar:
@@ -220,11 +223,11 @@ class QuoteSidecar:
         self.path = Path(path)
         self.rows: list[dict] = []
 
-    def record(self, minute: int, strike: float, bid, ask, limit_price, marketable: bool,
-               decision: str) -> None:
-        self.rows.append(dict(minute=minute, strike=strike, bid=bid, ask=ask,
-                              limit_price=limit_price, marketable=bool(marketable),
-                              decision=decision))
+    def record(self, minute: int, strike: float, side: str, bid, ask, limit_price,
+               marketable: bool, decision: str) -> None:
+        self.rows.append(dict(minute=minute, strike=strike, side=side, bid=bid,
+                              ask=ask, limit_price=limit_price,
+                              marketable=bool(marketable), decision=decision))
 
     def flush(self) -> None:
         import pandas as pd

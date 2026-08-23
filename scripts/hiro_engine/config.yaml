@@ -68,9 +68,9 @@ chains:                        # R2.5 / R8.2 v3.0 pins (FROZEN rehearsal scope o
   root: ~/Dev/central_trade_data/thetadata/spxw_bomb_chains
   frozen_manifest_hash: "682d9973aa6c73f8242907080aa8c85199f3d1db9d6c0915778e8e1ff775ee50"
   sdk_version: "1.0.9"
-  control_frame_hash: "8a981150866e9ca528ea9dd8118174b5b2a1c93312efb739e5a1ec56e4b5001d"  # task-17 controls_build (base rates 0.470/0.454)
-  r9a_formulas_hash: "bade956cb5e8ffe151dbdf112987252f82c343382c6081b340e72eb3d86271a1"  # task-16 freeze (sha256 of derive_thresholds source)
-  r9a_registration_hash: "2a72d1f53f236be98827b8c192bf37fc6ec13ced0bdf101880793150411abca2"  # task-18 registration (run-once boundary now CLOSED)
+  control_frame_hash: "f1dc487378f0f50609a2d4c25a043fa27a2054e2d9f277fd3591b6cd74a3e4a6"  # rebuilt after BP2 F6/F7
+  r9a_formulas_hash: "500f2404267cada22c2520c6df3252894fc762fd905658235c6e2db34b7722c0"  # re-frozen after BP2 F1/F5 (p95 population per R11.3 text; constants in hash)
+  r9a_registration_hash: "7f0299e66d3a83c520615f4e7005f35ec1d15010b14c9e4f389a498d221b1156"  # BP2-corrected registration (run-once CLOSED)
   verification_v2_hash: "28bd84b8893db104478037e7c4ee058c5291df90d5150948de8a2cadb4ccb651"  # task-18 R12.3 pin (19 trades, 10 fills)
 
 data:
@@ -94,10 +94,10 @@ logging:
   paper_log: docs/replay/hiro/paper_log.csv
   sessions_log: docs/replay/hiro/sessions.csv
 
-r9_thresholds:                 # populated ONCE by R9a mechanical derivation (task 18)
+r9_thresholds:                 # populated ONCE by R9a mechanical derivation (task 18, BP2-corrected)
   fills_total_floor: 11
   sessions_with_fill_floor: 7
   b_fill_rate_floor: 0.1
   a_fill_rate_floor: 0.5
-  max_single_trade_loss_usd: 250
+  max_single_trade_loss_usd: 150
   median_scratch_loss_cap_usd: 140

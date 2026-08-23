@@ -170,14 +170,14 @@ def test_sidecar_round_trip(tmp_path):
     """15f frozen contract: write -> load -> quote_source."""
     from hiro_engine.eventlog import QuoteSidecar
     sc = QuoteSidecar(tmp_path / "live_quotes_2026-08-18.parquet")
-    sc.record(700, 7505.0, 40.2, 40.5, 39.9, False, "no_fill")
-    sc.record(701, 7505.0, 39.5, 39.8, 39.9, True, "fill")
+    sc.record(700, 7505.0, "buy", 40.2, 40.5, 39.9, False, "no_fill")
+    sc.record(701, 7505.0, "buy", 39.5, 39.8, 39.9, True, "fill")
     sc.flush()
     src = QuoteSidecar.quote_source(sc.path)
     assert src[(701, 7505.0)] == (39.5, 39.8)
     df = QuoteSidecar.load(sc.path)
-    assert list(df.columns) == ["minute", "strike", "bid", "ask", "limit_price",
-                                "marketable", "decision"]
+    assert list(df.columns) == ["minute", "strike", "side", "bid", "ask",
+                                "limit_price", "marketable", "decision"]
 
 
 def test_parity_check_tolerances(tmp_path):
@@ -191,16 +191,17 @@ def test_parity_check_tolerances(tmp_path):
         def quote(self, minute, strike):
             return hist._snap(minute, strike)
     sidecar = pd.DataFrame([
-        dict(minute=700, strike=7505.0, bid=40.2, ask=40.5, limit_price=39.9,
-             marketable=False, decision="no_fill"),
-        dict(minute=701, strike=7505.0, bid=39.5, ask=39.8, limit_price=39.9,
-             marketable=True, decision="fill"),
+        dict(minute=700, strike=7505.0, side="buy", bid=40.2, ask=40.5,
+             limit_price=39.9, marketable=False, decision="no_fill"),
+        dict(minute=701, strike=7505.0, side="buy", bid=39.5, ask=39.8,
+             limit_price=39.9, marketable=True, decision="fill"),
     ])
     rep = parity_check(sidecar, HistAdapter())
     assert rep["ok"] and rep["decision_agreement"] == 1.0 and rep["price_within_tick"] == 1.0
     # deliberate mismatch: live saw a 0.3-better ask -> beyond 1 tick -> price line fails
     sidecar2 = pd.concat([sidecar, pd.DataFrame([
-        dict(minute=702, strike=7505.0, bid=40.0, ask=40.0, limit_price=39.9,
-             marketable=False, decision="no_fill")])], ignore_index=True)
+        dict(minute=702, strike=7505.0, side="buy", bid=40.0, ask=40.0,
+             limit_price=39.9, marketable=False, decision="no_fill")])],
+        ignore_index=True)
     rep2 = parity_check(sidecar2, HistAdapter())
     assert rep2["price_within_tick"] < 0.95 or not rep2["ok"]

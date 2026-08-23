@@ -362,10 +362,12 @@ class RuleEngine:
                                    "outcome will be data_invalid (unscored)"))
         # exits first (they apply to the open trade before new entries can matter;
         # entry evaluation below still sees the trade as open this bar — one leg at a time)
+        gap_cancel_this_bar = any(e.event_type == "limit_canceled" for e in out)
         exit_ev = self._exit_decision(row, state)
         if exit_ev is not None:
             tr0 = state.open_trade
             if (exit_ev.outcome_type != "fill" and tr0 is not None
+                    and not gap_cancel_this_bar
                     and tr0.limit is not None and tr0.limit.status == "resting"):
                 out.append(Event(event_type="limit_canceled", rule_id="R7.0",
                                  trade_id=tr0.id,

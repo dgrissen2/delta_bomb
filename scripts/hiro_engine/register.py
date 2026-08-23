@@ -105,8 +105,9 @@ def derive_thresholds(entries: pd.DataFrame, countable_sessions: list[str]) -> d
     b_under = (b_empty / DRAWS) > EMPTY_RESAMPLE_LIMIT
     a_under = (a_empty / DRAWS) > EMPTY_RESAMPLE_LIMIT
 
+    # R11.3: realized loss of a trade = max(0, -pnl$) — defined for EVERY
+    # trade, so the p95 population INCLUDES zero-loss winners (codex BP2 F1)
     losses = (-scored.pnl_usd).clip(lower=0)
-    losses = losses[losses > 0]
     if len(losses):
         p95 = float(np.quantile(losses, 0.95))
         max_loss_cap = max(25, math.ceil(p95 / 25.0) * 25)
@@ -114,7 +115,7 @@ def derive_thresholds(entries: pd.DataFrame, countable_sessions: list[str]) -> d
         max_loss_cap = 25
     scr = scored[scored.exit_type == "scratch"]
     if len(scr):
-        med = float((-scr.pnl_usd).median())
+        med = float((-scr.pnl_usd).clip(lower=0).median())   # realized loss, R11.3
         median_scratch_cap = max(10, math.ceil(med * 1.5 / 10.0) * 10)
     else:
         median_scratch_cap = 50
@@ -138,8 +139,10 @@ def derive_thresholds(entries: pd.DataFrame, countable_sessions: list[str]) -> d
 
 
 def formulas_hash() -> str:
-    """sha256 of the frozen derivation source text."""
-    return hashlib.sha256(inspect.getsource(derive_thresholds).encode()).hexdigest()
+    """sha256 of the frozen derivation source text AND its module constants."""
+    blob = (inspect.getsource(derive_thresholds)
+            + f"|DRAWS={DRAWS}|SEED={SEED}|EMPTY={EMPTY_RESAMPLE_LIMIT}")
+    return hashlib.sha256(blob.encode()).hexdigest()
 
 
 def run_register(cfg: Config, log_path: Optional[Path] = None,

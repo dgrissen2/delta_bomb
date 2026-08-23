@@ -148,21 +148,23 @@ def _strike_series(cd) -> dict:
 
 def _limit_replay(series: dict, k2: float, L: float, buy: bool, first: int,
                   last: int, gap_limit: int) -> tuple:
-    """(indicator, eligible). Skips single invalid minutes; >= gap_limit
-    consecutive -> ineligible (INDETERMINATE, excluded)."""
+    """(indicator, eligible). R11.4: the ENTIRE horizon must be data-valid
+    (no >= gap_limit consecutive invalid minutes) for the candidate to be
+    eligible — even if a fill occurred before a later gap (codex BP2 F6)."""
     q = series.get(k2, {})
     gap = 0
+    filled = False
     for m in range(first, last + 1):
         ba = q.get(m)
         if ba is None or ba[0] <= 0 or ba[1] < ba[0]:
             gap += 1
             if gap >= gap_limit:
-                return 0.0, False
+                return 0.0, False               # horizon not data-valid, period
             continue
         gap = 0
-        if (ba[1] <= L) if buy else (ba[0] >= L):
-            return 1.0, True
-    return 0.0, True
+        if not filled and ((ba[1] <= L) if buy else (ba[0] >= L)):
+            filled = True
+    return (1.0 if filled else 0.0), True
 
 
 def controls_build(cfg: Config, chains=None) -> pd.DataFrame:
@@ -225,6 +227,7 @@ def controls_build(cfg: Config, chains=None) -> pd.DataFrame:
             raise ControlDatasetError(
                 f"controls_build plausibility FAIL: {side} base fill rate {base:.3f} "
                 "is outside (0.02, 0.98) — investigate units/sign before proceeding")
+    frame["source_manifest_sha"] = chains.frozen_manifest_hash(cfg.control_days)
     CONTROL_FRAME.parent.mkdir(parents=True, exist_ok=True)
     frame.to_parquet(CONTROL_FRAME, index=False)
     return frame
@@ -240,7 +243,14 @@ def load_control_frame(cfg: Config) -> pd.DataFrame:
         raise ControlDatasetError("control frame missing — run controls_build (task 17)")
     if pin and control_frame_hash() != pin:
         raise ControlDatasetError("control frame hash != CONFIG pin (R8.2)")
-    return pd.read_parquet(CONTROL_FRAME)
+    df = pd.read_parquet(CONTROL_FRAME)
+    src = str(cfg.get("chains", "frozen_manifest_hash"))
+    if "source_manifest_sha" in df.columns and len(df) \
+            and str(df.source_manifest_sha.iloc[0]) != src:
+        raise ControlDatasetError(
+            "control frame was built from a DIFFERENT chain cache than the "
+            "pinned one (stale frame; rerun controls_build)")
+    return df
 
 
 def clock_matched_v3(cfg: Config, entry_minutes, frame: pd.DataFrame = None) -> float:

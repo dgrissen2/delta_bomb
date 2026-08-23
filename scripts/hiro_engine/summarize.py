@@ -41,15 +41,22 @@ def summarize(cfg: Config, entries: pd.DataFrame, qualify: pd.DataFrame,
               days: list[str], variant: str = "frozen") -> dict:
     """R13.3 summary contract for one variant. Own-dataset matched controls:
     R11.4 form for sell-first entries, R11.5 form for long-first."""
-    noncens = entries[entries.exit_type != "censored"] if len(entries) else entries
+    if len(entries) and "data_invalid" in entries.columns:
+        invalid_n = int(entries.data_invalid.fillna(False).sum())
+        scored = entries[~entries.data_invalid.fillna(False)]
+    else:
+        invalid_n, scored = 0, entries
+    noncens = scored[scored.exit_type != "censored"] if len(scored) else scored
     out = dict(variant=variant,
                trades=len(entries),
                episodes=int(len(qualify)) if qualify is not None else None,
                days=len(days),
-               fills=int((entries.exit_type == "fill").sum()) if len(entries) else 0,
+               fills=int((scored.exit_type == "fill").sum()) if len(scored) else 0,
                fill_rate=(float((noncens.exit_type == "fill").mean())
                           if len(noncens) else float("nan")),
-               censored=int((entries.exit_type == "censored").sum()) if len(entries) else 0)
+               censored=int((scored.exit_type == "censored").sum()) if len(scored) else 0,
+               data_invalid=invalid_n)
+    entries = scored
     ci = bootstrap_fill_ci(entries) if len(entries) else (float("nan"),) * 2
     out["fill_ci90_lo"], out["fill_ci90_hi"] = ci
     sf = entries[entries.side == "sell_first"] if len(entries) else entries

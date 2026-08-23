@@ -188,7 +188,7 @@ sessions · 1–3 executable entries on ≥ 6/10 · **≥ 11 limit fills total A
 ≤ 3 entries/session, one leg at a time · Branch B ≥ 20 qualifying signals with fill rate (R11.6) ≥ **0.1**
 and not below its frozen clock-matched control (R11.4) · Branch A ≥ 8 qualifying episodes with fill rate ≥
 **0.5** and ≥ +10 pp over its frozen midpoint-matched control (R11.5) · branches reported separately; a
-minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ 250 on every
+minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ 150 on every
 trade** · **median scratch loss (R11.3, $) ≤ 140** · ≤ 1 scratch whose RESTING LIMIT would have filled
 within its ORIGINAL 60-minute horizon absent the scratch (pure limit replay from the pinned chain cache,
 no other R7 exits applied; single invalid/missing minutes are skipped with no fill decision; a gap ≥ 5
@@ -200,7 +200,7 @@ count still hold; thresholds unchanged, denominators reduced. A branch below its
 INCONCLUSIVE. `data_invalid` trades (R10.4): REMAIN executable entries for the entries-per-session
 criteria and the one-leg/3-day limits (they occupied the slot); are EXCLUDED from fill totals,
 sessions-with-fill, both fill-rate sides (R11.6), the $-risk lines, and the would-have-filled re-check;
-and are reported in their own column. Any rule change resets the test. **Thresholds populated 2026-08-23 by the R9a mechanical derivation (registration.json, hash-pinned; one grading-layer defect fixed + re-run per the defect policy — trade list identical, documented).**
+and are reported in their own column. Any rule change resets the test. **Thresholds populated 2026-08-23 by the R9a mechanical derivation (registration.json, hash-pinned; two grading-layer defects fixed + re-run per the defect policy — trade list identical, documented).**
 
 ## R9a. Threshold pre-registration (FROZEN before the first v3.0 rehearsal run; hashed in CONFIG)
 - Criteria FORM: inherited unchanged from R9 v2.3 (structure above); $-risk lines replace SPX-point lines.
@@ -231,9 +231,10 @@ and are reported in their own column. Any rule change resets the test. **Thresho
   inclusive. Reported for continuity with prior research only.
 - **R11.3 Economic P&L ($ — drives R9; contract multiplier 100, 1-lot):**
   Non-fill exit realized P&L in POINTS = sell-first: fill1 − (exit buy-back price); long-first: (exit sale
-  price) − fill1. **Realized P&L in $ = points × 100.** Realized LOSS of a trade = max(0, −realized $ P&L).
-  A completed bomb contributes exactly +$10 realized (the credit; the owned spread's value is reported,
-  never scored). Summed realized $ P&L of a session (best-session tie-break) = Σ non-fill exit $ P&L +
+  price) − fill1. **Realized P&L in $ = points × 100.** Realized LOSS of a trade = max(0, −realized $ P&L),
+  defined for EVERY trade (winners contribute zero losses — the R9a p95 population includes them).
+  A completed bomb contributes its BOOKED credit × 100 (≥ +$10 by the R1.4e invariant; tick rounding can
+  only raise it; the owned spread's value is reported, never scored). Summed realized $ P&L of a session (best-session tie-break) = Σ non-fill exit $ P&L +
   $10 × fills. Scratch loss ($) = realized loss of a scratch. `leg_liq_loss_usd` = the worst mark-to-
   conservative-NBBO liquidation of the lone leg vs its leg-1 fill over the trade's life, in $ (heartbeats
   print both families).

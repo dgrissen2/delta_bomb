@@ -60,7 +60,7 @@ class Session:
                  log: EventLog, range60_history: Optional[list[float]] = None,
                  shakedown: bool = False, resume: bool = False,
                  chain_available: bool = False, im: Optional[float] = None,
-                 chains=None):
+                 chains=None, sidecar=None):
         self.cfg = cfg
         self.tier = tier
         self.day = day
@@ -74,6 +74,7 @@ class Session:
         self.selector = InstrumentSelector(cfg)
         self.executor = Executor(cfg, self.selector, tier=tier)
         self.chains = chains
+        self.sidecar = sidecar                 # QuoteSidecar (live; None in replay)
         if tier.fill_mode == "limit" and chains is None:
             raise ValueError("fill_mode=limit requires a ChainStore (R2.5)")
         self.quote_gap_streak = 0
@@ -175,6 +176,26 @@ class Session:
         else:
             self.quote_gap_streak = 0
 
+    def _record_sidecar(self, minute: int, quote_view) -> None:
+        """Task 19: every evaluated resting-limit minute lands in the parity/
+        resume sidecar (incl. non-fills). Format = the 15f frozen contract."""
+        if self.sidecar is None:
+            return
+        tr = self.state.open_trade
+        if tr is None or tr.limit is None or tr.limit.status != "resting":
+            return
+        q2 = quote_view.leg2 if quote_view is not None else None
+        lim = tr.limit
+        if q2 is None or not q2.valid:
+            self.sidecar.record(minute, lim.strike, lim.side, float("nan"),
+                                float("nan"), lim.price, False, "quote_gap")
+            return
+        marketable = (q2.ask <= lim.price) if lim.side == "buy" else (q2.bid >= lim.price)
+        eligible = minute >= lim.first_eligible_min
+        self.sidecar.record(minute, lim.strike, lim.side, q2.bid, q2.ask, lim.price,
+                            marketable and eligible,
+                            "fill" if (marketable and eligible) else "no_fill")
+
     def _resolve_instruments(self, events, row):
         """R1.2 (v3.0): a fresh PendingEntry gets {expiry, K, K2} from the
         SIGNAL-minute chain snapshot; snapshot unusable -> entry aborted
@@ -233,6 +254,7 @@ class Session:
         self.health = new_health
         quote_view = self._quotes_for(bar.min)
         self._count_gap(quote_view)
+        self._record_sidecar(bar.min, quote_view)
         row = dataclasses.replace(row, vetoes=self._vetoes(row), health=self.health,
                                   quote_view=quote_view,
                                   quote_gap_streak=self.quote_gap_streak)      # (3)
@@ -250,7 +272,9 @@ class Session:
         rule_events = self.rules.evaluate(row, self.state)                     # (4)
         rule_events = self._resolve_instruments(rule_events, row)              # (4b) R1.2 at signal minute
         if self.health in ("HIRO_DOWN", "OPTION_QUOTES_DOWN"):
-            # R10.1: no new entries while HIRO is down; flow exits already gated by hiro_fresh
+            # R10.1/R10.4: both outages stand down NEW ENTRIES; only a HIRO
+            # outage invalidates FLOW-driven exits (their inputs are HIRO) —
+            # an option outage must NOT suppress scratch/veto (codex BP2 F13)
             kept = []
             for ev in rule_events:
                 if ev.event_type in ("signal", "pending_entry"):
@@ -258,7 +282,8 @@ class Session:
                            else "option quotes down (R10.4)")
                     kept.append(Event(event_type="skip", rule_id="R10.1", branch=ev.branch,
                                       episode=ev.episode, notes=f"skip: {why}"))
-                elif (ev.event_type == "exit_decision"
+                elif (self.health == "HIRO_DOWN"
+                      and ev.event_type == "exit_decision"
                       and ev.outcome_type in ("scratch", "veto_exit")
                       and self.state.open_trade is not None
                       and self.state.open_trade.branch == "B"):
@@ -299,6 +324,7 @@ class Session:
                                  or a.s0 != b.s0
                                  or a.leg1_fill != b.leg1_fill
                                  or _lim(a) != _lim(b)
+                                 or a.data_invalid != b.data_invalid
                                  or a.exit_type != b.exit_type))
                         or self.state.entries_today != ref.entries_today)
             if diverged:

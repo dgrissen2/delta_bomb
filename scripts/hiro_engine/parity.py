@@ -14,6 +14,7 @@ import pandas as pd
 TICK = 0.10
 DECISION_AGREEMENT = 1.00
 PRICE_WITHIN_TICK = 0.95
+COVERAGE_MIN = 0.90
 
 
 def parity_check(sidecar_df: pd.DataFrame, historical) -> dict:
@@ -26,10 +27,11 @@ def parity_check(sidecar_df: pd.DataFrame, historical) -> dict:
             rows.append(dict(minute=int(r.minute), strike=float(r.strike),
                              compared=False, decision_match=None, within_tick=None))
             continue
-        # decision: would the HISTORICAL quote have been marketable vs the limit?
+        # decision: would the HISTORICAL quote have been marketable vs the limit,
+        # on the RESTING LIMIT'S side (sidecar `side` column)?
         hist_marketable = None
         if r.limit_price == r.limit_price:                 # not NaN
-            hist_marketable = bool(h.ask <= r.limit_price) if r.decision != "sell_side" \
+            hist_marketable = bool(h.ask <= r.limit_price) if r.side == "buy" \
                 else bool(h.bid >= r.limit_price)
         d_match = (hist_marketable == bool(r.marketable)) if hist_marketable is not None else True
         within = (abs(h.bid - r.bid) <= TICK + 1e-9 and abs(h.ask - r.ask) <= TICK + 1e-9)
@@ -37,11 +39,14 @@ def parity_check(sidecar_df: pd.DataFrame, historical) -> dict:
                          decision_match=d_match, within_tick=within))
     df = pd.DataFrame(rows)
     comp = df[df.compared]
-    n = len(comp)
+    n, total = len(comp), len(df)
     dec = float(comp.decision_match.mean()) if n else float("nan")
     tick = float(comp.within_tick.mean()) if n else float("nan")
-    ok = n > 0 and dec >= DECISION_AGREEMENT and tick >= PRICE_WITHIN_TICK
-    return dict(ok=ok, compared=n, uncompared=int((~df.compared).sum()),
+    coverage = n / total if total else 0.0
+    # PRE-REGISTERED: >10% uncomparable minutes is itself a FAIL (codex BP2 F4)
+    ok = (n > 0 and coverage >= COVERAGE_MIN
+          and dec >= DECISION_AGREEMENT and tick >= PRICE_WITHIN_TICK)
+    return dict(ok=ok, compared=n, uncompared=int(total - n), coverage=coverage,
                 decision_agreement=dec, price_within_tick=tick, detail=df)
 
 

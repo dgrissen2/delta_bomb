@@ -182,7 +182,8 @@ def stage4_metrics(cfg: Config, entries: pd.DataFrame) -> dict:
         m[f"{br}_censored"] = int((e.exit_type == "censored").sum())
     m["data_invalid_n"] = int(entries.data_invalid.fillna(False).sum()) if len(entries) else 0
     scr = scored[scored.exit_type == "scratch"] if len(scored) else scored
-    m["median_scratch_loss_usd"] = float((-scr.pnl_usd).median()) if len(scr) else float("nan")
+    m["median_scratch_loss_usd"] = float((-scr.pnl_usd).clip(lower=0).median()) \
+        if len(scr) else float("nan")
     losses = (-scored.pnl_usd).clip(lower=0) if len(scored) else pd.Series(dtype=float)
     m["max_single_trade_loss_usd"] = float(losses.max()) if len(losses) else 0.0
     m["credits_usd"] = float(scored[scored.exit_type == "fill"].pnl_usd.sum())         if len(scored) else 0.0
@@ -212,7 +213,12 @@ def stage5_controls(cfg: Config, entries: pd.DataFrame) -> dict:
 
 
 def _best_session(entries: pd.DataFrame) -> Optional[str]:
-    """best = most fills; ties -> highest summed pnl; ties -> earliest date (R9)."""
+    """best = most fills; ties -> highest summed realized $; ties -> earliest
+    date (R9). data_invalid trades are excluded (they join no criterion)."""
+    if not len(entries):
+        return None
+    if "data_invalid" in entries.columns:
+        entries = entries[~entries.data_invalid.fillna(False)]
     if not len(entries):
         return None
     g = entries.groupby("date").agg(
@@ -223,12 +229,32 @@ def _best_session(entries: pd.DataFrame) -> Optional[str]:
 
 
 def _r9_thresholds(cfg: Config) -> Optional[dict]:
-    """Registered thresholds from CONFIG (populated at task 18); None = pending."""
+    """Registered thresholds from CONFIG (populated at task 18); None = pending.
+    ENFORCEMENT (codex BP2 F5): the registration artifact must match its pin
+    and its thresholds must match the config section — tampering either side
+    raises instead of silently grading."""
     try:
         t = cfg.section("r9_thresholds")
-        return t if t else None
     except Exception:
         return None
+    if not t:
+        return None
+    import hashlib as _h, json as _json
+    from .config import REPO_ROOT as _R
+    pin = str(cfg.get("chains", "r9a_registration_hash"))
+    reg_p = _R / "docs/hiro_engine/registration.json"
+    if pin:
+        if not reg_p.exists():
+            raise ScorecardError("registration.json missing but a registration hash is pinned")
+        if _h.sha256(reg_p.read_bytes()).hexdigest() != pin:
+            raise ScorecardError("registration.json bytes != pinned r9a_registration_hash")
+        reg = _json.load(open(reg_p))["thresholds"]
+        for k in ("fills_total_floor", "sessions_with_fill_floor", "b_fill_rate_floor",
+                  "a_fill_rate_floor", "max_single_trade_loss_usd",
+                  "median_scratch_loss_cap_usd"):
+            if abs(float(reg[k]) - float(t[k])) > 1e-9:
+                raise ScorecardError(f"config r9_thresholds.{k} != registration.json ({t[k]} vs {reg[k]})")
+    return t
 
 
 def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.DataFrame,
