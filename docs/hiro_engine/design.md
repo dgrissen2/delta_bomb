@@ -48,7 +48,12 @@ event objects, formatted twice.
         manifest sha256 + SDK version pinned in CONFIG, R8.2); signal_snapshot(min) for the R1.2
         strike pick; strike_series(strike) for fills/exits; live: minute snapshots (SDK or Schwab —
         whichever the spike proves). QuoteView = the two working strikes' VALID quotes for ONE minute
-        (R10.4 validity; quote_age=0 for decisions), attached to the tick by Session. controls_build:
+        (R10.4 validity; quote_age=0 for decisions), attached to the tick by Session.
+        signal_snapshot(t): on a bar where RuleEngine emitted a PendingEntry, Session fetches the
+        SIGNAL-minute full-chain snapshot and calls InstrumentSelector (pure: expiry nearest-30,
+        −0.20Δ pick, partner-listed constraint, lower-strike tie-break, R1.2) to resolve
+        {expiry, K, K2} INTO the PendingEntry before the next bar; snapshot missing/invalid →
+        the pending entry is dropped and `entry_aborted_no_quote` logged (R10.4). controls_build:
         offline job → derived control frame (R11.4/R11.5 limit-fill indicators), parquet + sha256
         pinned in CONFIG. No other module imports the SDK.
 
@@ -80,11 +85,15 @@ event objects, formatted twice.
         table-testable). Per bar: (1) a PendingEntry books leg 1 at THIS bar's closing NBBO conservative
         side (R1.4b; entry aborted per R10.4 if either working strike lacks a valid quote) and creates
         the RestingLimit (L tick-rounded against us, R1.4c); (2) applies the RuleEngine's decision:
-        Fill → book leg 2 at L (+0.10 credit invariant), LimitCancel+ExitDecision → cancel, then book the
-        lone leg at close-of-NEXT-bar NBBO per R7.0 (pending-exit mechanism unchanged); (3) tracks
-        quote_gap streaks → 5th consecutive → cancel limit, mark outcome data_invalid, keep guards
-        (R10.4); (4) updates EngineState. S0 stays the SPX context anchor only. One owner per concern:
-        conditions+arbitration in rules.py, state+booking in executor.py, never both.
+        Fill → book leg 2 at L (+0.10 credit invariant), LimitCancel(+ExitDecision) → cancel, then book
+        the lone leg at close-of-NEXT-bar NBBO per R7.0 (pending-exit mechanism unchanged); (3) updates
+        EngineState. Executor performs NO cancellation judgment: Session counts the quote_gap streak
+        (health, like vetoes) and attaches it to the row; RULEENGINE — the single arbiter — emits the
+        5th-gap `limit_canceled(reason=quote_gap)`. `data_invalid` is a PROPERTY (the open horizon
+        contained a ≥5-min gap), stamped on whatever exit eventually books — so a simultaneous 5th gap +
+        clock expiry is one arbitration: clock exit wins the booking, the cancel event rides with it,
+        the outcome carries data_invalid. S0 stays the SPX context anchor only. One owner per concern:
+        conditions+arbitration in rules.py, streak counting in session.py, state+booking in executor.py.
 
     eventlog.py
         Event dataclass → one formatter for console, one CSV writer; same fields (R8.1). Append-only.
@@ -103,6 +112,8 @@ event objects, formatted twice.
         5 controls  control.py functions over the frozen dataset, weighted to stage-2 clock distributions
         6 criteria  the R9 table, one row per criterion, incl. the best-session re-check (ties per R9)
         `--rehearsal` runs the same pipeline over backtest rows, output labeled REHEARSAL.
+        (Stage frames are kept deliberately: the BH-scratch forensics was conducted FROM these frames;
+        auditability is a standing requirement, not speculation.)
 
     summarize.py
         ONE summarizer shared by backtest and sweep (R13.3): trade+episode counts, days, own-dataset
@@ -113,6 +124,13 @@ event objects, formatted twice.
         clock_matched() and midpoint_matched() (R11.4/R11.5): the WEIGHTING math is unchanged (single
         home, research scripts import it); the indicator is v3.0 limit-fill, read from the pinned
         derived control frame built by chains.controls_build (no scorecard-time chain crunching).
+
+    register.py  (NEW, v3.0 — owns R9a)
+        `cli register-thresholds`: runs the FROZEN R9a derivation (one bootstrap procedure, count
+        floors, fill-rate floors, $-risk caps, empty-resample rule) over the first v3 rehearsal log;
+        writes registration.json (inputs, formulas, outputs) whose sha256 goes into CONFIG; populates
+        the «16b» markers (spec + config edit emitted as a printed patch for the operator to apply).
+        Run-once boundary: refuses to run if a registration hash is already pinned.
 
     sweep.py
         SweepRunner: whitelist dict {knob: [values]} literally from R13.2; runs ReplayFeed sessions per
@@ -140,6 +158,15 @@ event objects, formatted twice.
                    quote_gap_streak, data_invalid: bool,
                    state, exit_type, exit_ref ($ booking), minutes,
                    spx_adverse_pts, leg_liq_loss_usd }         # schema_v=2, ADDITIVE (readers accept v1)
+    Event v2     adds explicit columns (v1 columns retained; resolution_debit kept for v1 parsing,
+                 legacy-always-None): expiry, K, K2, leg1_fill, limit_price, limit_status,
+                 limit_cancel_reason, first_eligible_min, leg2_fill, credit, quote_age,
+                 quote_gap_streak, last_valid_bid, last_valid_ask, last_valid_quote_min,
+                 data_invalid, leg_liq_loss_usd, spx_adverse_pts.
+                 HEARTBEATS persist quote_gap_streak + last-valid NBBO each 5 min → crash-resume
+                 rebuilds streaks and the ≤3-min stale-booking anchor from the latest logged row;
+                 round-trip test: SimTrade ⊕ RestingLimit reconstructed field-for-field from
+                 ENTRY + limit events + latest heartbeat + EXIT.
                    # every field persisted in the ENTRY/EXIT events → crash round-trip is lossless
     Event        explicit versioned columns, schema_v=1 — no catch-all field:
                  { ts, mode (live|backtest|shakedown), tier, session_date, config_hash, schema_v,
@@ -169,6 +196,8 @@ event objects, formatted twice.
 
     for bar in feed:
         quotes = chains.quote_view(bar.min, state)                    # the two working strikes, this minute
+        # (after rules.evaluate below: a fresh PendingEntry gets its instruments resolved by
+        #  Session via chains.signal_snapshot(t) + InstrumentSelector — see chains.py notes)
         state, entry_events = executor.execute_pending(bar, quotes, state)  # leg 1 books at closing NBBO;
                                                                             # RestingLimit created (R1.4b/c)
         row    = features.update(bar, feed.hiro_snapshot(), feed.spy_bar())
@@ -193,7 +222,11 @@ event objects, formatted twice.
       Exit booking: last valid NBBO ≤ 3 min old, else administrative close at last valid NBBO + unscored.
       Live quote loss → stand down from NEW entries (banner); NEVER an SPX-based fill in any mode.
     Bad levels row:    fail closed → R4.2 long-first-only; loud banner.
-    Chain call fails:  fall back to spot proxies (R2.5) and log which path was used.
+    Chain failures are FOUR distinct policies (R1.2/R10.4 — never blended):
+      signal-minute snapshot missing → pending entry dropped, `entry_aborted_no_quote`;
+      entry-bar working-strike quotes invalid → entry aborted (same event);
+      resting-strike quote missing/invalid → `quote_gap` minute (5th consecutive → cancel per rules);
+      cap-evaluation quote missing → R7.3 SPX spot proxy FOR THE CAP ONLY (`cap_source=proxy`).
     Crash mid-session: restart replays today's log; open SimTrade rebuilt from its entry row (spec NFR).
     Hash mismatch:     loud reset warning (R8.2); scorecard refuses mixed hashes (R9).
 
@@ -209,10 +242,15 @@ event objects, formatted twice.
                   every cancel path, quote gaps → data_invalid, session-end booking.
     Golden:       R12.3 pinned v2 rehearsal artifact == full-tier v3 backtest, row-for-row, against the
                   pinned chain cache.
-    Gate:         live/backtest parity diff (shakedown gate): live-captured snapshots vs next-day
-                  historical series — 100% fill-decision agreement, booked prices within 1 tick on
-                  ≥ 95% of minutes (pre-registered tolerance).
-    Golden:       control.py values on the 8 sessions == the research scripts' published numbers.
+    Gate:         live/backtest parity diff (shakedown gate): in live mode chains.py persists a
+                  snapshot artifact per session (live_quotes_<date>.parquet: minute, strike, bid, ask,
+                  L, marketable?, decision) for EVERY evaluated minute incl. non-fills; `cli
+                  parity-check <date>` fetches the historical series next day and diffs — 100%
+                  fill-decision agreement, booked prices within 1 tick on ≥ 95% of minutes
+                  (pre-registered tolerance). Report written next to the artifact.
+    Golden:       control weighting math == hand-computed fixture; control-frame indicator values
+                  pinned at first controls_build (v3 semantics — the old touch-based research numbers
+                  are OBSOLETE for this comparison and are not a target).
     Golden:       scorecard over a synthetic 10-session fixture log == a hand-computed R9 table
                   (covers qualifying vs executable, censored denominators, A-over-B dedupe,
                   best-session re-check with each tie-break exercised).
@@ -222,7 +260,8 @@ event objects, formatted twice.
                   R13.1 differences and correct tier stamps.
     Unit:         features.py run machine (trough, break, re-anchor); EMA/VWAP/context reads at 10:30/13:00;
                   range60_pct warmup behavior below 300 observations.
-    Unit:         chain-present vs proxy paths for cap and resolution (cap_source recorded correctly).
+    Unit:         cap chain-mid vs spot-proxy fallback paths (cap_source recorded; resolution has no
+                  proxy path in v3 — resolution_close books per R7.0).
     Integration:  HIRO outage mid-trade → scratch_unavailable + PARTIAL; levels invalid → R4.2 banner.
     Integration:  crash-resume — kill after entry, restart, SimTrade reconstructed field-for-field from
                   events (lossless round-trip), exits still fire on schedule.
