@@ -61,7 +61,8 @@ event objects, formatted twice.
         {expiry, K, K2} INTO the PendingEntry before the next bar; snapshot missing/invalid →
         the pending entry is dropped and `entry_aborted_no_quote` logged (R10.4). controls_build:
         offline job → derived control frame (R11.4/R11.5 limit-fill indicators), parquet + sha256
-        pinned in CONFIG. No other module imports the SDK.
+        pinned in CONFIG. No other module imports the OPTION-CHAIN client (feeds.py keeps its
+        SPX/SPY/HIRO sources; options are exclusively ChainStore's).
 
     feeds.py
         Feed protocol: next_bar() -> Bar | None, spy_bar(), hiro_snapshot(). NO chain access here —
@@ -188,12 +189,16 @@ event objects, formatted twice.
                  test: SimTrade ⊕ RestingLimit reconstructed field-for-field from ENTRY + limit +
                  latest quote_gap/heartbeat + EXIT rows.
                    # every field persisted in the ENTRY/EXIT events → crash round-trip is lossless
-    Event        explicit versioned columns, schema_v=1 — no catch-all field:
+    Event        explicit versioned columns, schema_v=2 — no catch-all field. The full v1 column set
+                 (as implemented in models.EVENT_FIELDS) is retained verbatim:
                  { ts, mode (live|backtest|shakedown), tier, session_date, config_hash, schema_v,
                    event_type, rule_id, branch, side, s0, expiry, leg_strikes, strike_quote_ts,
                    run, rate, dC, dP, share, r15, pull30, bounce30, context, health,
-                   outcome_type, outcome_minutes, exit_ref, cap_source, resolution_debit,
-                   adverse, notes }                              # == one CSV row == one console line
+                   outcome_type, outcome_minutes, exit_ref, cap_source, resolution_debit (legacy,
+                   always None), adverse, trade_id, entry_min, signal_min, entry_option_mid,
+                   resting_limit_ref, target, bh_level, entry_L, cap_value, episode, notes }
+                 plus the v2 additions listed under "Event v2" above.
+                 # == one CSV row == one console line; readers accept v1 rows
     SessionRow   { date, disposition (countable|shakedown|partial|event_standdown), outage_min }
     Config       { R1..R7 numerics, control_dataset {path, data_hash}, verification_hash }
     TierPolicy   immutable per run (R13.1): { branch_b_enabled, price_a_conditions, r43_enabled,
