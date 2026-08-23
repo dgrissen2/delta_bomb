@@ -16,8 +16,12 @@ requirements text wins over this file. DO NOT START without the user's explicit 
       the frozen set only — live chain data is never a rolling pin)
     - QuoteView builder (R10.4 validity: bid>0, ask≥bid; quote_age=0 for decisions);
       signal_snapshot(min); strike_series(strike)
+    - MIGRATION: delete/absorb the existing `live.py` ChainAdapter — after this task, chains.py is the
+      only production module importing any option-chain client. Boundary test: an import-scan test
+      asserts no module outside chains.py references the option client (the task-14 spike script is
+      the ONE named diagnostic exception)
     - Tests: cache determinism (re-load == bytes); hash guard raises on any byte change; R13.1 refusal
-      lists missing dates; validity table (crossed/zero-bid/locked)
+      lists missing dates; validity table (crossed/zero-bid/locked); the import-boundary scan
     Requirements: R2.5, R10.4 (validity), R13.1
 
 - [ ] 14. LIVE QUOTE SPIKE (market hours; BEFORE any pricing code — the schedule risk lives here)
@@ -29,24 +33,35 @@ requirements text wins over this file. DO NOT START without the user's explicit 
       work (15–18) may proceed regardless — only live/shakedown blocks on this
     Requirements: R2.5 (live)
 
-- [ ] 15. Gate-2 hand fixture FIRST, then the pricing layer
-    - 15a. write `tests/fixtures/v3_quotes_fixture.py` + hand-computed expected outputs BEFORE touching
-      engine code (R12.2): both sides, tick rounding against us, t+2 first eligibility, same-minute
+- [ ] 15A. GATE-2 HAND FIXTURE (independent, closes BEFORE 15B may begin — R12.2)
+    - write `tests/fixtures/v3_quotes_fixture.py` + hand-computed expected outputs with the derivation
+      arithmetic in comments: both sides, tick rounding against us, t+2 first eligibility, same-minute
       fill-vs-scratch race (fill wins), every cancel path, 5th-gap data_invalid, session-end booking,
-      entry-abort. The expected numbers are calculated BY HAND and committed with derivations in comments
+      entry-abort
+    - CLOSE CONDITION: fixture + derivations COMMITTED and reviewed while `scripts/hiro_engine` contains
+      ZERO v3 pricing code (the commit history proves the ordering); expected values may never be
+      edited to match observed behavior afterward — a mismatch is a defect investigation
+
+- [ ] 15B. Pricing layer (built against the frozen 15A fixture)
     - 15b. models: QuoteSnap/QuoteView/RestingLimit; SimTrade v3 fields; Event schema_v=2 ADDITIVE columns
       (design "Event v2" list); TierPolicy.fill_mode (+ spot_touch for price tier); config.yaml v3 keys
       (resolution_debit_max REMOVED; new pins as placeholders)
     - 15c. session: attach QuoteView + quote_gap streak (Session counts, like vetoes);
       resolve_instruments (chains.signal_snapshot + InstrumentSelector, R1.2 constraints; missing →
-      entry_aborted_no_quote); delta-ledger docstring updates (design §delta ledger)
+      entry_aborted_no_quote); LIVE OPTION-OUTAGE HEALTH: chain-loss banner (`NO OPTION QUOTES —
+      STAND DOWN`), new-entry stand-down while quotes are absent (even with no open trade), outage
+      minutes counted toward R10.3 PARTIAL; fake-feed test drops quotes for 10 min with no open
+      trade and asserts no pending entries + outage counted; delta-ledger docstring updates
     - 15d. rules: limit_filled + t+2 guard INSIDE the single R7 arbitration; 5th-gap limit cancel;
       heartbeat carries streak + last-valid NBBO; quote_gap rows carry them too
     - 15e. executor: leg-1 closing-NBBO conservative booking; RestingLimit lifecycle; leg-2 booking at L
       (+0.10 invariant asserted in code); conservative NBBO exit booking per R7.0; resolution_debit
       branch DELETED; data_invalid as horizon property
-    - 15f. eventlog: v2 columns; rebuild_state learns fill/limit_canceled/quote_gap/entry_aborted;
-      resume authority rules (sidecar quotes; logged decisions authoritative; widened RESUME WARNING)
+    - 15f. eventlog + SIDECAR CONTRACT: v2 columns; rebuild_state learns fill/limit_canceled/
+      quote_gap/entry_aborted; the snapshot-sidecar SCHEMA + writer + reader live HERE (frozen
+      interface, exercised by a fixture sidecar in tests) with the resume authority rules (sidecar
+      quotes; logged decisions authoritative; widened RESUME WARNING) — task 19 only WIRES the
+      writer into the live loop, it may not change the format
     - Tests: the ENTIRE 15a fixture passes; round-trip SimTrade⊕RestingLimit from rows; property tests
       (one leg, 3/day, credit ≥ 0.10 on every fill) — plus the existing 116-test suite stays green
       (price tier keeps spot_touch semantics; golden gate R12.1 untouched)
@@ -54,9 +69,12 @@ requirements text wins over this file. DO NOT START without the user's explicit 
 
 - [ ] 16. Pre-registration freeze (R9a) — BEFORE any v3 rehearsal runs
     - `register.py` + `cli register-thresholds`: the frozen R9a derivation (one bootstrap, count floors,
-      fill-rate floors, $-risk caps, empty-resample rule, run-once boundary via pinned hash)
-    - commit the R9a formulas hash into CONFIG placeholders; scorecard stage6 reads thresholds FROM
-      CONFIG (hardcoded v2 thresholds deleted)
+      fill-rate floors, $-risk caps, empty-resample rule)
+    - TWO DISTINCT CONFIG PINS, never reused: `r9a_formulas_hash` (pinned HERE, pre-rehearsal — the
+      hash of the derivation code+formulas text) and `r9a_registration_hash` (EMPTY until task 18 pins
+      registration.json). The run-once boundary checks ONLY `r9a_registration_hash`: non-empty →
+      register-thresholds refuses
+    - scorecard stage6 reads thresholds FROM CONFIG (hardcoded v2 thresholds deleted)
     - Tests: derivation on a synthetic log matches hand-computed floors incl. empty-resample and
       rounding edges; refuses to run twice
     Requirements: R9, R9a
@@ -75,26 +93,31 @@ requirements text wins over this file. DO NOT START without the user's explicit 
 
 - [ ] 18. One rehearsal run → thresholds → verification artifact v2
     - run the v3.0 full-tier rehearsal over the 8 sessions ONCE; `register-thresholds` populates the
-      «16b» markers (spec + config patch applied and committed); registration.json hash pinned
+      «16b» markers (spec + config patch applied and committed); registration.json hash pinned into
+      `r9a_registration_hash` (the formulas pin from task 16 is untouched)
     - spot-check the trade list row-by-row against raw cached quotes; pin as verification artifact v2
       (R12.3) in CONFIG; document the after picture (fills, credits, $ risk) in build_notes
     - defect policy per R9a (fix → re-run ONCE → document)
     Requirements: R9a, R12.3
 
-- [ ] 19. Battery + parity plumbing + ops
+- [ ] 19. Readiness battery + parity plumbing (MARKET-INDEPENDENT — closes offline)
     - full test battery green from repo root AND scripts/; determinism (same day twice byte-identical)
-      re-proven under v3; crash-resume e2e re-proven (sidecar + authoritative-log rules)
-    - live: chains snapshot sidecar (live_quotes_<date>.parquet incl. non-fill decisions);
-      `cli parity-check <date>` (pre-registered tolerance: 100% fill-decision agreement, prices within
-      1 tick on ≥95% of minutes) — the SHAKEDOWN GATE, runs after the first live capture day
+      re-proven under v3; crash-resume e2e re-proven against a FIXTURE sidecar (15f contract)
+    - wire the 15f sidecar writer into the live loop; `cli parity-check <date>` implemented and proven
+      against a synthetic capture (fixture live-snapshots vs fixture historical series, incl. a
+      deliberate 1-tick mismatch case) — tolerance pre-registered: 100% fill-decision agreement,
+      prices within 1 tick on ≥95% of minutes
     - RUNBOOK/ops: chain-cache freshness + sidecar presence in morning/evening checks; quote-gap and
-      NO CHAIN FEED console lines documented for the trader
-    Requirements: R12.3 parity gate, R2 [OPS], non-functional
+      stand-down console lines documented for the trader
+    - READINESS GATE (deterministic): everything above green with NO live session required
+    Requirements: R12.3 parity mechanics, R2 [OPS], non-functional
 
-- [ ] 20. Shakedown (market-dependent, after 14 PASS + 19 green)
-    - two live `--shakedown` sessions under v3.0; parity-check PASSES both days; dispositions written;
-      ops green; fix only defects, never thresholds; then the 10-session clock starts
-    Requirements: spec acceptance
+- [ ] 20. Shakedown sequence (market-dependent, after 14 PASS + 19's readiness gate)
+    - shakedown day 1 (live `--shakedown`) → NEXT DAY: `parity-check day1` must PASS → shakedown day 2
+      → NEXT DAY: `parity-check day2` must PASS → only then does the 10-session clock start
+    - dispositions written; ops green both days; fix only defects, never thresholds; a parity FAIL
+      stops the sequence (investigate, fix, restart shakedown)
+    Requirements: spec acceptance, R12.3 parity gate (live)
 
 Estimated shape: 13+15 are the bulk (the fixture in 15a is the single most important artifact — hand
 derivations reviewed before code); 14 is the schedule risk (first market morning); 16–17 are offline;
