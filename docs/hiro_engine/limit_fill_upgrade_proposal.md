@@ -1,163 +1,213 @@
-# Proposal — v3.0 "Real resting-limit fills" (spec/design/task deltas)
+# Proposal v2 — spec v3.0 "Real resting-limit fills"
 
-*Drafted 2026-08-23 from the option-midpoint repricing of the 19 rehearsal
-trades. GOAL (user): every completed bomb nets **+0.10 ($10) by construction**
-— the second leg RESTS at a 0.10 net credit vs the first leg's actual fill and
-the system only counts a bomb when that limit demonstrably fills on the
-option's own 1-minute data. No more "SPX moved 3 points so we assume done."*
+*2026-08-23. Draft 1 was reviewed by Architect × PM (inline), then FAILED both
+the red-team audit (4 blockers / 5 majors) and codex-plan-review (3 blockers /
+6 majors, 2 de-scopes). This is the full rewrite with every finding resolved
+in the body text. Review artifacts: session scratchpad; summary in §7.*
 
-## 0. Why (evidence)
+## 0. Goal and evidence
 
-- Repricing all 15 completed rehearsal bombs at real SPXW chain mids: average
-  legging cost **$46/bomb** (range −$45 credit to +$120), not ~$0. A 3-pt SPX
-  move shifts a 20Δ put ~0.6 while stepping 5 strikes shifts it ~1.0 — the
-  touch proxy structurally overstates completion economics by ~0.4–0.5 pts.
-- Data feasibility (probed 2026-08-23): these strikes TRADE in ~6 of 391
-  minutes → **trade-OHLC cannot be the fill test**. 1-min NBBO quotes exist
-  every minute (ThetaData SDK, verified) → **quote-based fill** is the faithful
-  mechanic: a resting BUY limit at L is filled in minute m iff ask(m) ≤ L; a
-  resting SELL limit at L iff bid(m) ≥ L. (Marketable-against-us = guaranteed
-  fill; no queue-position assumptions.)
-- Historical SPXW 1-min chains ARE available via the ThetaData SDK (greeks
-  incl. bid/ask/delta; verified across all 8 sessions) — the spec's standing
-  premise "no stored chain exists for backtests" (R2.5) is obsolete.
+**GOAL (user):** every completed bomb nets **+0.10 ($10) by construction** —
+the second leg RESTS at a 0.10-credit limit against the first leg's actual
+fill, and a bomb only counts when that limit demonstrably fills on the
+option's own 1-minute data. The $10 is the anti-slippage floor, not the
+objective: the product is the owned 5-wide spread (max $500/lot); no criterion
+may reward avoiding completion.
 
-## 1. The new mechanic (normative once adopted)
+Evidence: repricing the 15 completed rehearsal bombs at real SPXW mids showed
+the ±3-pt SPX touch proxy costs ~$46/bomb on average (a 3-pt move shifts a 20Δ
+put ~0.6 while 5 strikes shift ~1.0). Trade prints are too sparse for fill
+detection (measured 6/391 minutes on a bomb strike); 1-min NBBO is dense.
+Historical SPXW 1-min chains are available via the ThetaData SDK (verified all
+8 sessions; full-chain full-day greeks pull = ~138k rows in ~13 s/day).
 
-1. **Leg 1 (entry)** executes at the NEXT bar (unchanged timing, R1.4). Price =
-   the option's 1-min NBBO at the execution minute, CONSERVATIVE side:
-   sell-first sells K at the **bid**; long-first buys K at the **ask**.
-   (Mid is a sensitivity diagnostic, never the booked price.)
-2. **Leg 2 rests immediately** at the 0.10-credit limit:
-   sell-first → BUY K+5 limit **L = fill1 − 0.10**;
-   long-first → SELL K−5 limit **L = fill1 + 0.10**.
-3. **Fill detection, each completed minute** (backtest and live, one code
-   path): BUY limit filled iff ask(K+5, m) ≤ L; SELL limit filled iff
-   bid(K−5, m) ≥ L. Booked at L. Completed bomb = 5-wide spread + **+0.10
-   credit, by construction**.
-4. **Everything else about the trade unchanged**: entry signals (R6), vetoes
-   (R4), windows (R5), scratch/veto/state-flip/clock/resolution (R7) still
-   govern the lone leg; exits now BOOK at the lone leg's conservative NBBO
-   (buy back at ask / sell out at bid) so scratch/timeout losses are real
+## 1. The mechanic (normative once adopted)
+
+**Causal sequence (one timeline, live == backtest):**
+1. Signal fires at the close of bar *t* (R6 unchanged).
+2. **Leg 1 books at the END-OF-MINUTE NBBO of bar *t+1*** (the execution bar's
+   closing snapshot; live = the post-bar-close snapshot — same instant, both
+   paths), CONSERVATIVE side: sell-first sells K at the **bid**; long-first
+   buys K at the **ask**. Mid is never a booked price. Entry minute (clock,
+   window, episode anchors) remains *t+1*.
+3. **Leg 2 rests from that moment**: sell-first → BUY K+5 limit
+   **L = fill1 − 0.10**; long-first → SELL K−5 limit **L = fill1 + 0.10**.
+   L rounds to a valid tick AGAINST us (down for buys, up for sells; these
+   puts trade on a 0.10 grid).
+4. **First fill-eligible minute is *t+2*.** In each completed minute *m*, the
+   limit fills iff that minute's closing NBBO is marketable against it:
+   BUY limit → ask(m) ≤ L; SELL limit → bid(m) ≥ L. Booked at L. No
+   same-snapshot leg1+leg2 fills, no look-ahead, by construction.
+5. **Cancel semantics:** any R7 exit decision (scratch, cap, veto_exit,
+   state_flip, clock, resolution) CANCELS the resting limit at the decision
+   bar's close (one `limit_canceled` event), then the exit books per §1.6.
+   Same-minute race: **fill wins** — R7 precedence is unchanged and evaluated
+   at one point (§3, arbitration stays in RuleEngine).
+6. **Exit booking (non-fill exits):** decision at close of bar *j* → lone leg
+   books at the close-of-bar *j+1* NBBO, conservative side (buy back at ask /
+   sell out at bid); session end → bar *j*'s closing NBBO. Losses are option
    dollars, not SPX-point proxies.
-5. **Strike selection in backtests becomes real** (R1.2): −0.20Δ from the
-   historical chain at signal time, constrained to strikes where the 5-wide
-   partner is listed (observed grid: 10s with 5s at 25-pt anchors).
+7. **15:30 resolution completes NOTHING (v3.0):** the resting limit is
+   canceled and the lone leg closes (`resolution_close`). `resolution_debit`
+   is RETIRED — completing a pair at a ≤0.50 debit violates the credit
+   invariant. Invariant: **every event labeled a completed bomb booked leg 2
+   at L and carries credit ≥ 0.10.**
+8. **Strike selection (backtest and live):** −0.20Δ from the chain at the
+   signal-minute snapshot, constrained to strikes whose 5-wide partner is
+   listed (grid: 10s with 5s at 25-pt anchors); ties → lower strike.
 
-## 2. Spec deltas (requirements.md v3.0)
+**Signals, vetoes, windows, episodes, caps, and B-scratch conditions are all
+untouched.** This proposal swaps the pricing/fill layer only.
 
-| Rule | Change |
-|---|---|
-| R1.2 | Backtests use the historical chain for strike selection (drop "no chain in backtests"); tie-breaks unchanged |
-| R1.4 | REPLACE the ±3.0 touch proxy with §1 above (leg-1 NBBO fill + resting limit + quote-fill test). The 3-pt touch is retired from fills; it survives ONLY inside R11.4/R11.5 matched controls where noted below |
-| R2.5 | Rewrite: historical SPXW 1-min chain (ThetaData SDK) is a REQUIRED backtest input for full tier; live chain = same SDK snapshot path (spike required) with Schwab as fallback; cache under `~/Dev/central_trade_data/thetadata/spxw_bomb_chains/` (strike-windowed, manifest-hashed, per central-data rules) |
-| R7.1 | Fill = the resting limit filling per §1.3; minutes-to-fill = minutes from entry to the fill minute |
-| R7.2/R7.4 | Unchanged conditions; exit BOOKING at conservative NBBO |
-| R7.3 | Cap: option-mid trigger becomes computable in backtests (real mids); spot proxy retained only where chain data is missing (logged) |
-| R7.6 | Implied debit test becomes real in backtests (ask(K+5) − fill1 etc.) |
-| R8.1 | Event rows gain: leg1_fill, limit_price, leg2_fill, quote_ts columns (schema_v=2) |
-| R9 | Thresholds MUST be re-registered: fill under limit semantics is strictly harder than the 3-pt touch. Process: run the v3.0 rehearsal ONCE over the 8 stored sessions, set B/A fill-rate thresholds and sample minimums from it in one sitting, freeze (no iteration — anti-overfit discipline), new CONFIG_HASH, clock resets (has not started) |
-| R11.4/R11.5 | Controls re-specified as: same clock/midpoint matching, indicator = "would a limit placed per §1 at that minute have filled within the horizon" computed from the cached chains. (The SPX-touch indicator is retired with R1.4) |
-| R12 | New verification artifact v2: the first clean v3.0 rehearsal trade list is reviewed row-by-row (spot-check legs against raw quotes), then hash-pinned like R12.1. R12.1 + the existing golden gate REMAIN (they verify the ported research core, which is untouched) |
-| R13.1 | full tier now requires HIRO + SPX + chain cache per date; **price tier keeps the old ±3 SPX touch** as a coarse screen (no chains for the 2022+ archive at acceptable cost), stamped `tier=price` as always — price-tier numbers were already quarantined from full-rule claims |
-| R13.2 | Sweep whitelist gains exactly one knob: `credit` {0.05, 0.10, 0.15, 0.20} (the resting-limit offset). Nothing else |
+## 2. Option-data health (new R10.4 — fail closed, never fall back to SPX fills)
 
-## 3. Design deltas (design.md v2)
+- No valid quote at the execution bar → entry ABORTED, logged
+  `entry_aborted_no_quote`; the signal still counts as qualifying (R11.1), the
+  aborted entry joins neither fill-rate numerator nor denominator.
+- Quote gap while a limit rests: minutes logged `quote_gap`; a gap ≥ 5
+  consecutive minutes while a trade is open → the trade's outcome is
+  `data_invalid` (excluded from numerator AND denominator, reported
+  separately). Fill status is never guessed across a gap.
+- Exit booking with no fresh quote: book at the last valid NBBO if ≤ 3 min
+  old, else `data_invalid`.
+- Cumulative option-quote outage inside 10:00–14:30 counts toward R10.3
+  PARTIAL exactly like HIRO/SPX outages. There is NO spot-proxy fill fallback,
+  live or backtest — if quotes are unavailable live, the engine stands down
+  from new entries (banner), keeping cap(spot)/clock/resolution guards for any
+  open leg.
 
-- **New module `chains.py`**: `ChainStore` — fetch-on-demand + local cache of
-  SPXW 1-min NBBO/greeks per (date, expiry, strike window around the day's
-  entries); manifest with sha256s; DATA_DICTIONARY/CHANGELOG updates. The ONLY
-  module that talks to the option endpoints (live snapshots included).
-- **Executor**: `SimTrade` gains leg1_fill, limit_price, leg2_fill;
-  `execute_pending` books leg 1 from ChainStore quotes; per-bar `apply` asks
-  ChainStore "limit filled this minute?"; exits book at conservative NBBO.
-  Executor stays a pure state applier — quote lookups behind a `QuoteView`
-  protocol so replay and live share the code path.
-- **RuleEngine untouched** except the fill condition moves out: rules no longer
-  detect fills from SPX bars; the Executor reports fills (rules keep exit
-  precedence for everything else). One owner per concern, as before.
-- **FeatureEngine untouched.** Signals are HIRO/tape; options are pricing.
-- **Scorecard/controls**: fill/pnl definitions read the new columns; control
-  functions consume the chain cache; day-clustered bootstrap unchanged.
-- **Explicitly NOT built**: order-book queue modeling, partial fills,
-  multi-lot, smart routing, intra-minute quote interpolation.
+## 3. Ownership (design contract — unchanged principles)
 
-## 4. Task deltas (tasks.md v2 — new tasks 13–18)
+- **Session** fetches the minute's quotes (execution-bar chain snapshot at
+  signal+1; the two working strikes each minute after) and ATTACHES them to
+  the row — exactly like vetoes/health. Session performs no trading logic.
+- **RuleEngine remains the ONLY owner of R7 precedence.** It computes
+  `limit_filled` from the attached quotes and arbitrates fill > scratch > cap
+  > veto_exit > state_flip > clock > resolution in one place, as today.
+- **Executor stays a pure, I/O-free state applier**: books prices (leg 1,
+  limit fills at L, conservative exit NBBO), maintains the resting-limit
+  state, emits ENTRY/EXIT/limit events. Fixture quotes make it table-testable.
+- **FeatureEngine untouched.**
+- **TierPolicy gains one field** `fill_mode: limit | spot_touch`. Price tier =
+  `spot_touch` (legacy ±3 touch, no chains for the 2022+ archive), stamped and
+  quarantined as always; this is the ONLY surviving production use of the
+  touch. Schema v2 is ADDITIVE (new columns: leg1_fill, limit_price,
+  leg2_fill, quote_age, outcome data_invalid label; readers accept v1).
 
-- [ ] 13. ChainStore: fetch/cache/manifest + loaders; store the 8 rehearsal
-      sessions' strike windows; central-data docs updated. Tests: cache hit
-      determinism; hash guard; missing-date refusal (R13.1).
-- [ ] 14. Pricing layer: leg-1 NBBO booking, resting limit, quote-fill test,
-      NBBO exit booking; schema_v=2 events + round-trip/crash-resume updates.
-      Tests: table-driven fill/no-fill minutes incl. limit==ask boundary;
-      credit arithmetic (+0.10 by construction); one leg at a time preserved.
-- [ ] 15. Scorecard/controls/summarizer on v3 semantics; R11.4/11.5 limit-fill
-      controls; golden fixture updated by hand.
-- [ ] 16. v3.0 rehearsal over the 8 sessions → ONE-SITTING threshold
-      re-registration (R9) → spec numbers frozen → verification artifact v2
-      generated, reviewed, hash-pinned.
-- [ ] 17. Live chain snapshot SPIKE (market hours): minutely SDK snapshots of
-      2 strikes — latency/coverage; STOP if it fails (Schwab fallback design).
-- [ ] 18. Re-run full battery + reviews; RUNBOOK/ops updates (chain cache
-      freshness in morning check).
+## 4. Metrics & controls (R11 rewritten in two explicit unit families)
 
-## 5. Open decisions (for architect/PM below)
+- **Economic ($, drives R9):** `leg_liq_loss_usd` = worst conservative
+  liquidation of the lone leg vs leg-1 fill; realized exit P&L in $; median
+  scratch loss in $; max single-trade realized loss in $. Best-session
+  tie-break #2 becomes summed realized $ P&L.
+- **Contextual (SPX pts, drives nothing):** `spx_adverse_pts` retained for
+  continuity with prior research, reported only.
+- **Fill rate (R11.6):** limit fills ÷ executable entries with complete,
+  data-valid horizons (censored and `data_invalid` excluded from both sides).
+- **Would-have-completed scratch re-check:** replays the RESTING LIMIT (not
+  any SPX touch) over the remaining horizon from the pinned chain data.
+- **Heartbeat** prints both families.
+- **Matched controls (R11.4/R11.5):** same clock/midpoint matching; indicator
+  = "a limit placed per §1 at that minute fills within the horizon." Control
+  candidates need their own strike pick + limit + horizon per minute →
+  computed ONCE by a `controls_build` job over the full-day full-chain cache
+  and persisted as a **hash-pinned derived control frame** (parquet + sha256
+  in CONFIG). Scorecard-time controls read the pinned frame only. Candidate
+  eligibility mirrors trade rules: valid quotes at the candidate's execution
+  minute, partner listed, complete data-valid horizon; ineligible minutes are
+  excluded and counted in the frame's manifest.
 
-A. NBBO conservatism: leg-1 at bid/ask (proposed) vs mid — affects whether the
-   +0.10 is real-world-credible or paper-flattering.
-B. Fill test tick tolerance: ask ≤ L (proposed) vs ask < L.
-C. Do we keep logging the SPX ±3 touch as a diagnostic column (proposed: yes,
-   it is the bridge to all prior research)?
-D. R9 threshold re-registration numbers — set from the v3.0 rehearsal in one
-   sitting (proposed) — PM to confirm the anti-overfit protocol.
+## 5. Data, pinning, verification (three separate gates)
 
----
+- **ChainStore (new module `chains.py`):** full-chain, full-day 1-min
+  NBBO+greeks per session (one SDK pull/day, ~seconds), cached under
+  `~/Dev/central_trade_data/thetadata/spxw_bomb_chains/` with a manifest;
+  DATA_DICTIONARY/CHANGELOG updated. **The chain-cache manifest sha256 AND the
+  thetadata SDK version go into CONFIG (R8.2)** — a silent re-fetch or vendor
+  revision changes CONFIG_HASH visibly. Acknowledged: verification artifacts
+  are reproducible against the pinned cache, not against the vendor.
+- **Gate 1 (unchanged):** legacy golden gate — verify.py reproduces the v1
+  27-trade research artifact through the ported core. Verifies the research
+  port, nothing about v3.
+- **Gate 2 (new, pre-implementation):** a HAND-COMPUTED v3 fixture — small
+  synthetic quote series covering both sides, tick rounding, the t+2 first
+  eligibility, same-minute fill-vs-scratch race, cancel paths, quote gaps,
+  session-end booking. Expected outputs calculated by hand BEFORE the pricing
+  layer is written (TDD; the forensics lesson made mandatory).
+- **Gate 3:** the first clean v3 rehearsal trade list, row-spot-checked
+  against raw quotes, then hash-pinned as verification artifact v2 (with the
+  chain manifest + control frame + preregistration hashes in CONFIG).
 
-## 6. Architect × PM review (2026-08-23) — findings APPLIED above where noted
+## 6. R9 re-registration (pre-registered BEFORE the first v3 rehearsal run)
 
-**Architect (simple/DRY/robust, no overengineering):**
-1. **Executor must stay I/O-free.** The draft had the Executor querying
-   ChainStore. Corrected: Session fetches the minute's two-strike NBBO and
-   attaches it to the tick (exactly like vetoes/health); the Executor consumes
-   attached quotes. Replay and live share one code path; fixture quotes make
-   the pricing layer table-testable. (§3 amended.)
-2. **Schema v2 is ADDITIVE**: new columns appended, `schema_v=2` stamped,
-   reader accepts v1 rows (old logs stay parseable); crash-resume and
-   console==CSV tests regenerate against v2.
-3. **Cache scope precisely**: (a) full-chain snapshot at SIGNAL minutes only
-   (for the −0.20Δ pick), (b) full-day 1-min NBBO for the two chosen strikes
-   only. No whole-chain full-day hoards. (Task 13 amended.)
-4. **Live-quotes hard gate**: task 17 must prove ONE of (i) SDK live option
-   snapshots or (ii) Schwab chain quotes at 1-min cadence. If neither works,
-   v3.0 CANNOT go live — there is no spot-proxy fallback for fills, because
-   that would fork live vs backtest semantics (the sin this upgrade removes).
-5. **NBBO timing convention pinned**: the fill test uses the minute's NBBO as
-   served by the 1-min series; live uses the post-bar-close snapshot. Same
-   convention both paths, documented once.
-6. **TierPolicy gains one field** (`fill_mode: limit | spot_touch`) instead of
-   scattered conditionals; price tier = spot_touch (quarantined as ever).
+Task 16a freezes, in the spec, before any v3 rehearsal runs:
+- **Criteria FORM:** inherited unchanged from R9 v2.3 (structure, not
+  numbers) + the $-risk lines replacing SPX-point lines per §4.
+- **Sample minimums:** carried over UNCHANGED (B ≥ 20 qualifying signals, A ≥
+  8 episodes) — qualifying semantics don't change; no re-derivation, no
+  judgment.
+- **Fill-rate floors formula:** floor = max(0.10, point estimate − 1
+  day-clustered bootstrap SD), rounded DOWN to 0.05. Bootstrap resamples with
+  zero entries for a branch are dropped from that branch's SD; if > 30% of
+  resamples are empty the branch is pre-declared underpowered (reported).
+- **$-risk lines formula:** max single-trade loss cap = rehearsal p95 realized
+  loss rounded UP to $25; median scratch loss cap = rehearsal median × 1.5
+  rounded UP to $10.
+- Rounding, denominators, and the defect/re-run policy (a code defect found
+  after 16b → fix, re-run ONCE, document; a disliked number is not a defect).
+Then 16b runs the rehearsal ONCE and populates the numbers mechanically.
+Honesty note: we have seen v2.3 touch-fill rehearsal numbers but no v3
+limit-fill numbers; the pre-registration boundary is the first v3 run.
 
-**PM (risk & governance):**
-1. **Conservatism is the product.** Endorse leg-1 booking at bid/ask (never
-   mid) and fill test `ask ≤ L` / `bid ≥ L` (marketable = guaranteed). Limit
-   prices round to valid ticks AGAINST us (down for buys, up for sells) —
-   these puts trade on a 0.10 grid, so the credit knob is {0.00, 0.10, 0.20,
-   0.30} (tick-valid; 0.00 = any-credit baseline). (§2 R13.2 amended.)
-2. **Unfilled-leg risk becomes the dominant risk** under limit semantics (more
-   lone legs ride to clock/resolution). R9 re-registration MUST add two
-   pre-registered risk lines in OPTION dollars: median unfilled-leg realized
-   loss, and a max single-trade loss cap analogue. Numbers set in the same
-   one sitting as the fill thresholds.
-3. **Mechanical threshold derivation (anti-overfit)**: pre-commit the criteria
-   FORM first (same structure as today's R9); then derive numbers from the
-   v3.0 rehearsal by a stated rule — floor = point estimate minus one
-   day-clustered bootstrap SD, rounded down to 0.05 — no judgment pass, no
-   second look. (Task 16 amended.)
-4. **The $10 is the floor, not the objective.** The bomb's value is the owned
-   spread (max $500/lot); no criterion may reward avoiding completion. The
-   scorecard reports credits captured AND spreads planted, together.
+## 7. De-scoped (review-driven; 98% principle)
 
-**Joint verdict: APPROVED to proceed to red-team + codex-plan-review** with the
-amendments above. Scope is judged proportionate: one new data module, a
-pricing layer swap, scorecard re-derivation, two market-dependent spikes; the
-signal engine (features/rules) is untouched.
+- **No credit sweep knob.** The 0.10 credit is FROZEN. R13.2 gains nothing.
+- **No production SPX-touch diagnostic column.** The old-vs-new comparison is
+  computed once in the offline verification report.
+- No queue modeling, partial fills, multi-lot, intra-minute interpolation,
+  quote-persistence rules in the mechanic (a 2-consecutive-minute marketable
+  sensitivity is ONE diagnostic column in the rehearsal report only).
+
+## 8. Task plan (replaces draft §4; ordering is the contract)
+
+- [ ] 13. **ChainStore + pins**: full-day full-chain cache for the 8 sessions;
+      manifest; CONFIG gains chain-cache hash + SDK version. Tests: cache
+      determinism, hash guard, refusal on missing dates.
+- [ ] 14. **LIVE QUOTE SPIKE (before any pricing code — schedule risk lives
+      here)**: prove ONE of (i) SDK live option snapshots or (ii) Schwab chain
+      quotes, at 1-min cadence, for BOTH workloads: full-chain snapshot at a
+      signal minute AND two-strike freshness afterward, within the 5-s budget.
+      Neither works → STOP; v3.0 cannot go live (no fallback exists).
+- [ ] 15. **Gate-2 hand fixture** (written and hand-computed first), then the
+      pricing layer: Session quote attachment; RuleEngine `limit_filled` +
+      cancel arbitration; Executor booking + resting-limit state; R10.4
+      health; InstrumentSelector historical-chain path; schema v2; crash-
+      resume round-trip on v2 rows.
+- [ ] 16a. **Pre-registration freeze** (§6) — spec text + hashes committed.
+- [ ] 17. **Scorecard/controls v3**: $ metrics; controls_build → pinned
+      control frame; summarizer unchanged otherwise.
+- [ ] 16b. **One rehearsal run** → thresholds populated mechanically →
+      verification artifact v2 pinned.
+- [ ] 18. **Battery + parity gate**: full test battery; live/backtest parity
+      diff test as a SHAKEDOWN GATE — capture live snapshots for a session,
+      fetch the historical series next day, compare: 100% fill-decision
+      agreement and booked prices within 1 tick on ≥ 95% of minutes
+      (pre-registered tolerance; miss → investigate before the clock starts).
+- [ ] 19. **RUNBOOK/ops**: chain-cache freshness in morning check; quote-gap
+      lines documented; evening check verifies chain manifest hashes.
+
+## 9. Review trail
+
+Draft 1: Architect×PM amendments (Executor I/O-free, additive schema, tick
+grid, live hard gate) — incorporated. Red-team FAIL: R1.4/R11 contradiction,
+controls data contract, R7.6 invariant breach, cancel semantics, orphaned
+SPX-point metrics, NBBO flicker honesty, parity untested, cache unpinned,
+floor formula ill-defined at small n, leg-1 instant — ALL resolved in §§1–6.
+Codex-plan-review FAIL: R7.6 (same), t+1 look-ahead, precedence ownership,
+quote-failure semantics/denominators, unit mixing, control data volume,
+pre-registration discretion, verification circularity, task ordering,
+unapplied amendments, credit-sweep/touch-diagnostic overengineering — ALL
+resolved (de-scopes adopted in §7). Residual accepted risks: 1-min NBBO
+snapshot granularity (flicker) is mitigated by closing-snapshot convention +
+the sensitivity column, not eliminated; artifact reproducibility is
+cache-relative, not vendor-relative.
