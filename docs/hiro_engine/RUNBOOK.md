@@ -40,6 +40,10 @@ cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python -m hiro_engine live
 | `LATE — NO ENTRY` | Move too steep/late (R6.3) | Do NOT chase |
 | `SKIP …` | Signal fired but blocked (one leg / 3-day cap / veto) | Nothing |
 | `HIRO DOWN` | Feed lost: no new entries; cap/clock/resolution still guard the open trade (R10.1) | Watch your open leg manually |
+| `NO OPTION QUOTES — STAND DOWN` | Option feed lost (R10.4): no new entries even with no trade on; outage counts toward PARTIAL | Wait for restore; watch any open leg |
+| `quote_gap minute (N consecutive)` | The partner strike had no valid quote this minute; at 5 the resting limit cancels and the trade becomes unscored (`data_invalid`) | Nothing — the guards still run |
+| `resting limit CANCELED (...)` | An exit fired while the second leg was still resting — the order is pulled before the exit books | Cancel your own resting order too |
+| `ENTRY ... resting BUY/SELL @ <L>` | Leg 1 booked at real NBBO; the second leg RESTS at the +\$10-credit limit — a bomb only completes when that limit fills | Mirror it: place the same resting limit |
 | `scratch_unavailable` | Flow-based scratch can't be evaluated | Watch flow on the dashboard yourself |
 | `RESUME WARNING` | Restarted state disagrees with the log | Stop; inspect `paper_log.csv` before trusting signals |
 | loud `CONFIG_HASH CHANGED` block | Someone edited config.yaml | The 10-session test RESETS — only proceed deliberately |
@@ -59,6 +63,11 @@ rebuilds the open trade from the log, and continues. If you see
 ```bash
 ~/Dev/virtualenvs/gamma_chaser/bin/python scripts/hiro_engine/ops/evening_check.py
 ```
+
+**Shakedown parity gate (v3.0):** the morning AFTER each shakedown day run
+`cd scripts && python -m hiro_engine parity-check <date>` — it must PASS
+(100% fill-decision agreement, prices within 1 tick on ≥95% of minutes)
+before the next shakedown day. A FAIL stops the sequence.
 RED HIRO partition = run the backfill IMMEDIATELY (the vendor only retains ~5
 sessions; a missed day is gone forever):
 ```bash

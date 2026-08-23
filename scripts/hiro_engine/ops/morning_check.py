@@ -80,6 +80,17 @@ def main() -> int:
          + (f"VT={lv.vt} CW={lv.cw}" if lv.valid
             else "MISSING/INVALID -> engine enforces LONG-FIRST ONLY (R4.2)"),
          warn_only=True)
+    # v3.0: frozen chain cache integrity (pins enforced; a tampered byte is RED)
+    try:
+        from hiro_engine.chains import ChainStore
+        ChainStore().verify_frozen(cfg)
+        line(True, "chain cache (frozen 8)", "manifest + per-file sha256 match CONFIG pins")
+    except Exception as e:
+        line(False, "chain cache (frozen 8)", f"INTEGRITY FAIL: {e}")
+    spike = Path("docs/hiro_engine/spike_chain_live_result.json")
+    line(spike.exists(), "live-quote spike artifact",
+         "present" if spike.exists() else "MISSING — live stays REFUSED (task 14 gate)",
+         warn_only=True)
     cal = CalendarLoader(cfg.path_of("calendar_csv"))
     ev = cal.check(str(today))
     line(not ev.is_event_day, "event calendar",

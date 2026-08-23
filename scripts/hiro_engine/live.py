@@ -186,12 +186,28 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
     from .backtest import available_spx_days
     hist_days = [d for d in available_spx_days(cfg, era, day) if d < day]
     hist = build_range60_history(cfg, TIER_FULL, hist_days)
-    # v3.0: live REQUIRES the option-quote path, which is gated on the task-14
-    # spike + task-19 interlocks. Until those pass there is no live session.
+    # v3.0 LIVE-STARTUP INTERLOCKS (task 19 — mechanical, not textual):
+    # (a) the task-14 spike artifact must exist and say PASS;
+    # (b) the snapshot sidecar path must be writable.
+    spike_artifact = REPO_ROOT / "docs/hiro_engine/spike_chain_live_result.json"
+    if not spike_artifact.exists():
+        raise SystemExit(
+            "live REFUSED: no chain-spike PASS artifact "
+            f"({spike_artifact}). Run scripts/hiro_engine/spike_chain_live.py "
+            "during market hours first (task 14; hard gate, no fallback exists).")
+    import json as _json
+    if _json.load(open(spike_artifact)).get("verdict") != "PASS":
+        raise SystemExit("live REFUSED: the chain spike artifact says FAIL (task 14).")
+    sidecar_path = REPO_ROOT / f"docs/replay/hiro/live_quotes_{day}.parquet"
+    try:
+        sidecar_path.parent.mkdir(parents=True, exist_ok=True)
+        sidecar_path.with_suffix(".probe").write_text("ok")
+        sidecar_path.with_suffix(".probe").unlink()
+    except OSError as e:
+        raise SystemExit(f"live REFUSED: sidecar path not writable ({e}).")
     raise SystemExit(
-        "live mode is DISABLED pending the v3.0 live-quote spike (task 14) and "
-        "readiness interlocks (task 19): fills require real option quotes and "
-        "there is no SPX-proxy fallback by spec (R2.5/R10.4).")
+        "live mode wiring for v3.0 quotes lands with the spike validation — "
+        "interlocks passed structurally but the quote loop is not yet enabled.")
     session = Session(cfg, TIER_FULL, day, "live", log, range60_history=hist,
                       shakedown=shakedown, chain_available=chain.available, im=im)
     hiro = HiroPull()

@@ -156,9 +156,9 @@ def test_stage6_criteria_statuses(config, graded):
     t = {r.criterion: r for r in table.itertuples()}
     assert t["qualifying signals on >=7/10 sessions"].status == "PASS"     # 10/10
     assert t["1-3 executable entries on >=6/10 sessions"].status == "PASS"
-    # v3: threshold rows are PENDING until R9a registration (task 18)
-    assert "PENDING" in t["limit fills total"].status
-    assert "PENDING" in t["Branch B fill rate"].status
+    # v3 post-registration (task 18): thresholds come from CONFIG
+    assert t["limit fills total"].status == "FAIL"          # 8 fills < registered floor 11
+    assert t["Branch B fill rate"].status == "PASS"         # 0.667 >= registered 0.10
     assert t["<=3 entries/session"].status == "PASS"
     assert t["one leg at a time"].status == "PASS"
     assert t["Branch B qualifying signals"].status == "PASS"                # 22 >= 20

@@ -136,6 +136,11 @@ def main(argv=None) -> int:
     s.add_argument("--from", dest="date_from"); s.add_argument("--to", dest="date_to")
     s.set_defaults(fn=cmd_scorecard)
 
+    pc = sub.add_parser("parity-check"); _common(pc)
+    pc.add_argument("day")
+    pc.set_defaults(fn=lambda a: __import__("hiro_engine.parity", fromlist=["run_parity_cli"])
+                    .run_parity_cli(load_config(a.config), a.day))
+
     rg = sub.add_parser("register-thresholds"); _common(rg)
     rg.add_argument("--log", default=None)
     rg.set_defaults(fn=lambda a: __import__("hiro_engine.register", fromlist=["run_register"])
