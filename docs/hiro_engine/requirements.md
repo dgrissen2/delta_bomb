@@ -118,11 +118,11 @@ without human fudging — whether this strategy earns the next stage**.
 
 ## R6. Entries
 - **R6.1 Branch A (long-first; primary — wins same-bar ties):** fire when ALL of: (i) range60 ≥ range60_pct;
-  (ii) r30 < 0; (iii) bounce30 ≥ 3 pts; (iv) close < mid30. Action: BUY the −0.20Δ put at the next bar's open;
-  rest the SELL of K−5 at (cost + 0.10) limit on the bid side.
+  (ii) r30 < 0; (iii) bounce30 ≥ 3 pts; (iv) close < mid30. Action: BUY the −0.20Δ put at the entry bar, BOOKED per
+  R1.4(b) (entry bar's closing NBBO ask); rest the SELL of K−5 at (fill1 + 0.10) per R1.4(c).
 - **R6.2 Branch B (sell-first; only if no R4 veto blocks shorts):** ARM when pull30 ≥ 3 pts AND the run has:
   dur ≥ 10 min, rate ≥ 2 $B/hr, ΔC > 0 ∧ ΔP > 0 with min(ΔC, ΔP) ÷ max(ΔC, ΔP) ≥ 0.25, ΔN > 0 with share ≥ 0.5, and run drawdown < 0.6 $B (implied by an unbroken run; stated for explicitness). GATES: r15 > 0; time ≤ 14:30; weak side ≥ 0.15 $B. Action: SELL the −0.20Δ put at the
-  next bar's open (limit at current bid); rest the BUY of K+5 at (sale − 0.10) limit on the ask side.
+  entry bar, BOOKED per R1.4(b) (entry bar's closing NBBO bid); rest the BUY of K+5 at (fill1 − 0.10) per R1.4(c).
 - **R6.3 Late-state suppression:** if rate ≥ 4 $B/hr AND r30 ≥ 1.0 $B, suppress Branch B entries (one
   `LATE — NO ENTRY` line per episode).
 - **R6.4 Limits:** one unpaired leg at a time; ≤ 3 entries/day; one entry per episode (R3.5); A beats B on the
@@ -147,7 +147,7 @@ without human fudging — whether this strategy earns the next stage**.
   entry minute. (The retired ±3.0 SPX touch survives NOWHERE in production; price tier uses its own
   legacy screen per R13.1, stamped and quarantined.)
 - **R7.2** Flow-shutoff scratch (Branch B only): within 3 minutes of entry, L drops ≥ 0.3 $B below its entry
-  value OR the run breaks, before the fill touch → scratch at the next bar's open. **Branch A has NO scratch**
+  value OR the run breaks, before the resting limit fills (R1.4d) → scratch, booked per R7.0. **Branch A has NO scratch**
   (v2.3): its exits are R7.1/R7.3/R7.5/R7.6 exactly as researched. *Standing rule: no exit may trigger off the
   same variable as its entry condition, and no rule enters this spec without a backtest showing it saves more
   than it costs.* Pre-registered candidate (NOT active; requires stored-session backtest + spec edit before
@@ -156,7 +156,7 @@ without human fudging — whether this strategy earns the next stage**.
   (`cap`). The option-mid trigger is now computable in ALL tiers with chain data (R2.5); the 15.0-pt SPX
   spot proxy survives only as the quote-gap fallback (chain data missing at that bar — logged
   `cap_source=proxy`). Never convert by adding a different strike.
-- **R7.4** Veto exit: R4.3 activating while a short is carried → scratch it at the next bar's open (`veto_exit`).
+- **R7.4** Veto exit: R4.3 activating while a short is carried → exit the leg (`veto_exit`), booked per R7.0.
   State-flip exit (13:00 read only): mapping is by SIDE — an open sell-first leg exits if the 13:00 read is
   DOWN; an open long-first leg exits if it is UP; CHOP never triggers it. Applies regardless of when the leg
   was opened (in practice only 12:00–13:00 entries can still be open). Same-bar tie: `veto_exit` before
@@ -190,12 +190,15 @@ and not below its frozen clock-matched control (R11.4) · Branch A ≥ 8 qualify
 **«16b»** and ≥ +10 pp over its frozen midpoint-matched control (R11.5) · branches reported separately; a
 minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ «16b» on every
 trade** · **median scratch loss (R11.3, $) ≤ «16b»** · ≤ 1 scratch whose RESTING LIMIT would have filled
-within its remaining horizon absent the scratch (replayed from the pinned chain cache) · the RISK RE-CHECK
+within its ORIGINAL 60-minute horizon absent the scratch (pure limit replay from the pinned chain cache,
+no other R7 exits applied) · the RISK RE-CHECK
 holds: with the best session removed (best = most fills; ties → highest summed realized $ P&L; ties →
 earliest date), recompute over the remaining sessions' entries — the $ risk lines and the would-have-filled
 count still hold; thresholds unchanged, denominators reduced. A branch below its sample minimum is
-INCONCLUSIVE. `data_invalid` outcomes (R10.4) join no numerator or denominator and are reported separately.
-Any rule change resets the test. **«16b» markers are populated ONCE by the R9a mechanical derivation.**
+INCONCLUSIVE. `data_invalid` trades (R10.4): REMAIN executable entries for the entries-per-session
+criteria and the one-leg/3-day limits (they occupied the slot); are EXCLUDED from fill totals,
+sessions-with-fill, both fill-rate sides (R11.6), the $-risk lines, and the would-have-filled re-check;
+and are reported in their own column. Any rule change resets the test. **«16b» markers are populated ONCE by the R9a mechanical derivation.**
 
 ## R9a. Threshold pre-registration (FROZEN before the first v3.0 rehearsal run; hashed in CONFIG)
 - Criteria FORM: inherited unchanged from R9 v2.3 (structure above); $-risk lines replace SPX-point lines.
@@ -204,9 +207,11 @@ Any rule change resets the test. **«16b» markers are populated ONCE by the R9a
 - Fill-rate floors: floor = max(0.10, rehearsal point estimate − 1 day-clustered bootstrap SD), rounded
   DOWN to 0.05. Bootstrap resamples containing zero entries for a branch are dropped from that branch's
   SD; if > 30% of resamples are empty, the branch is pre-declared underpowered (reported as such).
-- Fills-total floor = rehearsal fills ÷ rehearsal countable sessions × 10, − 1 SD (same bootstrap),
-  rounded down to an integer ≥ 5; sessions-with-fill floor = rehearsal proportion − 1 SD, × 10, rounded
-  down, ≥ 5.
+- Count floors — ONE bootstrap procedure for both: resample countable rehearsal sessions with
+  replacement (2,000 draws, numpy default_rng(42)); per draw compute (i) fills_projected = total fills in
+  the draw × 10 ÷ sessions-per-draw, and (ii) prop = share of drawn sessions with ≥ 1 fill. Fills-total
+  floor = floor(mean(fills_projected) − 1·SD(fills_projected)), minimum 5. Sessions-with-fill floor =
+  floor(10 × (mean(prop) − 1·SD(prop))), minimum 5.
 - $-risk lines: max single-trade loss cap = rehearsal p95 realized loss rounded UP to $25; median scratch
   loss cap = rehearsal median × 1.5 rounded UP to $10.
 - Defect policy: a CODE defect found after the rehearsal → fix, re-run ONCE, document. A disliked number
@@ -222,18 +227,25 @@ Any rule change resets the test. **«16b» markers are populated ONCE by the R9a
 - **R11.2 Contextual SPX excursion (`spx_adverse_pts`, drives NOTHING in R9):** in SPX points against the
   completion direction, measured from S0, maximum over bars from the entry bar through the exit bar
   inclusive. Reported for continuity with prior research only.
-- **R11.3 Economic P&L ($ — drives R9):** completed bomb = +credit (≥ 0.10 by construction) plus the owned
-  spread (reported, not scored). Non-fill exit realized P&L = (leg-1 fill − exit booking) × side sign, in
-  option dollars per R7.0's conservative NBBO booking. Scratch loss = −realized P&L of a scratch, $.
-  `leg_liq_loss_usd` = the worst conservative liquidation of the lone leg vs its leg-1 fill over the
-  trade's life (heartbeats print both families).
+- **R11.3 Economic P&L ($ — drives R9; contract multiplier 100, 1-lot):**
+  Non-fill exit realized P&L in POINTS = sell-first: fill1 − (exit buy-back price); long-first: (exit sale
+  price) − fill1. **Realized P&L in $ = points × 100.** Realized LOSS of a trade = max(0, −realized $ P&L).
+  A completed bomb contributes exactly +$10 realized (the credit; the owned spread's value is reported,
+  never scored). Summed realized $ P&L of a session (best-session tie-break) = Σ non-fill exit $ P&L +
+  $10 × fills. Scratch loss ($) = realized loss of a scratch. `leg_liq_loss_usd` = the worst mark-to-
+  conservative-NBBO liquidation of the lone leg vs its leg-1 fill over the trade's life, in $ (heartbeats
+  print both families).
 - **R11.4 Frozen clock-matched control (Branch B):** a deterministic FUNCTION computed by `scorecard` at grading
   time: over the frozen control dataset (the eight research sessions 2026-08-12..21, fixed forever, identified
   in CONFIG by path + data hash), take every minute 10:00–14:30 with a complete 60-min horizon; weight minutes
   to match the clock-minute distribution of the test's Branch-B executable entries; control = weighted mean
-  of the v3.0 LIMIT-FILL indicator: "a trade entered per R1.4 at that minute — own strike pick, own limit —
-  fills within its complete, data-valid horizon", precomputed ONCE by the `controls_build` job over the
-  pinned chain cache and persisted as a hash-pinned derived control frame (sha256 in CONFIG). Candidate
+  of the v3.0 LIMIT-FILL indicator: treat the candidate minute as a SIGNAL minute t — strike pick from
+  t's chain snapshot, leg 1 booked per R1.4(b) at t+1, limit per R1.4(c), fills tested per R1.4(d) —
+  indicator = 1 iff the limit fills within min(60 minutes, session end) of the entry minute, **with NO R7
+  exits applied** (a pure fill-probability baseline, exactly parallel to the old touch control). Complete
+  data-valid horizon required (no quote_gap ≥ 5 min inside it). Precomputed ONCE by the `controls_build`
+  job over the pinned chain cache and persisted as a hash-pinned derived control frame (sha256 in CONFIG).
+  Candidate
   eligibility mirrors trade rules (valid quotes at its execution minute, partner listed, complete
   data-valid horizon); ineligible minutes are excluded and counted in the frame's manifest. Deterministic
   given the test log + the pinned frame.
@@ -282,11 +294,18 @@ Any rule change resets the test. **«16b» markers are populated ONCE by the R9a
 - **R10.3** Cumulative outage > 15 minutes inside 10:00–14:30 (HIRO, SPX, or option-quote outages combined),
   or bars ending before 15:55 → session PARTIAL.
 - **R10.4 Option-quote health (v3.0 — fail closed; NEVER an SPX fill fallback):**
-  no valid quote at the execution bar → entry ABORTED (`entry_aborted_no_quote`; the signal still counts as
-  qualifying per R11.1; the aborted entry joins neither side of R11.6) · quote gap while a limit rests →
-  minutes logged `quote_gap`; a gap ≥ 5 consecutive minutes while a trade is open → outcome `data_invalid`
-  (excluded from both sides of R11.6, reported separately); fill status is never guessed across a gap ·
-  exit booking with no fresh quote → book at the last valid NBBO if ≤ 3 minutes old, else `data_invalid` ·
+  **Quote validity**: a strike's quote at a minute is VALID iff bid > 0 AND ask ≥ bid (locked ok, crossed
+  or zero-bid invalid). At the entry bar, BOTH working strikes (K and K±5) must have valid quotes in the
+  closing snapshot, else the entry is ABORTED (`entry_aborted_no_quote`; the signal still counts as
+  qualifying per R11.1; the aborted entry joins neither side of R11.6). · While a limit rests, a minute
+  whose working-strike quote is missing/invalid is a `quote_gap` minute (no fill decision that minute);
+  **on the 5th consecutive quote_gap minute of an open trade the engine CANCELS the resting limit
+  (`limit_canceled`, reason quote_gap) and labels the trade's eventual outcome `data_invalid`** — the
+  position itself remains open under the surviving guards (R7.3 spot-fallback cap, R7.5 clock, R7.6
+  resolution) and still occupies the one-leg lock and the 3/day count until it closes. · Exit booking with
+  no valid quote at bar j+1 → book at the last valid NBBO if ≤ 3 minutes old, else the exit itself is
+  booked `data_invalid` (position closed administratively at the last valid NBBO regardless, so no
+  position survives; the trade is unscored). ·
   live loss of option quotes → stand down from NEW entries (banner), keep cap(spot fallback)/clock/
   resolution guards on any open leg.
 
