@@ -191,7 +191,9 @@ and not below its frozen clock-matched control (R11.4) · Branch A ≥ 8 qualify
 minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ «16b» on every
 trade** · **median scratch loss (R11.3, $) ≤ «16b»** · ≤ 1 scratch whose RESTING LIMIT would have filled
 within its ORIGINAL 60-minute horizon absent the scratch (pure limit replay from the pinned chain cache,
-no other R7 exits applied) · the RISK RE-CHECK
+no other R7 exits applied; single invalid/missing minutes are skipped with no fill decision; a gap ≥ 5
+consecutive minutes inside the replay makes that counterfactual INDETERMINATE — excluded from this count
+and reported in its own column, never guessed) · the RISK RE-CHECK
 holds: with the best session removed (best = most fills; ties → highest summed realized $ P&L; ties →
 earliest date), recompute over the remaining sessions' entries — the $ risk lines and the would-have-filled
 count still hold; thresholds unchanged, denominators reduced. A branch below its sample minimum is
@@ -295,7 +297,10 @@ and are reported in their own column. Any rule change resets the test. **«16b»
   or bars ending before 15:55 → session PARTIAL.
 - **R10.4 Option-quote health (v3.0 — fail closed; NEVER an SPX fill fallback):**
   **Quote validity**: a strike's quote at a minute is VALID iff bid > 0 AND ask ≥ bid (locked ok, crossed
-  or zero-bid invalid). At the entry bar, BOTH working strikes (K and K±5) must have valid quotes in the
+  or zero-bid invalid). **Freshness**: entry booking and fill decisions use ONLY the quote OF that minute
+  (backtest: the 1-min series row for minute m; live: the snapshot taken after bar m closes) — quote_age =
+  0 for decisions, no carry-forward ever. The ≤ 3-minute last-valid-NBBO allowance applies SOLELY to exit
+  BOOKING (below), never to entries or fills. At the entry bar, BOTH working strikes (K and K±5) must have valid quotes in the
   closing snapshot, else the entry is ABORTED (`entry_aborted_no_quote`; the signal still counts as
   qualifying per R11.1; the aborted entry joins neither side of R11.6). · While a limit rests, a minute
   whose working-strike quote is missing/invalid is a `quote_gap` minute (no fill decision that minute);
@@ -374,10 +379,10 @@ and are reported in their own column. Any rule change resets the test. **«16b»
 **THE SYSTEM SHALL** abort the entry / mark the outcome `data_invalid` / book at the last <= 3-min-old NBBO respectively, and never substitute an SPX-based fill.
 
 **WHEN** R7.2 triggers
-**THE SYSTEM SHALL** record `scratch` at the next bar's open.
+**THE SYSTEM SHALL** record `scratch`, booked per R7.0 (close-of-bar j+1 NBBO, conservative side).
 
 **WHEN** R7.4 triggers (veto activation while carrying a short, or an opposite 13:00 read)
-**THE SYSTEM SHALL** exit at the next bar's open recording `veto_exit` / `state_flip` respectively.
+**THE SYSTEM SHALL** exit per R7.0 booking, recording `veto_exit` / `state_flip` respectively.
 
 **WHEN** R7.3 triggers
 **THE SYSTEM SHALL** record `cap`, logging whether option mid or spot proxy was used.
