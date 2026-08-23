@@ -160,3 +160,41 @@ runs further, its final surge is usually the top, so the rule dumps us at the
 worst possible price right before the drop we paid for (Example 2). Eight
 trades were canceled this way across the test; **all eight** would have hit
 their 3-point target in time; the rule saved nothing and cost 38 points.
+
+---
+
+## Charlie × CIO joint review — the simple fix (2026-08-23)
+
+**Charlie (flows):** The pop you're buying into on these days is mechanical —
+a squeeze in a heavy tape. Squeezes *overshoot by construction*; a pop ticking
+past its old high is the signature of the squeeze burning out, not of a trend
+change. So a cancel rule keyed to "the pop made a new high" is keyed to noise
+at best and to the exact top at worst — the data showed both. Iron rule: **an
+exit must watch a DIFFERENT dial than the entry.** You entered on price
+(the bounce); if you ever want an invalidation, it has to be flow (the
+negative 30-minute HIRO reading flipping hard positive) or structure (price
+reclaiming the range midpoint) — never the bounce itself.
+
+**CIO (what ships):** Three tests for any rule: implementable, backtested,
+scales. The bounce-high scratch fails test two — it was never run before it
+was frozen, and the first time it WAS run it destroyed the strategy it was
+guarding. The protections that were researched — the 15-point hard cap, the
+60-minute clock, the 15:30 close-everything — bounded every trade in the
+rehearsal without help. Buffers, trailing versions, time-boxes: all rejected,
+no version saves a single point in the data. And we will not swap in the
+midpoint check today either — that would repeat the original sin of shipping
+an untested rule because it sounds sensible.
+
+**THE FIX (three lines):**
+1. **Delete the bounce-high scratch.** The down-bet keeps exactly the exits
+   the research validated: hit the target, hard 15-point stop, 60-minute
+   clock, everything closed by 15:30. Nothing else.
+2. **New standing rule for the spec:** no exit may trigger off the same
+   variable as its entry, and no rule enters the frozen document without a
+   backtest that shows it saving more than it costs. One sentence, permanent.
+3. **Park the midpoint check as a pre-registered candidate.** Test it on the
+   stored sessions first; it gets in later only if the numbers say so.
+
+Cost of doing this now: a one-line spec edit and a config change, which resets
+a 10-session test that hasn't started. Cost of not doing it: the rehearsal
+numbers, live.
