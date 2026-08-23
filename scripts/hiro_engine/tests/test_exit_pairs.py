@@ -104,3 +104,28 @@ def test_exit_pair(config, name, winner, tkw, rkw):
     decisions = [e for e in evs if e.event_type == "exit_decision"]
     assert len(decisions) == 1, f"{name}: expected one decision"
     assert decisions[0].outcome_type == winner, name
+
+
+def test_a_breach_plus_cap_cap_wins(config):
+    """codex v2.3 finding 3: with no A-scratch, the cap is the load-bearing
+    protective exit on an A leg — a bounce-high breach AND a 15-pt adverse
+    close on the same bar -> cap fires (nothing else)."""
+    tr = _trade(side="long_first", branch="A", entry_min=700, s0=100.0,
+                target=97.0, bh_level=100.5)
+    st = EngineState(open_trade=tr)
+    row = mk_row(710, close=116.0, high=116.5, low=99.0)   # breach + 16 pts against
+    evs = RuleEngine(config, TIER_FULL).evaluate(row, st)
+    d = [e for e in evs if e.event_type == "exit_decision"]
+    assert len(d) == 1 and d[0].outcome_type == "cap"
+
+
+def test_bh_level_telemetry_split(config):
+    """v2.3 telemetry contract: the A SIGNAL event carries bh_level as a
+    diagnostic; the pending entry (and therefore the trade) does NOT."""
+    from helpers import a_fire_row
+    evs = RuleEngine(config, TIER_FULL).evaluate(a_fire_row(700, bh_level=101.25),
+                                                 EngineState())
+    sig = next(e for e in evs if e.event_type == "signal")
+    pend = next(e for e in evs if e.event_type == "pending_entry")
+    assert sig.bh_level == 101.25
+    assert pend.bh_level is None
