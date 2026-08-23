@@ -96,58 +96,67 @@ The general lesson is the one that never gets old: it does not matter how sensib
 
 ---
 
-## Walkthrough — two real scratches, bar by bar (what the variables said, and what happened)
+## Walkthrough — two real scratches, in plain English
 
-**Remember the trade's direction first**: Branch A buys a ~20-delta SPX **put**
-(that is the "long-first" leg — long the put). It wins when SPX **drops 3
-points** from our entry mark (S0), letting us sell the put 5 strikes lower and
-complete the vertical for roughly free. The entry deliberately buys the put
-while price is *bouncing up* (bounce30 ≥ 3 pts off the 30-bar low) — a bounce
-makes the put cheaper — as long as the tape still looks heavy: 30-minute HIRO
-flow negative (r30 < 0), price still below the middle of the last 30 bars
-(close < mid30), on a big-range day (range60 ≥ its 75th percentile). The BH
-scratch rule then says: BH = the highest HIGH printed between the 30-bar low
-and our signal bar; if any bar after entry ticks ABOVE that high, abandon ship.
+### First, the bet itself — no jargon
 
-### Example 1 — 2026-08-18, signal 11:03 (the tripwire-at-your-forehead case)
+**We are trying to catch a DOWNSWING. Full stop.** Branch A is a bet that the
+S&P is about to fall. We win when the index drops 3 points from where we got
+in. That's the whole game: get in, market falls 3 points, we're done, paid.
 
-What the variables said at 11:03: the 30-bar close low was 7695.36, printed at
-**11:01 — just two minutes earlier**. Signal close 7699.95, so bounce30 = 4.59
-(≥ 3 ✓); mid30 = 7702.90, close below it ✓; flow negative ✓. Because the low
-was only 2 minutes old, BH = the highest high of a **three-minute window**
-(11:01–11:03) = **7700.42** — sitting 0.47 pts above our close. We entered at
-11:04's open: S0 = 7700.06, needing 7697.06 (−3) to win, scratching above
-7700.42 (+0.36). Read that again: the rule gave the trade **0.36 points of
-breathing room upward** against a 3-point objective downward. The 11:04 entry
-bar itself printed a high of 7702.50 — through BH by 2.08 — so the trade was
-condemned *on its own entry bar*, and we exited at 11:05's open, 7701.84, for
-−1.78. What happened next: the bounce exhausted and SPX hit 7697.06 at **11:09
-— five minutes after entry**. No scratch → +3.00 fill. The scratch converted a
-five-minute winner into a loss because "the bounce continued for one more bar,"
-which is exactly what the entry rule (buy INTO a bounce) makes likely.
+**So why do we get in while the market is popping UP?** Timing. On the days
+this setup looks for, the market is grinding lower all day but keeps making
+little 3-4 point pops upward along the way — like a ball bouncing as it goes
+down the stairs. Our bet (a put option) gets **cheaper** during each little
+pop. So the play is: wait for one of those pops, buy the down-bet near the top
+of the pop at a discount, then collect when the slide resumes. Buying during
+the pop is not a mistake — it IS the strategy. The pop is our entrance, the
+slide is our payday.
 
-### Example 2 — 2026-08-20, signal 10:50 (the "even with room, it hurts you" case)
+**Now the broken rule.** Someone added a safety rule that says: look at the
+highest price the pop has reached so far; if the market goes even ONE TICK
+above that, assume the pop is actually a real rally, panic, and cancel the
+bet. Sounds reasonable — until you remember we *deliberately entered near the
+top of the pop*. The pop's high is basically where we're standing when we walk
+in. So "one tick above the pop's high" is usually a coin-flip away — the
+scratched trades had a median of **0.13 points** of headroom, on an index that
+wiggles more than that every single minute. We ask the market to fall 3 points
+without ever wiggling up a dime first. Markets don't move like that.
 
-This one had real clearance, and it was still wrong. At 10:50: 30-bar low
-7679.85 (10:21), close 7686.32, bounce30 = 6.47, mid30 = 7686.53 (barely
-below ✓). BH over 10:21–10:50 = **7693.65**, a healthy 7.33 pts above the
-close. Entry 10:51 at S0 = 7686.34, target 7683.34. Then the bounce kept
-running: ten minutes later, at 11:01, SPX spiked to 7698.82 — through BH by
-5.17 — and the rule dumped us at 11:02's open, **7697.91**, for **−11.57**,
-the single worst print of the entire rehearsal (and the one "adverse > 10"
-event in the test — *created by this exit*). What happened next: that spike
-was the top. SPX rolled straight over and touched 7683.34 at **11:09 — seven
-minutes after our forced exit**, eighteen minutes after entry, well inside the
-60-minute clock. No scratch → we ride 12 points of paper drawdown (still under
-the 15-point cap, which exists precisely for this) and collect +3.00. The
-scratch didn't just miss the win — it *locked in the exact worst moment* of a
-trade that the cap and the clock were already protecting.
+### Example 1 — Aug 18, 11:03am: canceled by a wiggle, paid off 5 minutes later
 
-**The pattern in one sentence**: the entry rule requires price to be near the
-top of a fresh bounce, so BH is almost always a whisker overhead (median 0.13
-pts on the scratched trades) and the "invalidation" fires on noise; and even
-when BH is far away (Example 2), piercing it marks the bounce's *exhaustion* —
-statistically the best moment to be short — so the rule systematically sells
-the put back at bounce tops, right before the drop it was bought for. Across
-all 8 scratches: every one reached its −3 target within the horizon; total
-surrendered, 38.1 points.
+The market had been sliding, bottomed at 7695 around 11:01, and popped ~4.5
+points up — our discount window. At 11:04 we bought the down-bet with the
+market at **7700**. To win we needed **7697** (3 points down). The cancel line
+— the pop's high so far — was **7700.42**. Look at those numbers: we needed
+the market to fall 3.00 points, but the rule canceled us if it rose **0.36**
+first. In the very first minute the market wiggled up to 7702.50 — pops
+overshoot, that's what pops do — cancel triggered, out at a 1.78-point loss.
+And then? The pop died, the slide resumed, and the market hit 7697 at
+**11:09 — five minutes after we entered**. The win was sitting right there.
+The rule threw it away because a 4-point pop briefly became a 6-point pop.
+
+### Example 2 — Aug 20, 10:50am: the rule sold the exact top
+
+Here the cancel line wasn't a whisker away — it was 7+ points up, at 7693.65.
+Room to breathe, right? We bought the down-bet at **7686**, needing **7683**.
+The pop kept climbing — 10 minutes later it spiked to 7698.82, through the
+cancel line — and the rule dumped us at **7698**, a **BRUTAL 11.6-point loss**,
+the single worst print of the whole test. Here's the sickening part: that
+spike WAS the top. The very thing that triggered the cancel — the pop running
+out of steam in one last surge — is the classic look of a pop *ending*. The
+market rolled straight over and hit our 7683 target **seven minutes after the
+rule kicked us out**. And we didn't even need the rule for protection: we
+already carry a hard stop at 15 points against us and a 60-minute time limit.
+The market never got near either. The "safety" rule didn't prevent the big
+loss — it **manufactured** it, by selling at the exact top and skipping the
+payoff.
+
+### The one-sentence takeaway
+
+We enter during pops on purpose, so a rule that panics "when the pop goes any
+higher" cancels us on routine noise (Example 1) — and when the pop genuinely
+runs further, its final surge is usually the top, so the rule dumps us at the
+worst possible price right before the drop we paid for (Example 2). Eight
+trades were canceled this way across the test; **all eight** would have hit
+their 3-point target in time; the rule saved nothing and cost 38 points.
