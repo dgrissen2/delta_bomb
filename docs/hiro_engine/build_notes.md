@@ -135,3 +135,23 @@ Red-team bp2 (same milestone, ran in parallel with codex): findings 1–3 and
   gapless, so row offset == minute offset on the control dataset (no change).
 - Chain wiring (Schwab option-mid cap / debit resolution / IM straddle) remains
   OPEN, needs a live session; live runs proxy-mode with a loud banner until then.
+
+
+## ThetaData access correction (2026-08-23, user direction)
+
+- live.py now uses the **ThetaData Python SDK** (`ThetaClient(creds_file=
+  ~/Dev/ThetaData/creds.txt)`, project convention per fetch_nvda_1m.py) instead
+  of raw REST against a local terminal — the v3 SDK authenticates directly, no
+  terminal process at all. Verified: SDK SPX 1-min == stored parquet exactly
+  (2026-08-20, 391 bars, 0 diff).
+- **SPY stock history is PERMISSION_DENIED on the current index-only ThetaData
+  subscription** → live sessions run the spec'd DEGRADED_VWAP path (R3.4 →
+  CHOP), logged once. No practical impact while the chain (and hence IM) is
+  unwired — context reads were CHOP regardless. Options if wanted later:
+  ThetaData stock tier, or Schwab price_history as the SPY source (spec edit).
+- **2026-08-21 SPX parquet stays truncated (15:27) FOREVER**: it is part of the
+  R11.4 frozen control dataset ("fixed forever", hash-pinned in config).
+  Yesterday's note suggesting a refresh was wrong — refreshing would invalidate
+  the control-data pin and potentially the verification artifact. Ops scripts
+  now exempt frozen control days from the completeness RED and say
+  "hash-pinned, DO NOT refresh".

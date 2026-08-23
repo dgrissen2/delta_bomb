@@ -1,9 +1,13 @@
-"""Live plumbing (task 7): ThetaData SPX/SPY bars, HIRO snapshot via the
+"""Live plumbing (task 7): ThetaData Python SDK SPX/SPY bars (v3 SDK,
+creds-file auth direct to ThetaData — NO local terminal), HIRO snapshot via the
 logged-in Chrome CDP session (IMPORTED from HIRO_finder — not copied, DRY
 ledger), optional Schwab chain adapter, and the live session loop.
 
-Requires: ThetaData terminal up (localhost:25510); Chrome with
---remote-debugging-port=9222 logged in to dashboard.spotgamma.com.
+Requires: ~/Dev/ThetaData/creds.txt; Chrome with --remote-debugging-port=9222
+logged in to dashboard.spotgamma.com.
+Note: SPY stock history needs a paid ThetaData stock tier — on the current
+index-only subscription the SDK returns PERMISSION_DENIED and the engine runs
+the spec'd DEGRADED_VWAP path (R3.4 -> CHOP), logged once per session.
 Run via: python -m hiro_engine live [--shakedown]
 """
 from __future__ import annotations
@@ -16,7 +20,6 @@ from typing import Any, Optional
 from zoneinfo import ZoneInfo
 
 import pandas as pd
-import requests
 
 from .config import REPO_ROOT, Config
 from .eventlog import EventLog
@@ -25,41 +28,65 @@ from .models import Bar, Event, SpyBar, TIER_FULL
 from .session import Session, build_range60_history
 
 ET = ZoneInfo("America/New_York")
-THETA = "http://127.0.0.1:25510"
+THETA_CREDS = Path("~/Dev/ThetaData/creds.txt").expanduser()
 HIRO_FINDER = Path("~/Dev/HIRO_finder").expanduser()
 SYMBOL = "S&P 500"
 CDP_PORT = 9222
 
 
 # ---------------------------------------------------------------------------
-# ThetaData (R2.1 / R2.6): re-request today's history each minute — simple,
-# stateless, and self-healing after a stall.
+# ThetaData (R2.1 / R2.6) via the Python SDK (project convention — see
+# scripts/fetch_nvda_1m.py): ThetaClient(creds_file=...) talks directly to
+# ThetaData; re-request today's history each minute — stateless, self-healing.
 # ---------------------------------------------------------------------------
-def _theta_bars(url: str, params: dict) -> pd.DataFrame:
-    r = requests.get(url, params=params, timeout=4)
-    r.raise_for_status()
-    j = r.json()
-    cols = [c.lower() for c in j["header"]["format"]]
-    return pd.DataFrame(j["response"], columns=cols)
+_theta_client = None
+
+
+def theta_client():
+    global _theta_client
+    if _theta_client is None:
+        from thetadata import ThetaClient
+        _theta_client = ThetaClient(creds_file=str(THETA_CREDS))
+    return _theta_client
+
+
+def _to_min_frame(resp, keep_volume: bool = False) -> pd.DataFrame:
+    df = resp.to_pandas() if hasattr(resp, "to_pandas") else pd.DataFrame(resp)
+    ts = pd.to_datetime(df.timestamp)
+    df["min"] = (ts.dt.hour * 60 + ts.dt.minute).astype(int)
+    cols = ["min", "open", "high", "low", "close"] + (["volume"] if keep_volume else [])
+    return df[cols]
 
 
 def spx_bars_today(day: str) -> pd.DataFrame:
     """Completed SPX 1-min bars for `day`, columns min/open/high/low/close."""
-    ymd = day.replace("-", "")
-    df = _theta_bars(f"{THETA}/v2/hist/index/price", dict(
-        root="SPX", start_date=ymd, end_date=ymd, ivl=60000)) \
-        if False else _theta_bars(f"{THETA}/v2/hist/index/ohlc", dict(
-            root="SPX", start_date=ymd, end_date=ymd, ivl=60000))
-    df["min"] = (df.ms_of_day // 60000).astype(int)
-    return df[["min", "open", "high", "low", "close"]]
+    d = dt.date.fromisoformat(day)
+    resp = theta_client().index_history_ohlc(symbol="SPX", start_date=d, end_date=d,
+                                             interval="1m")
+    return _to_min_frame(resp)
+
+
+_spy_denied = False
 
 
 def spy_bars_today(day: str) -> pd.DataFrame:
-    ymd = day.replace("-", "")
-    df = _theta_bars(f"{THETA}/v2/hist/stock/ohlc", dict(
-        root="SPY", start_date=ymd, end_date=ymd, ivl=60000))
-    df["min"] = (df.ms_of_day // 60000).astype(int)
-    return df[["min", "open", "high", "low", "close", "volume"]]
+    """SPY 1-min OHLCV. Needs a ThetaData stock subscription; PERMISSION_DENIED
+    -> empty frame (engine degrades per R3.4/R10, logged as DEGRADED_VWAP)."""
+    global _spy_denied
+    if _spy_denied:
+        return pd.DataFrame(columns=["min", "open", "high", "low", "close", "volume"])
+    d = dt.date.fromisoformat(day)
+    try:
+        resp = theta_client().stock_history_ohlc(symbol="SPY", interval="1m",
+                                                 start_date=d, end_date=d)
+        return _to_min_frame(resp, keep_volume=True)
+    except Exception as e:
+        if "PERMISSION_DENIED" in str(e) or "subscription" in str(e).lower():
+            _spy_denied = True
+            print("[live] SPY history not in the ThetaData subscription — "
+                  "running DEGRADED_VWAP (context reads = CHOP)")
+            return pd.DataFrame(columns=["min", "open", "high", "low", "close", "volume"])
+        raise
 
 
 # ---------------------------------------------------------------------------

@@ -67,9 +67,12 @@ def main() -> int:
     if spx.exists():
         import pandas as pd
         last_bar = int(pd.read_parquet(spx)["min"].max())
-        line(last_bar >= 955, "SPX capture completeness",
+        frozen = day in cfg.control_days
+        line(last_bar >= 955 or frozen, "SPX capture completeness",
              f"ends {last_bar // 60:02d}:{last_bar % 60:02d}"
-             + ("" if last_bar >= 955 else " -> INCOMPLETE, refresh from ThetaData"))
+             + (" (frozen control day — hash-pinned, DO NOT refresh)" if frozen and last_bar < 955
+                else "" if last_bar >= 955 else " -> INCOMPLETE, refresh from ThetaData"),
+             warn_only=frozen)
     log_p = Path(cfg.get("logging", "paper_log"))
     log_p = log_p if log_p.is_absolute() else REPO_ROOT / log_p
     if log_p.exists():

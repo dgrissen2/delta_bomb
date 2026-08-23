@@ -62,10 +62,13 @@ def main() -> int:
     if latest_spx:
         import pandas as pd
         last_bar = int(pd.read_parquet(Path(spx_dir) / f"{latest_spx[-1]}.parquet")["min"].max())
-        line(last_bar >= 955, "SPX capture completeness",
-             f"{latest_spx[-1]} ends {last_bar // 60:02d}:{last_bar % 60:02d} "
-             + ("" if last_bar >= 955 else "-> INCOMPLETE, refresh from ThetaData "
-                "(feeds the live range60 pool!)"))
+        frozen = latest_spx[-1] in cfg.control_days
+        line(last_bar >= 955 or frozen, "SPX capture completeness",
+             f"{latest_spx[-1]} ends {last_bar // 60:02d}:{last_bar % 60:02d}"
+             + (" (frozen control day — hash-pinned, DO NOT refresh)" if frozen and last_bar < 955
+                else "" if last_bar >= 955 else
+                " -> INCOMPLETE, refresh from ThetaData (feeds the live range60 pool!)"),
+             warn_only=frozen)
     lv = LevelsLoader(cfg.path_of("levels_csv")).load(str(today))
     line(lv.valid, "SG levels", f"row for {today}: "
          + (f"VT={lv.vt} CW={lv.cw}" if lv.valid
@@ -81,7 +84,13 @@ def main() -> int:
          f"{len(month_rows)} manual rows for {str(today)[:7]} "
          "(empty -> add release dates to docs/hiro_engine/event_calendar.csv)",
          warn_only=True)
-    line(port_open(25510), "ThetaData terminal", "port 25510")
+    try:
+        import datetime as _dt
+        from hiro_engine.live import spx_bars_today
+        n = len(spx_bars_today(str(prev)))
+        line(n > 300, "ThetaData SDK", f"{n} SPX bars for {prev} (creds-file auth, no terminal)")
+    except Exception as e:
+        line(False, "ThetaData SDK", f"pull failed: {e}")
     cdp = port_open(9222)
     line(cdp, "Chrome CDP", "port 9222 (--remote-debugging-port=9222)")
     if cdp:

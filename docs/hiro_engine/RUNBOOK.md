@@ -9,8 +9,9 @@ PAPER ONLY — the engine never places orders; you hand-execute in the broker.*
 cd ~/Dev/delta_bomb
 ~/Dev/virtualenvs/gamma_chaser/bin/python scripts/hiro_engine/ops/morning_check.py
 ```
-Fix every **RED** before starting (ThetaData terminal, Chrome with
-`--remote-debugging-port=9222` logged in to dashboard.spotgamma.com). WARNs are
+Fix every **RED** before starting (ThetaData SDK creds at `~/Dev/ThetaData/creds.txt`
+— no terminal needed — and Chrome with `--remote-debugging-port=9222` logged in
+to dashboard.spotgamma.com). WARNs are
 informational: missing levels row = engine trades long-first only today; empty
 CPI/FOMC month = add the release dates to `docs/hiro_engine/event_calendar.csv`
 (a wrong computed NFP Friday can be cleared with a row `date,none`).
