@@ -44,8 +44,14 @@ event objects, formatted twice.
         Loaded from config.yaml; sha256() = CONFIG_HASH. Frozen file checked into the repo.
 
     chains.py  (NEW, v3.0 — the ONLY module that touches option endpoints)
-        ChainStore: per-session full-chain full-day 1-min NBBO+greeks cache (one SDK pull/day,
-        manifest sha256 + SDK version pinned in CONFIG, R8.2); signal_snapshot(min) for the R1.2
+        ChainStore: per-session full-chain full-day 1-min NBBO+greeks cache (one SDK pull/day).
+        PIN SCOPING (R8.2): CONFIG pins the FROZEN REHEARSAL set only — the 8 control sessions'
+        cache manifest + the ControlFrame + the SDK version. Live sessions' chain data is NOT
+        CONFIG-pinned (pinning a rolling cache would reset the test daily); the live record's
+        authority is the event log + the per-session snapshot sidecar. CROSS-LINK: the ControlFrame
+        manifest records its source-cache manifest sha; scorecard verifies frame.source_sha ==
+        the pinned cache sha, so a re-fetched cache with a stale frame can never pass silently.
+        signal_snapshot(min) for the R1.2
         strike pick; strike_series(strike) for fills/exits; live: minute snapshots (SDK or Schwab —
         whichever the spike proves). QuoteView = the two working strikes' VALID quotes for ONE minute
         (R10.4 validity; quote_age=0 for decisions), attached to the tick by Session.
@@ -96,8 +102,16 @@ event objects, formatted twice.
         conditions+arbitration in rules.py, streak counting in session.py, state+booking in executor.py.
 
     eventlog.py
-        Event dataclass → one formatter for console, one CSV writer; same fields (R8.1). Append-only.
-        On startup with an existing file for today: replay it to rebuild EngineState (crash-resume).
+        Event dataclass → one formatter for console, one CSV writer; same fields (R8.1, schema_v=2
+        additive). Append-only. rebuild_state handles the v3 event types (fill, limit_canceled,
+        quote_gap, entry_aborted_no_quote) with explicit columns — no notes-string parsing.
+        CRASH-RESUME DETERMINISM (v3.0): live quote snapshots are decision inputs, so live resume
+        NEVER re-decides the past — (a) the per-minute snapshot sidecar (live_quotes_<date>.parquet,
+        written for the parity gate anyway) is the quote source for warm replay; (b) LOGGED decisions
+        are AUTHORITATIVE: while replaying bars ≤ the last logged bar, fill/cancel/exit outcomes are
+        taken from the log, never recomputed — recomputation is only a cross-check, and any
+        divergence prints the RESUME WARNING (now including fill-state and limit-price drift, not
+        just trade identity). Backtest resume needs none of this (historical quotes are the record).
 
     scorecard.py
         v3.0: $-metrics per R11.3 (points × 100, realized loss, +$10 per fill; spread value reported
@@ -118,7 +132,9 @@ event objects, formatted twice.
     summarize.py
         ONE summarizer shared by backtest and sweep (R13.3): trade+episode counts, days, own-dataset
         controls (R11.4/R11.5 form), day-clustered bootstrap CI (resample days with replacement,
-        2,000 draws, numpy default_rng(42)), censored separate; leaderboard formatting per R13.4.
+        2,000 draws, numpy default_rng(42)), censored + data_invalid separate; leaderboard per R13.4.
+        UNITS follow TierPolicy.fill_mode: limit → $ columns (R11.3); spot_touch → SPX-point columns
+        with the $ columns suppressed (never mixed, never NaN-crashed).
 
     control.py
         clock_matched() and midpoint_matched() (R11.4/R11.5): the WEIGHTING math is unchanged (single
@@ -267,6 +283,21 @@ event objects, formatted twice.
                   events (lossless round-trip), exits still fire on schedule.
     Integration:  console line == CSV row for every event type (one formatter test per type).
     Manual:       backtest --day 2026-08-18 --verbose vs the entry carousel, bar by bar.
+
+## v3.0 delta ledger (contract rewrites an implementer must NOT miss)
+
+    session.py   per-bar contract docstring: step (1) becomes "book pending leg 1 at THIS bar's
+                 closing NBBO"; new steps: attach QuoteView + quote_gap streak; resolve instruments
+                 for fresh PendingEntries via chains.signal_snapshot + InstrumentSelector.
+    executor.py  every booking moves from bar OPEN to closing NBBO per R7.0; the resolution_debit
+                 branch and config key are DELETED; RestingLimit lifecycle added.
+    rules.py     R7.1 fill check rewritten (limit marketability from the attached QuoteView, t+2
+                 guard); 5th-gap cancel emitted here; heartbeat gains streak/last-valid fields.
+    eventlog.py  schema_v=2 columns; rebuild_state learns the four new event types; resume
+                 authority rules above.
+    config.yaml  resolution_debit_max removed; adds: chain cache pin, SDK version, control-frame
+                 pin, R9a registration hash, «16b» thresholds once registered.
+    scorecard.py stage6 thresholds come FROM CONFIG (populated by register.py), never hardcoded.
 
 ## Explicitly not built
 
