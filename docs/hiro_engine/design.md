@@ -1,6 +1,11 @@
 # Design — hiro_engine
 
-*Architect design v1.1 for `requirements.md` v2.2 (v1.0 reviewed via codex-plan-review: FAIL, 5 blockers + 4 majors — all applied; review: `design_review_2026-08-22.md`). Principles: DRY (one rule module, one event stream, reuse the
+*Architect design v2.0 for `requirements.md` v3.0 (real resting-limit fills). v3.0 additions: ONE new
+data module (ChainStore), quotes attached by Session like vetoes/health, RuleEngine keeps sole ownership
+of R7 arbitration with a `limit_filled` input, Executor books conservative NBBO and carries the
+resting-limit state, R10.4 quote-health states, $-metrics scorecard, derived control frame, five new
+CONFIG pins. The signal path (features, entry rules, vetoes) is UNTOUCHED. Prior: v1.1 for v2.2
+(codex-plan-review FAIL 5B+4M applied; `design_review_2026-08-22.md`). Principles: DRY (one rule module, one event stream, reuse the
 reviewed research code), simple and interpretable (a trader can read the engine loop top to bottom), robust
 (crash-resume, fail-closed on bad data). Deliberately not built: plugins, async frameworks, databases, GUIs.*
 
@@ -12,12 +17,13 @@ event objects, formatted twice.
 
 ## Architecture
 
-    CLI (live | backtest | sweep | scorecard)
+    CLI (live | backtest | sweep | scorecard | verify | controls_build)
        ↓
     Session
        ↓
-    Feed (LiveFeed | ReplayFeed)          ← SPX bars, HIRO payload, levels, SPY, [chain]
-       ↓  one completed 1-min bar at a time
+    Feed (LiveFeed | ReplayFeed)          ← SPX bars, HIRO payload, levels, SPY
+    ChainStore                            ← SPXW 1-min NBBO+greeks (cache | live snapshots), R2.5
+       ↓  one completed 1-min bar at a time (Session attaches the bar's QuoteView)
     FeatureEngine (R3)                    ← pure functions, no I/O
        ↓  FeatureRow
     RuleEngine (R4–R7)                    ← pure: (FeatureRow, EngineState) → [Event]
@@ -37,6 +43,15 @@ event objects, formatted twice.
         Config: every R1–R7 numeric + control-dataset id + verification-artifact hash (R8.2).
         Loaded from config.yaml; sha256() = CONFIG_HASH. Frozen file checked into the repo.
 
+    chains.py  (NEW, v3.0 — the ONLY module that touches option endpoints)
+        ChainStore: per-session full-chain full-day 1-min NBBO+greeks cache (one SDK pull/day,
+        manifest sha256 + SDK version pinned in CONFIG, R8.2); signal_snapshot(min) for the R1.2
+        strike pick; strike_series(strike) for fills/exits; live: minute snapshots (SDK or Schwab —
+        whichever the spike proves). QuoteView = the two working strikes' VALID quotes for ONE minute
+        (R10.4 validity; quote_age=0 for decisions), attached to the tick by Session. controls_build:
+        offline job → derived control frame (R11.4/R11.5 limit-fill indicators), parquet + sha256
+        pinned in CONFIG. No other module imports the SDK.
+
     feeds.py
         Feed protocol: next_bar() -> Bar | None, spy_bar(), hiro_snapshot(), chain() (live only).
         LiveFeed: ThetaData SPX bars; CDP HIRO pull; Schwab chain; SPY via ThetaData. Retries once, then
@@ -53,23 +68,34 @@ event objects, formatted twice.
         per bar. Pure computation; unit-testable from fixture frames.
 
     rules.py
-        RuleEngine — the ONLY owner of ALL condition logic: R4 vetoes, R6 entries, and R7 exits including
-        their precedence. evaluate(row, state) returns Events (VetoChange, Signal, PendingEntry, ExitDecision,
-        StateLine). Pure: no I/O, no clock access. Shared verbatim by live and backtest.
+        RuleEngine — the ONLY owner of ALL condition logic AND the single R7 arbitration point (v3.0):
+        R4 vetoes, R6 entries, R7 exits. `limit_filled` is computed from the row's attached QuoteView
+        (ask ≤ L / bid ≥ L, first eligible minute t+2) INSIDE evaluate(), so fill > scratch > cap > … is
+        decided in one place; a winning non-fill exit also emits `limit_canceled` (R7.0). Emits
+        Fill | ExitDecision | LimitCancel | Signal | PendingEntry | VetoChange | StateLine.
+        Pure: no I/O, no clock access. Shared verbatim by live and backtest.
 
     executor.py
-        Executor — a pure STATE APPLIER, no trading judgment. Order per bar: (1) if a PendingEntry exists,
-        execute it at THIS bar's open (that open = S0) and emit the ENTRY event; (2) hand the bar's
-        ExitDecision (if any) its execution price per R7.0; (3) update EngineState (open SimTrade | None,
-        PendingEntry | None, entries_today, per-branch episode ids). One owner per rule: conditions in
-        rules.py, state/prices in executor.py, never both.
+        Executor — a pure, I/O-FREE state applier (quotes arrive on the row; fixture quotes make it
+        table-testable). Per bar: (1) a PendingEntry books leg 1 at THIS bar's closing NBBO conservative
+        side (R1.4b; entry aborted per R10.4 if either working strike lacks a valid quote) and creates
+        the RestingLimit (L tick-rounded against us, R1.4c); (2) applies the RuleEngine's decision:
+        Fill → book leg 2 at L (+0.10 credit invariant), LimitCancel+ExitDecision → cancel, then book the
+        lone leg at close-of-NEXT-bar NBBO per R7.0 (pending-exit mechanism unchanged); (3) tracks
+        quote_gap streaks → 5th consecutive → cancel limit, mark outcome data_invalid, keep guards
+        (R10.4); (4) updates EngineState. S0 stays the SPX context anchor only. One owner per concern:
+        conditions+arbitration in rules.py, state+booking in executor.py, never both.
 
     eventlog.py
         Event dataclass → one formatter for console, one CSV writer; same fields (R8.1). Append-only.
         On startup with an existing file for today: replay it to rebuild EngineState (crash-resume).
 
     scorecard.py
-        A staged pipeline with an inspectable intermediate record per stage (each stage writes its frame):
+        v3.0: $-metrics per R11.3 (points × 100, realized loss, +$10 per fill; spread value reported
+        never scored); data_invalid trades stay in entry-count criteria, leave fills/rates/risk (R9);
+        would-have-filled = pure limit replay, INDETERMINATE on ≥5-min gaps (excluded+reported);
+        controls read the PINNED derived control frame only. Staged pipeline as before (each stage
+        writes its frame):
         1 filter    rows by mode=live, disposition=countable, single config_hash (mixed → refuse)
         2 entries   build the entries table (one row per executable entry; SimTrade fields from events)
         3 qualify   per R11.1: qualifying signals/episodes incl. blocked ones; A∧B same-minute → A only
@@ -84,9 +110,9 @@ event objects, formatted twice.
         2,000 draws, numpy default_rng(42)), censored separate; leaderboard formatting per R13.4.
 
     control.py
-        clock_matched() and midpoint_matched() (R11.4/R11.5): ported once from the reviewed logic in
-        hiro_uptrend_confirm.py / hiro_experiments.py (exq(), cm_base()); those scripts then import from
-        here — one implementation, research and engine agree by construction.
+        clock_matched() and midpoint_matched() (R11.4/R11.5): the WEIGHTING math is unchanged (single
+        home, research scripts import it); the indicator is v3.0 limit-fill, read from the pinned
+        derived control frame built by chains.controls_build (no scorecard-time chain crunching).
 
     sweep.py
         SweepRunner: whitelist dict {knob: [values]} literally from R13.2; runs ReplayFeed sessions per
@@ -103,11 +129,17 @@ event objects, formatted twice.
                    pull30, bounce30, mid30, ref_low_bar, range60, range60_pct, warmup,
                    ema5, ema9, ema20, vwap, context_1030, context_1300,
                    vetoes {vt_broken, levels_invalid, flow_veto}, health (OK|HIRO_DOWN|SPX_STALLED|DEGRADED_VWAP) }
-    PendingEntry { branch, side, signal_ts, expiry, strike_hint, chain_quote_ts | None }
+    QuoteSnap    { strike, bid, ask, valid }                     # one strike, one minute (R10.4 validity)
+    QuoteView    { minute, leg1: QuoteSnap|None, leg2: QuoteSnap|None }   # attached by Session per bar
+    RestingLimit { side (buy|sell), strike, price L, placed_min, first_eligible_min (t+2),
+                   status (resting|filled|canceled), cancel_reason | None }
+    PendingEntry { branch, side, signal_ts, expiry, K, K2, chain_quote_ts }   # strikes now real (R1.2)
     SimTrade     { id, branch, side, signal_ts, entry_ts, s0, expiry, leg_strikes,
-                   entry_option_mid | None, resting_limit_ref, target,
-                   bh_level (Branch A), entry_L (Branch B), cap_source (chain|proxy), cap_value,
-                   state, exit_type, exit_ref, resolution_debit | None, minutes, adverse }
+                   leg1_fill, limit: RestingLimit, leg2_fill | None, credit | None,
+                   entry_L (Branch B), cap_source (chain|proxy), cap_value,
+                   quote_gap_streak, data_invalid: bool,
+                   state, exit_type, exit_ref ($ booking), minutes,
+                   spx_adverse_pts, leg_liq_loss_usd }         # schema_v=2, ADDITIVE (readers accept v1)
                    # every field persisted in the ENTRY/EXIT events → crash round-trip is lossless
     Event        explicit versioned columns, schema_v=1 — no catch-all field:
                  { ts, mode (live|backtest|shakedown), tier, session_date, config_hash, schema_v,
@@ -118,8 +150,12 @@ event objects, formatted twice.
     SessionRow   { date, disposition (countable|shakedown|partial|event_standdown), outage_min }
     Config       { R1..R7 numerics, control_dataset {path, data_hash}, verification_hash }
     TierPolicy   immutable per run (R13.1): { branch_b_enabled, price_a_conditions, r43_enabled,
-                 r72_enabled, tier_stamp } — consumed by FeatureEngine and RuleEngine; `full` and `price`
-                 are the only two instances, defined next to the whitelist, tested individually.
+                 r72_enabled, requires_hiro, fill_mode (limit|spot_touch), tier_stamp } — `full`
+                 (fill_mode=limit) and `price` (fill_mode=spot_touch, the only surviving touch use)
+                 are the only two instances, tested individually.
+    ChainDay     cached parquet per session: full-chain 1-min NBBO+greeks; manifest {sha256, sdk_version}
+    ControlFrame derived parquet (controls_build): per candidate minute — eligibility, limit-fill
+                 indicator, exclusion reason; manifest sha256 pinned in CONFIG
 
 ## Reuse (DRY ledger)
 
@@ -132,10 +168,13 @@ event objects, formatted twice.
 ## Main loop (the whole engine, interpretable)
 
     for bar in feed:
-        state, entry_events = executor.execute_pending(bar, state)   # PendingEntry fills at THIS open (S0)
+        quotes = chains.quote_view(bar.min, state)                    # the two working strikes, this minute
+        state, entry_events = executor.execute_pending(bar, quotes, state)  # leg 1 books at closing NBBO;
+                                                                            # RestingLimit created (R1.4b/c)
         row    = features.update(bar, feed.hiro_snapshot(), feed.spy_bar())
-        events = rules.evaluate(row, state)          # R4 → R6 (may emit PendingEntry) → R7 (ExitDecision)
-        state, trade_events = executor.apply(events, row, state)     # exit prices per R7.0
+        row    = row + vetoes/health/QuoteView                        # Session attaches (unchanged pattern)
+        events = rules.evaluate(row, state)          # R4 → R6 → R7 arbitration incl. limit_filled (one place)
+        state, trade_events = executor.apply(events, row, state)     # bookings per R7.0; quote-gap streaks
         log.emit(entry_events + events + trade_events)
 
 ## Error handling
@@ -148,6 +187,11 @@ event objects, formatted twice.
       DEGRADED_VWAP: SPY missing → R3.4 returns CHOP, logged once per transition.
       End of session: disposition computed (countable | partial per R10.3 | shakedown | event_standdown)
         and written as the SessionRow — the scorecard consumes dispositions, never re-derives them.
+    Option quotes (R10.4): entry bar without both valid working-strike quotes → entry ABORTED (event).
+      quote_gap minutes → no fill decision; 5th consecutive while open → limit canceled, outcome
+      data_invalid, guards (cap-spot/clock/resolution) keep running, one-leg + 3/day slots stay occupied.
+      Exit booking: last valid NBBO ≤ 3 min old, else administrative close at last valid NBBO + unscored.
+      Live quote loss → stand down from NEW entries (banner); NEVER an SPX-based fill in any mode.
     Bad levels row:    fail closed → R4.2 long-first-only; loud banner.
     Chain call fails:  fall back to spot proxies (R2.5) and log which path was used.
     Crash mid-session: restart replays today's log; open SimTrade rebuilt from its entry row (spec NFR).
@@ -158,7 +202,16 @@ event objects, formatted twice.
     Property:     replaying any day twice yields byte-identical event streams (determinism).
     Property:     at most one open SimTrade; entries_today ≤ 3; PendingEntry always executes exactly once,
                   at the bar after its signal, with S0 == that bar's open (R1.4 timing).
-    Golden:       full-tier backtest over the 8 sessions == verification_trades_v1.csv row-for-row (R12.1).
+    Golden:       R12.1 legacy gate — verify.py reproduces verification_trades_v1.csv through the
+                  ported research core (unchanged; says nothing about v3 fills).
+    Golden:       R12.2 HAND-COMPUTED quote fixture, written before the pricing layer: both sides,
+                  tick rounding, t+2 first eligibility, same-minute fill-vs-scratch race (fill wins),
+                  every cancel path, quote gaps → data_invalid, session-end booking.
+    Golden:       R12.3 pinned v2 rehearsal artifact == full-tier v3 backtest, row-for-row, against the
+                  pinned chain cache.
+    Gate:         live/backtest parity diff (shakedown gate): live-captured snapshots vs next-day
+                  historical series — 100% fill-decision agreement, booked prices within 1 tick on
+                  ≥ 95% of minutes (pre-registered tolerance).
     Golden:       control.py values on the 8 sessions == the research scripts' published numbers.
     Golden:       scorecard over a synthetic 10-session fixture log == a hand-computed R9 table
                   (covers qualifying vs executable, censored denominators, A-over-B dedupe,
@@ -181,3 +234,5 @@ event objects, formatted twice.
     No database (CSV + parquet suffice at 391 rows/day). No async/websockets (1-min cadence; sequential
     pulls fit in the 5-s budget). No plugin system, no strategy abstraction beyond the two branches the
     spec names. No dashboard (console is the contract). No live order routing of any kind.
+    v3.0 additions to this list: no order-book queue modeling, no partial fills, no multi-lot, no
+    intra-minute quote interpolation, no credit knob (0.10 frozen), no quote carry-forward for decisions.
