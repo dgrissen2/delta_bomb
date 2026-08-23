@@ -76,8 +76,9 @@ class Executor:
     # -- (1) start of bar --------------------------------------------------------
     def execute_pending(self, bar: Bar, state: EngineState) -> list[Event]:
         """Pending exits price at THIS bar's open; then a PendingEntry opens at
-        THIS bar's open (S0 = that open, R1.4). Anchors (bh_level / entry_L)
-        were fixed at signal time and travel on the PendingEntry."""
+        THIS bar's open (S0 = that open, R1.4). The Branch-B entry_L anchor is
+        fixed at signal time and travels on the PendingEntry (bh_level is a
+        legacy field, always None since v2.3 — A has no scratch)."""
         out: list[Event] = []
         tr = state.open_trade
         if tr is not None and state.pending_exit is not None:

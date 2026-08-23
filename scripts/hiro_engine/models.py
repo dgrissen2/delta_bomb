@@ -82,7 +82,7 @@ class FeatureRow:
     bounce30: Optional[float]
     mid30: Optional[float]
     ref_low_bar: Optional[int]      # bar min of the 30-bar close low (Branch A BH anchor)
-    bh_level: Optional[float]       # highest HIGH from ref_low_bar through this bar (R7.2 A)
+    bh_level: Optional[float]       # highest HIGH from ref_low_bar through this bar — DIAGNOSTIC only since v2.3 (logged on A signals; nothing trades off it)
     range60: Optional[float]
     range60_pct: Optional[float]
     warmup: bool
@@ -120,7 +120,7 @@ class PendingEntry:
     expiry: Optional[str] = None
     strike_hint: Optional[str] = None
     chain_quote_ts: Optional[str] = None
-    bh_level: Optional[float] = None    # Branch A scratch anchor, fixed at signal time (R7.2)
+    bh_level: Optional[float] = None    # legacy field, always None since v2.3 (A has no scratch)
     entry_L: Optional[float] = None     # Branch B flow anchor = L at the SIGNAL bar (research L0)
 
 
@@ -138,7 +138,7 @@ class SimTrade:
     entry_option_mid: Optional[float]
     resting_limit_ref: Optional[float]
     target: float                   # S0 +/- fill_touch_pts
-    bh_level: Optional[float]       # Branch A scratch anchor (R7.2)
+    bh_level: Optional[float]       # legacy schema column, always None since v2.3
     entry_L: Optional[float]        # Branch B scratch anchor (R7.2)
     cap_source: str                 # "chain" | "proxy"
     cap_value: float
@@ -158,7 +158,7 @@ class TierPolicy:
     branch_b_enabled: bool
     price_a_conditions: bool        # True => Branch A uses (i),(iii),(iv) only
     r43_enabled: bool               # flow veto
-    r72_enabled: bool               # flow-shutoff scratch (BH scratch always retained)
+    r72_enabled: bool               # Branch-B flow-shutoff scratch (Branch A has no scratch, v2.3)
     requires_hiro: bool             # False => missing HIRO is NOT an outage (price tier)
     tier_stamp: str
 

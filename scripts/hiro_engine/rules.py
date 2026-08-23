@@ -227,6 +227,8 @@ class RuleEngine:
             out.append(_stamp_conditions(Event(
                 event_type="signal", rule_id="R6.1", branch="A",
                 side="long_first", signal_min=m, episode=row.episode_a,
+                bh_level=row.bh_level,   # DIAGNOSTIC only (v2.3): logged for the
+                # pre-registered mid30 candidate research; nothing trades off it
                 notes=(f"SIGNAL A LONG-FIRST{hint} | range60={row.range60:.2f}"
                        f">=p75 {row.range60_pct:.2f} r30={row.r30:.2f} "
                        f"bounce30={row.bounce30:.2f} close<mid30={row.mid30:.2f}"))))

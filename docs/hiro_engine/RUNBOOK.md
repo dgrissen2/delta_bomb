@@ -32,7 +32,7 @@ cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python -m hiro_engine live
 | `ENTRY … S0=…` | The engine's simulated entry price (that bar's open) | Compare with your fill |
 | `HEARTBEAT … clock Xm left` | Trade open; 60-min clock counting (R7.5) | Nothing |
 | `EXIT fill` | Second leg deemed filled (±3.0 touch) | Confirm your resting order filled |
-| `EXIT scratch` | Flow shut off / bounce-high broken — get out (R7.2) | Close the lone leg at market |
+| `EXIT scratch` | Branch B only: the flow that justified the short shut off (R7.2). Branch A has NO scratch (v2.3) — an A leg holds until fill/cap/clock/resolution | Close the lone leg at market |
 | `EXIT cap` | Leg moved 3.5 pts (option) / 15 SPX pts against (R7.3) | Close the lone leg NOW |
 | `EXIT veto_exit` / `state_flip` | Flow veto fired / 13:00 read flipped against you (R7.4) | Close the lone leg |
 | `EXIT timeout` | 60 minutes, no fill (R7.5) | Close the lone leg |

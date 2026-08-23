@@ -180,7 +180,7 @@ resets the test.
 ## R13. Backtesting definitions
 - **R13.1 Tiers:** `full` requires HIRO + SPX 1-min per date (missing → date refused and listed); `price` runs
   the whole SPX archive with: Branch B disabled; Branch A as "price-A" (R6.1 (i), (iii), (iv) only); R4.3 and
-  R7.2 disabled (BH scratch retained); all else identical; every output stamped `tier=price`.
+  R7.2 disabled; all else identical; every output stamped `tier=price`.
 - **R13.2 Sweep whitelist (fully enumerated; one knob per run; all else frozen):** scratch drop magnitude
   {0.2, 0.3, 0.4, 0.5, 0.6 $B below entry L} · scratch window {2, 3, 4, 5 min} · pullback {3, 5, 8 pts} ·
   cap {3.0, 3.25, 3.5, 3.75, 4.0} · clock {45, 60, 75 min}. Any other knob is rejected; changing this list

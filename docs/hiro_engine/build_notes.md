@@ -30,7 +30,7 @@ threshold; thresholds live only in `scripts/hiro_engine/config.yaml`.*
 - **R5.2 windows bind the SIGNAL minute** (B: 10:00 ≤ t ≤ 14:30, A: ≥ 10:35);
   execution is at t+1 open (research convention; artifact contains a t=870 trade).
 - **R7.2 Branch-B flow anchor = L at the SIGNAL bar** (research `L0`), carried on
-  the PendingEntry; Branch-A BH likewise fixed at signal time from the signal row.
+  the PendingEntry; Branch-A BH likewise fixed at signal time from the signal row. [SUPERSEDED v2.3: the A-scratch was removed; bh_level survives only as a signal-event diagnostic.]
 - **R7.3 spot-proxy cap** compares the bar CLOSE to S0 (conditions evaluate at
   bar close per R7.0); the option-mid path is live-only (R2.5).
 - **R3.4 VWAP leg** compares SPY closes to the SPY volume-VWAP (SPX has no
