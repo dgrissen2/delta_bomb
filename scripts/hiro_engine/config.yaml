@@ -1,6 +1,9 @@
 # hiro_engine frozen configuration — every numeric in R1-R7 of docs/hiro_engine/requirements.md.
+# spec_version stamps the RULE SET so any rule change moves CONFIG_HASH (R8.2/R9 reset).
 # CONFIG_HASH = sha256 of this file's bytes (R8.2). Editing ANY byte changes the hash and
 # resets the 10-session acceptance test (R9). Do not touch during the test.
+
+spec_version: "2.3"   # v2.3: Branch-A BH scratch removed (bh_scratch_forensics_2026-08-23)
 
 r1_instruments:
   width_strikes: 5            # R1.1 vertical width in strike points

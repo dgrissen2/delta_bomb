@@ -1,5 +1,10 @@
 """RuleEngine (R4-R7) — the ONLY owner of ALL condition logic.
 
+v2.3: Branch A has NO scratch (the BH rule was removed after the 2026-08-23
+forensics; see requirements R7.2 and bh_scratch_forensics_2026-08-23.md).
+FeatureRow.bh_level remains a logged DIAGNOSTIC (needed to research the
+pre-registered mid30 candidate) but nothing trades off it.
+
 Pure: no I/O, no clock access. evaluate(row, state) -> list[Event].
 Module-level predicates are the single home of the R6 condition sets; the
 FeatureEngine imports them for episode tracking (R3.5) so conditions are never
@@ -226,8 +231,7 @@ class RuleEngine:
                        f">=p75 {row.range60_pct:.2f} r30={row.r30:.2f} "
                        f"bounce30={row.bounce30:.2f} close<mid30={row.mid30:.2f}"))))
             out.append(Event(event_type="pending_entry", rule_id="R6.1", branch="A",
-                             side="long_first", signal_min=m, episode=row.episode_a,
-                             bh_level=row.bh_level))
+                             side="long_first", signal_min=m, episode=row.episode_a))
         elif chosen == "B":
             hint = f" | {self.selector.hint('sell_first')}" if self.selector else ""
             out.append(_stamp_conditions(Event(
@@ -261,8 +265,6 @@ class RuleEngine:
             if (m - tr.entry_min) <= self.e7["scratch_window_min"] and tr.entry_L is not None:
                 if row.L <= tr.entry_L - self.e7["scratch_drop_bps"] or row.run_broke:
                     return ev("scratch", "R7.2")
-        if tr.branch == "A" and tr.bh_level is not None and bar.high > tr.bh_level:
-            return ev("scratch", "R7.2")
 
         # R7.3 cap: chain path uses the option-mid move Session attaches live;
         # proxy path uses SPX vs S0 at the bar close

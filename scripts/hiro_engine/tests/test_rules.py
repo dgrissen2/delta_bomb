@@ -173,12 +173,14 @@ def test_clock_beats_resolution_only_before_1530(config):
     assert _exit_type(_engine(config).evaluate(mk_row(930, close=100.0), st2)) == "resolution"
 
 
-def test_branch_a_bh_scratch(config):
+def test_branch_a_has_no_scratch(config):
+    """v2.3: Branch A has NO scratch — a high above the old bounce high does
+    NOTHING; only fill/cap/clock/resolution exit an A leg (R7.2)."""
     tr = _open_trade(side="long_first", branch="A", entry_min=700, s0=100.0,
                      target=97.0, bh_level=101.0, entry_L=None)
     st = EngineState(open_trade=tr)
     row = mk_row(710, close=100.9, high=101.2, low=100.5)
-    assert _exit_type(_engine(config).evaluate(row, st)) == "scratch"
+    assert _exit_type(_engine(config).evaluate(row, st)) is None
 
 
 def test_b_scratch_window_closes(config):

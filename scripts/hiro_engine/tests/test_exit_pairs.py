@@ -28,7 +28,7 @@ CASES = [
     ("fill+scratchB", "fill",
      dict(side="sell_first", branch="B", entry_min=700, s0=100.0, entry_L=1.0),
      dict(m=701, close=101.0, high=103.5, L=0.5)),
-    ("fill+scratchA_bh", "fill",
+    ("fill+high_above_old_bh (A: no scratch, v2.3)", "fill",
      dict(side="long_first", branch="A", entry_min=700, s0=100.0, bh_level=100.5),
      dict(m=705, close=98.0, high=101.0, low=96.9)),
     ("fill+cap", "fill",
@@ -56,10 +56,10 @@ CASES = [
     ("scratchB+state_flip", "scratch",
      dict(side="sell_first", branch="B", entry_min=778, s0=100.0, entry_L=1.0),
      dict(m=780, close=99.0, L=0.5, context_1300="DOWN")),
-    ("scratchA+clock", "scratch",                              # A-scratch has no window
+    ("A_high_above_old_bh+clock -> clock (no A-scratch, v2.3)", "clock",
      dict(side="long_first", branch="A", entry_min=700, s0=100.0, bh_level=100.5),
      dict(m=760, close=100.0, high=100.9, low=99.5)),
-    ("scratchA+resolution", "scratch",
+    ("A_high_above_old_bh+resolution -> resolution (v2.3)", "resolution",
      dict(side="long_first", branch="A", entry_min=869, s0=100.0, bh_level=100.5),
      dict(m=930, close=100.0, high=100.9, low=99.5)),
     # ---- cap beats veto / flip / clock / resolution

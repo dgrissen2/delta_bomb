@@ -1,6 +1,11 @@
 # Requirements — Delta Bomb Signal Engine ("hiro_engine")
 
-*v2.2 — 2026-08-22. v2.1 + final plan review (6 blockers, 2 majors → fixed: signal/entry split, R7.0 exit-timing table, controls as deterministic scorecard functions, R13 backtest definitions, best-session re-check enumerated, full-tier source contract, single-backlink rule restored). Prior: v2.0 + red-team audit (31 findings, verdict FAIL → all fixed: controls and metrics defined in R11, verification artifact pinned, chain/SPY sources added, state-flip mapping, price-tier behavior enumerated, boundary and denominator rules). Self-contained: every trading rule is stated in this document with an R-number; acceptance
+*v2.3 — 2026-08-23. v2.2 + removal of the Branch-A bounce-high (BH) scratch from R7.2 after the
+rehearsal forensics (`bh_scratch_forensics_2026-08-23.md`: never backtested, 8/8 scratches would
+have filled, 38.1 pts surrendered, created the sole adverse>10 event; Charlie×CIO joint review).
+Branch A keeps only the researched exits: fill, cap, clock, resolution. New standing rule and one
+pre-registered candidate recorded in R7.2. This is a rule change: CONFIG_HASH changes and the
+10-session test resets (it had not started). Prior: v2.2 — 2026-08-22. v2.1 + final plan review (6 blockers, 2 majors → fixed: signal/entry split, R7.0 exit-timing table, controls as deterministic scorecard functions, R13 backtest definitions, best-session re-check enumerated, full-tier source contract, single-backlink rule restored). Prior: v2.0 + red-team audit (31 findings, verdict FAIL → all fixed: controls and metrics defined in R11, verification artifact pinned, chain/SPY sources added, state-flip mapping, price-tier behavior enumerated, boundary and denominator rules). Self-contained: every trading rule is stated in this document with an R-number; acceptance
 criteria reference R-numbers only. Research provenance, evidence and status history: see
 [`../specs/delta_bomb_master_playbook.md`](../specs/delta_bomb_master_playbook.md) (the only external reference in this spec).*
 
@@ -106,8 +111,12 @@ without human fudging — whether this strategy earns the next stage**.
   executes at its open. R11.2 adverse excursion runs over bars from the execution bar through the exit's
   execution price inclusive (fills: touch bar excluded).
 - **R7.1** Fill: SPX touches S0 + 3.0 (sell-first) / S0 − 3.0 (long-first) → completed; record minutes-to-fill.
-- **R7.2** Flow-shutoff scratch (Branch B): within 3 minutes of entry, L drops ≥ 0.3 $B below its entry value OR
-  the run breaks, before the fill touch → scratch at the next bar's open. Branch A analogue: define BH = the highest high from the bar of the trade's reference 30-bar low through the signal bar; a bar's high > BH before the fill touch → scratch.
+- **R7.2** Flow-shutoff scratch (Branch B only): within 3 minutes of entry, L drops ≥ 0.3 $B below its entry
+  value OR the run breaks, before the fill touch → scratch at the next bar's open. **Branch A has NO scratch**
+  (v2.3): its exits are R7.1/R7.3/R7.5/R7.6 exactly as researched. *Standing rule: no exit may trigger off the
+  same variable as its entry condition, and no rule enters this spec without a backtest showing it saves more
+  than it costs.* Pre-registered candidate (NOT active; requires stored-session backtest + spec edit before
+  activation): Branch-A premise invalidation — exit if a bar CLOSES above mid30 while the leg is open.
 - **R7.3** Cap: with a chain (R2.5), the lone leg's option mid ((bid+ask)/2) moves 3.5 pts against its entry
   value → close it (`cap`). Without a chain (all backtests), the proxy trigger is SPX moving 15.0 pts against
   S0. The log records which trigger was used. Never convert by adding a different strike.
