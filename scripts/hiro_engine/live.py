@@ -40,6 +40,7 @@ CDP_PORT = 9222
 # ThetaData; re-request today's history each minute — stateless, self-healing.
 # ---------------------------------------------------------------------------
 _theta_client = None
+PULL_TIMEOUT_S = 8.0
 
 
 def theta_client():
@@ -48,6 +49,32 @@ def theta_client():
         from thetadata import ThetaClient
         _theta_client = ThetaClient(creds_file=str(THETA_CREDS))
     return _theta_client
+
+
+def reset_theta_client() -> None:
+    """Drop the singleton so the next call re-authenticates (the SDK holds a
+    session token with no re-auth logic — red-team 2026-08-23 finding 2)."""
+    global _theta_client
+    _theta_client = None
+
+
+def _pull(fn, *args, **kwargs):
+    """Run an SDK call with a hard timeout (gRPC has none — finding 1). On
+    timeout or error: reset the client and raise; the caller's per-minute loop
+    retries next cycle with a fresh session."""
+    from concurrent.futures import ThreadPoolExecutor, TimeoutError as _TO
+    ex = ThreadPoolExecutor(max_workers=1)
+    try:
+        fut = ex.submit(fn, *args, **kwargs)
+        return fut.result(timeout=PULL_TIMEOUT_S)
+    except _TO:
+        reset_theta_client()
+        raise TimeoutError(f"ThetaData pull exceeded {PULL_TIMEOUT_S}s")
+    except Exception:
+        reset_theta_client()
+        raise
+    finally:
+        ex.shutdown(wait=False)
 
 
 def _to_min_frame(resp, keep_volume: bool = False) -> pd.DataFrame:
@@ -61,8 +88,8 @@ def _to_min_frame(resp, keep_volume: bool = False) -> pd.DataFrame:
 def spx_bars_today(day: str) -> pd.DataFrame:
     """Completed SPX 1-min bars for `day`, columns min/open/high/low/close."""
     d = dt.date.fromisoformat(day)
-    resp = theta_client().index_history_ohlc(symbol="SPX", start_date=d, end_date=d,
-                                             interval="1m")
+    resp = _pull(theta_client().index_history_ohlc, symbol="SPX",
+                 start_date=d, end_date=d, interval="1m")
     return _to_min_frame(resp)
 
 
@@ -77,11 +104,14 @@ def spy_bars_today(day: str) -> pd.DataFrame:
         return pd.DataFrame(columns=["min", "open", "high", "low", "close", "volume"])
     d = dt.date.fromisoformat(day)
     try:
-        resp = theta_client().stock_history_ohlc(symbol="SPY", interval="1m",
-                                                 start_date=d, end_date=d)
+        resp = _pull(theta_client().stock_history_ohlc, symbol="SPY", interval="1m",
+                     start_date=d, end_date=d)
         return _to_min_frame(resp, keep_volume=True)
     except Exception as e:
-        if "PERMISSION_DENIED" in str(e) or "subscription" in str(e).lower():
+        # latch ONLY on the explicit subscription-tier message; transient
+        # auth/session PERMISSION_DENIEDs must not kill VWAP for the day
+        msg = str(e).lower()
+        if "subscription" in msg and ("free" in msg or "value" in msg or "upgrad" in msg):
             _spy_denied = True
             print("[live] SPY history not in the ThetaData subscription — "
                   "running DEGRADED_VWAP (context reads = CHOP)")
@@ -220,22 +250,33 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
     while True:
         now = dt.datetime.now(ET)
         now_min = now.hour * 60 + now.minute
-        if now_min >= cfg.i("r5_clock", "session_end_min"):
-            try:                                  # final catch-up: the 15:59 bar
+        if now_min > cfg.i("r5_clock", "session_end_min"):
+            # > 960: the 16:00 bar has completed — final catch-up matches the
+            # backtest grid (570..960), one code path (red-team finding 3)
+            try:
                 spx = spx_bars_today(day)
-                hframe = hiro.frame(day)
-                spy = spy_bars_today(day)
-                spy_map = {int(r.min): SpyBar(int(r.min), r.open, r.high, r.low,
-                                              r.close, r.volume) for r in spy.itertuples()}
-                tail = spx[(spx["min"] > processed_min) & (spx["min"] <= 959)]
+            except Exception as e:
+                print(f"[live] final catch-up SPX failed: {e}")
+                spx = None
+            if spx is not None:
+                try:
+                    hframe = hiro.frame(day)
+                except Exception as e:
+                    print(f"[live] final catch-up HIRO failed: {e}")
+                    hframe = None
+                try:
+                    spy = spy_bars_today(day)
+                    spy_map = {int(r.min): SpyBar(int(r.min), r.open, r.high, r.low,
+                                                  r.close, r.volume) for r in spy.itertuples()}
+                except Exception:
+                    spy_map = {}
+                tail = spx[(spx["min"] > processed_min) & (spx["min"] <= 960)]
                 for r in tail.itertuples():
                     m = int(r.min)
                     session.process_tick(ReplayTick(
                         Bar(m, r.open, r.high, r.low, r.close), spy_map.get(m),
                         hframe[hframe["min"] <= m] if hframe is not None else None))
                     processed_min = m
-            except Exception as e:
-                print(f"[live] final catch-up failed: {e}")
             session.finish()
             print("[live] 16:00 — session closed")
             return 0
@@ -243,6 +284,7 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
         time.sleep(max(0.2, 62 - now.second - now.microsecond / 1e6)
                    if now.second < 2 else max(0.2, 60 - now.second + 2))
         t0 = time.monotonic()
+        cutoff_min = dt.datetime.now(ET).hour * 60 + dt.datetime.now(ET).minute
         try:
             spx = spx_bars_today(day)
         except Exception as e:
@@ -259,8 +301,7 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
                                           r.close, r.volume) for r in spy.itertuples()}
         except Exception:
             spy_map = {}
-        now_min = dt.datetime.now(ET).hour * 60 + dt.datetime.now(ET).minute
-        new = spx[(spx["min"] > processed_min) & (spx["min"] < now_min)
+        new = spx[(spx["min"] > processed_min) & (spx["min"] < cutoff_min)
                   & (spx["min"] >= 570) & (spx["min"] <= 960)]
         for r in new.itertuples():
             m = int(r.min)

@@ -1,5 +1,7 @@
 """Morning ops (task 11): ONE command, green/red output. Run before `live`.
 
+Data source: ThetaData Python SDK (creds-file auth, no terminal).
+
   ~/Dev/virtualenvs/gamma_chaser/bin/python scripts/hiro_engine/ops/morning_check.py
 
 Checks: HIRO store freshness (vendor retains ~5 sessions — a missed day is
@@ -40,6 +42,7 @@ def main() -> int:
     cfg = load_config()
     today = dt.datetime.now(ET).date()
     prev = prev_trading_day(today)
+    prev2 = prev_trading_day(prev)          # holiday fallback (finding 6)
     red = 0
 
     def line(ok, label, detail, warn_only=False):
@@ -51,14 +54,17 @@ def main() -> int:
 
     print(f"=== hiro_engine morning check — {today} ===")
     hiro_root = cfg.path_of("hiro_root")
-    latest_hiro = sorted(p.name[5:] for p in Path(hiro_root).glob("date=*"))
-    line(bool(latest_hiro) and latest_hiro[-1] >= str(prev), "HIRO store",
-         f"latest partition {latest_hiro[-1] if latest_hiro else 'NONE'} "
-         f"(need >= {prev}; vendor keeps ~5 sessions — run the backfill NOW if red)")
+    latest_hiro = sorted(p.name[5:] for p in Path(hiro_root).glob("date=*")
+                         if (p / "normalized" / "hiro_series.csv").exists())   # (7) empty partition != captured
+    line(bool(latest_hiro) and latest_hiro[-1] >= str(prev2), "HIRO store",
+         f"latest COMPLETE partition {latest_hiro[-1] if latest_hiro else 'NONE'} "
+         f"(need >= {prev2}; {prev} expected unless it was a holiday; "
+         f"vendor keeps ~5 sessions — run the backfill NOW if red)")
     spx_dir = cfg.path_of("spx_dir")
     latest_spx = sorted(p.stem for p in Path(spx_dir).glob("????-??-??.parquet"))
-    line(bool(latest_spx) and latest_spx[-1] >= str(prev), "SPX 1-min store",
-         f"latest {latest_spx[-1] if latest_spx else 'NONE'} (need >= {prev})")
+    line(bool(latest_spx) and latest_spx[-1] >= str(prev2), "SPX 1-min store",
+         f"latest {latest_spx[-1] if latest_spx else 'NONE'} (need >= {prev2}; "
+         f"{prev} expected unless holiday)")
     if latest_spx:
         import pandas as pd
         last_bar = int(pd.read_parquet(Path(spx_dir) / f"{latest_spx[-1]}.parquet")["min"].max())
@@ -85,10 +91,16 @@ def main() -> int:
          "(empty -> add release dates to docs/hiro_engine/event_calendar.csv)",
          warn_only=True)
     try:
-        import datetime as _dt
         from hiro_engine.live import spx_bars_today
-        n = len(spx_bars_today(str(prev)))
-        line(n > 300, "ThetaData SDK", f"{n} SPX bars for {prev} (creds-file auth, no terminal)")
+        try:
+            n = len(spx_bars_today(str(prev)))
+            ref = prev
+        except Exception:
+            n = len(spx_bars_today(str(prev2)))   # holiday fallback
+            ref = prev2
+        line(n > 150, "ThetaData SDK",
+             f"{n} SPX bars for {ref} (creds-file auth, no terminal"
+             + ("; half-day?" if n <= 300 else "") + ")")
     except Exception as e:
         line(False, "ThetaData SDK", f"pull failed: {e}")
     cdp = port_open(9222)
