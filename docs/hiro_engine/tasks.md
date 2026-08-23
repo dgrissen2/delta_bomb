@@ -1,8 +1,109 @@
 # Implementation Tasks — hiro_engine
 
-*Architect breakdown v1.2 (v1.1 + architect codex-plan-review: FAIL 8 findings → applied: InstrumentSelector task, event-schema completeness test, Session task, TierPolicy moved before the CLI, event-type test matrix, FeatureRow ownership note, ops before shakedown, readiness vs shakedown gates split; review: `tasks_review_2026-08-22.md`). Prior: v1.1 of `design.md` v1.1 against `requirements.md` v2.2. CTO first-pass review applied (task 3 split; artifact-rot guard; task-7 HIRO-poll spike; ops task 11; sequencing notes). Order is dependency order; every task
-ends green (tests pass) before the next starts. "Rn" = requirement section in requirements.md. Junior notes are
-inline — when in doubt, the requirement text wins over this file.*
+*Architect breakdown v2.0 (2026-08-23): tasks 1–12 (spec v2.x build) are COMPLETE — kept below for the
+record. Tasks 13–20 implement spec v3.0 "real resting-limit fills" per design.md v2.0 (both docs passed
+their multi-round reviews; see `limit_fill_reviews_2026-08-23.md` and the git log). Order is dependency
+order; every task ends green before the next starts; junior notes inline — when in doubt the
+requirements text wins over this file. DO NOT START without the user's explicit go.*
+
+## v3.0 tasks (build order is the contract)
+
+- [ ] 13. ChainStore + pins (`chains.py`) — the ONLY module touching the option-chain client
+    - full-chain full-day 1-min NBBO+greeks cache per session (one SDK pull/day) under
+      `~/Dev/central_trade_data/thetadata/spxw_bomb_chains/` + manifest; fetch the 8 rehearsal sessions;
+      update central-data DATA_DICTIONARY/CHANGELOG in the same pass
+    - CONFIG pins (R8.2): frozen-rehearsal cache manifest sha256 + thetadata SDK version (PIN SCOPE:
+      the frozen set only — live chain data is never a rolling pin)
+    - QuoteView builder (R10.4 validity: bid>0, ask≥bid; quote_age=0 for decisions);
+      signal_snapshot(min); strike_series(strike)
+    - Tests: cache determinism (re-load == bytes); hash guard raises on any byte change; R13.1 refusal
+      lists missing dates; validity table (crossed/zero-bid/locked)
+    Requirements: R2.5, R10.4 (validity), R13.1
+
+- [ ] 14. LIVE QUOTE SPIKE (market hours; BEFORE any pricing code — the schedule risk lives here)
+    - prove ONE of (i) SDK live option snapshots or (ii) Schwab chain quotes, at 1-min cadence, for BOTH
+      workloads: full-chain snapshot at a signal minute AND two-strike freshness afterward, inside the
+      5-s post-bar budget; measure latency/failure/staleness like the HIRO spike
+    - script: `scripts/hiro_engine/spike_chain_live.py`, PASS/FAIL verdict, nonzero exit on FAIL
+    - **HARD GATE: neither works → STOP; v3.0 cannot go live (no fallback exists by spec).** Backtest
+      work (15–18) may proceed regardless — only live/shakedown blocks on this
+    Requirements: R2.5 (live)
+
+- [ ] 15. Gate-2 hand fixture FIRST, then the pricing layer
+    - 15a. write `tests/fixtures/v3_quotes_fixture.py` + hand-computed expected outputs BEFORE touching
+      engine code (R12.2): both sides, tick rounding against us, t+2 first eligibility, same-minute
+      fill-vs-scratch race (fill wins), every cancel path, 5th-gap data_invalid, session-end booking,
+      entry-abort. The expected numbers are calculated BY HAND and committed with derivations in comments
+    - 15b. models: QuoteSnap/QuoteView/RestingLimit; SimTrade v3 fields; Event schema_v=2 ADDITIVE columns
+      (design "Event v2" list); TierPolicy.fill_mode (+ spot_touch for price tier); config.yaml v3 keys
+      (resolution_debit_max REMOVED; new pins as placeholders)
+    - 15c. session: attach QuoteView + quote_gap streak (Session counts, like vetoes);
+      resolve_instruments (chains.signal_snapshot + InstrumentSelector, R1.2 constraints; missing →
+      entry_aborted_no_quote); delta-ledger docstring updates (design §delta ledger)
+    - 15d. rules: limit_filled + t+2 guard INSIDE the single R7 arbitration; 5th-gap limit cancel;
+      heartbeat carries streak + last-valid NBBO; quote_gap rows carry them too
+    - 15e. executor: leg-1 closing-NBBO conservative booking; RestingLimit lifecycle; leg-2 booking at L
+      (+0.10 invariant asserted in code); conservative NBBO exit booking per R7.0; resolution_debit
+      branch DELETED; data_invalid as horizon property
+    - 15f. eventlog: v2 columns; rebuild_state learns fill/limit_canceled/quote_gap/entry_aborted;
+      resume authority rules (sidecar quotes; logged decisions authoritative; widened RESUME WARNING)
+    - Tests: the ENTIRE 15a fixture passes; round-trip SimTrade⊕RestingLimit from rows; property tests
+      (one leg, 3/day, credit ≥ 0.10 on every fill) — plus the existing 116-test suite stays green
+      (price tier keeps spot_touch semantics; golden gate R12.1 untouched)
+    Requirements: R1.2, R1.4, R7.0–R7.6, R8.1, R10.4, R12.2
+
+- [ ] 16. Pre-registration freeze (R9a) — BEFORE any v3 rehearsal runs
+    - `register.py` + `cli register-thresholds`: the frozen R9a derivation (one bootstrap, count floors,
+      fill-rate floors, $-risk caps, empty-resample rule, run-once boundary via pinned hash)
+    - commit the R9a formulas hash into CONFIG placeholders; scorecard stage6 reads thresholds FROM
+      CONFIG (hardcoded v2 thresholds deleted)
+    - Tests: derivation on a synthetic log matches hand-computed floors incl. empty-resample and
+      rounding edges; refuses to run twice
+    Requirements: R9, R9a
+
+- [ ] 17. Scorecard/controls/summarizer v3
+    - scorecard: $ metrics (R11.3 ×100, realized loss, +$10/fill), data_invalid scoping per R9,
+      limit-replay would-have-filled with INDETERMINATE on ≥5-min gaps, best-session $ tie-break
+    - `controls_build` job → derived ControlFrame (indicator per R11.4/5: signal-minute candidate,
+      pure limit replay, no R7 exits, min(60, session end)); manifest cross-links source-cache sha;
+      frame sha pinned in CONFIG; scorecard verifies frame.source_sha == pinned cache sha
+    - summarizer units per TierPolicy.fill_mode (spot_touch = SPX pts, $ suppressed)
+    - Tests: hand-computed weighting fixture; control frame pinned at first build; synthetic-log
+      scorecard golden updated to v3 semantics
+    Requirements: R9, R11, R13.3
+    (Sweep: NO new knob — R13.2 unchanged; the 0.10 credit is frozen)
+
+- [ ] 18. One rehearsal run → thresholds → verification artifact v2
+    - run the v3.0 full-tier rehearsal over the 8 sessions ONCE; `register-thresholds` populates the
+      «16b» markers (spec + config patch applied and committed); registration.json hash pinned
+    - spot-check the trade list row-by-row against raw cached quotes; pin as verification artifact v2
+      (R12.3) in CONFIG; document the after picture (fills, credits, $ risk) in build_notes
+    - defect policy per R9a (fix → re-run ONCE → document)
+    Requirements: R9a, R12.3
+
+- [ ] 19. Battery + parity plumbing + ops
+    - full test battery green from repo root AND scripts/; determinism (same day twice byte-identical)
+      re-proven under v3; crash-resume e2e re-proven (sidecar + authoritative-log rules)
+    - live: chains snapshot sidecar (live_quotes_<date>.parquet incl. non-fill decisions);
+      `cli parity-check <date>` (pre-registered tolerance: 100% fill-decision agreement, prices within
+      1 tick on ≥95% of minutes) — the SHAKEDOWN GATE, runs after the first live capture day
+    - RUNBOOK/ops: chain-cache freshness + sidecar presence in morning/evening checks; quote-gap and
+      NO CHAIN FEED console lines documented for the trader
+    Requirements: R12.3 parity gate, R2 [OPS], non-functional
+
+- [ ] 20. Shakedown (market-dependent, after 14 PASS + 19 green)
+    - two live `--shakedown` sessions under v3.0; parity-check PASSES both days; dispositions written;
+      ops green; fix only defects, never thresholds; then the 10-session clock starts
+    Requirements: spec acceptance
+
+Estimated shape: 13+15 are the bulk (the fixture in 15a is the single most important artifact — hand
+derivations reviewed before code); 14 is the schedule risk (first market morning); 16–17 are offline;
+18 is one afternoon IF 15's fixture was honest. Do NOT parallelize 15d and 15e (shared arbitration
+contract). Nothing goes live before 14 and 19's parity gate.
+
+---
+
+## v2.x build record (COMPLETE 2026-08-22/23 — retained for reference)
 
 - [ ] 1. Scaffold & frozen config
     - `hiro_engine/` package under `scripts/` (plain Python, no framework); venv `gamma_chaser`
