@@ -59,7 +59,8 @@ class Session:
     def __init__(self, cfg: Config, tier: TierPolicy, day: str, mode: str,
                  log: EventLog, range60_history: Optional[list[float]] = None,
                  shakedown: bool = False, resume: bool = False,
-                 chain_available: bool = False, im: Optional[float] = None):
+                 chain_available: bool = False, im: Optional[float] = None,
+                 chains=None):
         self.cfg = cfg
         self.tier = tier
         self.day = day
@@ -70,7 +71,12 @@ class Session:
         self.features = FeatureEngine(cfg, tier, range60_history=range60_history,
                                       im=self.levels.im)
         self.rules = RuleEngine(cfg, tier, selector=InstrumentSelector(cfg))
-        self.executor = Executor(cfg, InstrumentSelector(cfg), chain_available=chain_available)
+        self.selector = InstrumentSelector(cfg)
+        self.executor = Executor(cfg, self.selector, tier=tier)
+        self.chains = chains
+        if tier.fill_mode == "limit" and chains is None:
+            raise ValueError("fill_mode=limit requires a ChainStore (R2.5)")
+        self.quote_gap_streak = 0
         self.state = rebuild_state(log.csv_path, day) if resume else EngineState()
         self.vt_broken = False
         self.health = "OK"
@@ -132,6 +138,58 @@ class Session:
             return "DEGRADED_VWAP"
         return "OK"
 
+    def _quotes_for(self, minute: int):
+        """QuoteView for the two working strikes this minute (limit mode)."""
+        if self.tier.fill_mode != "limit" or self.chains is None:
+            return None
+        tr = self.state.open_trade
+        pe = self.state.pending_entry
+        k1 = k2 = None
+        if tr is not None:
+            k1, k2 = tr.k1, tr.k2
+        elif pe is not None:
+            k1, k2 = pe.k1, pe.k2
+        return self.chains.quote_view(self.day, minute, k1, k2)
+
+    def _count_gap(self, quote_view) -> None:
+        """R10.4: streak of minutes without a valid working-strike quote while
+        a limit rests (Session counts; RuleEngine arbitrates the cancel)."""
+        tr = self.state.open_trade
+        if (self.tier.fill_mode == "limit" and tr is not None and tr.limit is not None
+                and tr.limit.status == "resting"):
+            q2 = quote_view.leg2 if quote_view is not None else None
+            self.quote_gap_streak = 0 if (q2 is not None and q2.valid)                 else self.quote_gap_streak + 1
+        else:
+            self.quote_gap_streak = 0
+
+    def _resolve_instruments(self, events, row):
+        """R1.2 (v3.0): a fresh PendingEntry gets {expiry, K, K2} from the
+        SIGNAL-minute chain snapshot; snapshot unusable -> entry aborted
+        (signal remains, stays qualifying)."""
+        if self.tier.fill_mode != "limit":
+            return events
+        out = []
+        for ev in events:
+            if ev.event_type == "pending_entry":
+                snap = self.chains.signal_snapshot(self.day, row.min)
+                side = ev.side
+                k1, k2 = (self.selector.pick_from_snapshot(snap, side)
+                          if len(snap) else (None, None))
+                if k1 is None:
+                    out.append(Event(event_type="entry_aborted_no_quote", rule_id="R10.4",
+                                     branch=ev.branch, side=side, signal_min=ev.signal_min,
+                                     episode=ev.episode,
+                                     notes="entry ABORTED — signal-minute chain snapshot "
+                                           "unusable (R10.4); signal remains qualifying"))
+                    continue
+                ev.k1, ev.k2 = k1, k2
+                ev.expiry = self.chains.expiry_of(self.day)
+                ev.leg_strikes = f"{k1:.0f}/{k2:.0f}"
+                out.append(ev)
+            else:
+                out.append(ev)
+        return out
+
     def observe_gap(self, gap_min: int) -> None:
         """SPX stall span (task 7 feeds this); counts toward outage inside 10:00-14:30."""
         self.outage_min += gap_min
@@ -151,14 +209,20 @@ class Session:
                     event_type="outage", rule_id="R10.2",
                     notes=f"SPX_STALLED: {gap}m gap before this bar | "
                           f"outage so far {self.outage_min}m"))
-        entry_events = self.executor.execute_pending(bar, self.state)          # (1)
+        start_quotes = self._quotes_for(bar.min)                               # (0) this bar's NBBO
+        entry_events = self.executor.execute_pending(bar, self.state,
+                                                     quotes=start_quotes)      # (1)
         row = self.features.update(bar, tick.hiro, tick.spy_bar)               # (2)
         prev_health = self.health
         new_health = self._health(tick)
         if new_health == "HIRO_DOWN" and 600 <= bar.min <= 870:
             self.outage_min += 1
         self.health = new_health
-        row = dataclasses.replace(row, vetoes=self._vetoes(row), health=self.health)  # (3)
+        quote_view = self._quotes_for(bar.min)
+        self._count_gap(quote_view)
+        row = dataclasses.replace(row, vetoes=self._vetoes(row), health=self.health,
+                                  quote_view=quote_view,
+                                  quote_gap_streak=self.quote_gap_streak)      # (3)
         health_events: list[Event] = []
         if new_health != prev_health:
             note = {"HIRO_DOWN": "HIRO DOWN — no new entries",
@@ -169,6 +233,7 @@ class Session:
                 note = f"HIRO RESTORED | outage so far {self.outage_min}m"
             health_events.append(Event(event_type="outage", rule_id="R10", notes=note))
         rule_events = self.rules.evaluate(row, self.state)                     # (4)
+        rule_events = self._resolve_instruments(rule_events, row)              # (4b) R1.2 at signal minute
         if self.health == "HIRO_DOWN":
             # R10.1: no new entries while HIRO is down; flow exits already gated by hiro_fresh
             kept = []
@@ -232,7 +297,8 @@ class Session:
 
     def finish(self, event_standdown: bool = False) -> SessionRow:
         if self.last_bar is not None:
-            end_events = self.executor.end_of_session(self.last_bar, self.state)
+            end_events = self.executor.end_of_session(
+                self.last_bar, self.state, quotes=self._quotes_for(self.last_bar.min))
             self.log.emit(self._stamp(end_events, self.last_bar.min))
         if event_standdown:
             dispo = "event_standdown"

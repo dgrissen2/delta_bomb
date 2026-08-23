@@ -29,7 +29,9 @@ def _run_two(config, tmp_path, name, crash_at=None):
         feed = ReplayFeed(config, [day])
         ticks = list(feed.iter_day(day))
         log = EventLog(log_p, console=io.StringIO())
-        s = Session(config, TIER_FULL, day, "live", log, range60_history=hist)
+        from hiro_engine.chains import ChainStore
+        s = Session(config, TIER_FULL, day, "live", log, range60_history=hist,
+                    chains=ChainStore())
         s._write_session_row = lambda row: dispos.append(row)
         log.emit(s._stamp(s.startup_events(), None))
         if i == 1 and crash_at is not None:
@@ -37,7 +39,8 @@ def _run_two(config, tmp_path, name, crash_at=None):
                 s.process_tick(t)
             log.close()                                   # CRASH
             log = EventLog(log_p, console=io.StringIO())  # restart
-            s = Session(config, TIER_FULL, day, "live", log, range60_history=hist)
+            s = Session(config, TIER_FULL, day, "live", log, range60_history=hist,
+                        chains=ChainStore())
             s._write_session_row = lambda row: dispos.append(row)
             s.warm_replay(ticks[:crash_at])
             for t in ticks[crash_at:]:

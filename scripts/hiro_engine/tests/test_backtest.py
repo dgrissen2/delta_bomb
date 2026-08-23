@@ -17,7 +17,7 @@ def _run_day(config, tmp_path, name, tier=TIER_FULL, day="2026-08-18"):
     orig = sm.Session._write_session_row
     sm.Session._write_session_row = lambda self, row: None
     try:
-        run_backtest(config, tier, [day], log)
+        run_backtest(config, tier, [day], log, prereg_override=True)
     finally:
         sm.Session._write_session_row = orig
     log.close()
@@ -51,7 +51,7 @@ def test_full_tier_refuses_pre_hiro_dates(config, tmp_path):
     from hiro_engine.feeds import FeedError
     log = EventLog(tmp_path / "x.csv", console=io.StringIO())
     with pytest.raises(FeedError) as ei:
-        run_backtest(config, TIER_FULL, ["2024-01-03"], log)
+        run_backtest(config, TIER_FULL, ["2024-01-03"], log, prereg_override=True)
     assert "2024-01-03" in str(ei.value)
 
 
@@ -66,7 +66,7 @@ def test_range60_pool_independent_of_selection(config, tmp_path):
     orig = sm.Session._write_session_row
     sm.Session._write_session_row = lambda self, row: None
     try:
-        run_backtest(config, TIER_FULL, ["2026-08-18", "2026-08-21"], log)
+        run_backtest(config, TIER_FULL, ["2026-08-18", "2026-08-21"], log, prereg_override=True)
     finally:
         sm.Session._write_session_row = orig
     log.close()

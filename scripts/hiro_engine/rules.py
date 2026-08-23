@@ -260,26 +260,36 @@ class RuleEngine:
                          side=tr.side, trade_id=tr.id, outcome_type=kind, **kw)
 
         # R7.1 fill (highest precedence)
-        if (sell and bar.high >= tr.target) or (not sell and bar.low <= tr.target):
-            return ev("fill", "R7.1")
+        if self.tier.fill_mode == "limit":
+            lim = tr.limit
+            q2 = row.quote_view.leg2 if row.quote_view is not None else None
+            if (lim is not None and lim.status == "resting"
+                    and m >= lim.first_eligible_min
+                    and q2 is not None and q2.valid):
+                marketable = (q2.ask <= lim.price) if lim.side == "buy"                     else (q2.bid >= lim.price)
+                if marketable:
+                    return ev("fill", "R7.1")
+        else:
+            if (sell and bar.high >= tr.target) or (not sell and bar.low <= tr.target):
+                return ev("fill", "R7.1")
         # R7.2 scratch
         if tr.branch == "B" and self.tier.r72_enabled and row.hiro_fresh:
             if (m - tr.entry_min) <= self.e7["scratch_window_min"] and tr.entry_L is not None:
                 if row.L <= tr.entry_L - self.e7["scratch_drop_bps"] or row.run_broke:
                     return ev("scratch", "R7.2")
 
-        # R7.3 cap: chain path uses the option-mid move Session attaches live;
-        # proxy path uses SPX vs S0 at the bar close
+        # R7.3 cap (v3.0): chain mode uses the leg-1 option mid vs the leg-1
+        # fill; spot proxy only as the quote-gap fallback (R2.5)
         adverse_move = (tr.s0 - bar.close) if sell else (bar.close - tr.s0)
-        if tr.cap_source == "chain":
-            if row.option_mid_move is not None:
-                if row.option_mid_move >= tr.cap_value:
+        if tr.cap_source == "chain" and tr.entry_option_mid is not None:
+            q1 = row.quote_view.leg1 if row.quote_view is not None else None
+            if q1 is not None and q1.valid:
+                move = (q1.mid - tr.entry_option_mid) if sell                     else (tr.entry_option_mid - q1.mid)
+                if move >= tr.cap_value:
                     return ev("cap", "R7.3", cap_source="chain")
             elif adverse_move >= self.e7["cap_spot_pts"]:
-                # chain quote unavailable this bar -> spot-proxy fallback so a
-                # live trade is NEVER capless (R2.5 "chain call fails" path)
                 return ev("cap", "R7.3", cap_source="proxy_fallback")
-        else:
+        elif tr.cap_source != "chain":
             if adverse_move >= tr.cap_value:
                 return ev("cap", "R7.3", cap_source="proxy")
         # R7.4 veto exit / state flip (veto_exit before state_flip on ties)
@@ -329,6 +339,17 @@ class RuleEngine:
             out.append(Event(event_type="state_line", rule_id="R10.1", trade_id=tr0.id,
                              notes="scratch_unavailable (HIRO down)"))
             self._scratch_unavail_trade = tr0.id
+        # v3.0 R10.4: 5th consecutive quote_gap minute while a limit rests ->
+        # the SINGLE ARBITER cancels it (executor stamps data_invalid)
+        tr_gap = state.open_trade
+        if (self.tier.fill_mode == "limit" and tr_gap is not None
+                and tr_gap.limit is not None and tr_gap.limit.status == "resting"
+                and row.quote_gap_streak >= self.cfg.i("r1v3_limits", "quote_gap_invalid_after")):
+            out.append(Event(event_type="limit_canceled", rule_id="R10.4",
+                             trade_id=tr_gap.id, limit_cancel_reason="quote_gap",
+                             quote_gap_streak=row.quote_gap_streak,
+                             notes="resting limit CANCELED — quote gap >= 5 min; "
+                                   "outcome will be data_invalid (unscored)"))
         # exits first (they apply to the open trade before new entries can matter;
         # entry evaluation below still sees the trade as open this bar — one leg at a time)
         exit_ev = self._exit_decision(row, state)
@@ -341,9 +362,17 @@ class RuleEngine:
             adverse = (tr.s0 - row.bar.low) if tr.side == "sell_first" else (row.bar.high - tr.s0)
             out.append(Event(event_type="heartbeat", rule_id="R8.1", branch=tr.branch,
                              side=tr.side, trade_id=tr.id,
+                             quote_gap_streak=row.quote_gap_streak,
+                             last_valid_bid=tr.last_valid_bid,
+                             last_valid_ask=tr.last_valid_ask,
+                             last_valid_quote_min=tr.last_valid_quote_min,
+                             limit_price=(tr.limit.price if tr.limit else None),
+                             leg_liq_loss_usd=tr.leg_liq_loss_usd,
+                             spx_adverse_pts=max(0.0, adverse),
                              notes=f"open {row.min - tr.entry_min}m, clock "
                                    f"{self.k['clock_minutes'] - (row.min - tr.entry_min)}m left, "
-                                   f"adverse-so-far {max(0.0, adverse):.2f}"))
+                                   f"liq-loss ${tr.leg_liq_loss_usd:,.0f}, "
+                                   f"spx-adverse {max(0.0, adverse):.2f}"))
         # entries (only during trading; R4.4 event days never reach evaluate())
         out.extend(self._entry_events(row, state))
         return out

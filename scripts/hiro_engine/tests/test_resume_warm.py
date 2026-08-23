@@ -16,7 +16,9 @@ DAY = "2026-08-12"     # a day with real B entries in the stored data
 
 
 def _session(config, log):
-    s = Session(config, TIER_FULL, DAY, "backtest", log, range60_history=[0.5] * 300)
+    from hiro_engine.chains import ChainStore
+    s = Session(config, TIER_FULL, DAY, "backtest", log, range60_history=[0.5] * 300,
+                chains=ChainStore())
     s._write_session_row = lambda row: None
     return s
 

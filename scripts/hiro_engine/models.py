@@ -64,6 +64,33 @@ class QuoteView:
     leg2: Optional[QuoteSnap] = None
 
 
+@dataclass
+class RestingLimit:
+    """The second leg's resting order (v3.0 R1.4c/d)."""
+    side: str                    # "buy" | "sell"
+    strike: float
+    price: float                 # L, tick-rounded AGAINST us
+    placed_min: int              # entry minute
+    first_eligible_min: int      # signal + 2
+    status: str = "resting"      # resting | filled | canceled
+    cancel_reason: Optional[str] = None
+
+
+def round_limit_against(raw: float, side: str, tick: float) -> float:
+    """R1.4c: BUY limits round DOWN, SELL limits round UP (never a better fill)."""
+    import math
+    n = raw / tick
+    r = math.floor(n + 1e-9) if side == "buy" else math.ceil(n - 1e-9)
+    return round(r * tick, 10)
+
+
+def realized_pnl_usd(side: str, leg1_fill: float, exit_price: float) -> float:
+    """R11.3 single home: points x 100. sell_first pnl = fill1 - buyback;
+    long_first pnl = sale - fill1. Used by executor, scorecard AND register."""
+    pts = (leg1_fill - exit_price) if side == "sell_first" else (exit_price - leg1_fill)
+    return round(pts * 100.0, 6)
+
+
 @dataclass(frozen=True)
 class Vetoes:
     vt_broken: bool = False
@@ -129,7 +156,9 @@ class FeatureRow:
     # attached by Session:
     vetoes: Vetoes = field(default=Vetoes())
     health: str = "OK"              # OK|HIRO_DOWN|SPX_STALLED|DEGRADED_VWAP
-    option_mid_move: Optional[float] = None   # live+chain: |mid - entry mid| against the leg (R7.3)
+    option_mid_move: Optional[float] = None   # chain-mode R7.3 cap input (Session computes from quotes)
+    quote_view: Optional["QuoteView"] = None  # v3.0: attached by Session (fill_mode=limit)
+    quote_gap_streak: int = 0                 # v3.0: Session-counted (R10.4)
 
 
 @dataclass(frozen=True)
@@ -143,6 +172,8 @@ class PendingEntry:
     chain_quote_ts: Optional[str] = None
     bh_level: Optional[float] = None    # legacy field, always None since v2.3 (A has no scratch)
     entry_L: Optional[float] = None     # Branch B flow anchor = L at the SIGNAL bar (research L0)
+    k1: Optional[float] = None          # v3.0: resolved by Session at the SIGNAL minute (R1.2)
+    k2: Optional[float] = None
 
 
 @dataclass
@@ -163,6 +194,20 @@ class SimTrade:
     entry_L: Optional[float]        # Branch B scratch anchor (R7.2)
     cap_source: str                 # "chain" | "proxy"
     cap_value: float
+    # ---- v3.0 (fill_mode=limit) ----
+    k1: Optional[float] = None
+    k2: Optional[float] = None
+    leg1_fill: Optional[float] = None
+    limit: Optional[RestingLimit] = None
+    leg2_fill: Optional[float] = None
+    credit: Optional[float] = None
+    quote_gap_streak: int = 0
+    data_invalid: bool = False
+    leg_liq_loss_usd: float = 0.0
+    last_valid_bid: Optional[float] = None
+    last_valid_ask: Optional[float] = None
+    last_valid_quote_min: Optional[int] = None
+    pnl_usd: Optional[float] = None
     state: str = "open"             # open | closed
     exit_type: Optional[str] = None
     exit_ref: Optional[float] = None
@@ -181,15 +226,16 @@ class TierPolicy:
     r43_enabled: bool               # flow veto
     r72_enabled: bool               # Branch-B flow-shutoff scratch (Branch A has no scratch, v2.3)
     requires_hiro: bool             # False => missing HIRO is NOT an outage (price tier)
+    fill_mode: str                  # "limit" (v3.0 real fills) | "spot_touch" (legacy price tier)
     tier_stamp: str
 
 
 TIER_FULL = TierPolicy("full", branch_b_enabled=True, price_a_conditions=False,
                        r43_enabled=True, r72_enabled=True, requires_hiro=True,
-                       tier_stamp="full")
+                       fill_mode="limit", tier_stamp="full")
 TIER_PRICE = TierPolicy("price", branch_b_enabled=False, price_a_conditions=True,
                         r43_enabled=False, r72_enabled=False, requires_hiro=False,
-                        tier_stamp="price")
+                        fill_mode="spot_touch", tier_stamp="price")
 TIERS = {"full": TIER_FULL, "price": TIER_PRICE}
 
 
@@ -214,6 +260,11 @@ EVENT_FIELDS = [
     "outcome_type", "outcome_minutes", "exit_ref", "cap_source", "resolution_debit",
     "adverse", "trade_id", "entry_min", "signal_min", "entry_option_mid",
     "resting_limit_ref", "target", "bh_level", "entry_L", "cap_value", "episode",
+    # ---- schema_v=2 additions (v3.0; additive — readers accept v1 rows) ----
+    "k1", "k2", "leg1_fill", "limit_price", "limit_status", "limit_cancel_reason",
+    "first_eligible_min", "leg2_fill", "credit", "quote_age", "quote_gap_streak",
+    "last_valid_bid", "last_valid_ask", "last_valid_quote_min", "data_invalid",
+    "leg_liq_loss_usd", "spx_adverse_pts", "pnl_usd",
     "notes",
 ]
 
@@ -226,7 +277,7 @@ class Event:
     tier: str = ""
     session_date: str = ""
     config_hash: str = ""
-    schema_v: int = 1
+    schema_v: int = 2
     event_type: str = ""
     rule_id: str = ""
     branch: str = ""
@@ -261,6 +312,24 @@ class Event:
     entry_L: Optional[float] = None
     cap_value: Optional[float] = None
     episode: Optional[int] = None
+    k1: Optional[float] = None
+    k2: Optional[float] = None
+    leg1_fill: Optional[float] = None
+    limit_price: Optional[float] = None
+    limit_status: Optional[str] = None
+    limit_cancel_reason: Optional[str] = None
+    first_eligible_min: Optional[int] = None
+    leg2_fill: Optional[float] = None
+    credit: Optional[float] = None
+    quote_age: Optional[int] = None
+    quote_gap_streak: Optional[int] = None
+    last_valid_bid: Optional[float] = None
+    last_valid_ask: Optional[float] = None
+    last_valid_quote_min: Optional[int] = None
+    data_invalid: Optional[bool] = None
+    leg_liq_loss_usd: Optional[float] = None
+    spx_adverse_pts: Optional[float] = None
+    pnl_usd: Optional[float] = None
     notes: str = ""
 
 

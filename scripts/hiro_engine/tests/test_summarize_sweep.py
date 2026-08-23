@@ -82,7 +82,7 @@ def test_tier_differences_enumerated(config, tmp_path):
         for tier in (TIER_FULL, TIER_PRICE):
             p = tmp_path / f"{tier.name}.csv"
             log = EventLog(p, console=io.StringIO(), echo=False)
-            run_backtest(config, tier, ["2026-08-19"], log)
+            run_backtest(config, tier, ["2026-08-19"], log, prereg_override=True)
             log.close()
             outs[tier.name] = pd.read_csv(p)
     finally:
@@ -93,4 +93,4 @@ def test_tier_differences_enumerated(config, tmp_path):
     assert not len(price[(price.event_type == "signal") & (price.branch == "B")])
     # R4.3 flow veto disabled in price tier: no flow_veto veto_change lines
     assert not any("flow_veto=True" in str(n) for n in price[price.event_type == "veto_change"].notes)
-    assert price.iloc[0].schema_v == 1
+    assert price.iloc[0].schema_v == 2   # v3 MIGRATION (15g: UPDATED): schema bumped, additive

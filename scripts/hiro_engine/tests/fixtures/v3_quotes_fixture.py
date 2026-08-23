@@ -67,7 +67,8 @@ SCENARIOS = [
             #   raw L = 40.25 + 0.10 = 40.35 -> SELL limit rounds UP (against us)
             #   on the 0.10 premium grid -> L = 40.40; fill iff bid(K-5) >= 40.40
             K:   {701: (39.95, 40.25)},
-            K2L: {702: (40.35, 40.75),    # bid 40.35 < 40.40 -> no fill (rounding matters!)
+            K2L: {701: (40.30, 40.70),    # entry-minute quote (valid, not marketable)
+                  702: (40.35, 40.75),    # bid 40.35 < 40.40 -> no fill (rounding matters!)
                   703: (40.40, 40.80)},   # bid 40.40 >= 40.40 -> FILL at 703 at L=40.40
         },
         expect=dict(leg1_fill=40.25, limit_price=40.40, outcome="fill",
@@ -82,7 +83,8 @@ SCENARIOS = [
         scratch_trigger_min=703,           # flow drop signalled at 703 close (within 3-min window)
         quotes={
             K:   {701: (40.00, 40.30)},                    # leg1 40.00, L 39.90
-            K2S: {702: (40.00, 40.40),
+            K2S: {701: (40.00, 40.40),    # entry-minute quote (valid, not marketable)
+                  702: (40.00, 40.40),
                   703: (39.50, 39.90)},   # marketable at the SAME close as the scratch -> FILL WINS
         },
         expect=dict(outcome="fill", fill_min=703, minutes=2, credit=0.10,
@@ -96,7 +98,8 @@ SCENARIOS = [
         quotes={
             K:   {701: (40.00, 40.30),
                   703: (40.30, 40.60)},   # buyback books at 703 CLOSING ASK = 40.60
-            K2S: {702: (40.20, 40.50)},   # never marketable
+            K2S: {701: (40.20, 40.50),    # entry-minute quote
+                  702: (40.20, 40.50)},   # never marketable
         },
         # DERIVATION: decision at 702 close -> limit_canceled at 702; book at
         # close-of-703 ask 40.60; pnl = 40.00 - 40.60 = -0.60 -> -$60
@@ -110,7 +113,7 @@ SCENARIOS = [
         side="sell_first", signal_min=700,
         quotes={
             K:   {701: (40.00, 40.30), 762: (41.00, 41.40)},
-            K2S: {m: (40.20, 40.50) for m in range(702, 763)},   # never <= 39.90
+            K2S: {m: (40.20, 40.50) for m in range(701, 763)},   # never <= 39.90
         },
         # DERIVATION: clock fires at m - entry >= 60 -> m = 761 (decision);
         # cancel at 761; book at 762 closing ask 41.40; pnl = 40.00 - 41.40 = -1.40 -> -$140
@@ -122,7 +125,7 @@ SCENARIOS = [
         name="S7_resolution_books_AT_the_1530_bar_close",
         side="sell_first", signal_min=868,
         quotes={
-            K:   {869: (40.00, 40.30), 930: (40.60, 41.00)},
+            K:   {871: (40.00, 40.30), 930: (40.60, 41.00)},   # input fix: entry minute is 871 (expected values untouched)
             K2S: {m: (40.20, 40.50) for m in range(870, 931)},
         },
         # DERIVATION: entry 869; clock would fire at 929 (869+60) BUT R5.4: a
@@ -145,7 +148,7 @@ SCENARIOS = [
             K:   {701: (40.00, 40.30),                     # leg1 40.00
                   710: (43.40, 43.70),                     # mid 43.55; 43.55-40.00=3.55>=3.5 -> cap at 710
                   711: (43.60, 44.00)},                    # book at 711 closing ask 44.00
-            K2S: {m: (40.20, 40.50) for m in range(702, 712)},
+            K2S: {m: (40.20, 40.50) for m in range(701, 712)},
         },
         # DERIVATION: pnl = 40.00 - 44.00 = -4.00 -> -$400
         expect=dict(outcome="cap", cap_min=710, limit_canceled_min=710,
@@ -157,11 +160,11 @@ SCENARIOS = [
         name="S9_five_gap_data_invalid_then_timeout",
         side="sell_first", signal_min=700,
         quotes={
-            K:   dict({701: (40.00, 40.30), 762: (40.80, 41.20)},
-                      **{m: (40.10, 40.40) for m in range(702, 705)}),
+            K:   {**{701: (40.00, 40.30), 762: (40.80, 41.20)},
+                  **{m: (40.10, 40.40) for m in range(702, 705)}},
             # K2 quotes exist 702-704, MISSING 705-709 (5 consecutive gap minutes)
-            K2S: dict({m: (40.20, 40.50) for m in range(702, 705)},
-                      **{m: (40.20, 40.50) for m in range(710, 763)}),
+            K2S: {**{m: (40.20, 40.50) for m in range(701, 705)},
+                  **{m: (40.20, 40.50) for m in range(710, 763)}},
         },
         # DERIVATION: gap minutes 705,706,707,708,709 -> 5th at 709: limit
         # canceled (reason quote_gap); trade stays open under guards; clock at
@@ -173,17 +176,21 @@ SCENARIOS = [
     ),
     # ------------------------------------------------------------------ S10
     dict(
+        # SCENARIO INPUT REDESIGN (authoring defect found by the harness): the
+        # original placed the entry at 15:41, INSIDE the R7.6 resolution window,
+        # so resolution correctly fired — censoring is only reachable on a
+        # PARTIAL day whose bars stop early. Same derivation, same numbers.
         name="S10_session_end_censored_books_bar_j_close",
-        side="sell_first", signal_min=940,
-        session_last_min=950,
+        side="sell_first", signal_min=600,
+        session_last_min=610,
         quotes={
-            K:   {941: (40.00, 40.30), 950: (40.30, 40.60)},
-            K2S: {m: (40.20, 40.50) for m in range(942, 951)},
+            K:   {601: (40.00, 40.30), 610: (40.30, 40.60)},
+            K2S: {m: (40.20, 40.50) for m in range(601, 611)},
         },
-        # DERIVATION: entry 941; session ends at bar 950 with no decision ->
-        # censored; NO bar j+1 -> book at bar 950's closing ask 40.60;
+        # DERIVATION: entry 601; bars stop at 610 with no decision (clock needs
+        # 60m) -> censored; NO bar j+1 -> book at bar 610's closing ask 40.60;
         # pnl = 40.00 - 40.60 = -0.60 -> -$60
-        expect=dict(outcome="censored", exit_book_min=950, exit_price=40.60,
+        expect=dict(outcome="censored", exit_book_min=610, exit_price=40.60,
                     pnl_usd=-60.0),
     ),
     # ------------------------------------------------------------------ S11
@@ -204,7 +211,7 @@ SCENARIOS = [
         veto_trigger_min=720,
         quotes={
             K:   {701: (40.00, 40.30), 721: (41.10, 41.50)},
-            K2S: {m: (40.20, 40.50) for m in range(702, 722)},
+            K2S: {m: (40.20, 40.50) for m in range(701, 722)},
         },
         # DERIVATION: veto at 720 close -> cancel at 720, book at 721 closing
         # ask 41.50; pnl = 40.00 - 41.50 = -1.50 -> -$150
@@ -219,7 +226,7 @@ SCENARIOS = [
         quotes={
             K:   {771: (39.95, 40.25),     # leg1 = BUY at ask 40.25
                   781: (39.00, 39.40)},    # book SELL at 781 closing BID 39.00
-            K2L: {m: (39.50, 39.90) for m in range(772, 782)},   # bid < L=40.40 always
+            K2L: {m: (39.50, 39.90) for m in range(771, 782)},   # bid < L=40.40 always
         },
         # DERIVATION: pnl (long_first) = sale - fill1 = 39.00 - 40.25 = -1.25 -> -$125
         expect=dict(outcome="state_flip", limit_canceled_min=780,

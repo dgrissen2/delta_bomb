@@ -7,7 +7,7 @@ import pytest
 from hiro_engine.models import (EngineState, SimTrade, TIER_FULL, TIER_PRICE, Vetoes)
 from hiro_engine.rules import RuleEngine
 
-from helpers import a_fire_row, b_fire_row, mk_row
+from helpers import a_fire_row, b_fire_row, mk_row, qv, resting_trade
 
 
 def _engine(config, tier=TIER_FULL):
@@ -117,10 +117,12 @@ def _exit_type(evs):
 
 
 def test_fill_beats_scratch(config):
-    tr = _open_trade(entry_min=700, s0=100.0, entry_L=1.0)
+    """v3 MIGRATION (15g: RE-PARAMETERIZED): marketable partner quote AND a
+    flow drop on the same close -> fill wins (fixture S4 covers the full path)."""
+    tr = resting_trade(entry_min=700, entry_L=1.0)
     st = EngineState(open_trade=tr)
-    # bar touches target AND flow dropped 0.4 below entry_L in window
-    row = mk_row(701, close=101.0, high=103.2, L=0.6, run_broke=True)
+    row = mk_row(701, close=101.0, L=0.6, run_broke=True,
+                 quote_view=qv(701, leg2=(39.5, 39.9)))
     assert _exit_type(_engine(config).evaluate(row, st)) == "fill"
 
 

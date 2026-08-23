@@ -12,6 +12,8 @@ from hiro_engine.feeds import ReplayTick
 from hiro_engine.models import Bar, SpyBar, TIER_FULL
 from hiro_engine.session import Session
 
+from helpers import FakeChains
+
 
 def _hiro_frame(upto: int, slope: float = 0.2):
     mins = list(range(570, upto + 1))
@@ -27,7 +29,8 @@ def _hiro_frame(upto: int, slope: float = 0.2):
 def _mk_session(config, tmp_path, day="2026-08-18", **kw) -> tuple[Session, EventLog]:
     log = EventLog(tmp_path / "paper_log.csv", console=io.StringIO())
     s = Session(config, TIER_FULL, day, "backtest", log,
-                range60_history=[0.5] * 300, **kw)
+                range60_history=[0.5] * 300,
+                chains=kw.pop("chains", FakeChains()), **kw)
     return s, log
 
 
@@ -58,14 +61,18 @@ def test_per_bar_contract_ordering(config, tmp_path, monkeypatch):
     assert calls == ["execute_pending", "features", "rules", "apply"]
 
 
-def test_entry_executes_bar_after_signal_with_s0_that_open(config, tmp_path):
-    """Force a pending entry via state; the very next bar's open becomes S0."""
-    s, log = _mk_session(config, tmp_path)
+def test_entry_executes_bar_after_signal_books_leg1(config, tmp_path):
+    """v3 MIGRATION: the pending entry books leg 1 at the next bar's closing
+    NBBO bid (S0 stays the context anchor = that bar's open)."""
+    fk = FakeChains(quotes={("*", 7500.0): (40.0, 40.3), ("*", 7505.0): (40.2, 40.5)})
+    s, log = _mk_session(config, tmp_path, chains=fk)
     from hiro_engine.models import PendingEntry
-    s.state.pending_entry = PendingEntry("B", "sell_first", 700, 1, entry_L=1.0)
+    s.state.pending_entry = PendingEntry("B", "sell_first", 700, 1, entry_L=1.0,
+                                         k1=7500.0, k2=7505.0)
     tick = ReplayTick(Bar(701, 123.45, 124.0, 123.0, 123.5), None, _hiro_frame(701))
     s.process_tick(tick)
     assert s.state.open_trade is not None
+    assert s.state.open_trade.leg1_fill == 40.0
     assert s.state.open_trade.s0 == 123.45 and s.state.open_trade.entry_min == 701
 
 

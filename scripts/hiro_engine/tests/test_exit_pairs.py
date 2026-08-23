@@ -8,17 +8,19 @@ import pytest
 from hiro_engine.models import EngineState, SimTrade, TIER_FULL, Vetoes
 from hiro_engine.rules import RuleEngine
 
-from helpers import mk_row
+from helpers import mk_row, qv, resting_trade
 
 
 def _trade(side, branch, entry_min, s0, **kw):
-    d = dict(id=1, branch=branch, side=side, signal_min=entry_min - 1, entry_min=entry_min,
-             s0=s0, expiry=None, leg_strikes=None, entry_option_mid=None,
-             resting_limit_ref=None,
-             target=s0 + 3 if side == "sell_first" else s0 - 3,
-             bh_level=None, entry_L=None, cap_source="proxy", cap_value=15.0, episode=1)
-    d.update(kw)
-    return SimTrade(**d)
+    """v3 MIGRATION (15g table: RE-PARAMETERIZED): pairs now use a resting-limit
+    trade; 'fill' condition = marketable partner quote instead of an SPX touch.
+    Old SPX kwargs (target etc.) are mapped onto the v3 trade."""
+    kw.pop("target", None)
+    entry_L = kw.pop("entry_L", 1.0 if branch == "B" else None)
+    bh = kw.pop("bh_level", None)
+    return resting_trade(side=side, branch=branch, entry_min=entry_min,
+                         entry_L=entry_L, bh_level=bh, s0=s0, cap_source="proxy",
+                         cap_value=15.0, **kw)
 
 
 # Each case: (name, expected_winner, trade_kwargs, row_kwargs)
@@ -27,25 +29,30 @@ CASES = [
     # ---- fill beats everything it can co-occur with
     ("fill+scratchB", "fill",
      dict(side="sell_first", branch="B", entry_min=700, s0=100.0, entry_L=1.0),
-     dict(m=701, close=101.0, high=103.5, L=0.5)),
+     dict(m=701, close=101.0, L=0.5, quote_view=qv(701, leg2=(39.5, 39.9)))),
     ("fill+high_above_old_bh (A: no scratch, v2.3)", "fill",
-     dict(side="long_first", branch="A", entry_min=700, s0=100.0, bh_level=100.5),
-     dict(m=705, close=98.0, high=101.0, low=96.9)),
+     dict(side="long_first", branch="A", entry_min=700, s0=100.0, bh_level=100.5,
+          leg1_fill=40.25, L=40.40, k2=7495.0),
+     dict(m=705, close=98.0, high=101.0, low=96.9,
+          quote_view=qv(705, k2=7495.0, leg2=(40.4, 40.8)))),
     ("fill+cap", "fill",
      dict(side="sell_first", branch="B", entry_min=700, s0=100.0),
-     dict(m=710, close=84.0, high=103.2, low=83.0)),          # touch AND 16 pts against at close
+     dict(m=710, close=84.0, low=83.0,
+          quote_view=qv(710, leg1=(44.0, 44.4), leg2=(39.5, 39.9)))),  # marketable AND mid 4.2 over fill
     ("fill+veto_exit", "fill",
      dict(side="sell_first", branch="B", entry_min=700, s0=100.0),
-     dict(m=710, close=101.0, high=103.2, vetoes=Vetoes(flow_veto=True))),
+     dict(m=710, close=101.0, vetoes=Vetoes(flow_veto=True),
+          quote_view=qv(710, leg2=(39.5, 39.9)))),
     ("fill+state_flip", "fill",
      dict(side="sell_first", branch="B", entry_min=777, s0=100.0),
-     dict(m=780, close=101.0, high=103.1, context_1300="DOWN")),
+     dict(m=780, close=101.0, context_1300="DOWN",
+          quote_view=qv(780, leg2=(39.5, 39.9)))),
     ("fill+clock", "fill",
      dict(side="sell_first", branch="B", entry_min=700, s0=100.0),
-     dict(m=760, close=101.0, high=103.4)),
+     dict(m=760, close=101.0, quote_view=qv(760, leg2=(39.5, 39.9)))),
     ("fill+resolution", "fill",
      dict(side="sell_first", branch="B", entry_min=869, s0=100.0),
-     dict(m=930, close=101.0, high=103.4)),
+     dict(m=930, close=101.0, quote_view=qv(930, leg2=(39.5, 39.9)))),
     # ---- scratch beats cap / veto / flip / clock / resolution
     ("scratchB+cap", "scratch",
      dict(side="sell_first", branch="B", entry_min=700, s0=120.0, entry_L=1.0),

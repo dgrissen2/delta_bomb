@@ -14,8 +14,14 @@ from .models import EVENT_FIELDS, EngineState, Event, PendingEntry, SimTrade
 _FLOAT_FIELDS = {"s0", "run", "rate", "dC", "dP", "share", "r15", "pull30", "bounce30",
                  "outcome_minutes", "exit_ref", "resolution_debit", "adverse",
                  "entry_option_mid", "resting_limit_ref", "target", "bh_level",
-                 "entry_L", "cap_value"}
-_INT_FIELDS = {"schema_v", "trade_id", "entry_min", "signal_min", "episode"}
+                 "entry_L", "cap_value",
+                 "k1", "k2", "leg1_fill", "limit_price", "leg2_fill", "credit",
+                 "last_valid_bid", "last_valid_ask", "leg_liq_loss_usd",
+                 "spx_adverse_pts", "pnl_usd"}
+_INT_FIELDS = {"schema_v", "trade_id", "entry_min", "signal_min", "episode",
+               "first_eligible_min", "quote_age", "quote_gap_streak",
+               "last_valid_quote_min"}
+_BOOL_FIELDS = {"data_invalid"}
 
 
 def _hhmm(m: Optional[int]) -> str:
@@ -63,13 +69,16 @@ def event_from_row(row: dict) -> Event:
     for f in EVENT_FIELDS:
         v = row.get(f, "")
         if v == "" or v is None:
-            kw[f] = None if (f in _FLOAT_FIELDS or f in _INT_FIELDS
+            kw[f] = None if (f in _FLOAT_FIELDS or f in _INT_FIELDS or f in _BOOL_FIELDS
                              or f in ("expiry", "leg_strikes", "strike_quote_ts", "context",
-                                      "outcome_type", "cap_source")) else ""
+                                      "outcome_type", "cap_source", "limit_status",
+                                      "limit_cancel_reason")) else ""
         elif f in _FLOAT_FIELDS:
             kw[f] = float(v)
         elif f in _INT_FIELDS:
             kw[f] = int(float(v))
+        elif f in _BOOL_FIELDS:
+            kw[f] = str(v) in ("True", "true", "1")
         else:
             kw[f] = str(v)
     if kw["schema_v"] is None:
@@ -101,13 +110,28 @@ class EventLog:
 
 
 def trade_from_entry_event(ev: Event) -> SimTrade:
+    from .models import RestingLimit
+    lim = None
+    if ev.limit_price is not None:
+        lim = RestingLimit(side=("buy" if ev.side == "sell_first" else "sell"),
+                           strike=ev.k2, price=ev.limit_price,
+                           placed_min=ev.entry_min,
+                           first_eligible_min=ev.first_eligible_min,
+                           status=ev.limit_status or "resting",
+                           cancel_reason=ev.limit_cancel_reason)
     return SimTrade(
         id=ev.trade_id, branch=ev.branch, side=ev.side, signal_min=ev.signal_min,
         entry_min=ev.entry_min, s0=ev.s0, expiry=ev.expiry, leg_strikes=ev.leg_strikes,
         entry_option_mid=ev.entry_option_mid, resting_limit_ref=ev.resting_limit_ref,
         target=ev.target, bh_level=ev.bh_level, entry_L=ev.entry_L,
         cap_source=ev.cap_source or "proxy", cap_value=ev.cap_value,
-        episode=ev.episode)
+        episode=ev.episode, k1=ev.k1, k2=ev.k2, leg1_fill=ev.leg1_fill, limit=lim,
+        leg2_fill=ev.leg2_fill, credit=ev.credit,
+        quote_gap_streak=ev.quote_gap_streak or 0,
+        data_invalid=bool(ev.data_invalid),
+        leg_liq_loss_usd=ev.leg_liq_loss_usd or 0.0,
+        last_valid_bid=ev.last_valid_bid, last_valid_ask=ev.last_valid_ask,
+        last_valid_quote_min=ev.last_valid_quote_min)
 
 
 def apply_exit_event(tr: SimTrade, ev: Event) -> SimTrade:
@@ -115,8 +139,14 @@ def apply_exit_event(tr: SimTrade, ev: Event) -> SimTrade:
     tr.exit_type = ev.outcome_type
     tr.exit_ref = ev.exit_ref
     tr.minutes = int(ev.outcome_minutes) if ev.outcome_minutes is not None else None
-    tr.resolution_debit = ev.resolution_debit
     tr.adverse = ev.adverse if ev.adverse is not None else tr.adverse
+    tr.leg2_fill = ev.leg2_fill if ev.leg2_fill is not None else tr.leg2_fill
+    tr.credit = ev.credit if ev.credit is not None else tr.credit
+    tr.pnl_usd = ev.pnl_usd
+    tr.data_invalid = bool(ev.data_invalid) or tr.data_invalid
+    if tr.limit is not None and ev.limit_status:
+        tr.limit.status = ev.limit_status
+        tr.limit.cancel_reason = ev.limit_cancel_reason
     return tr
 
 
@@ -152,4 +182,20 @@ def rebuild_state(csv_path: Path, session_date: str) -> EngineState:
             elif ev.event_type == "exit_decision" and state.open_trade is not None:
                 if ev.outcome_type not in ("fill", "resolution"):
                     state.pending_exit = ev.outcome_type
+            elif ev.event_type == "limit_canceled" and state.open_trade is not None:
+                tr = state.open_trade
+                if tr.limit is not None:
+                    tr.limit.status = "canceled"
+                    tr.limit.cancel_reason = ev.limit_cancel_reason or "quote_gap"
+                tr.data_invalid = True
+            elif ev.event_type in ("heartbeat", "quote_gap") and state.open_trade is not None:
+                tr = state.open_trade
+                if ev.quote_gap_streak is not None:
+                    tr.quote_gap_streak = ev.quote_gap_streak
+                if ev.last_valid_quote_min is not None:
+                    tr.last_valid_bid = ev.last_valid_bid
+                    tr.last_valid_ask = ev.last_valid_ask
+                    tr.last_valid_quote_min = ev.last_valid_quote_min
+            elif ev.event_type == "entry_aborted_no_quote":
+                state.pending_entry = None
     return state

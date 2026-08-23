@@ -186,6 +186,12 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
     from .backtest import available_spx_days
     hist_days = [d for d in available_spx_days(cfg, era, day) if d < day]
     hist = build_range60_history(cfg, TIER_FULL, hist_days)
+    # v3.0: live REQUIRES the option-quote path, which is gated on the task-14
+    # spike + task-19 interlocks. Until those pass there is no live session.
+    raise SystemExit(
+        "live mode is DISABLED pending the v3.0 live-quote spike (task 14) and "
+        "readiness interlocks (task 19): fills require real option quotes and "
+        "there is no SPX-proxy fallback by spec (R2.5/R10.4).")
     session = Session(cfg, TIER_FULL, day, "live", log, range60_history=hist,
                       shakedown=shakedown, chain_available=chain.available, im=im)
     hiro = HiroPull()

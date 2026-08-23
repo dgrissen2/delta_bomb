@@ -50,6 +50,22 @@ class InstrumentSelector:
             return k, k + self.width          # sell K, buy K+5
         return k, k - self.width              # buy K, sell K-5
 
+    def pick_from_snapshot(self, snapshot, side: str):
+        """R1.2 (v3.0): from a signal-minute chain snapshot frame (strike, bid,
+        ask, delta), pick K = delta-closest to -0.20 among strikes whose 5-wide
+        partner is LISTED with a live (bid>0) quote; ties -> lower strike.
+        Returns (k1, k2) or (None, None)."""
+        off = float(self.width) if side == "sell_first" else -float(self.width)
+        live = snapshot[snapshot.bid > 0]
+        listed = set(live.strike)
+        cand = live[live.strike.map(lambda k: (k + off) in listed)]
+        if not len(cand):
+            return None, None
+        cand = cand.assign(_key=(cand.delta - self.delta_target).abs())
+        cand = cand.sort_values(["_key", "strike"])
+        k1 = float(cand.strike.iloc[0])
+        return k1, k1 + off
+
     def hint(self, side: str) -> str:
         """R1.2 no-chain fallback text."""
         verb = "SELL" if side == "sell_first" else "BUY"

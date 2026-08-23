@@ -14,11 +14,15 @@ from hiro_engine.instruments import InstrumentSelector
 from hiro_engine.models import (Bar, EngineState, Event, PendingEntry, SimTrade, TIER_FULL)
 from hiro_engine.rules import RuleEngine
 
-from helpers import b_fire_row, mk_row
+from helpers import b_fire_row, mk_row, qv, resting_trade
 
 
 def _exec(config):
-    return Executor(config, InstrumentSelector(config))
+    from hiro_engine.models import TIER_FULL
+    return Executor(config, InstrumentSelector(config), tier=TIER_FULL)
+
+
+PE = dict(k1=7500.0, k2=7505.0)          # v3: instruments resolved at signal
 
 
 # ---- 4b InstrumentSelector -------------------------------------------------------
@@ -42,48 +46,58 @@ def test_delta_tiebreak_and_width(config):
 
 
 # ---- executor properties ------------------------------------------------------------
-def test_pending_entry_executes_exactly_once_at_next_open(config):
+def test_pending_entry_executes_exactly_once_books_leg1_nbbo(config):
+    """v3 MIGRATION: leg 1 books at the bar's closing NBBO bid (sell-first);
+    the resting limit is created at fill1 - 0.10; S0 is context only."""
     ex = _exec(config)
-    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0))
-    evs = ex.execute_pending(Bar(701, 100.5, 101.0, 100.0, 100.8), st)
+    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0, **PE))
+    evs = ex.execute_pending(Bar(701, 100.5, 101.0, 100.0, 100.8), st,
+                             quotes=qv(701, leg1=(40.0, 40.3), leg2=(40.2, 40.5)))
     assert [e.event_type for e in evs] == ["entry"]
-    assert st.open_trade.s0 == 100.5 and st.open_trade.target == 103.5
+    assert st.open_trade.leg1_fill == 40.0 and st.open_trade.limit.price == 39.9
+    assert st.open_trade.s0 == 100.5 and st.open_trade.target is None
     assert st.pending_entry is None and st.entries_today == 1
-    assert ex.execute_pending(Bar(702, 101, 101, 100, 101), st) == []   # never twice
+    assert ex.execute_pending(Bar(702, 101, 101, 100, 101), st,
+                              quotes=qv(702)) == []                     # never twice
 
 
-def test_fill_prices_at_touch_level_and_excludes_touch_bar_adverse(config):
+def test_fill_books_at_limit_with_credit(config):
+    """v3 MIGRATION (SUPERSEDED touch semantics; fixture S1/S2 are the golden):
+    the fill books at L with credit >= 0.10; pnl_usd = +$10."""
     ex = _exec(config)
-    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0))
-    ex.execute_pending(Bar(701, 100.0, 100.2, 99.0, 100.0), st)
-    row1 = mk_row(701, close=100.0, high=100.2, low=99.0)
-    ex.apply([], row1, st)                                # adverse 1.0 (entry bar included)
-    assert st.open_trade.adverse == pytest.approx(1.0)
+    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0, **PE))
+    ex.execute_pending(Bar(701, 100.0, 100.2, 99.0, 100.0), st,
+                       quotes=qv(701, leg1=(40.0, 40.3), leg2=(40.2, 40.5)))
     rules = RuleEngine(config, TIER_FULL)
-    row2 = mk_row(702, close=102.9, high=103.4, low=95.0) # touch bar: low would be 5 pts
-    evs = rules.evaluate(row2, st)
-    out = ex.apply(evs, row2, st)
-    assert out[0].outcome_type == "fill" and out[0].exit_ref == 103.0
-    assert out[0].adverse == pytest.approx(1.0)           # touch bar excluded (R11.2)
+    row2 = mk_row(702, close=102.9, quote_view=qv(702, leg2=(39.5, 39.9)))
+    out = ex.apply(rules.evaluate(row2, st), row2, st)
+    assert out[0].outcome_type == "fill" and out[0].exit_ref == 39.9
+    assert out[0].credit == pytest.approx(0.10) and out[0].pnl_usd == pytest.approx(10.0)
     assert out[0].outcome_minutes == 1
 
 
-def test_non_fill_exit_prices_next_open_and_censored_at_session_end(config):
+def test_non_fill_exit_books_next_close_nbbo_and_censored(config):
+    """v3 MIGRATION: scratch books at the NEXT bar's closing ASK (sell-first);
+    censored books at the last bar's NBBO (fixture S5/S10 are the golden)."""
     ex = _exec(config)
-    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0))
-    ex.execute_pending(Bar(701, 100.0, 100.2, 99.5, 100.0), st)
+    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0, **PE))
+    ex.execute_pending(Bar(701, 100.0, 100.2, 99.5, 100.0), st,
+                       quotes=qv(701, leg1=(40.0, 40.3), leg2=(40.2, 40.5)))
     rules = RuleEngine(config, TIER_FULL)
-    row = mk_row(702, close=99.5, L=0.5)                  # flow drop -> scratch decision
+    row = mk_row(702, close=99.5, L=0.5, quote_view=qv(702))
     ex.apply(rules.evaluate(row, st), row, st)
     assert st.pending_exit == "scratch"
-    evs = ex.execute_pending(Bar(703, 99.2, 99.4, 99.0, 99.3), st)
-    assert evs[0].outcome_type == "scratch" and evs[0].exit_ref == 99.2
+    evs = ex.execute_pending(Bar(703, 99.2, 99.4, 99.0, 99.3), st,
+                             quotes=qv(703, leg1=(40.3, 40.6)))
+    assert evs[0].outcome_type == "scratch" and evs[0].exit_ref == 40.6
+    assert evs[0].pnl_usd == pytest.approx(-60.0)
     assert st.open_trade is None
-    # censored: open trade at session end with no decision
-    st2 = EngineState(pending_entry=PendingEntry("B", "sell_first", 950, 2, entry_L=1.0))
-    ex.execute_pending(Bar(951, 100.0, 100.1, 99.9, 100.0), st2)
-    evs2 = ex.end_of_session(Bar(959, 100.0, 100.1, 99.9, 99.95), st2)
-    assert evs2[0].outcome_type == "censored" and evs2[0].exit_ref == 99.95
+    st2 = EngineState(pending_entry=PendingEntry("B", "sell_first", 600, 2, entry_L=1.0, **PE))
+    ex.execute_pending(Bar(601, 100.0, 100.1, 99.9, 100.0), st2,
+                       quotes=qv(601, leg1=(40.0, 40.3), leg2=(40.2, 40.5)))
+    evs2 = ex.end_of_session(Bar(610, 100.0, 100.1, 99.9, 99.95), st2,
+                             quotes=qv(610, leg1=(40.3, 40.6)))
+    assert evs2[0].outcome_type == "censored" and evs2[0].exit_ref == 40.6
 
 
 def test_at_most_one_open_trade_and_daily_cap_holds(config):
@@ -93,11 +107,15 @@ def test_at_most_one_open_trade_and_daily_cap_holds(config):
     st = EngineState()
     entries = 0
     for m in range(600, 960):
-        evs_open = ex.execute_pending(Bar(m, 100.0, 100.4, 99.6, 100.0), st)
+        evs_open = ex.execute_pending(Bar(m, 100.0, 100.4, 99.6, 100.0), st,
+                                      quotes=qv(m))
         entries += sum(1 for e in evs_open if e.event_type == "entry")
         assert (st.open_trade is None) or (st.pending_entry is None)
-        row = b_fire_row(m, episode=m)                    # fire every bar, new episode each
+        row = b_fire_row(m, episode=m, quote_view=qv(m))  # fire every bar, never marketable
         evs = rules.evaluate(row, st)
+        for e in evs:                                      # stand-in for Session resolve (R1.2)
+            if e.event_type == "pending_entry":
+                e.k1, e.k2 = 7500.0, 7505.0
         ex.apply(evs, row, st)
         assert st.entries_today <= 3
     assert entries == 3
@@ -107,11 +125,15 @@ def test_at_most_one_open_trade_and_daily_cap_holds(config):
 def test_entry_exit_round_trip_reconstructs_simtrade_field_for_field(config):
     ex = _exec(config)
     st = EngineState(pending_entry=PendingEntry("A", "long_first", 700, 3,
-                                                bh_level=101.5, entry_L=None))
-    entry_evs = ex.execute_pending(Bar(701, 100.0, 100.2, 99.5, 100.0), st)
+                                                bh_level=None, entry_L=None,
+                                                k1=7500.0, k2=7495.0))
+    entry_evs = ex.execute_pending(Bar(701, 100.0, 100.2, 99.5, 100.0), st,
+                                   quotes=qv(701, k2=7495.0, leg1=(39.95, 40.25),
+                                             leg2=(39.5, 39.9)))
     original = dataclasses.replace(st.open_trade)
     rules = RuleEngine(config, TIER_FULL)
-    row = mk_row(710, close=96.9, low=96.8, high=100.0)   # long-first fill at 97
+    row = mk_row(710, close=96.9,
+                 quote_view=qv(710, k2=7495.0, leg2=(40.40, 40.80)))  # bid>=L=40.40 -> fill
     exit_evs = ex.apply(rules.evaluate(row, st), row, st)
     # serialize -> CSV row -> back -> rebuild
     e_in = event_from_row(event_to_row(entry_evs[0]))
@@ -120,11 +142,17 @@ def test_entry_exit_round_trip_reconstructs_simtrade_field_for_field(config):
     from hiro_engine.eventlog import apply_exit_event
     apply_exit_event(rebuilt, x_in)
     closed = original
-    closed.state, closed.exit_type, closed.exit_ref = "closed", "fill", 97.0
+    closed.state, closed.exit_type, closed.exit_ref = "closed", "fill", 40.40
     closed.minutes, closed.adverse = 9, exit_evs[0].adverse
+    closed.leg2_fill, closed.credit, closed.pnl_usd = 40.40, exit_evs[0].credit, exit_evs[0].pnl_usd
     for f in dataclasses.fields(SimTrade):
-        assert getattr(rebuilt, f.name) == getattr(st.open_trade or closed, f.name) \
-            or getattr(rebuilt, f.name) == getattr(closed, f.name), f.name
+        if f.name == "limit":
+            assert rebuilt.limit.price == closed.limit.price
+            assert rebuilt.limit.status == "filled"
+            continue
+        got, want = getattr(rebuilt, f.name), getattr(closed, f.name)
+        assert got == want or (got is None and want is None), \
+            f"{f.name}: {got} != {want}"
 
 
 # ---- console/CSV identity per event type (R8.1 matrix) ----------------------------------
@@ -168,8 +196,9 @@ def test_csv_round_trip_and_console_render(ev):
 def test_crash_resume_reconstructs_open_trade(config, tmp_path):
     log = EventLog(tmp_path / "log.csv", console=io.StringIO())
     ex = _exec(config)
-    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0))
-    evs = ex.execute_pending(Bar(701, 100.0, 100.2, 99.5, 100.0), st)
+    st = EngineState(pending_entry=PendingEntry("B", "sell_first", 700, 1, entry_L=1.0, **PE))
+    evs = ex.execute_pending(Bar(701, 100.0, 100.2, 99.5, 100.0), st,
+                             quotes=qv(701, leg1=(40.0, 40.3), leg2=(40.2, 40.5)))
     for e in evs:
         e.session_date = "2026-08-18"
     log.emit(evs)
@@ -180,7 +209,7 @@ def test_crash_resume_reconstructs_open_trade(config, tmp_path):
         assert getattr(st2.open_trade, f.name) == getattr(st.open_trade, f.name), f.name
     assert st2.entries_today == 1 and st2.entered_episode_b == 1
     # after an exit row, resume shows flat
-    row = mk_row(702, close=102.9, high=103.4)
+    row = mk_row(702, close=102.9, quote_view=qv(702, leg2=(39.5, 39.9)))
     rules = RuleEngine(config, TIER_FULL)
     exit_evs = ex.apply(rules.evaluate(row, st), row, st)
     log2 = EventLog(tmp_path / "log.csv", console=io.StringIO())

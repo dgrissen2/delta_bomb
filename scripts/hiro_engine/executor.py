@@ -1,9 +1,14 @@
-"""Executor — a pure STATE APPLIER, no trading judgment (design.md).
+"""Executor — a pure, I/O-FREE state applier (spec v3.0).
 
-Order per bar: (1) execute_pending at THIS bar's open (pending exits priced,
-then pending entry -> S0 = this open, R1.4); (2) rules evaluated elsewhere;
-(3) apply() hands the bar's ExitDecision its execution price per R7.0 and
-updates EngineState. One owner per rule: conditions in rules.py, state/prices here.
+fill_mode="limit" (full tier): leg 1 books at the bar's closing NBBO
+conservative side (R1.4b); the second leg is a RestingLimit at fill1 -/+ 0.10
+(R1.4c); fills book at L (R7.1); every non-fill exit books at the NEXT bar's
+closing NBBO conservative side (R7.0; resolution books AT the 15:30 bar;
+session end books at bar j). Quotes arrive on the QuoteView passed in by
+Session — the Executor never performs I/O or trading judgment.
+
+fill_mode="spot_touch" (price tier only): the legacy v2 semantics (S0 +/- 3
+touch, open-price bookings) are retained verbatim, quarantined by TierPolicy.
 """
 from __future__ import annotations
 
@@ -11,162 +16,268 @@ from typing import Optional
 
 from .config import Config
 from .instruments import InstrumentSelector
-from .models import Bar, EngineState, Event, FeatureRow, PendingEntry, SimTrade
+from .models import (Bar, EngineState, Event, FeatureRow, PendingEntry, QuoteView,
+                     RestingLimit, SimTrade, TierPolicy, realized_pnl_usd,
+                     round_limit_against)
 
 
 class Executor:
-    def __init__(self, cfg: Config, selector: InstrumentSelector, chain_available: bool = False):
+    def __init__(self, cfg: Config, selector: InstrumentSelector,
+                 tier: Optional[TierPolicy] = None):
         self.cfg = cfg
         self.sel = selector
-        self.chain_available = chain_available
+        from .models import TIER_FULL
+        self.tier = tier or TIER_FULL
         self.fill_pts = cfg.num("r1_instruments", "fill_touch_pts")
         self.cap_spot = cfg.num("r7_exits", "cap_spot_pts")
         self.cap_option = cfg.num("r7_exits", "cap_option_pts")
         self.rest_offset = cfg.num("r6_entries", "rest_offset")
-        self.debit_max = cfg.num("r7_exits", "resolution_debit_max")
+        self.credit = cfg.num("r1v3_limits", "credit")
+        self.tick = cfg.num("r1v3_limits", "limit_tick")
+        self.first_off = cfg.i("r1v3_limits", "first_eligible_offset")
+        self.stale_max = cfg.i("r1v3_limits", "exit_stale_quote_max_min")
 
-    # -- helpers ---------------------------------------------------------------
+    # ------------------------------------------------------------------ events
+    def _trade_fields(self, tr: SimTrade) -> dict:
+        lim = tr.limit
+        return dict(branch=tr.branch, side=tr.side, s0=tr.s0, expiry=tr.expiry,
+                    leg_strikes=tr.leg_strikes, trade_id=tr.id, entry_min=tr.entry_min,
+                    signal_min=tr.signal_min, entry_option_mid=tr.entry_option_mid,
+                    resting_limit_ref=tr.resting_limit_ref, target=tr.target,
+                    bh_level=tr.bh_level, entry_L=tr.entry_L, cap_source=tr.cap_source,
+                    cap_value=tr.cap_value, episode=tr.episode,
+                    k1=tr.k1, k2=tr.k2, leg1_fill=tr.leg1_fill,
+                    limit_price=(lim.price if lim else None),
+                    limit_status=(lim.status if lim else None),
+                    limit_cancel_reason=(lim.cancel_reason if lim else None),
+                    first_eligible_min=(lim.first_eligible_min if lim else None),
+                    leg2_fill=tr.leg2_fill, credit=tr.credit,
+                    quote_gap_streak=tr.quote_gap_streak,
+                    last_valid_bid=tr.last_valid_bid, last_valid_ask=tr.last_valid_ask,
+                    last_valid_quote_min=tr.last_valid_quote_min,
+                    data_invalid=tr.data_invalid, leg_liq_loss_usd=tr.leg_liq_loss_usd,
+                    spx_adverse_pts=tr.adverse, pnl_usd=tr.pnl_usd)
+
     def _entry_event(self, tr: SimTrade) -> Event:
-        rest = (f"rest BUY K+5 @ sale-{self.rest_offset:.2f}" if tr.side == "sell_first"
-                else f"rest SELL K-5 @ cost+{self.rest_offset:.2f}")
-        return Event(event_type="entry", rule_id="R1.4", branch=tr.branch, side=tr.side,
-                     s0=tr.s0, expiry=tr.expiry, leg_strikes=tr.leg_strikes,
-                     trade_id=tr.id, entry_min=tr.entry_min, signal_min=tr.signal_min,
-                     entry_option_mid=tr.entry_option_mid,
-                     resting_limit_ref=tr.resting_limit_ref, target=tr.target,
-                     bh_level=tr.bh_level, entry_L=tr.entry_L, cap_source=tr.cap_source,
-                     cap_value=tr.cap_value, episode=tr.episode,
-                     notes=f"ENTRY {tr.branch} | S0={tr.s0} | {rest}")
+        if self.tier.fill_mode == "limit":
+            verb = "sold" if tr.side == "sell_first" else "bought"
+            rest = ("resting BUY" if tr.side == "sell_first" else "resting SELL")
+            note = (f"ENTRY {tr.branch} | {verb} {tr.k1:.0f}P @ {tr.leg1_fill:.2f} | "
+                    f"{rest} {tr.k2:.0f}P @ {tr.limit.price:.2f}")
+        else:
+            note = f"ENTRY {tr.branch} | S0={tr.s0} (spot_touch tier)"
+        return Event(event_type="entry", rule_id="R1.4", notes=note, **self._trade_fields(tr))
 
     def _exit_event(self, tr: SimTrade) -> Event:
-        return Event(event_type="exit", rule_id="R7", branch=tr.branch, side=tr.side,
-                     s0=tr.s0, expiry=tr.expiry, leg_strikes=tr.leg_strikes,
-                     trade_id=tr.id, entry_min=tr.entry_min, signal_min=tr.signal_min,
-                     entry_option_mid=tr.entry_option_mid,
-                     resting_limit_ref=tr.resting_limit_ref, target=tr.target,
-                     bh_level=tr.bh_level, entry_L=tr.entry_L, cap_source=tr.cap_source,
-                     cap_value=tr.cap_value, episode=tr.episode,
-                     outcome_type=tr.exit_type, outcome_minutes=tr.minutes,
-                     exit_ref=tr.exit_ref, resolution_debit=tr.resolution_debit,
-                     adverse=tr.adverse,
-                     notes=f"EXIT {tr.exit_type} | pnl {self.pnl(tr):+.2f} pts | adverse {tr.adverse:.2f}")
+        note = f"EXIT {tr.exit_type}"
+        if tr.pnl_usd is not None:
+            note += f" | pnl ${tr.pnl_usd:+,.0f}"
+        if tr.data_invalid:
+            note += " | DATA_INVALID (unscored)"
+        return Event(event_type="exit", rule_id="R7", outcome_type=tr.exit_type,
+                     outcome_minutes=tr.minutes, exit_ref=tr.exit_ref, adverse=tr.adverse,
+                     notes=note, **self._trade_fields(tr))
 
-    @staticmethod
-    def pnl(tr: SimTrade) -> float:
-        """R11.3 leg P&L proxy in SPX points."""
-        if tr.exit_ref is None:
-            return 0.0
-        return (tr.exit_ref - tr.s0) if tr.side == "sell_first" else (tr.s0 - tr.exit_ref)
+    # ------------------------------------------------------------------ booking
+    def _conservative_close_out(self, tr: SimTrade, q: Optional[QuoteView],
+                                minute: int) -> tuple[Optional[float], bool]:
+        """Price to close the LONE leg now: sell_first buys back at ASK,
+        long_first sells at BID. Returns (price, data_invalid_flag)."""
+        snap = q.leg1 if q else None
+        if snap is not None and snap.valid:
+            return (snap.ask if tr.side == "sell_first" else snap.bid), False
+        # stale allowance (exit BOOKING only, <= stale_max minutes)
+        if (tr.last_valid_quote_min is not None
+                and minute - tr.last_valid_quote_min <= self.stale_max):
+            px = tr.last_valid_ask if tr.side == "sell_first" else tr.last_valid_bid
+            return px, False
+        # administrative close at last valid, unscored (R10.4)
+        px = tr.last_valid_ask if tr.side == "sell_first" else tr.last_valid_bid
+        return px, True
 
-    def _close(self, state: EngineState, tr: SimTrade, exit_type: str, exit_ref: float,
-               minutes: Optional[int] = None, debit: Optional[float] = None) -> Event:
+    def _close(self, state: EngineState, tr: SimTrade, exit_type: str,
+               exit_ref: Optional[float], minutes: Optional[int] = None,
+               data_invalid: bool = False) -> Event:
         tr.state = "closed"
         tr.exit_type = exit_type
         tr.exit_ref = exit_ref
         tr.minutes = minutes
-        tr.resolution_debit = debit
-        # R11.2: the exit reference price is included for non-fill exits
-        if exit_type != "fill":
-            move = (tr.s0 - exit_ref) if tr.side == "sell_first" else (exit_ref - tr.s0)
-            tr.adverse = max(tr.adverse, move)
+        if data_invalid:
+            tr.data_invalid = True
+        if tr.limit is not None and tr.limit.status == "resting":
+            tr.limit.status = "canceled" if exit_type != "fill" else "filled"
+            if exit_type != "fill" and tr.limit.cancel_reason is None:
+                tr.limit.cancel_reason = exit_type
+        if self.tier.fill_mode == "limit" and tr.leg1_fill is not None:
+            if exit_type == "fill":
+                tr.pnl_usd = round(abs(tr.credit or 0.0) * 100.0, 6)
+            elif exit_ref is not None:
+                tr.pnl_usd = realized_pnl_usd(tr.side, tr.leg1_fill, exit_ref)
+        elif exit_ref is not None:                       # spot_touch legacy pnl in pts
+            pts = (exit_ref - tr.s0) if tr.side == "sell_first" else (tr.s0 - exit_ref)
+            tr.pnl_usd = None
         state.open_trade = None
         state.pending_exit = None
         return self._exit_event(tr)
 
-    # -- (1) start of bar --------------------------------------------------------
-    def execute_pending(self, bar: Bar, state: EngineState) -> list[Event]:
-        """Pending exits price at THIS bar's open; then a PendingEntry opens at
-        THIS bar's open (S0 = that open, R1.4). The Branch-B entry_L anchor is
-        fixed at signal time and travels on the PendingEntry (bh_level is a
-        legacy field, always None since v2.3 — A has no scratch)."""
+    # ------------------------------------------------------------------ (1) bar start
+    def execute_pending(self, bar: Bar, state: EngineState,
+                        quotes: Optional[QuoteView] = None) -> list[Event]:
         out: list[Event] = []
         tr = state.open_trade
+        # pending non-fill exit books at THIS bar
         if tr is not None and state.pending_exit is not None:
             label = "timeout" if state.pending_exit == "clock" else state.pending_exit
-            out.append(self._close(state, tr, label, bar.open,
-                                   minutes=None))
+            if self.tier.fill_mode == "limit":
+                px, dinv = self._conservative_close_out(tr, quotes, bar.min)
+                out.append(self._close(state, tr, label, px, data_invalid=dinv))
+            else:
+                out.append(self._close(state, tr, label, bar.open))
         pe = state.pending_entry
         if pe is not None:
             state.pending_entry = None
-            s0 = bar.open
-            sell = pe.side == "sell_first"
-            target = s0 + self.fill_pts if sell else s0 - self.fill_pts
-            cap_source = "chain" if self.chain_available else "proxy"
-            cap_value = self.cap_option if cap_source == "chain" else self.cap_spot
-            bh = pe.bh_level
-            entry_l = pe.entry_L
-            tr = SimTrade(
-                id=state.next_trade_id, branch=pe.branch, side=pe.side,
-                signal_min=pe.signal_min, entry_min=bar.min, s0=s0,
-                expiry=pe.expiry, leg_strikes=pe.strike_hint,
-                entry_option_mid=None, resting_limit_ref=None, target=target,
-                bh_level=bh, entry_L=entry_l, cap_source=cap_source,
-                cap_value=cap_value, episode=pe.episode,
-            )
-            state.next_trade_id += 1
-            state.open_trade = tr
-            state.entries_today += 1
-            if pe.branch == "A":
-                state.entered_episode_a = pe.episode
+            if self.tier.fill_mode == "limit":
+                out.extend(self._book_limit_entry(bar, pe, quotes, state))
             else:
-                state.entered_episode_b = pe.episode
-            out.append(self._entry_event(tr))
+                out.append(self._book_spot_entry(bar, pe, state))
         return out
 
-    # -- (3) end of bar ------------------------------------------------------------
+    def _book_spot_entry(self, bar: Bar, pe: PendingEntry, state: EngineState) -> Event:
+        s0 = bar.open
+        sell = pe.side == "sell_first"
+        tr = SimTrade(id=state.next_trade_id, branch=pe.branch, side=pe.side,
+                      signal_min=pe.signal_min, entry_min=bar.min, s0=s0,
+                      expiry=pe.expiry, leg_strikes=pe.strike_hint,
+                      entry_option_mid=None, resting_limit_ref=None,
+                      target=s0 + self.fill_pts if sell else s0 - self.fill_pts,
+                      bh_level=pe.bh_level, entry_L=pe.entry_L,
+                      cap_source="proxy", cap_value=self.cap_spot, episode=pe.episode)
+        self._register_entry(state, tr, pe)
+        return self._entry_event(tr)
+
+    def _book_limit_entry(self, bar: Bar, pe: PendingEntry,
+                          quotes: Optional[QuoteView], state: EngineState) -> list[Event]:
+        q1 = quotes.leg1 if quotes else None
+        q2 = quotes.leg2 if quotes else None
+        if (pe.k1 is None or pe.k2 is None or q1 is None or q2 is None
+                or not q1.valid or not q2.valid):
+            return [Event(event_type="entry_aborted_no_quote", rule_id="R10.4",
+                          branch=pe.branch, side=pe.side, signal_min=pe.signal_min,
+                          episode=pe.episode, k1=pe.k1, k2=pe.k2,
+                          notes="entry ABORTED — working-strike quotes missing/invalid (R10.4)")]
+        sell = pe.side == "sell_first"
+        leg1_fill = q1.bid if sell else q1.ask                     # conservative (R1.4b)
+        raw_l = leg1_fill - self.credit if sell else leg1_fill + self.credit
+        lim_side = "buy" if sell else "sell"
+        L = round_limit_against(raw_l, lim_side, self.tick)
+        lim = RestingLimit(side=lim_side, strike=pe.k2, price=L, placed_min=bar.min,
+                           first_eligible_min=pe.signal_min + self.first_off)
+        tr = SimTrade(id=state.next_trade_id, branch=pe.branch, side=pe.side,
+                      signal_min=pe.signal_min, entry_min=bar.min, s0=bar.open,
+                      expiry=pe.expiry, leg_strikes=f"{pe.k1:.0f}/{pe.k2:.0f}",
+                      entry_option_mid=q1.mid, resting_limit_ref=L, target=None,
+                      bh_level=pe.bh_level, entry_L=pe.entry_L,
+                      cap_source="chain", cap_value=self.cap_option, episode=pe.episode,
+                      k1=pe.k1, k2=pe.k2, leg1_fill=leg1_fill, limit=lim,
+                      last_valid_bid=q1.bid, last_valid_ask=q1.ask,
+                      last_valid_quote_min=bar.min)
+        self._register_entry(state, tr, pe)
+        return [self._entry_event(tr)]
+
+    def _register_entry(self, state: EngineState, tr: SimTrade, pe: PendingEntry) -> None:
+        state.next_trade_id += 1
+        state.open_trade = tr
+        state.entries_today += 1
+        if pe.branch == "A":
+            state.entered_episode_a = pe.episode
+        else:
+            state.entered_episode_b = pe.episode
+
+    # ------------------------------------------------------------------ (3) bar end
     def apply(self, events: list[Event], row: FeatureRow,
               state: EngineState) -> list[Event]:
         out: list[Event] = []
         exit_ev = next((e for e in events if e.event_type == "exit_decision"), None)
+        cancel_ev = next((e for e in events if e.event_type == "limit_canceled"), None)
         pend_ev = next((e for e in events if e.event_type == "pending_entry"), None)
         tr = state.open_trade
         if tr is not None:
-            is_fill = exit_ev is not None and exit_ev.outcome_type == "fill"
-            is_resolution = exit_ev is not None and exit_ev.outcome_type == "resolution"
-            # fills: touch bar excluded (R11.2); resolution: executes at this bar's
-            # OPEN, so this bar's range past the open never counts (R7.0)
-            if not is_fill and not is_resolution:
-                # R11.2 adverse: include this bar (execution bar included; touch bar excluded)
-                move = (tr.s0 - row.bar.low) if tr.side == "sell_first" else (row.bar.high - tr.s0)
-                tr.adverse = max(tr.adverse, move)
+            self._update_marks(tr, row)
+            if cancel_ev is not None and tr.limit is not None and tr.limit.status == "resting":
+                tr.limit.status = "canceled"
+                tr.limit.cancel_reason = cancel_ev.limit_cancel_reason or "quote_gap"
+                tr.data_invalid = True                     # R10.4 horizon property
             if exit_ev is not None:
                 kind = exit_ev.outcome_type
                 if kind == "fill":
-                    out.append(self._close(state, tr, "fill", tr.target,
-                                           minutes=row.min - tr.entry_min))
+                    out.append(self._apply_fill(tr, row, state))
                 elif kind == "resolution":
-                    # R7.0: evaluates at the 15:30 bar, executes at its OPEN
-                    debit = self._implied_debit(tr) if self.chain_available else None
-                    if debit is not None and debit <= self.debit_max:
-                        out.append(self._close(state, tr, "resolution_debit",
-                                               row.bar.open, debit=debit))
+                    if self.tier.fill_mode == "limit":
+                        px, dinv = self._conservative_close_out(tr, row.quote_view, row.min)
+                        out.append(self._close(state, tr, "resolution_close", px,
+                                               data_invalid=dinv))
                     else:
-                        out.append(self._close(state, tr, "resolution_close",
-                                               row.bar.open, debit=debit))
+                        out.append(self._close(state, tr, "resolution_close", row.bar.open))
                 else:
-                    state.pending_exit = kind      # priced at next bar's open
+                    if tr.limit is not None and tr.limit.status == "resting":
+                        tr.limit.status = "canceled"
+                        tr.limit.cancel_reason = kind
+                    state.pending_exit = kind              # books next bar
         if pend_ev is not None and state.open_trade is None and state.pending_entry is None:
             state.pending_entry = PendingEntry(
                 branch=pend_ev.branch, side=pend_ev.side, signal_min=pend_ev.signal_min,
                 episode=pend_ev.episode, expiry=pend_ev.expiry,
                 strike_hint=pend_ev.leg_strikes, chain_quote_ts=pend_ev.strike_quote_ts,
-                bh_level=pend_ev.bh_level, entry_L=pend_ev.entry_L)
+                bh_level=pend_ev.bh_level, entry_L=pend_ev.entry_L,
+                k1=pend_ev.k1, k2=pend_ev.k2)
         return out
 
-    def _implied_debit(self, tr: SimTrade) -> Optional[float]:
-        return None   # live chain hook (task 7); backtests always resolution_close (R2.5)
+    def _apply_fill(self, tr: SimTrade, row: FeatureRow, state: EngineState) -> Event:
+        if self.tier.fill_mode == "limit":
+            L = tr.limit.price
+            tr.leg2_fill = L
+            tr.credit = round(abs(tr.leg1_fill - L), 10)
+            tr.limit.status = "filled"
+            return self._close(state, tr, "fill", L, minutes=row.min - tr.entry_min)
+        # spot_touch legacy: fill at the SPX target touch
+        return self._close(state, tr, "fill", tr.target, minutes=row.min - tr.entry_min)
 
-    # -- session end -----------------------------------------------------------------
-    def end_of_session(self, last_bar: Bar, state: EngineState) -> list[Event]:
-        """R7.0: no bar j+1 -> price at the close of bar j. An open horizon
-        truncated by session end is censored, never timeout (R7.5)."""
+    def _update_marks(self, tr: SimTrade, row: FeatureRow) -> None:
+        # contextual SPX excursion (drives nothing)
+        move = (tr.s0 - row.bar.low) if tr.side == "sell_first" else (row.bar.high - tr.s0)
+        tr.adverse = max(tr.adverse, move)
+        # option marks (limit mode)
+        q = row.quote_view.leg1 if (row.quote_view is not None) else None
+        if q is not None and q.valid:
+            tr.last_valid_bid, tr.last_valid_ask = q.bid, q.ask
+            tr.last_valid_quote_min = row.min
+            if tr.leg1_fill is not None:
+                liq = realized_pnl_usd(tr.side, tr.leg1_fill,
+                                       q.ask if tr.side == "sell_first" else q.bid)
+                tr.leg_liq_loss_usd = max(tr.leg_liq_loss_usd, -min(liq, 0.0))
+        tr.quote_gap_streak = row.quote_gap_streak
+
+    # ------------------------------------------------------------------ session end
+    def end_of_session(self, last_bar: Bar, state: EngineState,
+                       quotes: Optional[QuoteView] = None) -> list[Event]:
         out: list[Event] = []
         tr = state.open_trade
         if tr is None:
             return out
+        if self.tier.fill_mode == "limit":
+            px, dinv = self._conservative_close_out(tr, quotes, last_bar.min)
+        else:
+            px, dinv = last_bar.close, False
         if state.pending_exit is not None:
             label = "timeout" if state.pending_exit == "clock" else state.pending_exit
-            out.append(self._close(state, tr, label, last_bar.close))
+            out.append(self._close(state, tr, label, px, data_invalid=dinv))
         else:
-            out.append(self._close(state, tr, "censored", last_bar.close))
+            out.append(self._close(state, tr, "censored", px, data_invalid=dinv))
         return out
+
+    @staticmethod
+    def pnl(tr: SimTrade) -> float:
+        """Legacy pts helper (price tier / v2 tests)."""
+        if tr.exit_ref is None or tr.s0 is None:
+            return 0.0
+        return (tr.exit_ref - tr.s0) if tr.side == "sell_first" else (tr.s0 - tr.exit_ref)

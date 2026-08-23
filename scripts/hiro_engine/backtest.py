@@ -20,12 +20,27 @@ def available_spx_days(cfg: Config, d_from: str, d_to: str) -> list[str]:
 
 
 def run_backtest(cfg: Config, tier: TierPolicy, days: list[str], log: EventLog,
-                 mode: str = "backtest") -> list[SessionRow]:
+                 mode: str = "backtest", chains=None,
+                 prereg_override: bool = False) -> list[SessionRow]:
     """Runs sessions in date order. The causal pooled range60 history for day D
     is built from ALL stored sessions in [pool_start, D) — independent of which
     dates the run requests (codex review 2026-08-22 finding 6). pool_start =
     hiro_era_start for the full tier (R3.3); the archive start for price tier
     (documented interpretation, build_notes.md)."""
+    if tier.fill_mode == "limit":
+        if chains is None:
+            from .chains import ChainStore
+            chains = ChainStore()
+        # 15B INTERLOCK (R9a boundary): a full-tier run over any frozen control
+        # session IS a rehearsal — refuse while the formulas pin is empty,
+        # unless the test-only override is set.
+        formulas_pin = str(cfg.get("chains", "r9a_formulas_hash"))
+        if not prereg_override and formulas_pin == "" and \
+                any(d in set(cfg.control_days) for d in days):
+            raise RuntimeError(
+                "REFUSED: full-tier backtest over frozen control sessions while "
+                "r9a_formulas_hash is unpinned would burn the one-shot rehearsal "
+                "boundary (R9a). Pin the pre-registration first (task 16).")
     feed = ReplayFeed(cfg, days, tier=tier.name)      # refuses+lists missing (R13.1)
     era_start = str(cfg.get("data", "hiro_era_start"))
     pool_start = era_start if tier.name == "full" else "0000-00-00"
@@ -37,6 +52,7 @@ def run_backtest(cfg: Config, tier: TierPolicy, days: list[str], log: EventLog,
         while pooled_upto < len(stored) and stored[pooled_upto] < day:
             hist.extend(build_range60_history(cfg, tier, [stored[pooled_upto]]))
             pooled_upto += 1
-        s = Session(cfg, tier, day, mode, log, range60_history=list(hist))
+        s = Session(cfg, tier, day, mode, log, range60_history=list(hist),
+                    chains=chains)
         out.append(s.run_replay(feed))
     return out
