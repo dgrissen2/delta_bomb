@@ -44,6 +44,27 @@ class CalendarDay:
 
 
 @dataclass(frozen=True)
+class QuoteSnap:
+    """One strike's NBBO at one minute (v3.0). valid per R10.4: bid>0, ask>=bid."""
+    strike: float
+    bid: float
+    ask: float
+    valid: bool
+
+    @property
+    def mid(self) -> float:
+        return (self.bid + self.ask) / 2.0
+
+
+@dataclass(frozen=True)
+class QuoteView:
+    """The two working strikes' quotes for ONE minute, attached by Session (v3.0)."""
+    minute: int
+    leg1: Optional[QuoteSnap] = None
+    leg2: Optional[QuoteSnap] = None
+
+
+@dataclass(frozen=True)
 class Vetoes:
     vt_broken: bool = False
     levels_invalid: bool = False
