@@ -4,7 +4,10 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import os
 import pytest
+
+os.environ["HIRO_ENGINE_TEST"] = "1"   # gates prereg_override to test runs only
 
 # make `hiro_engine` importable when pytest runs from repo root
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))

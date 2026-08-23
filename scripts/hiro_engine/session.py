@@ -134,9 +134,22 @@ class Session:
                 tick.hiro is None or not len(tick.hiro)
                 or int(tick.hiro["min"].max()) < tick.bar.min - 2):   # stale payload
             return "HIRO_DOWN"
+        if (self.tier.fill_mode == "limit" and self.chains is not None
+                and not self._option_feed_ok(tick.bar.min)):
+            return "OPTION_QUOTES_DOWN"
         if tick.spy_bar is None:
             return "DEGRADED_VWAP"
         return "OK"
+
+    def _option_feed_ok(self, minute: int) -> bool:
+        """R10.4 live lifecycle: is the option feed serving ANY data this
+        minute? Replay caches always are; a live ChainStore reports outages
+        via `feed_ok` (task 19 wires the real check). FakeChains in tests may
+        override feed_ok to simulate a 10-minute outage."""
+        probe = getattr(self.chains, "feed_ok", None)
+        if probe is None:
+            return True
+        return bool(probe(self.day, minute))
 
     def _quotes_for(self, minute: int):
         """QuoteView for the two working strikes this minute (limit mode)."""
@@ -215,7 +228,7 @@ class Session:
         row = self.features.update(bar, tick.hiro, tick.spy_bar)               # (2)
         prev_health = self.health
         new_health = self._health(tick)
-        if new_health == "HIRO_DOWN" and 600 <= bar.min <= 870:
+        if new_health in ("HIRO_DOWN", "OPTION_QUOTES_DOWN") and 600 <= bar.min <= 870:
             self.outage_min += 1
         self.health = new_health
         quote_view = self._quotes_for(bar.min)
@@ -226,21 +239,25 @@ class Session:
         health_events: list[Event] = []
         if new_health != prev_health:
             note = {"HIRO_DOWN": "HIRO DOWN — no new entries",
+                    "OPTION_QUOTES_DOWN": "NO OPTION QUOTES — STAND DOWN from new entries "
+                                          "(open leg keeps cap/clock/resolution guards)",
                     "DEGRADED_VWAP": "SPY missing — context reads degrade to CHOP (degraded_vwap)",
-                    "OK": f"HIRO RESTORED | outage so far {self.outage_min}m",
+                    "OK": f"feed RESTORED | outage so far {self.outage_min}m",
                     }.get(new_health, new_health)
             if prev_health == "HIRO_DOWN" and new_health != "HIRO_DOWN":
                 note = f"HIRO RESTORED | outage so far {self.outage_min}m"
             health_events.append(Event(event_type="outage", rule_id="R10", notes=note))
         rule_events = self.rules.evaluate(row, self.state)                     # (4)
         rule_events = self._resolve_instruments(rule_events, row)              # (4b) R1.2 at signal minute
-        if self.health == "HIRO_DOWN":
+        if self.health in ("HIRO_DOWN", "OPTION_QUOTES_DOWN"):
             # R10.1: no new entries while HIRO is down; flow exits already gated by hiro_fresh
             kept = []
             for ev in rule_events:
                 if ev.event_type in ("signal", "pending_entry"):
+                    why = ("HIRO down" if self.health == "HIRO_DOWN"
+                           else "option quotes down (R10.4)")
                     kept.append(Event(event_type="skip", rule_id="R10.1", branch=ev.branch,
-                                      episode=ev.episode, notes="skip: HIRO down"))
+                                      episode=ev.episode, notes=f"skip: {why}"))
                 elif (ev.event_type == "exit_decision"
                       and ev.outcome_type in ("scratch", "veto_exit")
                       and self.state.open_trade is not None
@@ -274,10 +291,15 @@ class Session:
         if real_log.csv_path is not None:
             ref = rebuild_state(real_log.csv_path, self.day)
             a, b = self.state.open_trade, ref.open_trade
+            def _lim(t):
+                return (t.limit.price, t.limit.status) if (t and t.limit) else None
             diverged = ((a is None) != (b is None)
                         or (a is not None and b is not None
                             and (a.id != b.id or a.entry_min != b.entry_min
-                                 or a.s0 != b.s0))
+                                 or a.s0 != b.s0
+                                 or a.leg1_fill != b.leg1_fill
+                                 or _lim(a) != _lim(b)
+                                 or a.exit_type != b.exit_type))
                         or self.state.entries_today != ref.entries_today)
             if diverged:
                 self.log.emit(self._stamp([Event(

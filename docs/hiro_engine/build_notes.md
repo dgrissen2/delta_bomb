@@ -155,3 +155,34 @@ Red-team bp2 (same milestone, ran in parallel with codex): findings 1–3 and
   the control-data pin and potentially the verification artifact. Ops scripts
   now exempt frozen control days from the completeness RED and say
   "hash-pinned, DO NOT refresh".
+
+## v3.0 build — break point 1 review (2026-08-23, tasks 13+15A+15B[+16/17 in flight])
+
+Red-team FAIL (1 HIGH + 1 HIGH harness + notes) and codex FAIL (1B/6M/1m) —
+convergent on the two big ones; ALL applied:
+- **Cap base bug (both reviewers)**: rules compared the option mid to the
+  ENTRY MID, spec says LEG-1 FILL. My earlier "fix" used a non-asserting
+  replace that silently missed; the Gate-2 harness let it through because the
+  hand-derived MINUTES were not asserted. Both fixed: cap now vs leg1_fill,
+  and the harness tags every event with its minute and asserts cap_min /
+  limit_canceled_min / exit_book_min / fill_min — S8 is now a true regression
+  test (books at 711 off a 710 cap, per the derivation).
+- limit_canceled is emitted by the RULE ENGINE for EVERY winning non-fill
+  exit (was executor-side silent cancel — single-arbiter contract restored);
+  quote_gap event rows every gap minute (resume anchor, minute-accurate);
+  pending-entry resume restores k1/k2; heartbeat resume restores liq/adverse;
+  RESUME WARNING widened to leg1_fill/limit price/status/exit drift.
+- R9a interlock: prereg_override now requires HIRO_ENGINE_TEST=1 (set only by
+  conftest); verify_frozen() + per-file sha256 enforced AT LOAD in production
+  (the pin is no longer decorative).
+- R10.4 live option-outage lifecycle in Session: OPTION_QUOTES_DOWN health,
+  stand-down with no open trade, outage minutes -> PARTIAL, fake-feed test.
+- Sidecar frozen contract (15f) in eventlog.QuoteSidecar + round-trip test;
+  task 19 wires the live writer only.
+- credit >= 0.10 asserted at fill booking (fail fast); quote_age=0 stamped.
+ACCEPTED with documentation (98% rule): (a) unit tests exercised single
+control days for plumbing before the formulas pin landed — no aggregate fill
+rates were computed or observed; the R9a boundary (first AGGREGATE rehearsal)
+is intact and the formulas pin now predates any such run. (b) Fixture INPUT
+corrections after 15A (entry-minute partner quotes, S7 minute, S10 partial-day
+redesign) are documented in-file; expected VALUES were never edited.

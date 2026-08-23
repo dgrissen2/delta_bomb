@@ -38,11 +38,17 @@ def _run_scenario(config, sc):
         signal_min=signal, episode=1, entry_L=(1.0 if side == "sell_first" else None),
         k1=K, k2=k2))
     events_all = []
+
+    def collect(evs, minute):
+        for e in evs:
+            e._at_min = minute                     # harness tag: WHEN it happened
+        events_all.extend(evs)
+
     streak = 0
     m = entry
     while m <= min(last_min, 962):
         qv = QuoteView(minute=m, leg1=_snap(quotes, K, m), leg2=_snap(quotes, k2, m))
-        events_all += ex.execute_pending(Bar(m, 100.0, 100.2, 99.8, 100.0), st, quotes=qv)
+        collect(ex.execute_pending(Bar(m, 100.0, 100.2, 99.8, 100.0), st, quotes=qv), m)
         tr = st.open_trade
         if tr is None and st.pending_entry is None:
             break
@@ -60,14 +66,16 @@ def _run_scenario(config, sc):
             row_kw["context_1300"] = "UP" if side == "long_first" else "DOWN"
         row = mk_row(m, close=100.0, **row_kw)
         evs = eng.evaluate(row, st)
-        events_all += evs + ex.apply(evs, row, st)
+        collect(evs, m)
+        collect(ex.apply(evs, row, st), m)
         if st.open_trade is None and st.pending_exit is None and st.pending_entry is None:
             break
         m += 1
     if st.open_trade is not None:                                 # session end path
         qv = QuoteView(minute=last_min, leg1=_snap(quotes, K, last_min),
                        leg2=_snap(quotes, k2, last_min))
-        events_all += ex.end_of_session(Bar(last_min, 100, 100.2, 99.8, 100.0), st, quotes=qv)
+        collect(ex.end_of_session(Bar(last_min, 100, 100.2, 99.8, 100.0), st, quotes=qv),
+                last_min)
     return events_all
 
 
@@ -108,3 +116,23 @@ def test_v3_fixture_scenario(config, sc):
     if "cap_source" in exp:
         assert any(e.event_type == "exit_decision" and e.cap_source == exp["cap_source"]
                    for e in evs) or exit_ev.outcome_type == "cap"
+    # ---- MINUTE-LEVEL assertions (red-team/codex BP1: the hand-derived
+    # minutes are LOAD-BEARING, not decorative) ----
+    if "exit_book_min" in exp:
+        assert exit_ev._at_min == exp["exit_book_min"], \
+            f"exit booked at {exit_ev._at_min}, expected {exp['exit_book_min']}"
+    if "cap_min" in exp:
+        cap_dec = next(e for e in evs if e.event_type == "exit_decision"
+                       and e.outcome_type == "cap")
+        assert cap_dec._at_min == exp["cap_min"], \
+            f"cap decided at {cap_dec._at_min}, expected {exp['cap_min']}"
+    if "limit_canceled_min" in exp:
+        cans = [e for e in evs if e.event_type == "limit_canceled"]
+        assert cans, "no limit_canceled event emitted"
+        assert cans[0]._at_min == exp["limit_canceled_min"], \
+            f"cancel at {cans[0]._at_min}, expected {exp['limit_canceled_min']}"
+    if "cancel_reason" in exp:
+        assert any(e.event_type == "limit_canceled"
+                   and e.limit_cancel_reason == exp["cancel_reason"] for e in evs)
+    if "fill_min" in exp:
+        assert exit_ev._at_min == exp["fill_min"]

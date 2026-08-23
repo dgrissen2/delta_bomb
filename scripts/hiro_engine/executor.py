@@ -182,7 +182,9 @@ class Executor:
                       last_valid_bid=q1.bid, last_valid_ask=q1.ask,
                       last_valid_quote_min=bar.min)
         self._register_entry(state, tr, pe)
-        return [self._entry_event(tr)]
+        ev = self._entry_event(tr)
+        ev.quote_age = 0                                     # R10.4: decisions use minute-of quotes only
+        return [ev]
 
     def _register_entry(self, state: EngineState, tr: SimTrade, pe: PendingEntry) -> None:
         state.next_trade_id += 1
@@ -237,6 +239,9 @@ class Executor:
             L = tr.limit.price
             tr.leg2_fill = L
             tr.credit = round(abs(tr.leg1_fill - L), 10)
+            if tr.credit < self.credit - 1e-9:               # R1.4e invariant, hard
+                raise AssertionError(
+                    f"credit invariant violated: {tr.credit} < {self.credit}")
             tr.limit.status = "filled"
             return self._close(state, tr, "fill", L, minutes=row.min - tr.entry_min)
         # spot_touch legacy: fill at the SPX target touch

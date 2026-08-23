@@ -52,13 +52,24 @@ def summarize(cfg: Config, entries: pd.DataFrame, qualify: pd.DataFrame,
                censored=int((entries.exit_type == "censored").sum()) if len(entries) else 0)
     ci = bootstrap_fill_ci(entries) if len(entries) else (float("nan"),) * 2
     out["fill_ci90_lo"], out["fill_ci90_hi"] = ci
-    frame = build_control_frame(cfg, days=days) if len(entries) else None
     sf = entries[entries.side == "sell_first"] if len(entries) else entries
     lf = entries[entries.side == "long_first"] if len(entries) else entries
-    out["control_sell_first"] = (clock_matched(cfg, sf.signal_min, frame)
-                                 if len(sf) else float("nan"))
-    out["control_long_first"] = (midpoint_matched(cfg, lf.signal_min, frame)
-                                 if len(lf) else float("nan"))
+    # v3 controls exist only where chain data exists: the frozen set uses the
+    # pinned frame; other ranges report no control (never a touch-based one)
+    if len(entries) and set(days) <= set(cfg.control_days):
+        from .control import clock_matched_v3, load_control_frame, midpoint_matched_v3
+        frame = load_control_frame(cfg)
+        out["control_sell_first"] = (clock_matched_v3(cfg, sf.signal_min, frame)
+                                     if len(sf) else float("nan"))
+        out["control_long_first"] = (midpoint_matched_v3(cfg, lf.signal_min, frame)
+                                     if len(lf) else float("nan"))
+    else:
+        out["control_sell_first"] = out["control_long_first"] = float("nan")
+    # $ economics under fill_mode=limit (spot_touch runs keep SPX-pt semantics)
+    if len(entries) and "pnl_usd" in entries.columns and entries.pnl_usd.notna().any():
+        out["realized_pnl_usd"] = float(entries.pnl_usd.sum())
+    else:
+        out["realized_pnl_usd"] = float("nan")
     return out
 
 
@@ -67,8 +78,8 @@ def print_summary(s: dict) -> None:
           f"days={s['days']} fills={s['fills']} "
           f"fill_rate={s['fill_rate']:.3f} CI90=({s['fill_ci90_lo']:.3f},{s['fill_ci90_hi']:.3f}) "
           f"censored={s['censored']} | controls: sell {s['control_sell_first']:.3f} "
-          f"long {s['control_long_first']:.3f}"
-          .replace("nan", "—"))
+          f"long {s['control_long_first']:.3f} | realized ${s.get('realized_pnl_usd', float('nan')):,.0f}"
+          .replace("nan", "—").replace("$—", "n/a (spot_touch)"))
 
 
 def leaderboard(rows: list[dict]) -> pd.DataFrame:

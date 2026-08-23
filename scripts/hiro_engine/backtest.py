@@ -34,8 +34,12 @@ def run_backtest(cfg: Config, tier: TierPolicy, days: list[str], log: EventLog,
         # 15B INTERLOCK (R9a boundary): a full-tier run over any frozen control
         # session IS a rehearsal — refuse while the formulas pin is empty,
         # unless the test-only override is set.
+        if any(d in set(cfg.control_days) for d in days):
+            chains.verify_frozen(cfg)                       # R8.2 pin enforced at runtime
         formulas_pin = str(cfg.get("chains", "r9a_formulas_hash"))
-        if not prereg_override and formulas_pin == "" and \
+        import os
+        override_ok = prereg_override and os.environ.get("HIRO_ENGINE_TEST") == "1"
+        if not override_ok and formulas_pin == "" and \
                 any(d in set(cfg.control_days) for d in days):
             raise RuntimeError(
                 "REFUSED: full-tier backtest over frozen control sessions while "

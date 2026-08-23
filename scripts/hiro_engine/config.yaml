@@ -68,8 +68,8 @@ chains:                        # R2.5 / R8.2 v3.0 pins (FROZEN rehearsal scope o
   root: ~/Dev/central_trade_data/thetadata/spxw_bomb_chains
   frozen_manifest_hash: "682d9973aa6c73f8242907080aa8c85199f3d1db9d6c0915778e8e1ff775ee50"
   sdk_version: "1.0.9"
-  control_frame_hash: ""       # pinned by task 17 controls_build
-  r9a_formulas_hash: ""        # pinned by task 16 (pre-rehearsal freeze)
+  control_frame_hash: "8a981150866e9ca528ea9dd8118174b5b2a1c93312efb739e5a1ec56e4b5001d"  # task-17 controls_build (base rates 0.470/0.454)
+  r9a_formulas_hash: "bade956cb5e8ffe151dbdf112987252f82c343382c6081b340e72eb3d86271a1"  # task-16 freeze (sha256 of derive_thresholds source)
   r9a_registration_hash: ""    # pinned by task 18 (post-rehearsal, run-once)
   verification_v2_hash: ""     # pinned by task 18 (R12.3)
 

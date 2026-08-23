@@ -32,30 +32,41 @@ def _fixture_events() -> list[Event]:
     tid = 0
 
     def entry_exit(date, branch, side, sig, s0, exit_type, exit_ref, adverse,
-                   minutes=None, episode=1):
+                   minutes=None, episode=1, pnl_usd=None, k2=None, limit_price=None,
+                   data_invalid=False):
+        """v3 MIGRATION (15g UPDATED): events carry $ economics + limit fields."""
         nonlocal tid
         tid += 1
+        if pnl_usd is None:
+            pnl_usd = 10.0 if exit_type == "fill" else -50.0
         evs.append(_ev(session_date=date, event_type="signal", branch=branch, side=side,
                        signal_min=sig, episode=episode))
         evs.append(_ev(session_date=date, event_type="entry", branch=branch, side=side,
                        trade_id=tid, signal_min=sig, entry_min=sig + 1, s0=s0,
-                       episode=episode, target=s0 + 3 if side == "sell_first" else s0 - 3,
-                       cap_source="proxy", cap_value=15.0))
+                       episode=episode, k1=7500.0, k2=k2, leg1_fill=40.0,
+                       limit_price=limit_price, cap_source="chain", cap_value=3.5))
         evs.append(_ev(session_date=date, event_type="exit", branch=branch, side=side,
                        trade_id=tid, signal_min=sig, entry_min=sig + 1, s0=s0,
                        episode=episode, outcome_type=exit_type, exit_ref=exit_ref,
-                       outcome_minutes=minutes, adverse=adverse))
+                       outcome_minutes=minutes, adverse=adverse, pnl_usd=pnl_usd,
+                       k2=k2, limit_price=limit_price, data_invalid=data_invalid,
+                       credit=0.10 if exit_type == "fill" else None))
 
     # Branch B: 10 executable entries across the 10 days
     #  6 fills, 2 scratches, 1 timeout, 1 censored  -> fill rate 6/9 (censored excluded)
     for i, d in enumerate(DAYS[:6]):                       # 6 fills, one per day
         entry_exit(d, "B", "sell_first", 700 + i, 100.0, "fill", 103.0, 1.0, minutes=5)
-    # scratch #1: S0 far BELOW the tape -> +3 touch would certainly have printed
-    entry_exit(DAYS[6], "B", "sell_first", 700, 1000.0, "scratch", 999.0, 1.0)
-    # scratch #2: S0 far ABOVE the tape -> would never fill;  loss 2 pts
-    entry_exit(DAYS[7], "B", "sell_first", 700, 99999.0, "scratch", 99997.0, 2.0)
-    entry_exit(DAYS[8], "B", "sell_first", 700, 100.0, "timeout", 99.0, 11.5)  # 1 adverse>10
-    entry_exit(DAYS[9], "B", "sell_first", 700, 100.0, "censored", 100.5, 0.5)
+    # scratch #1 on a CACHED day (2026-08-13) with an absurd-high buy limit ->
+    # the limit replay finds ask <= 1000 immediately -> would-have-filled TRUE
+    entry_exit("2026-08-13", "B", "sell_first", 700, 100.0, "scratch", 40.4, 1.0,
+               pnl_usd=-40.0, k2=7575.0, limit_price=1000.0)
+    # scratch #2 on an UNCACHED day -> chain replay unavailable -> INDETERMINATE
+    entry_exit(DAYS[1], "B", "sell_first", 705, 100.0, "scratch", 40.7, 2.0,
+               pnl_usd=-70.0, k2=7505.0, limit_price=39.9, episode=2)
+    entry_exit(DAYS[8], "B", "sell_first", 700, 100.0, "timeout", 40.8, 11.5,
+               pnl_usd=-80.0)
+    entry_exit(DAYS[9], "B", "sell_first", 700, 100.0, "censored", 40.5, 0.5,
+               pnl_usd=-50.0)
     # Branch A: 2 executable entries, both fill -> rate 1.0
     entry_exit(DAYS[0], "A", "long_first", 720, 100.0, "fill", 97.0, 0.5, minutes=7, episode=11)
     entry_exit(DAYS[1], "A", "long_first", 720, 100.0, "fill", 97.0, 0.4, minutes=9, episode=11)
@@ -103,15 +114,18 @@ def graded(config, tmp_path):
 
 
 def test_stage2_and_4_hand_computed(config, graded):
+    """v3 hand-golden: $ metrics; limit-replay would-have-filled; indeterminate."""
     rows, entries, qualify, metrics = graded
     assert len(entries) == 12
     assert metrics["B_entries"] == 10 and metrics["B_fills"] == 6
     assert metrics["B_censored"] == 1
     assert metrics["B_fill_rate"] == pytest.approx(6 / 9)      # censored out of denominator
     assert metrics["A_fill_rate"] == pytest.approx(1.0)
-    assert metrics["adverse_gt10_n"] == 1
-    assert metrics["median_scratch_loss"] == pytest.approx(1.5)  # losses 1.0 and 2.0
-    assert metrics["would_have_filled_scratches"] == 1           # only the S0=1000 one
+    assert metrics["max_single_trade_loss_usd"] == pytest.approx(80.0)
+    assert metrics["median_scratch_loss_usd"] == pytest.approx(55.0)  # (40+70)/2
+    assert metrics["would_have_filled_scratches"] == 1           # cached-day absurd limit
+    assert metrics["would_have_filled_indeterminate"] == 1       # uncached day
+    assert metrics["credits_usd"] == pytest.approx(80.0)         # 8 fills x $10
 
 
 def test_stage3_qualify_hand_computed(graded):
@@ -142,16 +156,17 @@ def test_stage6_criteria_statuses(config, graded):
     t = {r.criterion: r for r in table.itertuples()}
     assert t["qualifying signals on >=7/10 sessions"].status == "PASS"     # 10/10
     assert t["1-3 executable entries on >=6/10 sessions"].status == "PASS"
-    assert t[">=8 fills total"].status == "PASS"                            # 8 fills
+    # v3: threshold rows are PENDING until R9a registration (task 18)
+    assert "PENDING" in t["limit fills total"].status
+    assert "PENDING" in t["Branch B fill rate"].status
     assert t["<=3 entries/session"].status == "PASS"
+    assert t["one leg at a time"].status == "PASS"
     assert t["Branch B qualifying signals"].status == "PASS"                # 22 >= 20
-    assert t["Branch B fill rate"].status == "PASS"                         # 0.667 >= 0.45
     assert t["Branch A qualifying episodes"].status == "PASS"               # 8
-    assert t["Branch A fill rate"].status == "PASS"                         # 1.0
-    assert t["adverse > 10 pts"].status == "PASS"                           # exactly 1, 1/11<=10%... 
-    assert t["median scratch loss"].status == "PASS"
-    assert t["would-have-completed scratches"].status == "PASS"             # 1 <= 1
-    # re-check rows exist and drop DAYS[0]
+    assert t["would-have-filled scratches (limit replay)"].status == "PASS" # 1 <= 1
+    assert "indeterminate" in str(t["would-have-filled scratches (limit replay)"].measured)
+    assert t["data_invalid trades (reported, unscored)"].status == "PASS"
+    # re-check rows exist and drop DAYS[0] (2 fills there)
     assert any("re-check (drop 2026-08-05)" in c for c in t)
 
 

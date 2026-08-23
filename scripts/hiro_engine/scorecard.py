@@ -94,14 +94,22 @@ def stage2_entries(rows: pd.DataFrame) -> pd.DataFrame:
     for r in entries.itertuples():
         x = exits[(exits.session_date == r.session_date) & (exits.trade_id == r.trade_id)]
         x = x.iloc[0] if len(x) else None
+        def _f(row, col):
+            v = getattr(row, col, None)
+            return float(v) if row is not None and pd.notna(v) else None
         recs.append(dict(
             date=r.session_date, trade_id=int(r.trade_id), branch=r.branch, side=r.side,
             signal_min=int(r.signal_min), entry_min=int(r.entry_min), s0=float(r.s0),
             episode=int(r.episode) if pd.notna(r.episode) else None,
+            k1=_f(r, "k1"), k2=_f(r, "k2"), leg1_fill=_f(r, "leg1_fill"),
+            limit_price=_f(r, "limit_price"),
             exit_type=(x.outcome_type if x is not None else None),
-            exit_ref=(float(x.exit_ref) if x is not None and pd.notna(x.exit_ref) else None),
-            minutes=(float(x.outcome_minutes) if x is not None and pd.notna(x.outcome_minutes) else None),
-            adverse=(float(x.adverse) if x is not None and pd.notna(x.adverse) else None)))
+            exit_ref=_f(x, "exit_ref"), minutes=_f(x, "outcome_minutes"),
+            adverse=_f(x, "adverse"),
+            credit=_f(x, "credit"), pnl_usd=_f(x, "pnl_usd"),
+            leg_liq_loss_usd=_f(x, "leg_liq_loss_usd"),
+            data_invalid=bool(getattr(x, "data_invalid", False))
+                if x is not None and pd.notna(getattr(x, "data_invalid", None)) else False))
     df = pd.DataFrame(recs)
     if len(df):
         df["pnl"] = np.where(df.side == "sell_first", df.exit_ref - df.s0, df.s0 - df.exit_ref)
@@ -128,54 +136,78 @@ def stage3_qualify(rows: pd.DataFrame) -> pd.DataFrame:
 
 
 def _would_have_filled(cfg: Config, tr) -> Optional[bool]:
-    """Deterministic re-check from stored SPX: would the fill touch have printed
-    within the 60-min horizon absent the scratch?"""
-    try:
-        spx = load_spx_day(cfg.path_of("spx_dir"), tr.date)
-    except FeedError:
+    """v3 (R9): pure RESTING-LIMIT replay from the pinned chain cache over the
+    ORIGINAL 60-min horizon, no other R7 exits; single invalid minutes are
+    skipped; a >= 5-consecutive-minute gap -> None (INDETERMINATE, reported
+    separately, never guessed)."""
+    if tr.limit_price is None or tr.k2 is None:
         return None
-    fill = cfg.num("r1_instruments", "fill_touch_pts")
+    from .chains import ChainError, ChainStore
+    try:
+        cd = ChainStore().load(tr.date)
+    except ChainError:
+        return None
     clock = cfg.i("r5_clock", "clock_minutes")
-    seg = spx[(spx["min"] >= tr.entry_min) & (spx["min"] <= tr.entry_min + clock)]
-    if tr.side == "sell_first":
-        return bool((seg.high >= tr.s0 + fill).any())
-    return bool((seg.low <= tr.s0 - fill).any())
+    gap_limit = cfg.i("r1v3_limits", "quote_gap_invalid_after")
+    first = int(tr.signal_min) + cfg.i("r1v3_limits", "first_eligible_offset")
+    buy = tr.side == "sell_first"
+    gap = 0
+    for m in range(first, int(tr.entry_min) + clock + 1):
+        q = cd.quote(m, tr.k2)
+        if q is None or not q.valid:
+            gap += 1
+            if gap >= gap_limit:
+                return None
+            continue
+        gap = 0
+        if (q.ask <= tr.limit_price) if buy else (q.bid >= tr.limit_price):
+            return True
+    return False
 
 
 def stage4_metrics(cfg: Config, entries: pd.DataFrame) -> dict:
+    """v3: economic $ metrics (R11.3). data_invalid trades stay in entry counts
+    (handled in stage6) but leave fills/rates/risk here."""
     m: dict = {"warnings": []}
+    if len(entries) and "data_invalid" not in entries.columns:
+        entries = entries.assign(data_invalid=False)
+    scored = entries[~entries.data_invalid.fillna(False)] if len(entries) else entries
     for br in ("A", "B", "ALL"):
-        e = entries if br == "ALL" else entries[entries.branch == br]
+        e = scored if br == "ALL" else scored[scored.branch == br]
         fills = e[e.exit_type == "fill"]
-        noncens = e[e.exit_type != "censored"]
-        m[f"{br}_entries"] = len(e)
+        denom = e[e.exit_type != "censored"]
+        m[f"{br}_entries"] = len(entries if br == "ALL" else entries[entries.branch == br])
         m[f"{br}_fills"] = len(fills)
-        m[f"{br}_fill_rate"] = len(fills) / len(noncens) if len(noncens) else float("nan")
+        m[f"{br}_fill_rate"] = len(fills) / len(denom) if len(denom) else float("nan")
         m[f"{br}_censored"] = int((e.exit_type == "censored").sum())
-    scr = entries[entries.exit_type == "scratch"]
-    m["scratch_losses"] = sorted((-scr.pnl).tolist()) if len(scr) else []
-    m["median_scratch_loss"] = float(np.median(-scr.pnl)) if len(scr) else float("nan")
-    whf = []
+    m["data_invalid_n"] = int(entries.data_invalid.fillna(False).sum()) if len(entries) else 0
+    scr = scored[scored.exit_type == "scratch"] if len(scored) else scored
+    m["median_scratch_loss_usd"] = float((-scr.pnl_usd).median()) if len(scr) else float("nan")
+    losses = (-scored.pnl_usd).clip(lower=0) if len(scored) else pd.Series(dtype=float)
+    m["max_single_trade_loss_usd"] = float(losses.max()) if len(losses) else 0.0
+    m["credits_usd"] = float(scored[scored.exit_type == "fill"].pnl_usd.sum())         if len(scored) else 0.0
+    m["realized_pnl_usd"] = float(scored.pnl_usd.sum()) if len(scored) else 0.0
+    whf, indet = [], 0
     for tr in scr.itertuples():
         r = _would_have_filled(cfg, tr)
         if r is None:
-            m["warnings"].append(f"no stored SPX for {tr.date} — would-have-filled unknown")
+            indet += 1
         elif r:
             whf.append(tr.date)
     m["would_have_filled_scratches"] = len(whf)
-    adv = entries[entries.adverse.notna()]
-    m["adverse_gt10_n"] = int((adv.adverse > 10).sum())
-    m["adverse_gt10_frac"] = float((adv.adverse > 10).mean()) if len(adv) else float("nan")
+    m["would_have_filled_indeterminate"] = indet
     return m
 
 
 def stage5_controls(cfg: Config, entries: pd.DataFrame) -> dict:
-    frame = build_control_frame(cfg)     # verifies the data hash (R8.2)
+    """v3: limit-fill controls from the PINNED derived frame (R11.4/R11.5)."""
+    from .control import clock_matched_v3, load_control_frame, midpoint_matched_v3
+    frame = load_control_frame(cfg)      # verifies the frame pin (R8.2)
     out = {}
     b = entries[entries.branch == "B"]
     a = entries[entries.branch == "A"]
-    out["B_control"] = clock_matched(cfg, b.signal_min, frame) if len(b) else float("nan")
-    out["A_control"] = midpoint_matched(cfg, a.signal_min, frame) if len(a) else float("nan")
+    out["B_control"] = clock_matched_v3(cfg, b.signal_min, frame) if len(b) else float("nan")
+    out["A_control"] = midpoint_matched_v3(cfg, a.signal_min, frame) if len(a) else float("nan")
     return out
 
 
@@ -185,20 +217,36 @@ def _best_session(entries: pd.DataFrame) -> Optional[str]:
         return None
     g = entries.groupby("date").agg(
         fills=("exit_type", lambda s: (s == "fill").sum()),
-        pnl=("pnl", "sum")).reset_index()
+        pnl=("pnl_usd", "sum")).reset_index()
     g = g.sort_values(["fills", "pnl", "date"], ascending=[False, False, True])
     return str(g.iloc[0].date)
+
+
+def _r9_thresholds(cfg: Config) -> Optional[dict]:
+    """Registered thresholds from CONFIG (populated at task 18); None = pending."""
+    try:
+        t = cfg.section("r9_thresholds")
+        return t if t else None
+    except Exception:
+        return None
 
 
 def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.DataFrame,
                     qualify: pd.DataFrame, metrics: dict, controls: dict) -> pd.DataFrame:
     n_sess = len(sessions_countable)
     rows = []
+    th = _r9_thresholds(cfg)
+    pending = th is None
 
     def crit(name, measured, threshold, ok, inconclusive=False):
+        status = ("PENDING (R9a unregistered)" if pending and "«16b»" in str(threshold)
+                  else "INCONCLUSIVE" if inconclusive
+                  else ("PASS" if ok else "FAIL"))
         rows.append(dict(criterion=name, measured=measured, threshold=threshold,
-                         status="INCONCLUSIVE" if inconclusive
-                         else ("PASS" if ok else "FAIL")))
+                         status=status))
+
+    def _t(key, default_marker="«16b»"):
+        return (th[key] if th and key in th else default_marker)
 
     q_days = qualify.groupby("date").size() if len(qualify) else pd.Series(dtype=int)
     crit("qualifying signals on >=7/10 sessions", f"{(q_days > 0).sum()}/{n_sess}",
@@ -208,9 +256,12 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
     crit("1-3 executable entries on >=6/10 sessions", f"{d13}/{n_sess}", ">=6 of 10", d13 >= 6)
     fills_by_day = (entries[entries.exit_type == "fill"].groupby("date").size()
                     if len(entries) else pd.Series(dtype=int))
-    crit(">=8 fills total", metrics["ALL_fills"], ">=8", metrics["ALL_fills"] >= 8)
-    crit(">=1 fill on 6/10 sessions", f"{(fills_by_day > 0).sum()}/{n_sess}", ">=6 of 10",
-         (fills_by_day > 0).sum() >= 6)
+    ft = _t("fills_total_floor")
+    crit("limit fills total", metrics["ALL_fills"], f">={ft}",
+         isinstance(ft, int) and metrics["ALL_fills"] >= ft)
+    sf = _t("sessions_with_fill_floor")
+    crit("sessions with >=1 fill", f"{(fills_by_day > 0).sum()}/{n_sess}", f">={sf} of 10",
+         isinstance(sf, int) and (fills_by_day > 0).sum() >= sf)
     max_per_day = int(e_per_day.max()) if len(e_per_day) else 0
     crit("<=3 entries/session", max_per_day, "<=3", max_per_day <= 3)
     crit("one leg at a time", metrics.get("one_leg_violations", 0),
@@ -220,8 +271,11 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
     b_inc = qb < 20
     crit("Branch B qualifying signals", qb, ">=20 (else INCONCLUSIVE)", qb >= 20,
          inconclusive=b_inc)
+    bf = _t("b_fill_rate_floor")
     crit("Branch B fill rate", round(metrics["B_fill_rate"], 3) if metrics["B_fill_rate"] == metrics["B_fill_rate"] else "n/a",
-         ">=0.45", metrics["B_fill_rate"] >= 0.45 if not b_inc else False, inconclusive=b_inc)
+         f">={bf}", (isinstance(bf, float) or isinstance(bf, int))
+         and metrics["B_fill_rate"] >= float(bf) if not b_inc and not pending else False,
+         inconclusive=b_inc)
     crit("Branch B vs clock-matched control",
          f"{metrics['B_fill_rate']:.3f} vs {controls['B_control']:.3f}"
          if metrics["B_fill_rate"] == metrics["B_fill_rate"] else "n/a",
@@ -232,8 +286,11 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
     a_inc = qa < 8
     crit("Branch A qualifying episodes", qa, ">=8 (else INCONCLUSIVE)", qa >= 8,
          inconclusive=a_inc)
+    af = _t("a_fill_rate_floor")
     crit("Branch A fill rate", round(metrics["A_fill_rate"], 3) if metrics["A_fill_rate"] == metrics["A_fill_rate"] else "n/a",
-         ">=0.70", metrics["A_fill_rate"] >= 0.70 if not a_inc else False, inconclusive=a_inc)
+         f">={af}", (isinstance(af, float) or isinstance(af, int))
+         and metrics["A_fill_rate"] >= float(af) if not a_inc and not pending else False,
+         inconclusive=a_inc)
     crit("Branch A vs midpoint-matched control (+10pp)",
          f"{metrics['A_fill_rate']:.3f} vs {controls['A_control']:.3f}"
          if metrics["A_fill_rate"] == metrics["A_fill_rate"] else "n/a",
@@ -241,32 +298,34 @@ def stage6_criteria(cfg: Config, sessions_countable: list[str], entries: pd.Data
          (metrics["A_fill_rate"] >= controls["A_control"] + 0.10) if not a_inc else False,
          inconclusive=a_inc)
 
-    frac = metrics["adverse_gt10_frac"]
-    crit("adverse > 10 pts", f"{metrics['adverse_gt10_n']} trades "
-         f"({frac:.1%})" if frac == frac else "0", "<=10% and <=1 trade",
-         (metrics["adverse_gt10_n"] <= 1)
-         and (frac <= 0.10 if frac == frac else True))
-    msl = metrics["median_scratch_loss"]
-    crit("median scratch loss", round(msl, 2) if msl == msl else "no scratches",
-         "<=3 pts", (msl <= 3.0) if msl == msl else True)
-    crit("would-have-completed scratches", metrics["would_have_filled_scratches"],
+    ml = _t("max_single_trade_loss_usd")
+    crit("max single-trade realized loss ($)", f"${metrics['max_single_trade_loss_usd']:,.0f}",
+         f"<=${ml}", isinstance(ml, int) and metrics["max_single_trade_loss_usd"] <= ml)
+    msl = metrics["median_scratch_loss_usd"]
+    mc = _t("median_scratch_loss_cap_usd")
+    crit("median scratch loss ($)", f"${msl:,.0f}" if msl == msl else "no scratches",
+         f"<=${mc}", (isinstance(mc, int) and msl <= mc) if msl == msl else True)
+    crit("would-have-filled scratches (limit replay)",
+         f"{metrics['would_have_filled_scratches']}"
+         + (f" (+{metrics['would_have_filled_indeterminate']} indeterminate)"
+            if metrics.get("would_have_filled_indeterminate") else ""),
          "<=1", metrics["would_have_filled_scratches"] <= 1)
+    crit("data_invalid trades (reported, unscored)", metrics.get("data_invalid_n", 0),
+         "report only", True)
 
     # RISK RE-CHECK: best session removed, thresholds unchanged, denominators reduced
     best = _best_session(entries)
     if best is not None:
         e2 = entries[entries.date != best]
         m2 = stage4_metrics(cfg, e2)
-        f2 = m2["adverse_gt10_frac"]
-        crit(f"re-check (drop {best}): adverse > 10 pts",
-             f"{m2['adverse_gt10_n']} ({f2:.1%})" if f2 == f2 else "0",
-             "<=10% and <=1 trade",
-             m2["adverse_gt10_n"] <= 1 and (f2 <= 0.10 if f2 == f2 else True))
-        msl2 = m2["median_scratch_loss"]
-        crit(f"re-check (drop {best}): median scratch loss",
-             round(msl2, 2) if msl2 == msl2 else "no scratches", "<=3 pts",
-             (msl2 <= 3.0) if msl2 == msl2 else True)
-        crit(f"re-check (drop {best}): would-have-completed scratches",
+        crit(f"re-check (drop {best}): max single loss ($)",
+             f"${m2['max_single_trade_loss_usd']:,.0f}", f"<=${ml}",
+             isinstance(ml, int) and m2["max_single_trade_loss_usd"] <= ml)
+        msl2 = m2["median_scratch_loss_usd"]
+        crit(f"re-check (drop {best}): median scratch loss ($)",
+             f"${msl2:,.0f}" if msl2 == msl2 else "no scratches", f"<=${mc}",
+             (isinstance(mc, int) and msl2 <= mc) if msl2 == msl2 else True)
+        crit(f"re-check (drop {best}): would-have-filled scratches",
              m2["would_have_filled_scratches"], "<=1",
              m2["would_have_filled_scratches"] <= 1)
     return pd.DataFrame(rows)
@@ -292,6 +351,10 @@ def run_scorecard(cfg: Config, rehearsal: bool = False,
         outdir = _p("paper_log").parent / ("scorecard_rehearsal" if rehearsal else "scorecard")
     outdir.mkdir(parents=True, exist_ok=True)
     label = "REHEARSAL" if rehearsal else "LIVE"
+    if not rehearsal and _r9_thresholds(cfg) is None:
+        print("scorecard LIVE: REFUSED — R9 thresholds are not registered "
+              "(r9a pending, task 18). Rehearsal grading is allowed.")
+        return 1
     try:
         rows = stage1_filter(cfg, _read_log(log_path), _read_sessions(sessions_path),
                              rehearsal, d_from, d_to)

@@ -136,6 +136,12 @@ def main(argv=None) -> int:
     s.add_argument("--from", dest="date_from"); s.add_argument("--to", dest="date_to")
     s.set_defaults(fn=cmd_scorecard)
 
+    rg = sub.add_parser("register-thresholds"); _common(rg)
+    rg.add_argument("--log", default=None)
+    rg.set_defaults(fn=lambda a: __import__("hiro_engine.register", fromlist=["run_register"])
+                    .run_register(load_config(a.config),
+                                  log_path=Path(a.log) if a.log else None))
+
     w = sub.add_parser("sweep"); _common(w)
     w.add_argument("knob")
     w.add_argument("--from", dest="date_from"); w.add_argument("--to", dest="date_to")

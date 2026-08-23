@@ -165,7 +165,7 @@ def rebuild_state(csv_path: Path, session_date: str) -> EngineState:
                     branch=ev.branch, side=ev.side, signal_min=ev.signal_min,
                     episode=ev.episode, expiry=ev.expiry, strike_hint=ev.leg_strikes,
                     chain_quote_ts=ev.strike_quote_ts, bh_level=ev.bh_level,
-                    entry_L=ev.entry_L)
+                    entry_L=ev.entry_L, k1=ev.k1, k2=ev.k2)
             elif ev.event_type == "entry":
                 state.pending_entry = None
                 state.open_trade = trade_from_entry_event(ev)
@@ -196,6 +196,49 @@ def rebuild_state(csv_path: Path, session_date: str) -> EngineState:
                     tr.last_valid_bid = ev.last_valid_bid
                     tr.last_valid_ask = ev.last_valid_ask
                     tr.last_valid_quote_min = ev.last_valid_quote_min
+                if ev.leg_liq_loss_usd is not None:
+                    tr.leg_liq_loss_usd = max(tr.leg_liq_loss_usd, ev.leg_liq_loss_usd)
+                if ev.spx_adverse_pts is not None:
+                    tr.adverse = max(tr.adverse, ev.spx_adverse_pts)
             elif ev.event_type == "entry_aborted_no_quote":
                 state.pending_entry = None
     return state
+
+
+# =============================================================================
+# Snapshot sidecar (v3.0, 15f FROZEN CONTRACT — task 19 wires the live writer,
+# it may not change this format). One row per evaluated minute while a trade/
+# limit is live; doubles as the parity-gate capture and the live-resume quote
+# source (logged decisions stay authoritative).
+# =============================================================================
+SIDECAR_COLUMNS = ["minute", "strike", "bid", "ask", "limit_price", "marketable",
+                   "decision"]
+
+
+class QuoteSidecar:
+    def __init__(self, path: Path):
+        self.path = Path(path)
+        self.rows: list[dict] = []
+
+    def record(self, minute: int, strike: float, bid, ask, limit_price, marketable: bool,
+               decision: str) -> None:
+        self.rows.append(dict(minute=minute, strike=strike, bid=bid, ask=ask,
+                              limit_price=limit_price, marketable=bool(marketable),
+                              decision=decision))
+
+    def flush(self) -> None:
+        import pandas as pd
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        pd.DataFrame(self.rows, columns=SIDECAR_COLUMNS).to_parquet(self.path, index=False)
+
+    @staticmethod
+    def load(path: Path):
+        import pandas as pd
+        return pd.read_parquet(path)
+
+    @staticmethod
+    def quote_source(path: Path):
+        """Resume quote source: {(minute, strike): (bid, ask)} from a sidecar."""
+        df = QuoteSidecar.load(path)
+        return {(int(r.minute), float(r.strike)): (r.bid, r.ask)
+                for r in df.itertuples() if r.bid == r.bid}

@@ -136,8 +136,12 @@ class ChainStore:
             if not p.exists():
                 raise ChainError(f"chain cache missing for {day} (R13.1): {p}")
             m = json.load(open(self.manifest_path))
-            expiry = m["sessions"][day]["expiry"]
-            self._days[day] = ChainDay(day, expiry, pd.read_parquet(p))
+            entry = m["sessions"][day]
+            got = hashlib.sha256(p.read_bytes()).hexdigest()
+            if got != entry["sha256"]:                     # bytes vs manifest, every load
+                raise ChainError(f"chain parquet bytes changed for {day} "
+                                 f"({got[:12]}… != manifest {entry['sha256'][:12]}…)")
+            self._days[day] = ChainDay(day, entry["expiry"], pd.read_parquet(p))
         return self._days[day]
 
     def frozen_manifest_hash(self, days: list[str]) -> str:

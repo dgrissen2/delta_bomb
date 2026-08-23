@@ -125,3 +125,56 @@ def test_hiro_down_blocks_entries_and_logs_outage(config, tmp_path):
     assert "HIRO DOWN" in text
     assert s.health == "HIRO_DOWN"
     assert s.outage_min == 20
+
+
+def test_option_quotes_down_stands_down_and_counts_outage(config, tmp_path):
+    """codex BP1 F5 / red-team: 10-minute option outage with NO open trade ->
+    stand-down banner, no pending entries, outage counted toward PARTIAL."""
+    class DownChains(FakeChains):
+        def __init__(self):
+            super().__init__()
+            self.down = set(range(700, 710))
+        def feed_ok(self, day, minute):
+            return minute not in self.down
+    s, log = _mk_session(config, tmp_path, chains=DownChains())
+    for m in range(690, 720):
+        s.process_tick(ReplayTick(Bar(m, 100, 100.5, 99.5, 100),
+                                  SpyBar(m, 10, 10.1, 9.9, 10, 100), _hiro_frame(m)))
+    text = (tmp_path / "paper_log.csv").read_text()
+    assert "NO OPTION QUOTES" in text
+    assert s.outage_min == 10
+    assert "pending_entry" not in text.split("OPTION QUOTES")[1].split("RESTORED")[0] \
+        if "RESTORED" in text else True
+
+
+def test_entry_abort_keeps_signal_qualifying(config, tmp_path):
+    """v3 S11 at session level: partner quote invalid at the signal snapshot ->
+    signal logged (stays qualifying), entry aborted, no trade."""
+    import pandas as pd
+    snap = pd.DataFrame({"strike": [7500.0], "bid": [40.0], "ask": [40.3],
+                         "delta": [-0.20]})           # partner 7505 NOT listed
+    fk = FakeChains(snapshot=snap)
+    s, log = _mk_session(config, tmp_path, chains=fk)
+    from hiro_engine.models import Event
+    from helpers import b_fire_row
+    row = b_fire_row(700)
+    evs = s.rules.evaluate(row, s.state)
+    evs = s._resolve_instruments(evs, row)
+    types = [e.event_type for e in evs]
+    assert "signal" in types                          # qualifying evidence stays
+    assert "entry_aborted_no_quote" in types
+    assert "pending_entry" not in types
+
+
+def test_sidecar_round_trip(tmp_path):
+    """15f frozen contract: write -> load -> quote_source."""
+    from hiro_engine.eventlog import QuoteSidecar
+    sc = QuoteSidecar(tmp_path / "live_quotes_2026-08-18.parquet")
+    sc.record(700, 7505.0, 40.2, 40.5, 39.9, False, "no_fill")
+    sc.record(701, 7505.0, 39.5, 39.8, 39.9, True, "fill")
+    sc.flush()
+    src = QuoteSidecar.quote_source(sc.path)
+    assert src[(701, 7505.0)] == (39.5, 39.8)
+    df = QuoteSidecar.load(sc.path)
+    assert list(df.columns) == ["minute", "strike", "bid", "ask", "limit_price",
+                                "marketable", "decision"]

@@ -281,10 +281,10 @@ class RuleEngine:
         # R7.3 cap (v3.0): chain mode uses the leg-1 option mid vs the leg-1
         # fill; spot proxy only as the quote-gap fallback (R2.5)
         adverse_move = (tr.s0 - bar.close) if sell else (bar.close - tr.s0)
-        if tr.cap_source == "chain" and tr.entry_option_mid is not None:
+        if tr.cap_source == "chain" and tr.leg1_fill is not None:
             q1 = row.quote_view.leg1 if row.quote_view is not None else None
             if q1 is not None and q1.valid:
-                move = (q1.mid - tr.entry_option_mid) if sell                     else (tr.entry_option_mid - q1.mid)
+                move = (q1.mid - tr.leg1_fill) if sell else (tr.leg1_fill - q1.mid)
                 if move >= tr.cap_value:
                     return ev("cap", "R7.3", cap_source="chain")
             elif adverse_move >= self.e7["cap_spot_pts"]:
@@ -344,6 +344,16 @@ class RuleEngine:
         tr_gap = state.open_trade
         if (self.tier.fill_mode == "limit" and tr_gap is not None
                 and tr_gap.limit is not None and tr_gap.limit.status == "resting"
+                and row.quote_gap_streak > 0):
+            out.append(Event(event_type="quote_gap", rule_id="R10.4",
+                             trade_id=tr_gap.id,
+                             quote_gap_streak=row.quote_gap_streak,
+                             last_valid_bid=tr_gap.last_valid_bid,
+                             last_valid_ask=tr_gap.last_valid_ask,
+                             last_valid_quote_min=tr_gap.last_valid_quote_min,
+                             notes=f"quote_gap minute ({row.quote_gap_streak} consecutive)"))
+        if (self.tier.fill_mode == "limit" and tr_gap is not None
+                and tr_gap.limit is not None and tr_gap.limit.status == "resting"
                 and row.quote_gap_streak >= self.cfg.i("r1v3_limits", "quote_gap_invalid_after")):
             out.append(Event(event_type="limit_canceled", rule_id="R10.4",
                              trade_id=tr_gap.id, limit_cancel_reason="quote_gap",
@@ -354,6 +364,14 @@ class RuleEngine:
         # entry evaluation below still sees the trade as open this bar — one leg at a time)
         exit_ev = self._exit_decision(row, state)
         if exit_ev is not None:
+            tr0 = state.open_trade
+            if (exit_ev.outcome_type != "fill" and tr0 is not None
+                    and tr0.limit is not None and tr0.limit.status == "resting"):
+                out.append(Event(event_type="limit_canceled", rule_id="R7.0",
+                                 trade_id=tr0.id,
+                                 limit_cancel_reason=exit_ev.outcome_type,
+                                 limit_price=tr0.limit.price,
+                                 notes=f"resting limit CANCELED ({exit_ev.outcome_type})"))
             out.append(exit_ev)
         # heartbeat while open (before exit executes — executor prices exits next bar)
         tr = state.open_trade
