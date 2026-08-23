@@ -186,20 +186,26 @@ def real_cache_sanity(cd: ChainDay) -> list[str]:
     off = ((f.ask / TICK).round() * TICK - f.ask).abs().max()
     if off > 1e-9:
         problems.append(f"ask off the {TICK} grid by {off}")
-    # put mid >= intrinsic - 1 tick
+    # EUROPEAN lower bound: SPX(W) puts may trade below naive K-S intrinsic
+    # (no early exercise). Bound = (K - S) - K*r_max*T with a generous
+    # r_max = 8%/yr — loose on purpose: this is a strategy-blind UNITS/sign
+    # detector (cents-vs-dollars, put/call swap), not a pricing model.
     mid = (f.bid + f.ask) / 2
-    intrinsic = (f.strike - f.underlying_price).clip(lower=0)
-    viol = (mid < intrinsic - TICK - 1e-9).mean()
+    t_years = 30.0 / 365.0
+    disc = f.strike * 0.08 * t_years
+    lower = (f.strike - f.underlying_price - disc).clip(lower=0)
+    viol = (mid < lower - TICK - 1e-9).mean()
     if viol > 0.001:
-        problems.append(f"put mid < intrinsic on {viol:.2%} of quotes")
-    # delta monotonic in strike (puts: more negative at higher strike), per sampled minutes
+        problems.append(f"put mid below the European lower bound on {viol:.2%} of quotes")
+    # delta ROUGHLY monotonic in strike (puts): check the tradeable body only
+    # (|delta| in [0.03, 0.97]) and flag only material inversions (> 0.02),
+    # since far-wing quotes carry stale/noisy greeks.
     for m in f["min"].unique()[::60]:
-        snap = f[f["min"] == m].sort_values("strike")
-        if len(snap) > 10 and not snap.delta.is_monotonic_decreasing:
-            d = snap.delta.diff()
-            if (d > 0.005).any():                        # tolerate quote noise
-                problems.append(f"delta not monotonic at minute {m}")
-                break
+        snap = f[(f["min"] == m) & (f.delta.abs() >= 0.03)
+                 & (f.delta.abs() <= 0.97)].sort_values("strike")
+        if len(snap) > 10 and (snap.delta.diff() > 0.02).any():
+            problems.append(f"delta materially non-monotonic at minute {m}")
+            break
     # minute alignment vs SPX grid
     mins = set(cd.frame["min"].unique())
     expected = set(range(570, 961))

@@ -161,22 +161,15 @@ class HiroPull:
         return hiro_minute_frame(pd.DataFrame(rows))
 
 
-# ---------------------------------------------------------------------------
-# Schwab chain adapter (R2.5) — optional; engine runs proxy-mode without it
-# ---------------------------------------------------------------------------
-class ChainAdapter:
-    """Wire to the user's Schwab tooling when available. Until wired+validated
-    in a live session, chain_available stays False and every signal uses the
-    R1.2 'nearest -0.20Δ' hint with spot-proxy caps/resolutions (R2.5)."""
+# (v3.0: the old ChainAdapter is DELETED — every option quote lives behind
+# chains.ChainStore, the single owner. live wiring lands with tasks 15c/19.)
+
+
+class _NoChain:
+    """Transitional stub until the v3 live chain path (spike-gated) is wired."""
     available = False
 
-    def option_mid_move(self, trade) -> Optional[float]:
-        return None
-
-    def implied_debit(self, trade) -> Optional[float]:
-        return None
-
-    def atm_straddle_im(self, day: str) -> Optional[float]:
+    def atm_straddle_im(self, day):
         return None
 
 
@@ -187,7 +180,7 @@ def run_live(cfg: Config, shakedown: bool = False) -> int:
     if not log_p.is_absolute():
         log_p = REPO_ROOT / log_p
     log = EventLog(log_p)
-    chain = ChainAdapter()
+    chain = _NoChain()
     im = chain.atm_straddle_im(day) if chain.available else None
     era = str(cfg.get("data", "hiro_era_start"))
     from .backtest import available_spx_days

@@ -3,7 +3,7 @@
 # CONFIG_HASH = sha256 of this file's bytes (R8.2). Editing ANY byte changes the hash and
 # resets the 10-session acceptance test (R9). Do not touch during the test.
 
-spec_version: "2.3"   # v2.3: Branch-A BH scratch removed (bh_scratch_forensics_2026-08-23)
+spec_version: "3.0"   # v3.0: real resting-limit fills (requirements v3.0, 2026-08-23)
 
 r1_instruments:
   width_strikes: 5            # R1.1 vertical width in strike points
@@ -53,10 +53,25 @@ r6_entries:
 r7_exits:
   scratch_drop_bps: 0.3       # R7.2 L drop below entry value ($B)
   scratch_window_min: 3       # R7.2 within 3 minutes of entry
-  cap_option_pts: 3.5         # R7.3 option-mid move against entry
-  cap_spot_pts: 15.0          # R7.3 spot proxy (no chain)
-  resolution_debit_max: 0.50  # R7.6 complete the pair at/below this debit
+  cap_option_pts: 3.5         # R7.3 option-mid move against leg-1 fill
+  cap_spot_pts: 15.0          # R7.3 spot fallback (quote-gap only, v3.0)
   heartbeat_min: 5            # AC: heartbeat cadence while a trade is open
+
+r1v3_limits:                  # v3.0 resting-limit mechanics (R1.4)
+  credit: 0.10                # FROZEN — not a knob (R13.2)
+  limit_tick: 0.10            # premium grid at these strikes; L rounds AGAINST us
+  first_eligible_offset: 2    # first fill-eligible minute = signal + 2
+  quote_gap_invalid_after: 5  # consecutive gap minutes -> cancel + data_invalid (R10.4)
+  exit_stale_quote_max_min: 3 # last-valid NBBO allowance for exit BOOKING only
+
+chains:                        # R2.5 / R8.2 v3.0 pins (FROZEN rehearsal scope only)
+  root: ~/Dev/central_trade_data/thetadata/spxw_bomb_chains
+  frozen_manifest_hash: "682d9973aa6c73f8242907080aa8c85199f3d1db9d6c0915778e8e1ff775ee50"
+  sdk_version: "1.0.9"
+  control_frame_hash: ""       # pinned by task 17 controls_build
+  r9a_formulas_hash: ""        # pinned by task 16 (pre-rehearsal freeze)
+  r9a_registration_hash: ""    # pinned by task 18 (post-rehearsal, run-once)
+  verification_v2_hash: ""     # pinned by task 18 (R12.3)
 
 data:
   spx_dir: ~/Dev/central_trade_data/thetadata/spx_index_1m_ohlc
