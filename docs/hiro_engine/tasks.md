@@ -20,8 +20,13 @@ requirements text wins over this file. DO NOT START without the user's explicit 
       only production module importing any option-chain client. Boundary test: an import-scan test
       asserts no module outside chains.py references the option client (the task-14 spike script is
       the ONE named diagnostic exception)
+    - REAL-CACHE SANITY (strategy-blind, protects the one-shot rehearsal): on the fetched 8 sessions
+      assert tick-grid conformance (all quotes on the 0.05/0.10 grid), put mids ≥ intrinsic − 1 tick,
+      delta monotonic in strike, minute alignment == the SPX bar grid; any violation → stop, units/
+      timezone bug
     - Tests: cache determinism (re-load == bytes); hash guard raises on any byte change; R13.1 refusal
-      lists missing dates; validity table (crossed/zero-bid/locked); the import-boundary scan
+      lists missing dates; validity table (crossed/zero-bid/locked); the import-boundary scan; the
+      real-cache sanity suite
     Requirements: R2.5, R10.4 (validity), R13.1
 
 - [ ] 14. LIVE QUOTE SPIKE (market hours; BEFORE any pricing code — the schedule risk lives here)
@@ -60,11 +65,31 @@ requirements text wins over this file. DO NOT START without the user's explicit 
     - 15f. eventlog + SIDECAR CONTRACT: v2 columns; rebuild_state learns fill/limit_canceled/
       quote_gap/entry_aborted; the snapshot-sidecar SCHEMA + writer + reader live HERE (frozen
       interface, exercised by a fixture sidecar in tests) with the resume authority rules (sidecar
-      quotes; logged decisions authoritative; widened RESUME WARNING) — task 19 only WIRES the
-      writer into the live loop, it may not change the format
-    - Tests: the ENTIRE 15a fixture passes; round-trip SimTrade⊕RestingLimit from rows; property tests
-      (one leg, 3/day, credit ≥ 0.10 on every fill) — plus the existing 116-test suite stays green
-      (price tier keeps spot_touch semantics; golden gate R12.1 untouched)
+      quotes; logged decisions authoritative; widened RESUME WARNING) — 15f's resume tests run
+      against a SYNTHETIC sidecar built from the frozen schema (no live capture exists yet); task 19
+      only WIRES the writer into the live loop, it may not change the format
+    - 15g. EXISTING-TEST MIGRATION TABLE (the old suite CANNOT simply "stay green" — v2.x tests assert
+      SPX-touch fills, next-bar-open booking, S0 targets, resolution_debit, point risk lines).
+      Disposition, test by test, committed WITH the code changes:
+        SUPERSEDED by the 15A fixture (delete): test_rules fill checks via bar.high>=target; every
+          test_exit_pairs "fill+X" pair; executor touch/target assertions; resolution_debit round-trip
+        RE-PARAMETERIZED to price tier (spot_touch keeps them meaningful): boundary open-booking tests
+          that survive as legacy-tier checks — EXCEPT Branch-B pairs (B is disabled in price tier):
+          those are fixture-superseded, not re-parameterized
+        UPDATED in place: config key assertions (fill_touch_pts → the R1.4 constants), scorecard
+          goldens (→ $ lines), determinism/e2e (same shape, v3 stream)
+      Weakening an assertion without a row in this table is a review-rejectable change
+    - R11.3 $-P&L math is ONE shared function defined in 15b (models/metrics), imported by executor,
+      scorecard (17) and register (16) — never re-implemented
+    - 15d MUST NOT rename Core/b_aligned/b_gates/late_state or the feature core (verify.py's legacy
+      gate imports them; R12.1 stays green throughout)
+    - Task 15 (15b–15g) is ONE green unit: transient breakage inside it is expected (e.g. removing
+      resolution_debit_max breaks Executor.__init__ until 15e); the suite is green at the 15-boundary
+    - INTERLOCK (protects the R9a boundary): while `r9a_formulas_hash` is EMPTY, `backtest` over any
+      of the 8 control sessions under full tier prints a loud REFUSAL (override flag exists for the
+      15A-fixture and unit tests only, which use synthetic days) — no accidental rehearsal
+    - Tests: the ENTIRE 15A fixture passes; round-trip SimTrade⊕RestingLimit from rows; property tests
+      (one leg, 3/day, credit ≥ 0.10 on every fill); golden gate R12.1 still green
     Requirements: R1.2, R1.4, R7.0–R7.6, R8.1, R10.4, R12.2
 
 - [ ] 16. Pre-registration freeze (R9a) — BEFORE any v3 rehearsal runs
@@ -72,9 +97,12 @@ requirements text wins over this file. DO NOT START without the user's explicit 
       fill-rate floors, $-risk caps, empty-resample rule)
     - TWO DISTINCT CONFIG PINS, never reused: `r9a_formulas_hash` (pinned HERE, pre-rehearsal — the
       hash of the derivation code+formulas text) and `r9a_registration_hash` (EMPTY until task 18 pins
-      registration.json). The run-once boundary checks ONLY `r9a_registration_hash`: non-empty →
-      register-thresholds refuses
-    - scorecard stage6 reads thresholds FROM CONFIG (hardcoded v2 thresholds deleted)
+      registration.json). register-thresholds REFUSES to run if (a) `r9a_registration_hash` is already
+      non-empty (run-once), OR (b) `r9a_formulas_hash` is empty or does not match the self-hash of its
+      own derivation code (the freeze must be real before the shot is spent)
+    - SCOPE: task 16 is register.py + pins ONLY — the stage6 rewiring moves to task 17 so every task
+      still ends green; scorecard (from 17 on) REFUSES to grade LIVE sessions while
+      `r9a_registration_hash` is empty (rehearsal-labeled runs allowed)
     - Tests: derivation on a synthetic log matches hand-computed floors incl. empty-resample and
       rounding edges; refuses to run twice
     Requirements: R9, R9a
@@ -85,6 +113,10 @@ requirements text wins over this file. DO NOT START without the user's explicit 
     - `controls_build` job → derived ControlFrame (indicator per R11.4/5: signal-minute candidate,
       pure limit replay, no R7 exits, min(60, session end)); manifest cross-links source-cache sha;
       frame sha pinned in CONFIG; scorecard verifies frame.source_sha == pinned cache sha
+    - stage6 rewired to read thresholds FROM CONFIG (moved here from 16; hardcoded v2 thresholds
+      deleted HERE so this task ends green); refuse-to-grade-live-unregistered rule + test
+    - controls_build PLAUSIBILITY BAND: if the control fill-indicator base rate is ≈0% or ≈100%,
+      STOP — that is a units/sign bug, not a market fact (protects the one-shot rehearsal)
     - summarizer units per TierPolicy.fill_mode (spot_touch = SPX pts, $ suppressed)
     - Tests: hand-computed weighting fixture; control frame pinned at first build; synthetic-log
       scorecard golden updated to v3 semantics
@@ -109,6 +141,13 @@ requirements text wins over this file. DO NOT START without the user's explicit 
       prices within 1 tick on ≥95% of minutes
     - RUNBOOK/ops: chain-cache freshness + sidecar presence in morning/evening checks; quote-gap and
       stand-down console lines documented for the trader
+    - LIVE-STARTUP INTERLOCKS: `cli live` REFUSES to start unless (a) the task-14 spike artifact
+      exists and says PASS, and (b) the sidecar path is writable — task-20 preconditions become
+      mechanical, not textual (RUNBOOK documents both refusal messages)
+    - docs: master-playbook gets a one-line v3.0 status note (fills are now real resting-limit
+      fills; ±3-pt touch retired); build_notes records that CONFIG_HASH legitimately churns at
+      13/15b/16/17/18 during the build (hash tests stay RELATIVE; each churn re-triggers the R8.2
+      loud warning — expected until the clock starts)
     - READINESS GATE (deterministic): everything above green with NO live session required
     Requirements: R12.3 parity mechanics, R2 [OPS], non-functional
 
