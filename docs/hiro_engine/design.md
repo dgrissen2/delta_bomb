@@ -64,9 +64,11 @@ event objects, formatted twice.
         pinned in CONFIG. No other module imports the SDK.
 
     feeds.py
-        Feed protocol: next_bar() -> Bar | None, spy_bar(), hiro_snapshot(), chain() (live only).
-        LiveFeed: ThetaData SPX bars; CDP HIRO pull; Schwab chain; SPY via ThetaData. Retries once, then
-        raises FeedDown(scope) — Session's health machine handles it (below).
+        Feed protocol: next_bar() -> Bar | None, spy_bar(), hiro_snapshot(). NO chain access here —
+        every option quote (historical cache, live snapshots, Schwab fallback) lives behind
+        ChainStore in chains.py, the SINGLE owner of option endpoints.
+        LiveFeed: ThetaData SPX bars (SDK); CDP HIRO pull; SPY via SDK. Retries once, then raises
+        FeedDown(scope) — Session's health machine handles it (below).
         ReplayFeed: stored parquets/CSVs; refuses missing required sources per R13.1 (listing dates).
         levels.py / calendar.py: LevelsLoader (validates date + CW−VT>0, fail-closed) and CalendarLoader
         (R2.4 list, checked at session start). range60_pct history: initialized at startup by replaying the
@@ -174,15 +176,17 @@ event objects, formatted twice.
                    quote_gap_streak, data_invalid: bool,
                    state, exit_type, exit_ref ($ booking), minutes,
                    spx_adverse_pts, leg_liq_loss_usd }         # schema_v=2, ADDITIVE (readers accept v1)
-    Event v2     adds explicit columns (v1 columns retained; resolution_debit kept for v1 parsing,
-                 legacy-always-None): expiry, K, K2, leg1_fill, limit_price, limit_status,
-                 limit_cancel_reason, first_eligible_min, leg2_fill, credit, quote_age,
+    Event v2     adds explicit columns (ALL v1 columns retained — signal_min, entry_min, s0, entry_L,
+                 episode etc. already exist in v1 and keep carrying SimTrade identity; resolution_debit
+                 kept for v1 parsing, legacy-always-None): expiry, K, K2, leg1_fill, limit_price,
+                 limit_status, limit_cancel_reason, first_eligible_min, leg2_fill, credit, quote_age,
                  quote_gap_streak, last_valid_bid, last_valid_ask, last_valid_quote_min,
                  data_invalid, leg_liq_loss_usd, spx_adverse_pts.
-                 HEARTBEATS persist quote_gap_streak + last-valid NBBO each 5 min → crash-resume
-                 rebuilds streaks and the ≤3-min stale-booking anchor from the latest logged row;
-                 round-trip test: SimTrade ⊕ RestingLimit reconstructed field-for-field from
-                 ENTRY + limit events + latest heartbeat + EXIT.
+                 EVERY quote_gap event row carries quote_gap_streak + last_valid_* (not only
+                 heartbeats), so the resume anchor is the LATEST of (entry, heartbeat, quote_gap,
+                 limit event) rows — minute-accurate, no between-heartbeat blind spot; round-trip
+                 test: SimTrade ⊕ RestingLimit reconstructed field-for-field from ENTRY + limit +
+                 latest quote_gap/heartbeat + EXIT rows.
                    # every field persisted in the ENTRY/EXIT events → crash round-trip is lossless
     Event        explicit versioned columns, schema_v=1 — no catch-all field:
                  { ts, mode (live|backtest|shakedown), tier, session_date, config_hash, schema_v,
@@ -211,15 +215,20 @@ event objects, formatted twice.
 ## Main loop (the whole engine, interpretable)
 
     for bar in feed:
-        quotes = chains.quote_view(bar.min, state)                    # the two working strikes, this minute
-        # (after rules.evaluate below: a fresh PendingEntry gets its instruments resolved by
-        #  Session via chains.signal_snapshot(t) + InstrumentSelector — see chains.py notes)
-        state, entry_events = executor.execute_pending(bar, quotes, state)  # leg 1 books at closing NBBO;
-                                                                            # RestingLimit created (R1.4b/c)
+        quotes = chains.quote_view(bar.min, state)                   # two working strikes, THIS minute
+        state, entry_events = executor.execute_pending(bar, quotes, state)  # leg 1 books at closing
+                                                                     # NBBO; RestingLimit created (R1.4b/c)
         row    = features.update(bar, feed.hiro_snapshot(), feed.spy_bar())
-        row    = row + vetoes/health/QuoteView                        # Session attaches (unchanged pattern)
-        events = rules.evaluate(row, state)          # R4 → R6 → R7 arbitration incl. limit_filled (one place)
-        state, trade_events = executor.apply(events, row, state)     # bookings per R7.0; quote-gap streaks
+        row    = row + vetoes/health/QuoteView/quote_gap_streak      # Session attaches (streaks counted HERE)
+        events = rules.evaluate(row, state)          # R4 → R6 → R7 single arbitration incl. limit_filled
+                                                     # and the 5th-gap limit cancel
+        if pending_entry in events:                                  # fresh signal this bar:
+            events = session.resolve_instruments(events)             # chains.signal_snapshot(t) +
+                                                                     # InstrumentSelector → {expiry,K,K2}
+                                                                     # into PendingEntry (+ SIGNAL line's
+                                                                     # strike text); snapshot missing →
+                                                                     # entry_aborted_no_quote instead
+        state, trade_events = executor.apply(events, row, state)     # bookings per R7.0 ONLY (no judgment)
         log.emit(entry_events + events + trade_events)
 
 ## Error handling
