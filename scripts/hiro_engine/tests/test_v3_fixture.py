@@ -136,3 +136,19 @@ def test_v3_fixture_scenario(config, sc):
                    and e.limit_cancel_reason == exp["cancel_reason"] for e in evs)
     if "fill_min" in exp:
         assert exit_ev._at_min == exp["fill_min"]
+
+
+def test_ordinary_exit_cancel_is_scored_not_data_invalid(config):
+    """Rehearsal defect regression (2026-08-23): the universal limit_canceled
+    event on ordinary exits must NOT stamp data_invalid — only quote_gap does
+    (fixture S5's scratch is scored; S9's gap trade is not)."""
+    s5 = next(s for s in SCENARIOS if s["name"].startswith("S5"))
+    evs = _run_scenario(config, s5)
+    exit_ev = next(e for e in evs if e.event_type == "exit")
+    assert exit_ev.outcome_type == "scratch"
+    assert not exit_ev.data_invalid              # SCORED
+    assert any(e.event_type == "limit_canceled"
+               and e.limit_cancel_reason == "scratch" for e in evs)
+    s9 = next(s for s in SCENARIOS if s["name"].startswith("S9"))
+    evs9 = _run_scenario(config, s9)
+    assert next(e for e in evs9 if e.event_type == "exit").data_invalid  # UNscored

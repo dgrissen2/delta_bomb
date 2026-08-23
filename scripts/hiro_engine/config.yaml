@@ -70,8 +70,8 @@ chains:                        # R2.5 / R8.2 v3.0 pins (FROZEN rehearsal scope o
   sdk_version: "1.0.9"
   control_frame_hash: "8a981150866e9ca528ea9dd8118174b5b2a1c93312efb739e5a1ec56e4b5001d"  # task-17 controls_build (base rates 0.470/0.454)
   r9a_formulas_hash: "bade956cb5e8ffe151dbdf112987252f82c343382c6081b340e72eb3d86271a1"  # task-16 freeze (sha256 of derive_thresholds source)
-  r9a_registration_hash: ""    # pinned by task 18 (post-rehearsal, run-once)
-  verification_v2_hash: ""     # pinned by task 18 (R12.3)
+  r9a_registration_hash: "2a72d1f53f236be98827b8c192bf37fc6ec13ced0bdf101880793150411abca2"  # task-18 registration (run-once boundary now CLOSED)
+  verification_v2_hash: "28bd84b8893db104478037e7c4ee058c5291df90d5150948de8a2cadb4ccb651"  # task-18 R12.3 pin (19 trades, 10 fills)
 
 data:
   spx_dir: ~/Dev/central_trade_data/thetadata/spx_index_1m_ohlc
@@ -93,3 +93,11 @@ verification:                  # R12.1
 logging:
   paper_log: docs/replay/hiro/paper_log.csv
   sessions_log: docs/replay/hiro/sessions.csv
+
+r9_thresholds:                 # populated ONCE by R9a mechanical derivation (task 18)
+  fills_total_floor: 11
+  sessions_with_fill_floor: 7
+  b_fill_rate_floor: 0.1
+  a_fill_rate_floor: 0.5
+  max_single_trade_loss_usd: 250
+  median_scratch_loss_cap_usd: 140

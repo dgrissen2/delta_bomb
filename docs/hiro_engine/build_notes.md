@@ -186,3 +186,32 @@ rates were computed or observed; the R9a boundary (first AGGREGATE rehearsal)
 is intact and the formulas pin now predates any such run. (b) Fixture INPUT
 corrections after 15A (entry-minute partner quotes, S7 minute, S10 partial-day
 redesign) are documented in-file; expected VALUES were never edited.
+
+## Task 18 — THE v3.0 rehearsal + registration (2026-08-23)
+
+- One rehearsal run (8 sessions, final trade list identical across the defect
+  re-run): **19 trades, 10 limit fills (0.526), realized −$670 in cash + 10
+  owned 5-wide spreads** (credits +$100; non-fill exits −$770 at conservative
+  NBBO). Controls (pinned frame): sell-first baseline 0.583, long-first 0.500.
+- DEFECT POLICY EXERCISED ONCE (R9a): the BP1 universal limit_canceled event
+  made the executor stamp data_invalid on EVERY non-fill exit (a grading-layer
+  bug; the scoped stamp is quote_gap only). Fixed + regression test; the
+  re-run produced the IDENTICAL trade list (trading code untouched); the first
+  registration output (all-1.0 floors) was discarded as the defect's artifact.
+- Registration (mechanical, frozen formulas): fills_total_floor 11 (10-session
+  projection), sessions_with_fill 7, B floor 0.10 (point 0.333), A floor 0.50
+  (point 0.615), max single loss $250 (p95 rule), median scratch cap $140.
+  registration.json hash-pinned; thresholds in config r9_thresholds; «16b»
+  markers populated in the spec; verification artifact v2 pinned (19 rows,
+  3 rows spot-checked against raw cached quotes: leg-1 NBBO and fill
+  marketability verified).
+- HONEST READINGS: the rehearsal FAILS its own thresholds on (a) the two count
+  floors — they are 10-session projections graded against 7 countable
+  sessions (incomplete-test artifact), and (b) max loss $290 > $250 — the p95
+  formula intentionally demands better tail control than the rehearsal's
+  single worst trade (a 08-20 timeout). Neither is tuning feedback; the
+  formulas were frozen first. Substantive finding: Branch B's limit-fill rate
+  (0.333, n=6) sits BELOW the 0.583 random-minute baseline — same
+  under-powered weakness as v2.3, now measured in real fills.
+- CONFIG_HASH churn during 13→18 was expected and loud (documented); the
+  FINAL frozen hash is the one stamped on the artifact-v2 run.

@@ -184,12 +184,12 @@ without human fudging — whether this strategy earns the next stage**.
 ## R9. Acceptance test (the frozen 10-session exam; graded by `scorecard`; all terms per R11)
 Over 10 countable sessions (live, non-shakedown, non-PARTIAL, non-event-standdown — PARTIAL and event days are
 excluded from the denominator and do not consume test slots) of one CONFIG_HASH: qualifying signals on ≥ 7/10
-sessions · 1–3 executable entries on ≥ 6/10 · **≥ «16b» limit fills total AND ≥ 1 fill on «16b»/10 sessions** ·
-≤ 3 entries/session, one leg at a time · Branch B ≥ 20 qualifying signals with fill rate (R11.6) ≥ **«16b»**
+sessions · 1–3 executable entries on ≥ 6/10 · **≥ 11 limit fills total AND ≥ 1 fill on 7/10 sessions** ·
+≤ 3 entries/session, one leg at a time · Branch B ≥ 20 qualifying signals with fill rate (R11.6) ≥ **0.1**
 and not below its frozen clock-matched control (R11.4) · Branch A ≥ 8 qualifying episodes with fill rate ≥
-**«16b»** and ≥ +10 pp over its frozen midpoint-matched control (R11.5) · branches reported separately; a
-minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ «16b» on every
-trade** · **median scratch loss (R11.3, $) ≤ «16b»** · ≤ 1 scratch whose RESTING LIMIT would have filled
+**0.5** and ≥ +10 pp over its frozen midpoint-matched control (R11.5) · branches reported separately; a
+minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ 250 on every
+trade** · **median scratch loss (R11.3, $) ≤ 140** · ≤ 1 scratch whose RESTING LIMIT would have filled
 within its ORIGINAL 60-minute horizon absent the scratch (pure limit replay from the pinned chain cache,
 no other R7 exits applied; single invalid/missing minutes are skipped with no fill decision; a gap ≥ 5
 consecutive minutes inside the replay makes that counterfactual INDETERMINATE — excluded from this count
@@ -200,7 +200,7 @@ count still hold; thresholds unchanged, denominators reduced. A branch below its
 INCONCLUSIVE. `data_invalid` trades (R10.4): REMAIN executable entries for the entries-per-session
 criteria and the one-leg/3-day limits (they occupied the slot); are EXCLUDED from fill totals,
 sessions-with-fill, both fill-rate sides (R11.6), the $-risk lines, and the would-have-filled re-check;
-and are reported in their own column. Any rule change resets the test. **«16b» markers are populated ONCE by the R9a mechanical derivation.**
+and are reported in their own column. Any rule change resets the test. **Thresholds populated 2026-08-23 by the R9a mechanical derivation (registration.json, hash-pinned; one grading-layer defect fixed + re-run per the defect policy — trade list identical, documented).**
 
 ## R9a. Threshold pre-registration (FROZEN before the first v3.0 rehearsal run; hashed in CONFIG)
 - Criteria FORM: inherited unchanged from R9 v2.3 (structure above); $-risk lines replace SPX-point lines.

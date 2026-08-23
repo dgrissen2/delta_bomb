@@ -208,7 +208,11 @@ class Executor:
             if cancel_ev is not None and tr.limit is not None and tr.limit.status == "resting":
                 tr.limit.status = "canceled"
                 tr.limit.cancel_reason = cancel_ev.limit_cancel_reason or "quote_gap"
-                tr.data_invalid = True                     # R10.4 horizon property
+                if cancel_ev.limit_cancel_reason == "quote_gap":
+                    tr.data_invalid = True                 # R10.4 horizon property —
+                    # ONLY the quote-gap cancel unscores a trade; ordinary exit
+                    # cancels (scratch/veto/clock/...) are fully scored
+                    # (rehearsal defect 2026-08-23, R9a defect policy)
             if exit_ev is not None:
                 kind = exit_ev.outcome_type
                 if kind == "fill":
