@@ -215,3 +215,35 @@ redesign) are documented in-file; expected VALUES were never edited.
   under-powered weakness as v2.3, now measured in real fills.
 - CONFIG_HASH churn during 13→18 was expected and loud (documented); the
   FINAL frozen hash is the one stamped on the artifact-v2 run.
+
+## BP2 reviews + the registration record, stated plainly (2026-08-23)
+
+Codex FAIL (2B/11M — all applied) then red-team **PASS with findings** after
+independently recomputing the registration, re-deriving trades from raw
+parquets, and confirming byte-identical determinism across fresh runs.
+
+**The R9a "run once" boundary was exercised THREE times, and the honest record
+is:** the trade list never changed (19 trades / 10 fills / −$670 in every
+run — independently verified); only the GRADING derivation was corrected, each
+time to conform to the frozen R9a/R11.3 TEXT, and each correction made the
+test HARDER, never easier:
+1. data_invalid mis-scoping (all non-fills unscored) → first registration's
+   all-1.0 floors discarded.
+2. p95 population per R11.3 (zero-loss winners included) → max loss cap
+   $250 → **$150** (codex's independent recomputation matched exactly).
+3. Countable-population restriction (PARTIAL 08-21 was leaking into point
+   estimates) → A floor 0.50 → **0.55** (red-team's prediction exact).
+Final registered thresholds: fills ≥ 11 (10-session projection), sessions
+with fill ≥ 7, B ≥ 0.10 (point 0.333), A ≥ 0.55 (point 0.667), max loss
+≤ $150, median scratch ≤ $140. registration.json is now FORCE-TRACKED in git
+(the *.json gitignore rule was hiding it — provenance requires committed
+bytes), the scorecard verifies its bytes + threshold equality at grading
+time, and `verify` enforces the v2 artifact pin.
+
+Also closed from red-team BP2: parity NaN-limit rows no longer count toward
+the 100% decision gate; registration inputs are countable-only.
+Accepted/inherent (documented): live-test chain caches for FUTURE sessions
+have no config pin by design — the manifest is append-only by convention and
+the evening ops check verifies per-file hashes; a deliberate delete+refetch
+of a future session's cache before its scratches are re-checked would alter
+would-have-filled counterfactuals and would be visible in the manifest diff.

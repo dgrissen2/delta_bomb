@@ -70,7 +70,7 @@ chains:                        # R2.5 / R8.2 v3.0 pins (FROZEN rehearsal scope o
   sdk_version: "1.0.9"
   control_frame_hash: "f1dc487378f0f50609a2d4c25a043fa27a2054e2d9f277fd3591b6cd74a3e4a6"  # rebuilt after BP2 F6/F7
   r9a_formulas_hash: "500f2404267cada22c2520c6df3252894fc762fd905658235c6e2db34b7722c0"  # re-frozen after BP2 F1/F5 (p95 population per R11.3 text; constants in hash)
-  r9a_registration_hash: "7f0299e66d3a83c520615f4e7005f35ec1d15010b14c9e4f389a498d221b1156"  # BP2-corrected registration (run-once CLOSED)
+  r9a_registration_hash: "5d4dcbc7c513c3ccc7b266c83c1a42150a171b864751c731b3c32bfeb21ff1ef"  # FINAL registration (countable population; run-once CLOSED)
   verification_v2_hash: "28bd84b8893db104478037e7c4ee058c5291df90d5150948de8a2cadb4ccb651"  # task-18 R12.3 pin (19 trades, 10 fills)
 
 data:
@@ -94,10 +94,10 @@ logging:
   paper_log: docs/replay/hiro/paper_log.csv
   sessions_log: docs/replay/hiro/sessions.csv
 
-r9_thresholds:                 # populated ONCE by R9a mechanical derivation (task 18, BP2-corrected)
+r9_thresholds:                 # populated ONCE by R9a mechanical derivation (final, countable population)
   fills_total_floor: 11
   sessions_with_fill_floor: 7
   b_fill_rate_floor: 0.1
-  a_fill_rate_floor: 0.5
+  a_fill_rate_floor: 0.55
   max_single_trade_loss_usd: 150
   median_scratch_loss_cap_usd: 140

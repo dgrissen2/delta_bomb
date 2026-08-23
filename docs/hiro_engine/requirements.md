@@ -187,7 +187,7 @@ excluded from the denominator and do not consume test slots) of one CONFIG_HASH:
 sessions · 1–3 executable entries on ≥ 6/10 · **≥ 11 limit fills total AND ≥ 1 fill on 7/10 sessions** ·
 ≤ 3 entries/session, one leg at a time · Branch B ≥ 20 qualifying signals with fill rate (R11.6) ≥ **0.1**
 and not below its frozen clock-matched control (R11.4) · Branch A ≥ 8 qualifying episodes with fill rate ≥
-**0.5** and ≥ +10 pp over its frozen midpoint-matched control (R11.5) · branches reported separately; a
+**0.55** and ≥ +10 pp over its frozen midpoint-matched control (R11.5) · branches reported separately; a
 minute qualifying for both counts once (as A) · **max single-trade realized loss (R11.3, $) ≤ 150 on every
 trade** · **median scratch loss (R11.3, $) ≤ 140** · ≤ 1 scratch whose RESTING LIMIT would have filled
 within its ORIGINAL 60-minute horizon absent the scratch (pure limit replay from the pinned chain cache,

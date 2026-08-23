@@ -33,14 +33,15 @@ def parity_check(sidecar_df: pd.DataFrame, historical) -> dict:
         if r.limit_price == r.limit_price:                 # not NaN
             hist_marketable = bool(h.ask <= r.limit_price) if r.side == "buy" \
                 else bool(h.bid >= r.limit_price)
-        d_match = (hist_marketable == bool(r.marketable)) if hist_marketable is not None else True
+        d_match = (hist_marketable == bool(r.marketable)) if hist_marketable is not None else None
         within = (abs(h.bid - r.bid) <= TICK + 1e-9 and abs(h.ask - r.ask) <= TICK + 1e-9)
         rows.append(dict(minute=int(r.minute), strike=float(r.strike), compared=True,
                          decision_match=d_match, within_tick=within))
     df = pd.DataFrame(rows)
     comp = df[df.compared]
     n, total = len(comp), len(df)
-    dec = float(comp.decision_match.mean()) if n else float("nan")
+    dec_rows = comp[comp.decision_match.notna()] if n else comp
+    dec = float(dec_rows.decision_match.mean()) if len(dec_rows) else float("nan")
     tick = float(comp.within_tick.mean()) if n else float("nan")
     coverage = n / total if total else 0.0
     # PRE-REGISTERED: >10% uncomparable minutes is itself a FAIL (codex BP2 F4)

@@ -1,0 +1,35 @@
+{
+ "formulas_hash": "500f2404267cada22c2520c6df3252894fc762fd905658235c6e2db34b7722c0",
+ "inputs": {
+  "config_hash": "c60a6b6bdffab43ebe4da301ec314e38b5663f52d3449f55660b62c79855ec19",
+  "entries": 18,
+  "log": "/Users/dgrissen/Dev/delta_bomb/docs/replay/hiro/paper_log_backtest.csv",
+  "sessions": [
+   "2026-08-12",
+   "2026-08-13",
+   "2026-08-14",
+   "2026-08-17",
+   "2026-08-18",
+   "2026-08-19",
+   "2026-08-20"
+  ]
+ },
+ "thresholds": {
+  "a_fill_rate_floor": 0.55,
+  "a_point_estimate": 0.6667,
+  "a_underpowered": false,
+  "b_fill_rate_floor": 0.1,
+  "b_point_estimate": 0.3333,
+  "b_underpowered": false,
+  "draws": 2000,
+  "empty_resample_share": {
+   "A": 0.0,
+   "B": 0.0185
+  },
+  "fills_total_floor": 11,
+  "max_single_trade_loss_usd": 150,
+  "median_scratch_loss_cap_usd": 140,
+  "seed": 42,
+  "sessions_with_fill_floor": 7
+ }
+}

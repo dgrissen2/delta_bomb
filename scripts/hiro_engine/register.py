@@ -174,6 +174,9 @@ def run_register(cfg: Config, log_path: Optional[Path] = None,
     if not len(entries) or not sessions:
         print("REFUSED: no rehearsal entries/countable sessions in the log.")
         return 1
+    entries = entries[entries.date.isin(sessions)]   # COUNTABLE-only population —
+    # floors must derive from exactly the population the scorecard grades
+    # (red-team BP2 F2: PARTIAL sessions were leaking into point estimates)
     th = derive_thresholds(entries, sessions)
     payload = dict(formulas_hash=pin, thresholds=th,
                    inputs=dict(log=str(log_path), config_hash=cfg.config_hash,

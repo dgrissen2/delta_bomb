@@ -87,6 +87,15 @@ def cmd_verify(args) -> int:
     print(f"verification vs {cfg.verification_artifact.name}: "
           f"{'PASS' if r.ok else 'FAIL'} ({r.n_engine}/{r.n_artifact} trades; "
           f"artifact hash {'ok' if r.artifact_hash_ok else 'MISMATCH'})")
+    # R12.3: the v2 artifact pin is enforced here too (red-team BP2 F4)
+    import hashlib as _h
+    v2 = REPO_ROOT / "docs/replay/hiro/verification_trades_v2.csv"
+    pin2 = str(cfg.get("chains", "verification_v2_hash"))
+    if pin2:
+        ok2 = v2.exists() and _h.sha256(v2.read_bytes()).hexdigest() == pin2
+        print(f"verification v2 artifact: {'PASS' if ok2 else 'FAIL — bytes != pin'}")
+        if not ok2:
+            return 1
     for m in r.mismatches:
         print("  DEFECT:", m)
     return 0 if r.ok else 1
