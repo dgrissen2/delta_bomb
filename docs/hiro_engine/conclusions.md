@@ -171,3 +171,16 @@ test (~3-4 B qualifying episodes/session on mixed-regime days) — roughly 2-4
 weeks. Design work on the 8 in-sample sessions may proceed anytime; VALIDATION
 waits for the accumulated out-of-sample days, which are clean by construction
 (the frozen test never tunes on them).
+
+## 12. The vendor window is real, moving, and has already eaten three frozen sessions (2026-08-24)
+
+Live retention probe through the authenticated CDP session (fetch pipe
+verified working — 08-21 and 08-18 return full data): the SpotGamma HIRO
+endpoint now serves only ~2026-08-17 onward. **2026-08-11 is unrecoverable**
+(the original question), and — the bigger finding — **2026-08-12/13/14, three
+of the eight frozen control sessions, are no longer obtainable from the
+vendor.** Our hash-pinned store is the only copy in existence. Actions taken:
+full tar.gz backups of the HIRO v1 store and the SPXW chain caches written to
+`~/Dev/central_trade_data/backups/` with SHA256SUMS (recommend an off-machine
+copy); the daily-capture requirement is now demonstrably existential — a
+missed session is permanently gone within ~5 trading days.
