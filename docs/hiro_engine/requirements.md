@@ -150,8 +150,20 @@ without human fudging — whether this strategy earns the next stage**.
   value OR the run breaks, before the resting limit fills (R1.4d) → scratch, booked per R7.0. **Branch A has NO scratch**
   (v2.3): its exits are R7.1/R7.3/R7.5/R7.6 exactly as researched. *Standing rule: no exit may trigger off the
   same variable as its entry condition, and no rule enters this spec without a backtest showing it saves more
-  than it costs.* Pre-registered candidate (NOT active; requires stored-session backtest + spec edit before
-  activation): Branch-A premise invalidation — exit if a bar CLOSES above mid30 while the leg is open.
+  than it costs.* Pre-registered candidates (NOT active; each requires a stored-session backtest + spec edit + full
+  R9a re-registration before activation):
+  (1) Branch-A premise invalidation — exit if a bar CLOSES above mid30 while the leg is open.
+  (2) **Branch-B exit re-timing for limit-fill horizons** (registered 2026-08-24 from the v3.0
+  rehearsal decomposition): B's flow-shutoff scratch (3-min window) and mid-trade flow veto were
+  researched under ±3-pt touch semantics where fills printed in minutes 1–28; real limit fills
+  arrive in minutes 8–58, and in the rehearsal 2 of B's 4 flow exits clipped trades whose limits
+  would have filled (minutes 39 and 58) while 2 were correct. B's no-exit counterfactual fill rate
+  was 0.667 vs its 0.583 clock-matched control — the ENTRY signal beat baseline; the EXITS produced
+  the 0.333 shortfall. Candidate revisions to test on stored sessions before any activation:
+  (a) widen the scratch window toward the observed fill horizon, (b) veto exits only cancel the
+  resting limit but hold the leg under cap/clock, or (c) require the veto condition to persist
+  N minutes before exiting. Evidence bar: the revision must beat the frozen exits on BOTH saved
+  losses and recovered fills across ≥ 20 B episodes.
 - **R7.3** Cap: the lone leg's option mid ((bid+ask)/2) moves 3.5 pts against its leg-1 fill → close it
   (`cap`). The option-mid trigger is now computable in ALL tiers with chain data (R2.5); the 15.0-pt SPX
   spot proxy survives only as the quote-gap fallback (chain data missing at that bar — logged
