@@ -90,6 +90,36 @@ def main() -> int:
                  warn_only=True)
     else:
         line(False, "paper_log", "no log file yet", warn_only=True)
+    # HIRO<->SPX day-identity guard (2026-08-24): the payload's stock_price path
+    # must match THIS day's actual SPX 1-min closes (verification-only use of
+    # stock_price — never a price source). Guards against mislabeled captures.
+    if norm.exists():
+        try:
+            import pandas as pd
+            h = pd.read_csv(norm)
+            h = h[h.series_group == "all"]
+            if len(h):
+                ts = pd.to_datetime(h.utc_iso, utc=True).dt.tz_convert("America/New_York")
+                h = h.assign(mn=ts.dt.hour * 60 + ts.dt.minute)
+                h = h[(h.mn >= 575) & (h.mn <= 955) & (h.stock_price > 1000)]
+                hp = h.groupby("mn").stock_price.last()
+                spx_df = pd.read_parquet(cfg.path_of("spx_dir") / f"{day}.parquet")                     if (cfg.path_of("spx_dir") / f"{day}.parquet").exists() else None
+                if spx_df is not None and len(hp) >= 100:
+                    j = pd.concat([hp, spx_df.set_index("min").close], axis=1,
+                                  join="inner").dropna()
+                    med = float((j.iloc[:, 0] - j.iloc[:, 1]).abs().median())
+                    line(med < 5.0, "HIRO<->SPX day identity",
+                         f"median |basket px - SPX close| = {med:.2f} pts "
+                         + ("" if med < 5.0 else "-> WRONG-DAY DATA? quarantine this partition"))
+                else:
+                    line(False, "HIRO<->SPX day identity",
+                         f"cannot verify ({len(hp)} priced minutes / SPX "
+                         f"{'missing' if spx_df is None else 'ok'}) — treat capture as unverified")
+            else:
+                line(False, "HIRO<->SPX day identity", "normalized file has ZERO data rows "
+                     "(vendor window missed? capture failed?)")
+        except Exception as ex:
+            line(False, "HIRO<->SPX day identity", f"check failed: {ex}")
     sc = Path(f"docs/replay/hiro/live_quotes_{day}.parquet")
     line(sc.exists(), "snapshot sidecar (live parity/resume)",
          str(sc.name) if sc.exists() else "missing (fine if today was not a live session)",

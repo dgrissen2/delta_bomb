@@ -144,3 +144,30 @@ untouched):
 - Caveats that bind: n = 8 fills, one heavy below-VT week, in-sample days,
   and this is precisely the knob-peeking the R9a honesty note exists for —
   which is why it is a pre-registered candidate and not a change.
+
+## 11. There is NO held-out HIRO set — and the identity check that proved it (2026-08-24)
+
+Correction of an error in this record's own section-6 discussion: the "5
+additional sessions (08-05..08-11)" proposed as a held-out set for the B-exit
+study DO NOT EXIST as data. The user demanded a day-identity check before
+using them (guarding against mislabeled captures); the check found the five
+partitions are EMPTY SHELLS — the manifest records them `status: unavailable`
+(the vendor's ~5-session retention window had already rolled past them when
+the 08-19 backfill ran). Directory count is not data count.
+
+The identity method itself is now permanent: each session's HIRO payload
+carries a per-row basket stock_price; matched per-minute against the ACTUAL
+SPX closes of every candidate day, the labeled day must win with median
+|diff| < 5 pts (verification-only use of stock_price — never a price source,
+per the standing Ref-Px rule). All 8 frozen sessions PASS (median diffs
+0.26–0.64 pts; nearest wrong-day 5.4–14 pts). The evening ops check now runs
+this guard on every new capture — an unverifiable or empty capture is RED,
+not silently banked.
+
+**Consequence for the B-exit study**: usable HIRO data = exactly the 8 frozen
+sessions (all burned in-sample). The study's ≥ 20-episode out-of-sample bar
+can only be met by ACCUMULATION: daily captures during the shakedown + live
+test (~3-4 B qualifying episodes/session on mixed-regime days) — roughly 2-4
+weeks. Design work on the 8 in-sample sessions may proceed anytime; VALIDATION
+waits for the accumulated out-of-sample days, which are clean by construction
+(the frozen test never tunes on them).
