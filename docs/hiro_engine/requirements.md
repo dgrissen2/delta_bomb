@@ -164,6 +164,14 @@ without human fudging — whether this strategy earns the next stage**.
   resting limit but hold the leg under cap/clock, or (c) require the veto condition to persist
   N minutes before exiting. Evidence bar: the revision must beat the frozen exits on BOTH saved
   losses and recovered fills across ≥ 20 B episodes.
+  (3) **Branch-A credit at 0.20–0.30** (registered 2026-08-24 from the credit-headroom replay):
+  at 0.20 the rehearsal's A fill set is IDENTICAL (8/13) with +$10 more per bomb; headroom is
+  bimodal — the 8 fills had $40–$460 of achievable credit, the 5 timeouts never came within $30
+  of flat — so even 0.30 keeps all 8 on this sample (tightest headroom $40). The walk-down
+  variant (0.10→0.00@30m→−0.10@45m) was tested and REJECTED: it rescues zero fills (unfilled
+  trades are $30–$110 away; B's rescuable trades die from flow exits before minute 30) and only
+  cheapens late fills. Evidence bar for activation: ≥ 15 A fills on OUT-OF-SAMPLE sessions with
+  zero fills lost vs the 0.10 baseline.
 - **R7.3** Cap: the lone leg's option mid ((bid+ask)/2) moves 3.5 pts against its leg-1 fill → close it
   (`cap`). The option-mid trigger is now computable in ALL tiers with chain data (R2.5); the 15.0-pt SPX
   spot proxy survives only as the quote-gap fallback (chain data missing at that bar — logged

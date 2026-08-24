@@ -120,3 +120,27 @@ than the rehearsal's worst trade). None of that is tuning feedback.
 4. Are 10 fills per 10 sessions (the registered floor: 11) realistic at
    exactly 0.10 credit, or is the honest bomb a 0.20-credit trade? (Only a
    post-test re-registration may ask this.)
+
+## 10. The credit knob barely touches A; the walk-down is a dead end (2026-08-24)
+
+Counterfactual replays on the pinned caches (pure limit replay, engine
+untouched):
+- **A @ 0.20 credit: the identical 8/13 fills**, +$10 more per bomb (+$80 on
+  the week; MTM +$260 vs +$190 on the pure-replay basis). Headroom is
+  BIMODAL: the 8 fills had **$40–$460** of achievable credit within the hour
+  (median ~$160); the 5 timeouts never came within **$30 of flat**. On this
+  sample even **0.30 keeps all 8 fills** (tightest headroom $40). A separates
+  winners from duds so cleanly that the limit level in 0.10–0.30 mostly just
+  sets the pay-per-bomb.
+- **Walk-down (0.10 → 0.00 @30m → −0.10 @45m): rejected.** It rescued ZERO
+  fills — unfilled trades are $30–$110 away even at the day's best print, and
+  B's two rescuable trades die from FLOW EXITS at minutes ~2–25, before the
+  walk begins. All it does is cheapen the five late fills (+$120 → +$60
+  credits). This independently re-proves conclusion 6: B's problem is exits,
+  not price.
+- Both registered as R7.2 pre-registered candidate (3) with an out-of-sample
+  evidence bar (≥ 15 A fills, zero lost vs 0.10). The live test runs frozen
+  at 0.10; the credit knob stays out of the sweep whitelist.
+- Caveats that bind: n = 8 fills, one heavy below-VT week, in-sample days,
+  and this is precisely the knob-peeking the R9a honesty note exists for —
+  which is why it is a pre-registered candidate and not a change.
