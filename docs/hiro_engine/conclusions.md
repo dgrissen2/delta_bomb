@@ -184,3 +184,94 @@ full tar.gz backups of the HIRO v1 store and the SPXW chain caches written to
 `~/Dev/central_trade_data/backups/` with SHA256SUMS (recommend an off-machine
 copy); the daily-capture requirement is now demonstrably existential — a
 missed session is permanently gone within ~5 trading days.
+
+## 13. First out-of-sample week (2026-08-24/25/26): three sessions, three learnings (2026-08-27)
+
+The first true out-of-sample sessions under the frozen CONFIG_HASH
+`80c3a41026c8…` — backtest-mode replays over identity-verified captures
+(0.33–0.49 pt medians, each a 15–40x cross-day winner), NOT part of the
+10-session live clock. Every rule fired as written; what follows is evidence
+about the *strategy*, not defects in the engine.
+
+**The ledger.** 08-24: zero trades (correct abstention). 08-25: B bomb
+COMPLETED +$10 (12-min fill) and an A timeout −$300. 08-26: A timeout −$50.
+Realized −$340 cash; one armed bomb (long 7380/7375 put vertical, exp 09-25,
+carried at negative cost) marked +$50 at the 08-26 close → MTM ≈ −$290.
+
+### 13.1 The discipline layer earned its keep on the flow-positive days
+
+08-24 was the archetype: SPX below the 7700 Vol Trigger every minute, +12.0B
+one-way positive flow, five Branch-B sell-first signals (runs to 5.6B at
+6-10B/hr) — ALL refused by R4.1 vt_broken (four also LATE per R6.3), and no
+A signal because no negative-flow episode ever formed. A hand trader watching
+those put-selling waves would have been sorely tempted to sell into them
+below the trigger. The system's whole-day abstention was the correct trade.
+08-26 repeated the pattern (2 more B blocks + 1 LATE below VT 7675).
+Standing clarification (asked and re-verified): R4.1 blocks NEW UNPAIRED
+SHORTS only — Branch A (buy-first) is deliberately legal below VT, because
+its unpaired exposure is LONG downside in the regime where downside extends.
+
+### 13.2 The early OOS tape mildly INVERTS the in-sample story: B filled, A didn't
+
+- **B's first out-of-sample completed bomb** came sell-first on the one
+  above-VT morning (08-25, VT 7660): sold 7375P @ 39.90 (bid), rested the
+  7380P buy at 39.80, marketable 12 minutes later. In-sample, B fills were
+  the registered worry (b_fill_rate floor 0.10); first OOS data point says
+  the mechanism works when the regime admits it.
+- **A went 0-for-2 on fills** against its 0.55 in-sample floor. Both A
+  entries fired on SHALLOW negative-flow readings — 08-25: r30 = −0.11B
+  (essentially flat), close<mid30 by 0.65 pts, bounce 3.18; 08-26:
+  r15 = −0.44B, bounce 5.24 — and both bought the put at what proved to be
+  the START of an upswing, not a pause in a downswing. 08-25's 10:30 low
+  (7650.92) was the LOW OF THE DAY; the "bounce" the signal bought into was
+  minute one of a V-reversal that ran +12.8 pts through the 60-min clock
+  (−$300). 08-26 rhymed (+10.3 adverse, −$50).
+- **This is the mid30 premise-check scenario, verbatim.** R7.2 pre-registered
+  candidate (1) exists to test whether close<mid30 + bounce30 selects
+  continuation dips or reversal bottoms. The first two OOS entries both vote
+  "reversal-catcher," specifically when the flow evidence is thin (|r30| ≪ 1B).
+  n=2 — no rule change; the candidate's evidence file is now open and
+  accumulating. A natural sharpening hypothesis for that file: A's flow gate
+  passed here on readings indistinguishable from noise; the winning B signal
+  17 minutes earlier had 0.59B of actual directional run.
+- **Tail note:** the −$300 A loss exceeds the registered
+  max_single_trade_loss line ($150). Informational (OOS replay, not the live
+  test; the rehearsal already flagged the p95 tail line) — but it is the
+  second consecutive dataset in which A's losers, not B's, carry the tail.
+
+### 13.3 Credit-ladder counterfactual on the completed bomb: 0.20 was free, 0.30 filled too
+
+Replaying the 08-25 B bomb's resting buy at wider credits (all guardrails
+live; cap never threatened — max adverse mid 40.05 vs 43.40 trigger):
+
+| credit | limit | fill | minutes after entry | clock slack |
+|---|---|---|---|---|
+| 0.10 (frozen) | 39.80 | YES | 12 | 48 min |
+| 0.20 | 39.70 | YES — SAME minute | 12 | 48 min |
+| 0.30 | 39.60 | YES | 34 | 26 min |
+
+The 10:58 dip printed ask 39.70 exactly: **0.20 credit was free on this
+trade** (identical fill minute, double the credit). 0.30 needed the second
+leg down at 11:20 — it filled with 26 min of slack and was then marketable
+virtually every remaining minute, but the extra $10 was bought with 22 more
+minutes of naked-short exposure through the same 11:05 bounce that, after
+the window, became the rally that killed the A trade. First BRANCH-B data
+point for the credit family (candidate (3) is A-specific; in-sample "0.30
+keeps all fills" was built on A fills). Running counterfactual: at 0.20 this
+week is identical except the bomb pays +$20; at 0.30, +$30.
+
+### 13.4 Ops lessons now standing
+
+- **Never point the backfill's `--force` at the store.** The 08-24 evening
+  recapture rewrote the store's canonical manifest in the backfill's own
+  schema; recovered byte-verified from the same-day backup tarball (all 8
+  frozen partitions re-verified, ALL OK). Since 08-25 the standing workflow
+  is: capture to a STAGING dir, identity-check, then ingest canonically —
+  the store manifest is written only by the ingest step.
+- **Intraday captures are short.** The first 08-24 pull ran at 15:57 ET and
+  missed the close; evening recapture (attempt=2) superseded it. Captures
+  are evening-only unless deliberately partial.
+- The SpotGamma login expires and blocks capture (08-27: session dead at the
+  first attempt; one human login fixed it). With the ~5-session vendor
+  window, a login outage that outlasts the window IS data loss — check login
+  the same day, not capture day + 4.
