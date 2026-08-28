@@ -30,6 +30,7 @@ output/**/*.html
 output/**/*.pdf
 **/data/*.html
 **/data/*.png
+docs/replay/hiro_daily_*/hiro_ticker_followthrough_to_*/ticker=*/
 
 # MCP & Claude Code
 .mcp.json
