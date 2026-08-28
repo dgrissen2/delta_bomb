@@ -275,3 +275,17 @@ week is identical except the bomb pays +$20; at 0.30, +$30.
   first attempt; one human login fixed it). With the ~5-session vendor
   window, a login outage that outlasts the window IS data loss — check login
   the same day, not capture day + 4.
+
+**§13.2 addendum (2026-08-28, OOS day 4 = 08-27):** A is now **0-for-3** on
+out-of-sample fills, and the third loss deepens the premise-check evidence in
+one important way: this time the flow reading was NOT thin — r15 = −0.85B,
+r30 = −0.69B, a genuinely negative episode — and the outcome was identical:
+the 10:47 entry (bought 7475P @ 37.40 at S0 7712.86, first above-VT-all-day
+session, VT 7675) bought the morning dip of a +55-pt rally day; 16.1 pts
+adverse, timeout, −$70. So the failure is not fully explained by "flow gate
+passes on noise" (the 08-25/26 hypothesis) — the deeper common factor across
+all three is that close<mid30 + bounce30 fired at the morning low of an
+up-trending day. Candidate (1) evidence: 3 episodes, 3 reversal-bottoms
+bought. B: zero signals on 08-27 (one-way rally never armed a qualifying
+run). Running OOS: 4 sessions, realized −$410; armed bomb marked +$35
+(7380/7375, exp 09-25).
