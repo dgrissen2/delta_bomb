@@ -319,9 +319,14 @@ three §13 losers fired on r30 = −0.11 / −0.69 / −0.14* $B against rallies
 but r15 −1.26 and a genuinely falling tape bailed it out in 22 min.) A
 one-line candidate hypothesis for the R7.2 file: A's premise holds when the
 30-min flow is deeply negative (|r30| ≳ 1-2 $B) and fails when close<mid30 +
-bounce30 fire on flow noise; the current gate accepts both. Now 8 OOS
-episodes: 5 wins (deep r30), 3 losses (thin r30). Not yet a rule change —
-the pattern is registered here and keeps accumulating.
+bounce30 fire on flow noise; the current gate accepts both. Now 8 OOS episodes, honestly
+split (correction per the 2026-09-02 Charlie/codex review): **4 wins on deep
+r30 / 0 losses on deep r30 / 1 win on thin r30 (the 08-28 #1 exception —
+rescued by r15 −1.26 and a falling tape) / 3 losses on thin r30**. A
+suggestive 4/4-vs-1/4 pattern, NOT a clean single-variable discriminator —
+and deep-r30 wins cluster in just two falling sessions, so the effect is
+confounded with continuation regime. Not yet a rule change — the pattern is
+registered here and keeps accumulating.
 
 **Running OOS ledger (7 sessions, 6 countable + 1 standdown):** realized
 −$360 (credits +$60, losers −$420); armed-bomb inventory SIX verticals
