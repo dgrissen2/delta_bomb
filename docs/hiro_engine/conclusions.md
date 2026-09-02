@@ -289,3 +289,60 @@ up-trending day. Candidate (1) evidence: 3 episodes, 3 reversal-bottoms
 bought. B: zero signals on 08-27 (one-way rally never armed a qualifying
 run). Running OOS: 4 sessions, realized −$410; armed bomb marked +$35
 (7380/7375, exp 09-25).
+
+## 14. OOS days 5-7 (08-28, 08-31, 09-01): A works in its regime — 5-for-5 fills, zero losers (2026-09-02)
+
+The strongest out-of-sample evidence yet, and it lands on the OTHER side of
+the §13.2 story. Three sessions: 08-28 countable, 08-31 event_standdown
+(month-end rebalance — R4.4 stood the engine down all day, exactly as
+designed), 09-01 countable.
+
+**Five A signals, five entries, five COMPLETED BOMBS, +$50, zero losers:**
+
+| day | entry | legs (exp) | leg1 | fill in | credit |
+|---|---|---|---|---|---|
+| 08-28 | 11:19 | 7530/7525 (09-25) | 34.40 | 22 min | +$10 |
+| 08-28 | 11:55 | 7525/7520 (09-25) | 37.80 | 2 min | +$10 |
+| 08-28 | 12:04 | 7480/7475 (09-25) | 34.00 | 15 min | +$10 |
+| 09-01 | 12:24 | 7375/7370 (10-02) | 40.90 | 4 min | +$10 |
+| 09-01 | 12:40 | 7375/7370 (10-02) | 43.60 | 22 min | +$10 |
+
+08-28 even hit the 3-entries/day cap (R6.4) with more qualifying signals
+behind it — the cap did its job on a target-rich day.
+
+**The discriminator between A's winners and losers is now legible: r30
+depth.** The five winners fired on r30 = −4.7 to −5.7 $B (08-28 #2/#3, 09-01
+both) — real, directional, put-buying flow — on days that were FALLING
+(08-28: 7771 high → 7711 close; 09-01: below VT all day, low 7611). The
+three §13 losers fired on r30 = −0.11 / −0.69 / −0.14* $B against rallies.
+(*08-28 #1 is the instructive near-miss: r30 −0.14 — as thin as the losers —
+but r15 −1.26 and a genuinely falling tape bailed it out in 22 min.) A
+one-line candidate hypothesis for the R7.2 file: A's premise holds when the
+30-min flow is deeply negative (|r30| ≳ 1-2 $B) and fails when close<mid30 +
+bounce30 fire on flow noise; the current gate accepts both. Now 8 OOS
+episodes: 5 wins (deep r30), 3 losses (thin r30). Not yet a rule change —
+the pattern is registered here and keeps accumulating.
+
+**Running OOS ledger (7 sessions, 6 countable + 1 standdown):** realized
+−$360 (credits +$60, losers −$420); armed-bomb inventory SIX verticals
+marked $585 at the 09-01 close (7380/7375 $75; 7530/7525 $120; 7525/7520
+$120; 7480/7475 $130; 2× 7375/7370 $70) → **MTM +$225, first positive mark
+of the out-of-sample period.** Every bomb is held at negative cost; the
+09-25 expiries have 24 days to run, the 10-02s have 31.
+
+**Ops/infra learnings:**
+- **Expiry listing gap (new failure mode):** on 08-31 the convention expiry
+  (Friday nearest 30 DTE = 10-02) did NOT YET exist at the vendor — the
+  weekly was listed between 08-31 and 09-01. Protocol set: probe, and cache
+  the day under the nearest LISTED Friday in [20,40] (08-31 → 09-25, 25
+  DTE), which is what a live trader could actually have traded. No engine
+  change — the cache manifest carries the expiry and `expiry_of` reads it.
+  Live-path corollary: the same listing gap will eventually hit LiveChains
+  on a real session; the spike/fallback should be checked before the
+  shakedown.
+- The SpotGamma web session expires in days, not weeks (second expiry in a
+  week). The pool browser + fresh login recovers it; captures remain
+  evening-only and staged.
+- Store-manifest running totals had silently missed the 08-19/20/21
+  partitions; totals are now recomputed from per-session entries (the
+  authoritative source) — 15 sessions, 1,083,583 raw / 590,239 normalized.
