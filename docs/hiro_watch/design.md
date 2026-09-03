@@ -1,6 +1,6 @@
 # Design — hiro_watch
 
-*Architect design v1.2 (2026-09-03) for `requirements.md` v1.2a — v1.1 + review round 2 (FAIL 23/8 → applied: identity guard wired into the loop, LB95 constants from the registration, A-DEPTH diagnostics producer, panel feature self-check, terminal-checkpoint rule, capacity-refused contract, manifest shas re-verified against bytes, holiday file in the payload, marks via `chains._sdk_pull_day` with atomic write + sha on rows, settlement pinned at commit, open-inventory derivation rule, `candidate_id` in every key, pruning REMOVED, snapshot chain via `prev_snapshot`, nullable $ columns, zero-denominator scale rule, single-writer lock, runtime-budget test, NaN test wording, `backfill` in the CLI; spec W8.3 aligned to snapshot-granularity code lineage in requirements v1.2a). Design review closed at two rounds per the 98% discipline. v1.1 = v1.0 + round 1 (FAIL 20/8 → all applied: single-pass post-filter hook with gated-episode memory, NaN gate semantics, credit property with setter, registration/rebind lifecycle made possible (code lineage in manifests not rows; `register --supersede`), engine-identity guard, holiday-aware calendar, versioned refusal map, entry-event-based sole-blocker, global isolated-replay cap, full-chain mark cache, 3-minute close window, composite ledger keys, calendar sha stamp, cohort attribution, discovery backfill order, cumulative snapshot state, health capture point). One principle decides everything
+*Architect design v1.3 (2026-09-03) for `requirements.md` v1.2a — v1.2 + tasks-review alignment (CLI `run <date>`, loop init order + lock scope, engine-assigned `trade_id`, `candidate_id` on events, `b_refused` enums/key, settlement source pinned for rebuild, holiday authority, exception list, `mark_sha` representation, constants scope, explicit frozen-manifest comparison). v1.2 — v1.1 + review round 2 (FAIL 23/8 → applied: identity guard wired into the loop, LB95 constants from the registration, A-DEPTH diagnostics producer, panel feature self-check, terminal-checkpoint rule, capacity-refused contract, manifest shas re-verified against bytes, holiday file in the payload, marks via `chains._sdk_pull_day` with atomic write + sha on rows, settlement pinned at commit, open-inventory derivation rule, `candidate_id` in every key, pruning REMOVED, snapshot chain via `prev_snapshot`, nullable $ columns, zero-denominator scale rule, single-writer lock, runtime-budget test, NaN test wording, `backfill` in the CLI; spec W8.3 aligned to snapshot-granularity code lineage in requirements v1.2a). Design review closed at two rounds per the 98% discipline. v1.1 = v1.0 + round 1 (FAIL 20/8 → all applied: single-pass post-filter hook with gated-episode memory, NaN gate semantics, credit property with setter, registration/rebind lifecycle made possible (code lineage in manifests not rows; `register --supersede`), engine-identity guard, holiday-aware calendar, versioned refusal map, entry-event-based sole-blocker, global isolated-replay cap, full-chain mark cache, 3-minute close window, composite ledger keys, calendar sha stamp, cohort attribution, discovery backfill order, cumulative snapshot state, health capture point). One principle decides everything
 below: **the watch never re-implements the engine — it RUNS the engine, read-only, in memory, with
 a candidate injected through three subclass hooks.** Every counterfactual fill, exit, capacity effect
 and bomb comes out of `hiro_engine`'s own `Session → RuleEngine → Executor` loop (W0.3), so the
@@ -83,8 +83,10 @@ one session ≈ 2–4 s, so 12 runs ≈ 50 s worst case.
   re-hashed and compared; a mismatch raises `InputTampered(path)`.
 - `nyse_holidays.csv` is part of the registration payload (its sha is in the JSON, W8.1) and is
   re-verified at every run like any other input.
-- `calendar_gaps(reg, upto_date) -> list[date]`: weekdays not in `event_calendar.csv` holidays and
-  without a disposition row (W1.7) — used by `ledger.chronology_guard`.
+- `calendar_gaps(reg, upto_date) -> list[date]`: weekdays not in `docs/hiro_watch/nyse_holidays.csv`
+  (the ONLY holiday authority; the engine's `event_calendar.csv` lists CPI/FOMC/opex EVENT days
+  and has nothing to do with market closure) and without a disposition row (W1.7). The holiday
+  file carries a `# coverage_end: YYYY-MM-DD` header; a date beyond it → `CalendarExpired`.
 
 ### 3. `shadow.py` — the heart (W0.3, W3b, W4b, W5b)
 - `Policy` (frozen dataclass): `a_depth_theta: float | None`; `credit_by_branch: dict[str, float]`
@@ -157,7 +159,10 @@ one session ≈ 2–4 s, so 12 runs ≈ 50 s worst case.
   `day`, so features match the engine bit-for-bit), returns `ShadowRun(candidate_id, policy,
   events_df: DataFrame[EVENT_FIELDS], rows_df: per-minute frame of every FeatureRow field +
   vetoes, session_row: SessionRow)`. `events_df` is stamped by the engine itself (ts/mode/tier/
-  session_date/config_hash) — identical columns to the log.
+  session_date/config_hash) — identical columns to the log — PLUS one watch column
+  `candidate_id` added by `run_shadow` (never present in the engine's own log; the baseline
+  self-check compares on EVENT_FIELDS only). `trade_id` is the ENGINE's (`state.next_trade_id`,
+  assigned in `Executor._register_entry`, present on entry/exit events); the watch never mints ids.
 - **Baseline self-check** (W9.4): `run_shadow(policy=BASELINE)` must equal the engine's logged rows
   for the date on every EVENT_FIELDS column (NaN-aware equality). Mismatch → `ShadowDrift(date)` →
   refuse. This single check proves the harness reproduces the engine before any candidate runs.
@@ -243,7 +248,13 @@ one session ≈ 2–4 s, so 12 runs ≈ 50 s worst case.
   engine's own pull function, so the mark path is the ChainStore module's code, not a second
   client) — written atomically (`.tmp` + `os.replace`), sha256 recorded BOTH in the snapshot
   manifest and on every `inventory`/`book` row that used it (`mark_sha`), and re-hashed on every
-  read (`MarkTampered` on mismatch). Because
+  read (`MarkTampered` on mismatch). The mark cache is GLOBAL across registrations and
+  immutable once written: a file is content-addressed by its sha; every snapshot that used it
+  recorded that sha; a later file with the same (date, expiry) key but a different sha is
+  `MarkTampered` — the watch never silently re-pulls. Representation on rows: `inventory.mark_sha`
+  = the sha of the ONE file that marked that bomb (its expiry) or null with `mark_source =
+  chain_cache` (then `chain_sha` identifies it); `book.mark_shas` = JSON list of every distinct
+  mark sha used that session. Because
   the whole chain is persisted, a strike needed by a later candidate is always present (no
   expansion problem). `mark(date, expiry, strike)`: the day's `ChainStore` cache if the expiry
   matches `expiry_of(date)`, else the mark cache, else the single pull (W6.2, W10.2).
@@ -254,9 +265,11 @@ one session ≈ 2–4 s, so 12 runs ≈ 50 s worst case.
 - `mark_inventory(bombs, date) -> DataFrame[bomb_id, mark_mid_usd, mark_liq_usd, unmarked]`
   (`mark_*_usd` are nullable `Int64`; null iff `unmarked`);
 - Settlement is PINNED at commit: the `settlements` row stores `settle_value`, `settle_source`,
-  and the source file's sha; a later-populated EOD table never changes a committed settlement
-  (snapshots are immutable; a rebuild reads the pinned value from the prior snapshot, not the
-  source).
+  and the source file's sha. **Rebuild rule:** when recomputing a session that already has a
+  committed settlement row, `settle()` MUST use the committed `settle_source` (and verify the
+  source file's sha still matches; `InputTampered` otherwise) — so a later-populated EOD table
+  never changes a settlement, and a first-time settlement is reproducible because its source
+  identity was pinned the moment it was made.
   `settle(bombs, date, spx_close, source)` per W6.4 (`clamp(intrinsic, 0, 5)·100`, on the expiry
   session, provenance `index_eod` if `~/Dev/central_trade_data/…/index_eod` has the date else
   `spx_1m_close`, reconciliation warning > 0.50 pt).
@@ -337,8 +350,17 @@ one session ≈ 2–4 s, so 12 runs ≈ 50 s worst case.
 verdict tables, the shock grid, the standing W10.4 caveat under every CREDIT table, DIAGNOSTIC
 labels. Text only, ≤ 120 columns, tables via `DataFrame.to_string`.
 
-### 12. `cli.py` / `__main__.py` — `watch <date> [--debug]`, `watch report`, `watch register
-[--supersede --reason]`, `watch backfill`, `watch rebind --reason`, `watch rebuild [--verify-only]`. `--debug` sets
+### 12. `cli.py` / `__main__.py` — fixed subcommands only: `watch run <date> [--debug]`,
+`watch report`, `watch register [--supersede --reason]`, `watch backfill`, `watch rebind --reason`,
+`watch rebuild [--verify-only]`. (`run` is explicit so argparse never has to disambiguate a date
+from a command name.)
+- **Constants scope (the "no numbers in code" rule, made precise):** DECISION constants (every
+  threshold, count, credit, window, shock list, bootstrap draws/seed) live only in the
+  registration payload. STRUCTURAL constants live in one module `constants.py`, each with a
+  one-line justification, and are hashed into `code_hash`: `MAX_ISOLATED = 20`, `USD_MULT = 100`,
+  `FLOAT_TOL = 1e-9`, `CLOSE_WINDOW_MIN = 3` (mirrors W6.2), and the spread width / tick which are
+  READ from the engine config (`r1_instruments.width_strikes`, `r1v3_limits.limit_tick`), never
+  retyped. Nothing numeric appears anywhere else. `--debug` sets
 `logging.DEBUG` and prints `[debug]` per the global CLI rule. Every command begins with
 `registration.require_code_match()` (except `rebind`, which begins with it and then re-verifies).
 
@@ -352,7 +374,7 @@ labels. Text only, ≤ 120 columns, tables via `DataFrame.to_string`.
 | `candidate_panels` | `(candidate_id, setup_id)` | same as `panel` + `in_baseline` |
 | `a_depth` | `(session_date, theta)` | n_passed/rejected/unclassifiable (diagnostic), portfolio-run trades & P&L for θ* only, `passed_days`, `max_day_share` |
 | `credit_ladder` | `(candidate_id, session_date, layer ∈ {diagnostic, portfolio}, branch, c, trade_id)` | diagnostic Δ row per trade per c; portfolio-run outcome per (branch,c) |
-| `b_refused` | `(table ∈ {vt,levels,late}, setup_id)` | layer ∈ {portfolio, isolated}, `scored|multi_blocked`, fill, minutes, pnl, mae, naked_short_min, `data_invalid` |
+| `b_refused` | `(candidate_id, table ∈ {vt,levels,late,capacity}, layer ∈ {portfolio,isolated,reported}, setup_id)` | attribution ∈ {scored, multi_blocked, data_invalid, censored, entry_aborted, reported}, fill, minutes, pnl, mae, naked_short_min |
 | `book` | `(candidate_id, session_date)` | realized_cash, credits, failed_attempt_pnl, settled_usd, inv_mid, inv_liq, n_bombs, n_unmarked, drawdown_liq, mtm_liq, shock grid as 9 columns |
 | `inventory` | `(candidate_id, bomb_id, session_date)` | long_k, short_k, expiry, credit_usd, mark_mid_usd, mark_liq_usd, unmarked, mark_source |
 | `settlements` | `(candidate_id, bomb_id)` | expiry, settle_value, settle_source, payoff_usd |
@@ -371,14 +393,17 @@ evening ops identity note (read, not recomputed). No numeric constant lives outs
 ## Main loop (the whole watch, interpretable)
 
 ```python
-def watch(date):
+def run(date):                                   # CLI: `watch run <date>`
     reg = registration.load_active(); registration.require_code_match()
-    with ledger.single_writer_lock(reg):                          # flock on <root>/.lock
+    cfg = load_config(None); chains = ChainStore()                # engine objects, read-only
+    with ledger.single_writer_lock(reg):                          # flock on <root>/.lock — encloses EVERYTHING below
       before = shadow.engine_artifact_hashes()                    # W0.1
-      shadow.engine_identity_guard(cfg, chains, reg)              # engine hash + frozen pin, ENFORCED
-    inp = inputs.resolve(cfg, date)                               # W0.4/W1.6/W10.3, refuses
-    ledger.chronology_guard(reg, date)                            # W1.7/W9.3
-    chains = ChainStore(); hist = build_range60_history(cfg, TIER_FULL, stored_before(date))
+      shadow.engine_identity_guard(cfg, chains, reg)              # cfg.config_hash == reg.engine_config_hash AND
+                                                                  # chains.frozen_manifest_hash(cfg.control_days) == reg.frozen_manifest_hash
+                                                                  # AND chains.verify_frozen(cfg) — all three, ENFORCED
+      inp = inputs.resolve(cfg, reg, date)                        # W0.4/W1.6/W10.3, refuses; needs reg for the engine hash
+      ledger.chronology_guard(reg, date)                          # W1.7/W9.3
+      hist = build_range60_history(cfg, TIER_FULL, stored_before(date))
     base = shadow.run_shadow(cfg, date, BASELINE, chains, hist)
     shadow.assert_matches_log(base, inp.log_path)                 # W9.4 self-check → refuse
     runs = {p.candidate_id: shadow.run_shadow(cfg, date, p, chains, hist)
@@ -395,15 +420,16 @@ def watch(date):
     stage = ledger.stage(date, panel, cpanels, a_depth, ladder, refused, books, verdicts, inp, reg)
     assert shadow.engine_artifact_hashes() == before              # W0.1
     ledger.commit(stage, date); report.print_session(...)
-    # (indentation: everything from `before` onward runs inside the lock)
+    # (every line from `before` onward is inside the `with` block; shown flat for width)
 ```
 
 `watch report` = `open_current()` + `report.print_cumulative`. `watch rebuild` = the loop above per
 snapshot in order with `commit` replaced by `verify_identity`.
 
 ## Error handling
-Exception hierarchy `WatchError` → `MissingInputs`, `Unverified`, `MissingSession`, `ChronologyError`,
-`ShadowDrift`, `LadderDrift`, `CodeMismatch`, `RegistrationError`, `MarkError`. Any exception before
+Exception hierarchy `WatchError` → `MissingInputs`, `Unverified`, `MissingSession`, `InputTampered`,
+`CalendarExpired`, `ChronologyError`, `EngineIdentityError`, `ShadowDrift`, `LadderDrift`,
+`CodeMismatch`, `RegistrationError`, `MarkError`, `MarkTampered`, `LedgerLocked`. Any exception before
 `commit` leaves the ledger untouched (snapshot design); the CLI prints the class + message and exits
 2. No exception is ever swallowed; `data_invalid` and `UNMARKED` are DATA states, not errors, and are
 tallied. Network failure in the single mark pull → `MarkError` → refuse (re-run later); a persisted

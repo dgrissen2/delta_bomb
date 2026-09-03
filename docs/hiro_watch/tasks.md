@@ -1,6 +1,6 @@
 # Implementation Tasks — hiro_watch
 
-*Build spec v1.1 (2026-09-03) for `requirements.md` v1.2a and `design.md` v1.2. Written for a junior
+*Build spec v1.2 (2026-09-03) for `requirements.md` v1.2a and `design.md` v1.3 — v1.1 + CIO/architect plan review (governance gate split from build acceptance; contract fixes). Review closed. Written for a junior
 engineer: every task says what to build, where, what "done" looks like, and what NOT to touch. Order
 is dependency order; every task ends green (`pytest scripts/hiro_watch/tests`) before the next starts.
 When this file and the requirements disagree, the requirements win; when this file and the design
@@ -12,9 +12,11 @@ disagree, the design wins. **DO NOT START without the user's explicit go. Never 
 1. **The engine is a library you import, not code you change.** `from hiro_engine.session import
    Session` etc. Task 10's test hashes every engine file and artifact before and after a full run —
    if that test ever fails, you changed something you must not.
-2. **No numbers in code.** Every threshold, count, credit, window, seed lives in the registration
-   payload (task 2) and is read from it. If you find yourself typing `0.30` or `20` in a module,
-   stop.
+2. **No DECISION numbers in code.** Every threshold, count, credit, window, seed, shock lives in
+   the registration payload (task 2) and is read from it. The few STRUCTURAL constants (design
+   §12: `MAX_ISOLATED`, `USD_MULT`, `FLOAT_TOL`, `CLOSE_WINDOW_MIN`; spread width and tick are
+   READ from the engine config) live in `constants.py` with a one-line reason each. If you find
+   yourself typing `0.30` or `20` anywhere else, stop.
 3. **Nothing partial ever lands.** Compute everything into a staging directory, validate, then commit
    in one rename (task 9). If anything raises, the ledger must look exactly as it did before.
 4. **Same venv as the engine:** `~/Dev/virtualenvs/gamma_chaser/bin/python`. Run tests from
@@ -28,7 +30,7 @@ disagree, the design wins. **DO NOT START without the user's explicit go. Never 
 ```
 scripts/hiro_watch/
   __init__.py  __main__.py  cli.py
-  registration.py  inputs.py  shadow.py  panel.py  ladder.py  refused.py
+  constants.py  registration.py  inputs.py  shadow.py  panel.py  ladder.py  refused.py
   book.py  stats.py  verdicts.py  ledger.py  report.py
   tests/  conftest.py  fixtures/  test_*.py
 docs/hiro_watch/registrations/        (created by `watch register`)
@@ -40,10 +42,10 @@ docs/replay/hiro_watch/marks/         (mark cache)
 ## Tasks (build order is the contract)
 
 - [ ] **1. Skeleton + exceptions + `--debug`** (`__init__.py`, `__main__.py`, `cli.py`)
-    - `WatchError` hierarchy exactly as design §Error handling; `cli.py` with argparse subcommands
-      `register`, `backfill`, `<date>` (positional), `report`, `rebind`, `rebuild`, each a
-      stub that raises `NotImplementedError` for now; `--debug` sets `logging.DEBUG` and prints
-      `[debug] on`.
+    - `WatchError` hierarchy exactly as design §Error handling (all 14 classes); `constants.py`
+      (design §12); `cli.py` with FIXED argparse subcommands `register`, `backfill`, `run <date>`,
+      `report`, `rebind`, `rebuild` — each a stub that raises `NotImplementedError` for now;
+      `--debug` sets `logging.DEBUG` and prints `[debug] on`.
     - DONE: `python -m hiro_watch --help` lists every command; `test_cli_lists_commands` passes.
 
 - [ ] **2. Registration** (`registration.py`) — W8, design §1
@@ -60,7 +62,10 @@ docs/replay/hiro_watch/marks/         (mark cache)
       payload never contains the hash. `code_hash()`: sha256 over sorted `*.py` under the package
       excluding `tests/` and `__pycache__`.
     - File lifecycle per design §1: `register()`, `register(supersede=True, reason=...)`,
-      `load_active()`, `require_code_match()`, `append_code_line(reason)`.
+      `load_active()`, `require_code_match()`, `append_code_line(reason)`. Guard rule, stated
+      once: `register` (first time) and `rebind` do NOT call `require_code_match` — the first has
+      nothing to match, the second exists to recover from a mismatch; every other command calls it
+      first.
     - Firewall: `classifier_columns ⊆ panel.W22_COLUMNS` (import the tuple from task 4's module —
       create `panel.py` with just `W22_COLUMNS` now if needed) else `RegistrationError`.
     - Junior note: "canonical" means two dicts with the same content but different key order or
@@ -70,12 +75,16 @@ docs/replay/hiro_watch/marks/         (mark cache)
       firewall rejects `post_hoc_x`.
 
 - [ ] **3. Inputs + calendar** (`inputs.py`, `docs/hiro_watch/nyse_holidays.csv`) — W1, W10.3, W1.7
-    - `SessionInputs` with the paths and sha256s listed in design §2; `resolve(cfg, date)` raising
+    - `SessionInputs` with the paths and sha256s listed in design §2; `resolve(cfg, reg, date)`
+      (needs the registration for the engine hash and the holiday sha) raising `CalendarExpired`
+      past the holiday file's `# coverage_end`, and
       `MissingInputs([...])` (list everything missing, not just the first), `Unverified(date)` when
       the HIRO manifest note lacks `day-identity verified`, `MissingSession(date)` when there is no
       disposition row with the registration's engine hash.
     - `calendar_gaps(reg, upto)`: weekdays from the registration date to `upto` that are not in
-      `nyse_holidays.csv` and have no disposition row. Write the holidays file (NYSE 2026–2027) and
+      `nyse_holidays.csv` and have no disposition row. `nyse_holidays.csv` is the ONLY holiday
+      authority (the engine's `event_calendar.csv` is the CPI/FOMC event list — do not read it for
+      holidays). Write the holidays file (NYSE 2026–2027, `# coverage_end: 2027-12-31`) and
       register its sha.
     - Manifest-declared shas are re-hashed from bytes and compared → `InputTampered(path)` on
       mismatch (never trust a manifest).
@@ -101,8 +110,10 @@ docs/replay/hiro_watch/marks/         (mark cache)
       (r30 == θ) passes; gated episode does not re-signal; `late` off changes only `late_state`;
       `vt_broken` override changes only that flag; entry_filter drops other setups and they never
       enter; (A,0.30) leaves a B leg at 0.10 and the fill assert sees 0.30 for A; super called once
-      per bar. DONE (integration): `assert_matches_log` passes on 2026-08-24, 2026-08-25,
-      2026-08-28, 2026-09-01 — exact EVENT_FIELDS equality (NaN-aware).
+      per bar; NaN r30 under the gate → skip line emitted, NO entry, and the panel later labels it
+      `unclassifiable` (both asserted); `events_df` carries `candidate_id`; `trade_id` on trades is
+      the engine's (never re-numbered). DONE (integration): `assert_matches_log` passes on
+      2026-08-24, 2026-08-25, 2026-08-28, 2026-09-01 — exact EVENT_FIELDS equality (NaN-aware).
 
 - [ ] **5. Panel** (`panel.py`) — W2, design §4
     - `W22_COLUMNS`, `REFUSAL_MAP_V1` + precedence, `build_panel(run, reg, baseline=None)`,
@@ -132,12 +143,15 @@ docs/replay/hiro_watch/marks/         (mark cache)
       baseline ledger is untouched).
 
 - [ ] **8. Book** (`book.py`) — W6, design §7
-    - `trades_from_events`, `bombs_from_trades`, `MarkCache` (full chain via
+    - `trades_from_events` (reads the engine's `trade_id` from entry/exit events — the watch
+      never assigns ids), `bombs_from_trades`, `MarkCache` (full chain via
       `hiro_engine.chains._sdk_pull_day`, ONE pull, atomic `.tmp`+`os.replace` write, sha
       re-verified on read → `MarkTampered`, `mark_sha` on every inventory/book row), `quality`,
       `closing_quote` ([L−3, L]), `mark_inventory` (nullable `Int64` marks), `settle`
-      (expiry-session, clamp 0..5 ×100, provenance + reconciliation, PINNED into the row — never
-      re-read), `book_state(candidate, date, prev)` where the open set is `prev.inventory` rows
+      (expiry-session, clamp 0..5 ×100 — width and multiplier from `constants`/engine config,
+      provenance + reconciliation, PINNED into the row; on rebuild the committed `settle_source`
+      is reused and its sha re-verified), `mark_sha`/`mark_shas` per design §7,
+      `book_state(candidate, date, prev)` where the open set is `prev.inventory` rows
       with `session_date == prev.date` only, cumulative + split columns, `shock_grid`.
     - Junior note: the ThetaData client is reached ONLY through `hiro_engine.live.theta_client`;
       in tests it is a stub that counts calls — the second mark of the same (date, expiry) must
@@ -146,7 +160,8 @@ docs/replay/hiro_watch/marks/         (mark cache)
       settlements on expiry; payoff clamp; early-close L; reconciliation warning at > 0.50 pt;
       shock grid monotone; cumulative book over 3 synthetic sessions equals a from-scratch
       recomputation; integration: marking the 16 real bombs at 2026-09-02 reproduces the
-      accounting's $1,265 (mid) within quote-quality exclusions (print any UNMARKED).
+      accounting's per-bomb mids EXACTLY (same quotes, tolerance 0) for every bomb that is not
+      UNMARKED, and lists any UNMARKED with the failing quote.
 
 - [ ] **9. Stats + verdicts + ledger** (`stats.py`, `verdicts.py`, `ledger.py`) — W6.5, W3.4–3.7,
   W4.3, W5.4, W9.3–9.4, W8.3
@@ -169,7 +184,9 @@ docs/replay/hiro_watch/marks/         (mark cache)
       REJECT-EXPIRED; settlement unchanged after an EOD value appears later.
 
 - [ ] **10. Main loop + report + shadow-guarantee test** (`cli.py`, `report.py`) — design §Main loop
-    - Wire `watch <date>`, `backfill`, `report`, `register --supersede`, `rebind`, `rebuild` (no prune); `report.py` prints
+    - Wire `watch run <date>`, `backfill`, `report`, `register --supersede`, `rebind`, `rebuild`
+      (no prune) — `run` opens the single-writer lock FIRST and everything happens inside it;
+      `report.py` prints
       the book (baseline + candidates side by side), progress lines, verdict tables, shock grid,
       DIAGNOSTIC labels, and the W10.4 caveat under every CREDIT table.
     - DONE: `test_engine_artifacts_untouched` — sha256 of every file under `scripts/hiro_engine/`,
@@ -186,6 +203,19 @@ docs/replay/hiro_watch/marks/         (mark cache)
     - Then the standing daily loop gains one step: capture → identity → ingest → engine replay →
       `watch <date>`. Add it to `docs/hiro_engine/RUNBOOK.md` (one line) and to
       `docs/hiro_watch/build_notes.md` with the WATCH_HASH.
+
+- [ ] **12. Investment gate (governance, not code) — separate from build acceptance**
+    - Build acceptance (tasks 1–11 green, shadow guarantee, byte-identity) says the WATCH works.
+      It says NOTHING about the strategy. No candidate is promoted, no rule is edited, no capital
+      is committed on the basis of a build sign-off.
+    - Investment decisions happen ONLY at the registered checkpoints (W3.5: confirmation sessions
+      10/20/30/40), only on the confirmation set, only through the verdict the watch prints, and
+      then only via the human R7.2 → spec-edit → R9a re-registration path. The calibration record
+      for every registered constant is `../hiro_engine/branch_accounting_2026-09-03.md` and
+      `../hiro_engine/conclusions.md` §13–§16 (discovery data); the payload cites them as
+      `calibration_ref`. Program-level risk stays the engine's (1-lot paper; R9 loss lines); the
+      watch adds visibility (W6.6 shock grid), not limits — by design, until a candidate is
+      promoted and the engine spec is re-registered.
 
 ## Review gates for this build
 After task 4 and after task 9: `/red-team-auditor` + architect `/codex-review` for adherence to
