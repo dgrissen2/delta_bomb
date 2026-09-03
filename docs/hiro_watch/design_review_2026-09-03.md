@@ -70,3 +70,85 @@
 | 19 | Cumulative state has no defined data flow from prior snapshots into books and verdicts, preventing deterministic evidence bars, checkpoints, inventory aging, settlements, and historical MTM. | CRITICAL | Architecture | Architect | Medium |
 | 20 | Panel capture occurs before health and quote fields are attached, and the engine’s single `health` value cannot directly supply separate HIRO and option-quote health columns. | HIGH | Data contracts | Architect | Medium |
 | 21 | No ADR applicability or compliance gate is defined. | MEDIUM | ADR alignment | Architect | Medium |
+
+## Round 2 (v1.1) — FAIL 23 generic / 8 architect → applied in v1.2 (+ requirements v1.2a alignment); design review closed at two rounds
+
+## Codex Plan Review — Verdict: FAIL (23 findings)
+
+| # | Finding | Severity | Dimension | Details |
+|---|---------|----------|-----------|---------|
+| 1 | Rebind guard is contradictory | HIGH | Internal consistency | Section 1 correctly says `rebind` runs without the code-match guard, but section 12 says it begins with that guard. The latter makes rebind impossible precisely when code changed. |
+| 2 | `register --supersede` violates registration semantics | HIGH | Spec fidelity | W8.2 requires `watch register` to refuse whenever `active.txt` exists. The design instead permits `watch register --supersede`; this needs a distinct command or a requirements change. |
+| 3 | `code_hash` is missing from ledger rows | HIGH | Data contracts | W8.3 explicitly requires every row to carry `code_hash`. The design knowingly stores it only in `manifest.json`, changing the required contract. |
+| 4 | Registered LB95 constants do not control execution | HIGH | Data contracts | Registration includes W6.5 constants, but `stats.lb95` imports `DRAWS` and `SEED` from the engine. Consequently WATCH_HASH does not bind the parameters actually used. |
+| 5 | A-DEPTH diagnostic ladder has no implementation path | HIGH | Spec fidelity | W3.3 requires diagnostic classification for every θ. No component produces the `a_depth` table, and the main loop neither constructs nor passes one to `ledger.stage`; only θ* receives a portfolio run. |
+| 6 | Candidate outcomes are omitted by the main loop | HIGH | Internal consistency | Section 4 promises `attach_outcomes` for candidate panels, but the “whole watch” loop builds `cpanels` without attaching trades, MAE, MFE, or P&L. W2.9 scorers would receive incomplete rows. |
+| 7 | Required panel self-check is absent | HIGH | Spec fidelity | W9.4 requires an every-session comparison of W2.2 panel features with logged features. The design checks EVENT_FIELDS before panel construction but never validates the resulting panel columns. |
+| 8 | Terminal-checkpoint behavior is impossible | HIGH | Logic errors | Checkpoint 40 is both terminal and deferrable for scale drift, missing marks, or representation failure, yet no later checkpoint exists. Candidates whose count bars mature after session 40 also can never receive a verdict. |
+| 9 | Isolated-replay cap violates W5.2 | HIGH | Spec fidelity | W5.2 requires every refused setup to receive an isolated replay. `MAX_ISOLATED = 20` silently truncates that required population and introduces `DIAGNOSTIC_TRUNCATED`, which is absent from the specification and schemas. |
+| 10 | Capacity-refused output has no durable contract | MEDIUM | Data contracts | W5.1 requires capacity-refused setups to be reported and scored separately. The design mentions a separate frame, but `b_refused` permits only `vt`, `levels`, and `late`, with no persisted capacity table or aggregate. |
+| 11 | Health mapping loses required state | HIGH | Data contracts | The design admits its single-string precedence mapping is lossy when HIRO and quote failures coincide. Raw `health` cannot substitute for correctly populated `hiro_health` and `option_quotes_health` columns required by W2.2. |
+| 12 | Manifest SHAs are trusted rather than verified | HIGH | Logic errors | Chain and HIRO identities are read from manifests, but the design does not recompute and compare their actual file hashes at load. `verify_frozen` covers frozen pins, not the stated per-session W1.2 verification contract. |
+| 13 | Calendar source is inconsistent and unregistered | HIGH | Dependencies | `inputs.py` describes `event_calendar.csv` as the holiday source, while `ledger.py` introduces `docs/hiro_watch/nyse_holidays.csv`. The latter is a new input absent from W1 and from the registration payload despite being called registered by SHA. |
+| 14 | Mark acquisition and provenance violate W6 | HIGH | Spec fidelity | W10.2 requires pulls through `ChainStore`, but the design calls `hiro_engine.live.theta_client` directly. It also records the cache SHA only in the snapshot manifest although W6.2 requires it in the book row. |
+| 15 | Historical inventory can be duplicated as open state | HIGH | Logic errors | Cumulative `inventory` contains one row per bomb per session, yet `book_state` reads prior inventory rows as open bombs without defining latest-row selection and settlement exclusion. Re-marking all historical rows would duplicate bombs and settled positions. |
+| 16 | CREDIT portfolio rows lack sufficient identity | HIGH | Data contracts | The `credit_ladder` key has only session, layer, branch, c, and trade ID. A target-A replay also contains B trades and vice versa; without `candidate_id` or separate `variant_branch` and `trade_branch`, variants can collide or be misattributed. |
+| 17 | Pruning breaks deterministic re-runs | HIGH | Dependencies | `verify_identity(date)` compares against that date’s committed snapshot manifest, but `prune(keep=5)` may delete it. The design provides no retained manifest or reconstruction rule for re-running an older ledgered date. |
+| 18 | Candidate refusal states do not map to eligibility | MEDIUM | Data contracts | The refusal map adds `shadow_gate`, `shadow_filter`, and `other:<raw>`, while eligibility is restricted to the W2.9 enum. The design never defines how those reasons map to `gate_failed`, `capacity_blocked`, or another legal value. |
+| 19 | Non-nullable dollar types conflict with UNMARKED data | MEDIUM | Data contracts | The design declares every dollar column as `int64`, but UNMARKED inventory requires absent `mark_mid_usd` and `mark_liq_usd`. It must specify nullable integer types or another non-numeric representation. |
+| 20 | Scale-ratio denominator is unguarded | MEDIUM | Edge cases | Excluding zero and NaN observations can leave `r30_scale_ref` empty or zero. `scale_monitor` defines no result for division by zero or an undefined reference median. |
+| 21 | Concurrent writers can lose snapshots | MEDIUM | Edge cases | There is no lock or compare-and-swap around reading `current`, staging, renaming, and replacing the pointer. Concurrent watch, rebuild, rebind, or prune commands can commit divergent states and delete one another’s snapshots as orphans. |
+| 22 | Runtime budget is internally inconsistent | MEDIUM | Test adequacy | The overview budgets approximately 12 runs and 50 seconds, while the detailed path allows 29 runs. At the stated four seconds per replay, replay alone reaches 116 seconds before marking, Parquet, statistics, and reporting; no runtime-budget test is planned. |
+| 23 | NaN gate test contradicts required behavior | MEDIUM | Test adequacy | The hooks test says “NaN untouched,” whereas W2.7, the hook design, and a later test require NaN r30 to suppress entry, avoid capacity consumption, and be labeled unclassifiable. |
+
+---
+
+## Codex Plan Review — Architect
+**Verdict**: FAIL (8 findings)
+
+| # | Finding | Severity | Dimension | Details |
+|---|---------|----------|-----------|---------|
+| 1 | Frozen engine identity is not enforced | Critical | Integration contract | `Registration.frozen_manifest_hash` is recorded but never compared by `engine_identity_guard`; the guard checks only CONFIG_HASH and chain pins. Pre/post artifact hashing detects mutation during a run, not engine drift before it. Changed engine code could therefore generate both the source log and shadow replay successfully under the old registration. |
+| 2 | Registration lifecycle contradicts both itself and W8.3 | Critical | Spec fidelity | The design intentionally omits `code_hash` from every ledger row although W8.3 explicitly requires it. It also says `rebind` runs without the code-match guard in `registration.py`, while the CLI contract says `rebind` begins with that guard, which would make recovery from a mismatch impossible. |
+| 3 | Discovery backfill has no exposed command | High | Dependency ordering | `ledger.py` requires `watch backfill` before normal processing, but the CLI command list omits `backfill`. With chronology requiring all earlier discovery and confirmation sessions, a fresh registration lacks a defined, executable bootstrap path. |
+| 4 | Verdict-critical lineage and eligibility mappings are implicit | High | Data contract | The plan never defines the complete event/reason/outcome-to-`eligibility` mapping, despite eligibility controlling all rates and count bars. It also references passed/forgone selectors without those fields in the schemas, and does not specify the join from `setup_id` through trades to bombs, marks, and settlements. Cohort expectancy cannot be implemented unambiguously without this lineage. |
+| 5 | Health reporting knowingly loses required state | High | Contract fidelity | `ShadowSession` acknowledges that mapping the engine’s single health string into `hiro_health` and `option_quotes_health` is lossy when conditions coincide. W2 requires both columns independently; retaining a raw column does not make the required columns correct and can misclassify data validity. |
+| 6 | Snapshot retention and replay semantics conflict | High | State management | `current` names only the latest snapshot, yet startup deletes snapshot directories “not reachable” from it; no predecessor chain or snapshot index defines older snapshots as reachable. Separately, `prune(keep=5)` can remove manifests that `verify_identity(date)` needs to validate any previously ledgered date. |
+| 7 | Valuation inputs are not fully deterministic or atomic | High | Data integrity | Settlement may switch to a later-populated `index_eod` row, but that row/value is not SHA-pinned as an input. Mark files are shared outside the WATCH_HASH tree and lack a specified staging, atomic-write, schema-validation, and hash-verification protocol. Their SHA is placed only in the manifest although W6.2 requires it in the book row, and the pull bypasses the stated ChainStore boundary. |
+| 8 | The A-DEPTH diagnostic deliverable has no producer | High | Completeness | The architecture defines an `a_depth` table for all five thresholds, but no component or main-loop operation builds it; only the primary-threshold portfolio run exists. `ledger.stage` is not passed an A-DEPTH diagnostic result. W3.1/W3.3’s per-threshold passed, rejected, unclassifiable, and actual-outcome tables are therefore absent from the implementation plan. |
+
+---
+
+## Codex Plan Review — Panel Synthesis
+
+| # | Finding | Severity | Dimension | Flagged By | Confidence |
+|---|---------|----------|-----------|------------|------------|
+| 1 | Frozen engine identity is recorded but not enforced | Critical | Integration contract | Architect | High |
+| 2 | Rebind guard is contradictory and prevents recovery from code drift | Critical | Internal consistency | Generic, Architect | High |
+| 3 | Ledger rows omit the required `code_hash` | Critical | Data contracts | Generic, Architect | High |
+| 4 | `register --supersede` violates registration semantics | High | Spec fidelity | Generic | High |
+| 5 | Registered LB95 constants do not control execution | High | Data contracts | Generic | High |
+| 6 | A-DEPTH diagnostics have no producer or main-loop implementation path | High | Completeness | Generic, Architect | High |
+| 7 | Candidate panels omit required trade outcomes | High | Internal consistency | Generic | High |
+| 8 | Required per-session panel self-check is absent | High | Spec fidelity | Generic | High |
+| 9 | Terminal-checkpoint deferral and late maturity make some verdicts impossible | High | Logic errors | Generic | High |
+| 10 | Isolated-replay cap violates the requirement to replay every refused setup | High | Spec fidelity | Generic | High |
+| 11 | Capacity-refused results lack a durable reporting and scoring contract | Medium | Data contracts | Generic | High |
+| 12 | Health mapping loses independently required HIRO and quote states | High | Data contracts | Generic, Architect | High |
+| 13 | Chain and HIRO manifest SHAs are trusted rather than verified against files | High | Logic errors | Generic | High |
+| 14 | Calendar sources are inconsistent and the introduced holiday file is unregistered | High | Dependencies | Generic | High |
+| 15 | Mark acquisition bypasses `ChainStore` and omits the cache SHA from book rows | High | Spec fidelity | Generic, Architect | High |
+| 16 | Settlement can use an unpinned, later-populated index value | High | Data integrity | Architect | High |
+| 17 | Shared mark files lack a defined atomic-write, validation, and hash-verification protocol | High | Data integrity | Architect | High |
+| 18 | Historical inventory can be duplicated as open state | High | Logic errors | Generic | High |
+| 19 | CREDIT portfolio rows lack sufficient candidate and branch identity | High | Data contracts | Generic | High |
+| 20 | Snapshot pruning breaks deterministic historical reruns | High | State management | Generic, Architect | High |
+| 21 | Snapshot reachability is undefined, risking deletion of valid snapshots | High | State management | Architect | High |
+| 22 | Refusal, event, reason, and outcome mappings to `eligibility` are incomplete | High | Data contracts | Generic, Architect | High |
+| 23 | Verdict selectors and setup-to-trade-to-valuation lineage are undefined | High | Data contracts | Architect | High |
+| 24 | Non-nullable dollar types conflict with UNMARKED inventory rows | Medium | Data contracts | Generic | High |
+| 25 | Scale-ratio behavior is undefined for an empty or zero reference denominator | Medium | Edge cases | Generic | High |
+| 26 | Concurrent writers can create divergent state and lost snapshots | Medium | Edge cases | Generic | Medium |
+| 27 | Runtime budget contradicts the detailed replay path and lacks a budget test | Medium | Test adequacy | Generic | High |
+| 28 | NaN gate test contradicts required suppression and classification behavior | Medium | Test adequacy | Generic | High |
+| 29 | Discovery backfill is required but has no exposed CLI command | High | Dependency ordering | Architect | High |

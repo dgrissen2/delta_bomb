@@ -1,6 +1,6 @@
 # Requirements — Shadow-Candidate Watch ("hiro_watch")
 
-*v1.2 — 2026-09-03. v1.1 + review round 2 (FAIL 18/9 → applied: code identity split from WATCH_HASH, snapshot-directory atomic commit, all replay inputs pinned by sha, session calendar, SPY input, MAE sign, episode/disposition field names, candidate cash from replay outputs, candidate opportunity ledger, A-DEPTH economics formula, verdict checkpoints, regime representation, scale-monitor constants registered, LB95 boundary rule, branch-isolated credit variants, absolute loss/MAE limits for CREDIT, sole-blocker attribution for W5, marks-completeness gate, eligibility enums, settlement provenance, test list). Round-2 residuals accepted as design-level (fill-quality realism is the engine's frozen R1.4d physics, parity-gated live; not re-litigated here). v1.1 = v1.0 + round 1 (FAIL, 25 findings → all applied; `requirements_review_2026-09-03.md`): hash canonicalization + code binding, minimum passed cohorts and explicit REJECT paths, positive-expectancy bar, LB95 bootstrap defined, portfolio (sequential) replay as the verdict basis with isolated replays demoted to diagnostic, setup identity + reason precedence, NaN/health rules, settlement formula, mark-quality controls, atomic commits, chronological processing, r30 scale-drift monitor, per-candidate shadow book, scenario grid, test list. Prior: v1.0 product-owner pass (product-operating-partner lens; no product-manager persona
+*v1.2a — 2026-09-03. v1.2 + design-review alignment (code lineage recorded at snapshot-manifest granularity, W8.3; isolated W5 replays are diagnostic and capped while the portfolio layer replays every refused setup, W5.2; `hiro_health`/`option_quotes_health` derived from the engine's single health state, W2.6; no snapshot pruning). v1.2 = v1.1 + review round 2 (FAIL 18/9 → applied: code identity split from WATCH_HASH, snapshot-directory atomic commit, all replay inputs pinned by sha, session calendar, SPY input, MAE sign, episode/disposition field names, candidate cash from replay outputs, candidate opportunity ledger, A-DEPTH economics formula, verdict checkpoints, regime representation, scale-monitor constants registered, LB95 boundary rule, branch-isolated credit variants, absolute loss/MAE limits for CREDIT, sole-blocker attribution for W5, marks-completeness gate, eligibility enums, settlement provenance, test list). Round-2 residuals accepted as design-level (fill-quality realism is the engine's frozen R1.4d physics, parity-gated live; not re-litigated here). v1.1 = v1.0 + round 1 (FAIL, 25 findings → all applied; `requirements_review_2026-09-03.md`): hash canonicalization + code binding, minimum passed cohorts and explicit REJECT paths, positive-expectancy bar, LB95 bootstrap defined, portfolio (sequential) replay as the verdict basis with isolated replays demoted to diagnostic, setup identity + reason precedence, NaN/health rules, settlement formula, mark-quality controls, atomic commits, chronological processing, r30 scale-drift monitor, per-candidate shadow book, scenario grid, test list. Prior: v1.0 product-owner pass (product-operating-partner lens; no product-manager persona
 exists in the global stores — noted, not fabricated). Motivation: the Charlie McElligott / codex review
 of the first seven out-of-sample sessions (`../hiro_engine/charlie_oos_review_2026-09-02.md`) and the
 full-book accounting (`../hiro_engine/branch_accounting_2026-09-03.md`) ordered a WATCH: a set of
@@ -317,8 +317,9 @@ myself with the sessions I have already inspected**.
 - **W8.2** Run-once: `watch register` refuses if `active.txt` exists. A change is a NEW registration
   file (new WATCH_HASH), `active.txt` repointed, a fresh ledger directory `docs/replay/hiro_watch/
   <WATCH_HASH>/`, and the old directory retained read-only (W0.5, W7.3).
-- **W8.3** Every ledger row is stamped with WATCH_HASH, the engine CONFIG_HASH, the W1.6 input shas,
-  and `code_hash`. Rows with a different WATCH_HASH are never aggregated. If the watch code changes
+- **W8.3** Every ledger row is stamped with WATCH_HASH, the engine CONFIG_HASH, and the W1.6 input
+  shas; `code_hash` is recorded once per snapshot in its manifest (code lineage), so that a rebind
+  can be verified by table byte-identity. Rows with a different WATCH_HASH are never aggregated. If the watch code changes
   (`code_hash` ≠ the current `.code` line) every command refuses except `watch rebind --reason`,
   which recomputes EVERY ledgered session under the new code into staging, verifies byte-identity
   (W9.4), and on success appends the new line to the `.code` file — WATCH_HASH unchanged, ledger
@@ -340,8 +341,8 @@ myself with the sessions I have already inspected**.
   self-checks), then commits with ONE atomic rename of the staging directory to its snapshot name
   followed by an atomic write of `current`; readers always follow `current`. A crash before the final
   pointer write leaves `current` on the previous snapshot; orphan staging/snapshot directories not
-  referenced by `current` are discarded on the next run. Older snapshots may be pruned by `watch
-  prune` keeping the last 5 — never the current. **Chronological processing:** `watch <date>` refuses if any countable session
+  referenced by `current` are discarded on the next run. Snapshots are never pruned (every one is
+  needed for identity verification and rebuild). **Chronological processing:** `watch <date>` refuses if any countable session
   between the registration date and `<date>` is not yet ledgered (book state, settlements, and
   drawdown depend on order); `watch rebuild` recomputes every ledgered session in order into a
   fresh staging tree and verifies byte-identity before replacing.
