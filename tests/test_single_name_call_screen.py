@@ -33,6 +33,15 @@ class PercentileTests(unittest.TestCase):
 
 
 class SignalTests(unittest.TestCase):
+    def test_canonical_strategy_names_are_stable(self) -> None:
+        self.assertEqual(SCREEN.BUY_FIRST_CALL_PUKE, "buy-first call puke")
+        self.assertEqual(SCREEN.BUY_FIRST_CALL_STANDARD, "buy-first call standard")
+        self.assertEqual(SCREEN.SELL_FIRST_CALL_GRAB, "sell-first call grab")
+        self.assertEqual(
+            SCREEN.BUY_FIRST_PUT_TAIL_INVENTORY,
+            "buy-first put-tail inventory",
+        )
+
     def test_read_ticker_universe_normalizes_and_deduplicates(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             universe_path = Path(temp_dir) / "tickers.csv"
@@ -69,10 +78,82 @@ class SignalTests(unittest.TestCase):
             SCREEN.sell_first_is_actionable("post-shock smile", -2.0, 50.0, True)
         )
 
+    def test_put_tail_inventory_requires_cheap_put_surface(self) -> None:
+        self.assertTrue(SCREEN.put_tail_inventory_is_actionable(25, 40, 20))
+        self.assertFalse(SCREEN.put_tail_inventory_is_actionable(36, 40, 20))
+        self.assertFalse(SCREEN.put_tail_inventory_is_actionable(25, 51, 20))
+        self.assertFalse(SCREEN.put_tail_inventory_is_actionable(25, 40, 26))
+
+    def test_scenario_expansion_preserves_overlapping_methods_and_windows(self) -> None:
+        signals = pd.DataFrame(
+            [
+                {
+                    "tradeDate": "2026-08-24",
+                    "ticker": "AAA",
+                    "liquid_final": True,
+                    "buy_first_puke": True,
+                    "buy_first_standard": False,
+                    "sell_first_actionable": False,
+                    "buy_first_put_tail_inventory": True,
+                    "buy_score": 10.0,
+                    "sell_score": 20.0,
+                    "put_inventory_score": 30.0,
+                },
+                {
+                    "tradeDate": "2026-08-28",
+                    "ticker": "BBB",
+                    "liquid_final": True,
+                    "buy_first_puke": True,
+                    "buy_first_standard": False,
+                    "sell_first_actionable": False,
+                    "buy_first_put_tail_inventory": True,
+                    "buy_score": 11.0,
+                    "sell_score": 21.0,
+                    "put_inventory_score": 31.0,
+                },
+            ]
+        )
+
+        selected = SCREEN.expand_scenario_candidates(
+            signals,
+            call_start="2026-08-28",
+            put_start="2026-08-24",
+        )
+
+        self.assertEqual(
+            list(
+                selected[["tradeDate", "ticker", "scenario"]].itertuples(
+                    index=False,
+                    name=None,
+                )
+            ),
+            [
+                ("2026-08-24", "AAA", "buy-first put-tail inventory"),
+                ("2026-08-28", "BBB", "buy-first call puke"),
+                ("2026-08-28", "BBB", "buy-first put-tail inventory"),
+            ],
+        )
+
     def test_orats_synthetic_aliases_are_not_single_stocks(self) -> None:
         self.assertTrue(SCREEN.is_single_stock_ticker("NVDA"))
         self.assertFalse(SCREEN.is_single_stock_ticker("XLY_C"))
         self.assertFalse(SCREEN.is_single_stock_ticker("SPX"))
+        self.assertFalse(SCREEN.is_single_stock_ticker("KRE"))
+        self.assertFalse(SCREEN.is_single_stock_ticker("URA"))
+        self.assertFalse(SCREEN.is_single_stock_ticker("XHB"))
+
+    def test_single_stock_metadata_rejects_sector_etfs(self) -> None:
+        self.assertTrue(
+            SCREEN.has_single_stock_metadata("Semiconductors", "XLK", "NVDA")
+        )
+        self.assertFalse(SCREEN.has_single_stock_metadata("N/A", "XLF", "XLF"))
+        self.assertFalse(
+            SCREEN.has_single_stock_metadata(
+                "Natural Resource Equities",
+                "XLB",
+                "XLB",
+            )
+        )
 
     def test_trading_calendar_refreshes_when_cached_history_is_stale(self) -> None:
         class FakeClient:
@@ -193,6 +274,42 @@ class ContractSelectionTests(unittest.TestCase):
         self.assertAlmostEqual(selected["entry_cash"], 0.10)
         self.assertTrue(selected["chain_confirmed"])
 
+    def test_put_tail_inventory_selects_ten_cent_monthly_spread(self) -> None:
+        chain = pd.DataFrame(
+            [
+                self._row(
+                    75,
+                    0.95,
+                    0.01,
+                    0.02,
+                    0.40,
+                    dte=25,
+                    expiry="2026-09-18",
+                    put_bid=0.11,
+                    put_ask=0.12,
+                ),
+                self._row(
+                    70,
+                    0.97,
+                    0.01,
+                    0.02,
+                    0.42,
+                    dte=25,
+                    expiry="2026-09-18",
+                    put_bid=0.03,
+                    put_ask=0.04,
+                ),
+            ]
+        )
+
+        selected = SCREEN.select_put_tail_inventory_spread(chain, set())
+
+        self.assertEqual(selected["option_side"], "put")
+        self.assertEqual(selected["leg1_strike"], 75)
+        self.assertEqual(selected["leg2_strike"], 70)
+        self.assertAlmostEqual(selected["entry_cash"], 0.09)
+        self.assertTrue(selected["chain_confirmed"])
+
     @staticmethod
     def _row(
         strike: float,
@@ -203,11 +320,14 @@ class ContractSelectionTests(unittest.TestCase):
         *,
         dte: int = 10,
         spot: float = 100,
+        expiry: str | None = None,
+        put_bid: float = 0.01,
+        put_ask: float = 0.02,
     ) -> dict[str, float | int | str]:
         return {
             "ticker": "TEST",
             "tradeDate": "2026-08-12",
-            "expirDate": "2026-08-21" if dte == 10 else "2026-09-25",
+            "expirDate": expiry or ("2026-08-21" if dte == 10 else "2026-09-25"),
             "dte": dte,
             "strike": strike,
             "stockPrice": spot,
@@ -217,6 +337,11 @@ class ContractSelectionTests(unittest.TestCase):
             "callMidIv": iv,
             "callOpenInterest": 100,
             "callVolume": 20,
+            "putBidPrice": put_bid,
+            "putAskPrice": put_ask,
+            "putMidIv": iv,
+            "putOpenInterest": 100,
+            "putVolume": 20,
         }
 
 

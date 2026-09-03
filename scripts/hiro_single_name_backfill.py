@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Backfill ticker-level HIRO after each call-strategy identification date.
+"""Backfill ticker-level HIRO after each four-method identification date.
 
 The input is the complete surface-qualifier CSV. Each ticker is requested once,
 from the calendar day after its first signal through ``--end-date``. The returned
@@ -47,6 +47,69 @@ class TickerWindow:
     ticker: str
     start_date: date
     end_date: date
+
+
+def build_incremental_candidates(
+    current_candidates: pd.DataFrame,
+    prior_capture_summary: pd.DataFrame,
+    *,
+    prior_end_date: date,
+) -> pd.DataFrame:
+    """Union prior inventory with current qualifiers without recapturing old dates."""
+    current_missing = {"ticker", "tradeDate"} - set(current_candidates.columns)
+    prior_missing = {"ticker"} - set(prior_capture_summary.columns)
+    if current_missing:
+        raise ValueError(
+            f"current candidate CSV is missing columns: {sorted(current_missing)}"
+        )
+    if prior_missing:
+        raise ValueError(
+            f"prior capture summary is missing columns: {sorted(prior_missing)}"
+        )
+
+    current = current_candidates[["ticker", "tradeDate"]].copy()
+    current["ticker"] = current["ticker"].astype(str).str.strip().str.upper()
+    current["tradeDate"] = pd.to_datetime(
+        current["tradeDate"], errors="raise"
+    ).dt.date
+    earliest = current.groupby("ticker", sort=True)["tradeDate"].min().to_dict()
+    prior_tickers = {
+        value
+        for value in prior_capture_summary["ticker"]
+        .astype(str)
+        .str.strip()
+        .str.upper()
+        if value
+    }
+
+    rows: list[dict[str, str]] = []
+    for ticker in sorted(set(earliest) | prior_tickers):
+        if ticker in prior_tickers:
+            signal_date = prior_end_date
+            source = "prior inventory refresh"
+        else:
+            signal_date = earliest[ticker]
+            source = "new surface qualifier"
+        rows.append(
+            {
+                "ticker": ticker,
+                "tradeDate": signal_date.isoformat(),
+                "source": source,
+            }
+        )
+    return pd.DataFrame(rows, columns=["ticker", "tradeDate", "source"])
+
+
+def partition_followup_candidates(
+    candidates: pd.DataFrame,
+    *,
+    end_date: date,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split names with a completed next session from end-date signals."""
+    signal_dates = pd.to_datetime(candidates["tradeDate"], errors="raise").dt.date
+    eligible = candidates.loc[signal_dates < end_date].reset_index(drop=True)
+    pending = candidates.loc[signal_dates >= end_date].reset_index(drop=True)
+    return eligible, pending
 
 
 def build_ticker_windows(candidates: pd.DataFrame, *, end_date: date) -> list[TickerWindow]:
@@ -378,7 +441,7 @@ def _load_or_initialize_manifest(
         return existing
     return {
         "schema_version": 1,
-        "purpose": "Ticker-level HIRO follow-through after call-strategy identification.",
+        "purpose": "Ticker-level HIRO follow-through after four-method identification.",
         "created_at_utc": _utc_now(),
         "updated_at_utc": _utc_now(),
         "candidate_csv": str(candidate_csv),
@@ -411,7 +474,7 @@ def _write_manifest_and_summary(manifest: Mapping[str, Any], path: Path) -> None
         "captured_at_utc",
     )
     with temporary.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for ticker in sorted(manifest.get("tickers", {})):
             record = manifest["tickers"][ticker]
@@ -450,6 +513,14 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the command-line interface."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate-csv", required=True)
+    parser.add_argument(
+        "--prior-summary",
+        help="optional prior HIRO summary whose tickers should be refreshed",
+    )
+    parser.add_argument(
+        "--prior-end-date",
+        help="last session covered by --prior-summary; required with it",
+    )
     parser.add_argument("--out-dir", required=True)
     parser.add_argument("--end-date", default=date.today().isoformat())
     parser.add_argument(
@@ -470,8 +541,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     """CLI entrypoint."""
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     args = build_parser().parse_args(argv)
+    candidate_csv = Path(args.candidate_csv).expanduser().resolve()
+    if bool(args.prior_summary) != bool(args.prior_end_date):
+        raise ValueError("--prior-summary and --prior-end-date must be supplied together")
+    if args.prior_summary:
+        output_root = Path(args.out_dir).expanduser().resolve()
+        prepared_csv = output_root.parent / "hiro_inventory_windows.csv"
+        pending_csv = output_root.parent / "hiro_inventory_pending.csv"
+        prepared_csv.parent.mkdir(parents=True, exist_ok=True)
+        merged = build_incremental_candidates(
+            pd.read_csv(candidate_csv),
+            pd.read_csv(Path(args.prior_summary).expanduser().resolve()),
+            prior_end_date=date.fromisoformat(args.prior_end_date),
+        )
+        merged, pending = partition_followup_candidates(
+            merged,
+            end_date=date.fromisoformat(args.end_date),
+        )
+        merged.to_csv(prepared_csv, index=False)
+        pending.to_csv(pending_csv, index=False)
+        candidate_csv = prepared_csv
     manifest = run_backfill(
-        candidate_csv=Path(args.candidate_csv).expanduser().resolve(),
+        candidate_csv=candidate_csv,
         output_root=Path(args.out_dir).expanduser().resolve(),
         end_date=date.fromisoformat(args.end_date),
         port=args.port,

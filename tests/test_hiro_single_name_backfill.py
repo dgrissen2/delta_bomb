@@ -18,6 +18,30 @@ SPEC.loader.exec_module(BACKFILL)
 
 
 class TickerWindowTests(unittest.TestCase):
+    def test_incremental_candidates_union_prior_and_current_inventory(self) -> None:
+        current = pd.DataFrame(
+            [
+                {"tradeDate": "2026-08-24", "ticker": "AAA"},
+                {"tradeDate": "2026-09-01", "ticker": "BBB"},
+            ]
+        )
+        prior = pd.DataFrame([{"ticker": "AAA"}, {"ticker": "OLD"}])
+
+        merged = BACKFILL.build_incremental_candidates(
+            current,
+            prior,
+            prior_end_date=date(2026, 8, 28),
+        )
+
+        self.assertEqual(
+            list(merged.itertuples(index=False, name=None)),
+            [
+                ("AAA", "2026-08-28", "prior inventory refresh"),
+                ("BBB", "2026-09-01", "new surface qualifier"),
+                ("OLD", "2026-08-28", "prior inventory refresh"),
+            ],
+        )
+
     def test_ticker_windows_start_after_each_tickers_first_signal(self) -> None:
         candidates = pd.DataFrame(
             [
@@ -36,6 +60,22 @@ class TickerWindowTests(unittest.TestCase):
                 BACKFILL.TickerWindow("BBB", date(2026, 8, 22), date(2026, 8, 28)),
             ],
         )
+
+    def test_followup_partition_leaves_end_date_signals_pending(self) -> None:
+        candidates = pd.DataFrame(
+            [
+                {"ticker": "READY", "tradeDate": "2026-09-01"},
+                {"ticker": "PENDING", "tradeDate": "2026-09-02"},
+            ]
+        )
+
+        eligible, pending = BACKFILL.partition_followup_candidates(
+            candidates,
+            end_date=date(2026, 9, 2),
+        )
+
+        self.assertEqual(eligible["ticker"].tolist(), ["READY"])
+        self.assertEqual(pending["ticker"].tolist(), ["PENDING"])
 
     def test_ticker_windows_reject_signal_after_end_date(self) -> None:
         candidates = pd.DataFrame([{"tradeDate": "2026-08-29", "ticker": "AAA"}])

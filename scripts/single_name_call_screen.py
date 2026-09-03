@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Screen liquid single stocks for NVDA-like call-side delta-bomb setups.
+"""Screen liquid single stocks for four NVDA-derived option strategies.
 
-The screen has two independent branches, both frozen from the NVDA research:
+The screen has four independent methods frozen from the NVDA research:
 
-* buy-first: calls are cheap after a pullback, so buy a 30--60 DTE call or
-  far-OTM call spread before the rebound;
-* sell-first: the front 5-delta call wing is unusually rich and kinked, so
-  sell the far weekly call and rest a bid for the nearer call after the crush.
+* buy-first call puke;
+* buy-first call standard;
+* sell-first call grab;
+* buy-first put-tail inventory.
 
 ORATS acquisition is point-in-time and resumable.  Every HTTP attempt is
 recorded before it is made, and the run refuses to exceed the configured call
@@ -44,6 +44,10 @@ DEFAULT_OUTPUT = Path(__file__).resolve().parents[1] / "docs" / "replay"
 MAX_TICKERS_PER_CALL = 10
 MIN_HISTORY = 126
 LOOKBACK = 252
+BUY_FIRST_CALL_PUKE = "buy-first call puke"
+BUY_FIRST_CALL_STANDARD = "buy-first call standard"
+SELL_FIRST_CALL_GRAB = "sell-first call grab"
+BUY_FIRST_PUT_TAIL_INVENTORY = "buy-first put-tail inventory"
 
 SUMMARY_FIELDS = (
     "ticker",
@@ -106,6 +110,14 @@ STRIKE_FIELDS = (
     "callAskIv",
     "callVolume",
     "callOpenInterest",
+    "putValue",
+    "putBidPrice",
+    "putAskPrice",
+    "putBidIv",
+    "putMidIv",
+    "putAskIv",
+    "putVolume",
+    "putOpenInterest",
 )
 VOL_FIELDS = (
     "iv10d",
@@ -134,7 +146,88 @@ EQUITY_SECTORS = frozenset(
         "Materials",
     }
 )
-NON_STOCK_TICKERS = frozenset({"DJX", "NDX", "NQX", "OEX", "RUT", "SPX", "VIX", "XSP"})
+NON_STOCK_TICKERS = frozenset(
+    {
+        "ARKK",
+        "ASHR",
+        "BITO",
+        "BOIL",
+        "DIA",
+        "DJX",
+        "EEM",
+        "EFA",
+        "ETHA",
+        "EWZ",
+        "FAS",
+        "FAZ",
+        "FXI",
+        "GDX",
+        "GDXJ",
+        "GLD",
+        "HYG",
+        "IBIT",
+        "IGV",
+        "IWM",
+        "IYR",
+        "JNK",
+        "KRE",
+        "KWEB",
+        "LABU",
+        "LQD",
+        "MSOS",
+        "NDX",
+        "NQX",
+        "OEX",
+        "OIH",
+        "QQQ",
+        "RUT",
+        "SKHY",
+        "SLV",
+        "SMH",
+        "SOXL",
+        "SOXS",
+        "SOXX",
+        "SOYB",
+        "SPCX",
+        "SPX",
+        "SPXL",
+        "SPXS",
+        "SPXU",
+        "SPY",
+        "SQQQ",
+        "SVXY",
+        "TLT",
+        "TNA",
+        "TQQQ",
+        "TSLL",
+        "TZA",
+        "UNG",
+        "UPRO",
+        "URA",
+        "USO",
+        "UVXY",
+        "VIX",
+        "VXX",
+        "WEAT",
+        "XBI",
+        "XHB",
+        "XLB",
+        "XLC",
+        "XLE",
+        "XLF",
+        "XLI",
+        "XLK",
+        "XLP",
+        "XLRE",
+        "XLU",
+        "XLV",
+        "XLY",
+        "XME",
+        "XOP",
+        "XRT",
+        "XSP",
+    }
+)
 
 
 class CallBudgetExceeded(RuntimeError):
@@ -224,9 +317,75 @@ def sell_first_is_actionable(
     return archetype == "post-shock smile"
 
 
+def put_tail_inventory_is_actionable(
+    iv_rank_1y: float,
+    rr25_percentile: float,
+    put_skew_percentile: float,
+) -> bool:
+    """Identify the calm, put-cheap surface used to seek penny put spreads.
+
+    These are the pre-registered judgment thresholds from the Pandar inventory
+    memo. Exact-chain confirmation still requires a tradable far-OTM put spread
+    at no more than ten cents.
+    """
+    return (
+        iv_rank_1y <= 35
+        and rr25_percentile <= 50
+        and put_skew_percentile <= 25
+    )
+
+
+def expand_scenario_candidates(
+    all_signals: pd.DataFrame,
+    *,
+    call_start: str,
+    put_start: str,
+) -> pd.DataFrame:
+    """Return one row per qualifying method without masking overlaps."""
+    rules = (
+        (BUY_FIRST_CALL_PUKE, "buy_first_puke", "buy_score", call_start),
+        (BUY_FIRST_CALL_STANDARD, "buy_first_standard", "buy_score", call_start),
+        (SELL_FIRST_CALL_GRAB, "sell_first_actionable", "sell_score", call_start),
+        (
+            BUY_FIRST_PUT_TAIL_INVENTORY,
+            "buy_first_put_tail_inventory",
+            "put_inventory_score",
+            put_start,
+        ),
+    )
+    candidates: list[pd.DataFrame] = []
+    for scenario, gate_column, score_column, start_date in rules:
+        mask = (
+            all_signals["liquid_final"]
+            & all_signals[gate_column]
+            & all_signals["tradeDate"].ge(start_date)
+        )
+        method_rows = all_signals.loc[mask].copy()
+        if method_rows.empty:
+            continue
+        method_rows["scenario"] = scenario
+        method_rows["ranking_score"] = method_rows[score_column]
+        candidates.append(method_rows)
+    if not candidates:
+        return all_signals.iloc[0:0].assign(
+            scenario=pd.Series(dtype=str),
+            ranking_score=pd.Series(dtype=float),
+        )
+    selected = pd.concat(candidates, ignore_index=True)
+    return selected.sort_values(
+        ["tradeDate", "ticker", "scenario", "ranking_score"],
+        ascending=[True, True, True, False],
+    ).reset_index(drop=True)
+
+
 def is_single_stock_ticker(ticker: str) -> bool:
     """Reject ORATS index symbols and synthetic ``*_C`` aliases."""
     return bool(ticker) and "_" not in ticker and ticker not in NON_STOCK_TICKERS
+
+
+def has_single_stock_metadata(sector: str, best_etf: str, ticker: str) -> bool:
+    """Reject sector funds that ORATS maps into equity sector-name buckets."""
+    return str(sector) != "N/A" and str(best_etf) != str(ticker)
 
 
 def read_ticker_universe(path: Path) -> frozenset[str]:
@@ -377,11 +536,11 @@ class OratsClient:
                     params={**params, "token": self.token},
                     timeout=timeout,
                 )
-            except requests.RequestException as error:
+            except requests.RequestException:
                 if attempt == max_attempts:
                     raise RuntimeError(
                         f"ORATS connection failure for {endpoint} after {attempt} attempts"
-                    ) from error
+                    ) from None
                 time.sleep(2**attempt)
                 continue
             if response.status_code in {429, 500, 502, 503, 504} and attempt < max_attempts:
@@ -513,7 +672,9 @@ def command_fetch(args: argparse.Namespace) -> None:
     )
     client = OratsClient(token, ledger, args.rpm)
     all_dates = get_trading_dates(client, Path(args.cache_dir), args.end)
-    start_index = all_dates.index(args.start)
+    put_start = args.put_start or args.start
+    earliest_start = min(args.start, put_start)
+    start_index = all_dates.index(earliest_start)
     end_index = all_dates.index(args.end)
     history_start_index = max(0, start_index - LOOKBACK)
     summary_dates = all_dates[history_start_index : end_index + 1]
@@ -627,7 +788,7 @@ def command_fetch_chains(args: argparse.Namespace) -> None:
                         "ticker": ",".join(batch),
                         "tradeDate": trade_date,
                         "dte": "5,90",
-                        "delta": ".005,.60",
+                        "delta": ".005,.995",
                         "fields": ",".join(STRIKE_FIELDS),
                     },
                 )
@@ -638,6 +799,52 @@ def command_fetch_chains(args: argparse.Namespace) -> None:
                 trade_date,
                 index,
                 len(batches),
+                len(batch),
+                len(rows),
+                "fetched" if fetched else "cached",
+                ledger.used,
+                ledger.max_calls,
+            )
+
+        put_tickers = sorted(
+            set(
+                day.loc[
+                    day["scenario"].eq(BUY_FIRST_PUT_TAIL_INVENTORY),
+                    "ticker",
+                ].astype(str)
+            )
+        )
+        put_batches = list(chunks(put_tickers))
+        for index, batch in enumerate(put_batches, start=1):
+            batch_key = "-".join(batch)
+            path = (
+                cache_dir
+                / "hist_strikes_put_tail"
+                / trade_date
+                / f"{batch_key}.json.gz"
+            )
+            if path.exists():
+                rows = read_gzip_json(path)
+                fetched = False
+            else:
+                rows = client.get(
+                    "hist/strikes",
+                    {
+                        "ticker": ",".join(batch),
+                        "tradeDate": trade_date,
+                        "dte": "14,75",
+                        "delta": ".995,.99999",
+                        "fields": ",".join(STRIKE_FIELDS),
+                    },
+                )
+                write_gzip_json(path, rows)
+                fetched = True
+            LOG.info(
+                "deep-put strikes %s batch %d/%d tickers=%d rows=%d %s "
+                "calls=%d/%d",
+                trade_date,
+                index,
+                len(put_batches),
                 len(batch),
                 len(rows),
                 "fetched" if fetched else "cached",
@@ -690,7 +897,9 @@ def command_fetch_followups(args: argparse.Namespace) -> None:
     finalists_path = Path(args.output_dir) / "single_name_call_screen_finalists.csv"
     finalists = pd.read_csv(finalists_path)
     trading_dates = get_trading_dates(client, cache_dir, args.end)
-    target_dates = [date for date in trading_dates if args.start <= date <= args.end]
+    put_start = args.put_start or args.start
+    earliest_start = min(args.start, put_start)
+    target_dates = [date for date in trading_dates if earliest_start <= date <= args.end]
     for trade_date in target_dates:
         active_finalists = finalists[finalists["tradeDate"] < trade_date]
         tickers = sorted(
@@ -712,7 +921,7 @@ def command_fetch_followups(args: argparse.Namespace) -> None:
                         "ticker": ",".join(batch),
                         "tradeDate": trade_date,
                         "dte": "1,90",
-                        "delta": ".005,.60",
+                        "delta": ".005,.99999",
                         "fields": ",".join(STRIKE_FIELDS),
                     },
                 )
@@ -790,6 +999,7 @@ def empty_contract(reason: str) -> dict[str, Any]:
     return {
         "chain_confirmed": False,
         "failure_reason": reason,
+        "option_side": "",
         "expiry": "",
         "dte": math.nan,
         "leg1_action": "",
@@ -813,9 +1023,11 @@ def empty_contract(reason: str) -> dict[str, Any]:
     }
 
 
-def quote_width(row: pd.Series) -> float:
-    """Return ask minus bid for one call quote."""
-    return float(row["callAskPrice"] - row["callBidPrice"])
+def quote_width(row: pd.Series, option_side: str = "call") -> float:
+    """Return ask minus bid for one option quote."""
+    if option_side not in {"call", "put"}:
+        raise ValueError(f"unsupported option side: {option_side}")
+    return float(row[f"{option_side}AskPrice"] - row[f"{option_side}BidPrice"])
 
 
 def contract_record(
@@ -830,26 +1042,30 @@ def contract_record(
     event_inside_expiry: bool,
     confirmed: bool,
     reasons: list[str],
+    option_side: str = "call",
 ) -> dict[str, Any]:
     """Create the common two-leg output schema."""
+    if option_side not in {"call", "put"}:
+        raise ValueError(f"unsupported option side: {option_side}")
     return {
         "chain_confirmed": bool(confirmed),
         "failure_reason": "; ".join(reasons),
+        "option_side": option_side,
         "expiry": str(leg1["expirDate"]),
         "dte": int(leg1["dte"]),
         "leg1_action": leg1_action,
         "leg1_strike": float(leg1["strike"]),
         "leg1_delta": float(leg1["delta"]),
-        "leg1_bid": float(leg1["callBidPrice"]),
-        "leg1_ask": float(leg1["callAskPrice"]),
-        "leg1_oi": int(leg1["callOpenInterest"]),
-        "leg1_volume": int(leg1["callVolume"]),
+        "leg1_bid": float(leg1[f"{option_side}BidPrice"]),
+        "leg1_ask": float(leg1[f"{option_side}AskPrice"]),
+        "leg1_oi": int(leg1[f"{option_side}OpenInterest"]),
+        "leg1_volume": int(leg1[f"{option_side}Volume"]),
         "leg2_action": leg2_action,
         "leg2_strike": float(leg2["strike"]),
-        "leg2_bid": float(leg2["callBidPrice"]),
-        "leg2_ask": float(leg2["callAskPrice"]),
-        "leg2_oi": int(leg2["callOpenInterest"]),
-        "leg2_volume": int(leg2["callVolume"]),
+        "leg2_bid": float(leg2[f"{option_side}BidPrice"]),
+        "leg2_ask": float(leg2[f"{option_side}AskPrice"]),
+        "leg2_oi": int(leg2[f"{option_side}OpenInterest"]),
+        "leg2_volume": int(leg2[f"{option_side}Volume"]),
         "spread_width": abs(float(leg2["strike"] - leg1["strike"])),
         "entry_cash": float(entry_cash),
         "target_leg2_price": float(target_leg2_price),
@@ -1027,6 +1243,108 @@ def select_puke_buy_spread(
     return pairs[0]
 
 
+def is_standard_monthly_expiry(value: str) -> bool:
+    """Return whether an expiry is the standard third-Friday monthly."""
+    expiry = pd.Timestamp(value)
+    return expiry.weekday() == 4 and 15 <= expiry.day <= 21
+
+
+def select_put_tail_inventory_spread(
+    chain: pd.DataFrame,
+    event_expiries: set[str],
+) -> dict[str, Any]:
+    """Select a complete near-free far-OTM put debit spread.
+
+    Pandar's NVDA structure was inventory, not an event bet: buy both legs at
+    once in the current or next standard monthly, roughly $5 wide and at least
+    25% OTM, only when the executable debit is ten cents or less. Earnings are
+    retained as metadata rather than used as a rejection gate.
+    """
+    eligible = chain[chain["dte"].between(14, 75)].copy()
+    eligible = eligible[
+        eligible["expirDate"].astype(str).map(is_standard_monthly_expiry)
+    ].copy()
+    if eligible.empty:
+        return empty_contract("no standard monthly expiry in 14-75 DTE")
+    monthly_expiries = (
+        eligible[["expirDate", "dte"]]
+        .drop_duplicates()
+        .sort_values(["dte", "expirDate"])
+        .head(2)["expirDate"]
+        .astype(str)
+        .tolist()
+    )
+    eligible = eligible[eligible["expirDate"].astype(str).isin(monthly_expiries)]
+    eligible["put_otm_pct"] = (1 - eligible["strike"] / eligible["stockPrice"]) * 100
+    longs = eligible[eligible["put_otm_pct"].between(25, 45)]
+    pairs: list[dict[str, Any]] = []
+    for _, long_put in longs.iterrows():
+        expiry = str(long_put["expirDate"])
+        short_pool = eligible[
+            (eligible["expirDate"].astype(str) == expiry)
+            & (eligible["strike"] < long_put["strike"])
+        ].copy()
+        short_pool["width_distance"] = (
+            (float(long_put["strike"]) - short_pool["strike"]) - 5
+        ).abs()
+        short_pool = short_pool[
+            (float(long_put["strike"]) - short_pool["strike"]).between(2.5, 7.5)
+        ]
+        if short_pool.empty:
+            continue
+        short_put = short_pool.sort_values(
+            ["width_distance", "strike"], ascending=[True, False]
+        ).iloc[0]
+        debit = float(long_put["putAskPrice"] - short_put["putBidPrice"])
+        event_inside = expiry in event_expiries
+        reasons: list[str] = []
+        if not -1e-9 <= debit <= 0.10 + 1e-9:
+            reasons.append("spread debit outside 0.00-0.10")
+        if (
+            float(long_put["putBidPrice"]) <= 0
+            or float(long_put["putAskPrice"]) <= 0
+            or float(short_put["putBidPrice"]) <= 0
+            or float(short_put["putAskPrice"]) <= 0
+        ):
+            reasons.append("one leg lacks a two-sided put quote")
+        if quote_width(long_put, "put") + quote_width(short_put, "put") > 0.10 + 1e-9:
+            reasons.append("combined put quote widths exceed 0.10")
+        if (
+            int(long_put["putOpenInterest"]) < 25
+            or int(short_put["putOpenInterest"]) < 25
+        ):
+            reasons.append("one put leg has OI below 25")
+        record = contract_record(
+            long_put,
+            short_put,
+            leg1_action="BTO",
+            leg2_action="STO",
+            entry_cash=max(debit, 0.0),
+            target_leg2_price=math.nan,
+            contract_wing_iv_points=math.nan,
+            event_inside_expiry=event_inside,
+            confirmed=not reasons,
+            reasons=reasons,
+            option_side="put",
+        )
+        record["long_otm_pct"] = float(long_put["put_otm_pct"])
+        record["selection_distance"] = abs(float(long_put["put_otm_pct"]) - 32.5)
+        pairs.append(record)
+    if not pairs:
+        return empty_contract(
+            "no roughly $5-wide put spread 25-45% OTM in current/next monthly"
+        )
+    pairs.sort(
+        key=lambda row: (
+            not row["chain_confirmed"],
+            row["entry_cash"],
+            row["selection_distance"],
+            abs(row["dte"] - 45),
+        )
+    )
+    return pairs[0]
+
+
 def load_all_gzip_rows(directory: Path) -> pd.DataFrame:
     """Load every gzipped JSON-list cache below a directory."""
     frames = [pd.DataFrame(read_gzip_json(path)) for path in sorted(directory.rglob("*.json.gz"))]
@@ -1073,7 +1391,16 @@ def command_confirm(args: argparse.Namespace) -> None:
     cache_dir = Path(args.cache_dir)
     output_dir = Path(args.output_dir)
     candidates = pd.read_csv(output_dir / "single_name_call_screen_candidates.csv")
-    chains_frame = load_all_gzip_rows(cache_dir / "hist_strikes")
+    chains_frame = pd.concat(
+        [
+            load_all_gzip_rows(cache_dir / "hist_strikes"),
+            load_all_gzip_rows(cache_dir / "hist_strikes_put_tail"),
+        ],
+        ignore_index=True,
+    ).drop_duplicates(
+        ["ticker", "tradeDate", "expirDate", "strike"],
+        keep="last",
+    )
     earnings = load_all_gzip_rows(cache_dir / "hist_earnings")
     if chains_frame.empty:
         raise FileNotFoundError("no cached strike chains; run fetch-chains first")
@@ -1093,6 +1420,14 @@ def command_confirm(args: argparse.Namespace) -> None:
             "callAskIv",
             "callVolume",
             "callOpenInterest",
+            "putValue",
+            "putBidPrice",
+            "putAskPrice",
+            "putBidIv",
+            "putMidIv",
+            "putAskIv",
+            "putVolume",
+            "putOpenInterest",
         ),
     )
     chains_frame["tradeDate"] = pd.to_datetime(chains_frame["tradeDate"]).dt.strftime(
@@ -1108,12 +1443,14 @@ def command_confirm(args: argparse.Namespace) -> None:
             contract = empty_contract("no cached chain rows")
         else:
             event_expiries = candidate_event_expiries(chain, candidate, earnings)
-            if candidate["scenario"] == "sell-first":
+            if candidate["scenario"] == SELL_FIRST_CALL_GRAB:
                 contract = select_sell_contract(chain, event_expiries)
-            elif candidate["scenario"] == "buy-first standard":
+            elif candidate["scenario"] == BUY_FIRST_CALL_STANDARD:
                 contract = select_standard_buy_contract(chain, event_expiries)
-            elif candidate["scenario"] == "buy-first puke":
+            elif candidate["scenario"] == BUY_FIRST_CALL_PUKE:
                 contract = select_puke_buy_spread(chain, event_expiries)
+            elif candidate["scenario"] == BUY_FIRST_PUT_TAIL_INVENTORY:
+                contract = select_put_tail_inventory_spread(chain, event_expiries)
             else:
                 contract = empty_contract(f"unsupported scenario: {candidate['scenario']}")
         confirmed_rows.append({**candidate.to_dict(), **contract})
@@ -1182,6 +1519,10 @@ def command_evaluate(args: argparse.Namespace) -> None:
             "callAskPrice",
             "callVolume",
             "callOpenInterest",
+            "putBidPrice",
+            "putAskPrice",
+            "putVolume",
+            "putOpenInterest",
         ),
     )
     followups["tradeDate"] = pd.to_datetime(followups["tradeDate"]).dt.strftime(
@@ -1211,28 +1552,37 @@ def command_evaluate(args: argparse.Namespace) -> None:
                 continue
             leg1 = leg1_rows.iloc[0]
             leg2 = leg2_rows.iloc[0]
-            if finalist["scenario"] == "sell-first":
+            option_side = (
+                "put"
+                if finalist["scenario"] == BUY_FIRST_PUT_TAIL_INVENTORY
+                else "call"
+            )
+            leg1_bid = float(leg1[f"{option_side}BidPrice"])
+            leg1_ask = float(leg1[f"{option_side}AskPrice"])
+            leg2_bid = float(leg2[f"{option_side}BidPrice"])
+            leg2_ask = float(leg2[f"{option_side}AskPrice"])
+            if finalist["scenario"] == SELL_FIRST_CALL_GRAB:
                 spread_bid = max(
-                    float(leg2["callBidPrice"] - leg1["callAskPrice"]),
+                    leg2_bid - leg1_ask,
                     0.0,
                 )
             else:
                 spread_bid = max(
-                    float(leg1["callBidPrice"] - leg2["callAskPrice"]),
+                    leg1_bid - leg2_ask,
                     0.0,
                 )
             paired_close = False
-            if finalist["scenario"] == "sell-first":
-                paired_close = float(leg2["callAskPrice"]) <= float(
+            if finalist["scenario"] == SELL_FIRST_CALL_GRAB:
+                paired_close = leg2_ask <= float(
                     finalist["target_leg2_price"]
                 )
-                mark_value = float(finalist["entry_cash"] - leg1["callAskPrice"])
+                mark_value = float(finalist["entry_cash"] - leg1_ask)
                 multiple = math.nan
-            elif finalist["scenario"] == "buy-first standard":
-                paired_close = float(leg2["callBidPrice"]) >= float(
+            elif finalist["scenario"] == BUY_FIRST_CALL_STANDARD:
+                paired_close = leg2_bid >= float(
                     finalist["target_leg2_price"]
                 )
-                mark_value = float(leg1["callBidPrice"] - finalist["entry_cash"])
+                mark_value = float(leg1_bid - finalist["entry_cash"])
                 multiple = math.nan
             else:
                 mark_value = float(spread_bid - finalist["entry_cash"])
@@ -1247,10 +1597,11 @@ def command_evaluate(args: argparse.Namespace) -> None:
                 "signal_date": finalist["tradeDate"],
                 "tradeDate": trade_date,
                 "stockPrice": float(leg1["stockPrice"]),
-                "leg1_bid": float(leg1["callBidPrice"]),
-                "leg1_ask": float(leg1["callAskPrice"]),
-                "leg2_bid": float(leg2["callBidPrice"]),
-                "leg2_ask": float(leg2["callAskPrice"]),
+                "option_side": option_side,
+                "leg1_bid": leg1_bid,
+                "leg1_ask": leg1_ask,
+                "leg2_bid": leg2_bid,
+                "leg2_ask": leg2_ask,
                 "spread_bid": spread_bid,
                 "paired_close_proxy": paired_close,
                 "mark_value_per_share": mark_value,
@@ -1275,7 +1626,7 @@ def command_evaluate(args: argparse.Namespace) -> None:
             daily_frame["paired_close_proxy"], "tradeDate"
         ].tolist()
         breakout_tell = False
-        if finalist["scenario"] == "sell-first":
+        if finalist["scenario"] == SELL_FIRST_CALL_GRAB:
             surface_path = all_signals[
                 (all_signals["ticker"] == finalist["ticker"])
                 & (all_signals["tradeDate"] > finalist["tradeDate"])
@@ -1295,7 +1646,7 @@ def command_evaluate(args: argparse.Namespace) -> None:
                 status = "unpaired; breakout tell active"
             else:
                 status = "unpaired; unresolved"
-        elif finalist["scenario"] == "buy-first standard":
+        elif finalist["scenario"] == BUY_FIRST_CALL_STANDARD:
             status = "paired on close proxy" if pair_dates else "long unpaired"
         else:
             latest_multiple = float(latest["spread_multiple"])
@@ -1426,7 +1777,9 @@ def command_analyze(args: argparse.Namespace) -> None:
             if row.get("tradeDate") and str(row["tradeDate"])[:10] <= args.end
         }
     )
-    start_index = all_dates.index(args.start)
+    put_start = args.put_start or args.start
+    earliest_start = min(args.start, put_start)
+    start_index = all_dates.index(earliest_start)
     end_index = all_dates.index(args.end)
     summary_dates = all_dates[max(0, start_index - LOOKBACK) : end_index + 1]
     target_dates = all_dates[start_index : end_index + 1]
@@ -1448,6 +1801,9 @@ def command_analyze(args: argparse.Namespace) -> None:
     summaries["callskew"] = (
         summaries["exErnDlt25Iv30d"] - summaries["exErnIv30d"]
     )
+    summaries["putskew"] = (
+        summaries["exErnDlt75Iv30d"] - summaries["exErnIv30d"]
+    )
     summaries["call_wing_30"] = summaries["dlt5Iv30d"] - summaries["iv30d"]
     summaries["call_wing_10"] = summaries["dlt5Iv10d"] - summaries["iv10d"]
     summaries["put_wing_10"] = summaries["dlt95Iv10d"] - summaries["iv10d"]
@@ -1456,6 +1812,7 @@ def command_analyze(args: argparse.Namespace) -> None:
     metrics = (
         "rr25",
         "callskew",
+        "putskew",
         "call_wing_10",
         "put_wing_10",
         "call_kink",
@@ -1540,6 +1897,18 @@ def command_analyze(args: argparse.Namespace) -> None:
         joined["dollar_stock_volume"] = joined["priorCls"] * joined["stkVolu"]
         joined["broad_universe"] = (
             joined.index.to_series().map(is_single_stock_ticker)
+            & pd.Series(
+                (
+                    has_single_stock_metadata(sector, best_etf, ticker)
+                    for ticker, sector, best_etf in zip(
+                        joined.index,
+                        joined["sector"],
+                        joined["bestEtf"],
+                        strict=True,
+                    )
+                ),
+                index=joined.index,
+            )
             & joined["sectorName"].isin(EQUITY_SECTORS)
             & (joined["avgOptVolu20d"] >= 150)
             & (joined["oi"] >= 1_000)
@@ -1604,6 +1973,14 @@ def command_analyze(args: argparse.Namespace) -> None:
             ),
             axis=1,
         )
+        joined["buy_first_put_tail_inventory"] = joined.apply(
+            lambda row: put_tail_inventory_is_actionable(
+                row["ivRank1y"],
+                row["rr25_pct252"],
+                row["putskew_pct252"],
+            ),
+            axis=1,
+        )
         joined["buy_score"] = (
             joined["buy_surface_tier"].map(tier_score).fillna(0) * 20
             + joined["buy_first_puke"].astype(int) * 25
@@ -1621,47 +1998,39 @@ def command_analyze(args: argparse.Namespace) -> None:
             + joined["call_kink_pct252"].fillna(0) / 20
             - joined["earnings_near_front_expiry"].astype(int) * 30
         )
+        joined["put_inventory_score"] = (
+            joined["liquid_final"].astype(int) * 15
+            + (35 - joined["ivRank1y"].fillna(35)).clip(lower=0)
+            + (50 - joined["rr25_pct252"].fillna(50)).clip(lower=0) / 5
+            + (25 - joined["putskew_pct252"].fillna(25)).clip(lower=0) / 5
+        )
         joined["tradeDate"] = trade_date
         joined["universe_size"] = int(joined["broad_universe"].sum())
         joined["liquid_universe_size"] = int(joined["liquid_final"].sum())
         signal_rows.append(joined.reset_index())
         LOG.info(
-            "%s broad=%d liquid=%d buy_standard=%d buy_puke=%d sell_actionable=%d",
+            "%s broad=%d liquid=%d call_standard=%d call_puke=%d "
+            "call_grab=%d put_inventory=%d",
             trade_date,
             int(joined["broad_universe"].sum()),
             int(joined["liquid_final"].sum()),
             int((joined["broad_universe"] & joined["buy_first_standard"]).sum()),
             int((joined["broad_universe"] & joined["buy_first_puke"]).sum()),
             int((joined["broad_universe"] & joined["sell_first_actionable"]).sum()),
+            int(
+                (
+                    joined["broad_universe"]
+                    & joined["buy_first_put_tail_inventory"]
+                ).sum()
+            ),
         )
 
     all_signals = pd.concat(signal_rows, ignore_index=True)
     all_signals = all_signals[all_signals["broad_universe"]].copy()
-    selected = all_signals[
-        all_signals["liquid_final"]
-        & (
-            all_signals["buy_first_standard"]
-            | all_signals["buy_first_puke"]
-            | all_signals["sell_first_actionable"]
-        )
-    ].copy()
-    selected["scenario"] = np.select(
-        [
-            selected["sell_first_actionable"],
-            selected["buy_first_puke"],
-            selected["buy_first_standard"],
-        ],
-        ["sell-first", "buy-first puke", "buy-first standard"],
-        default="",
-    )
-    selected["ranking_score"] = np.where(
-        selected["scenario"].eq("sell-first"),
-        selected["sell_score"],
-        selected["buy_score"],
-    )
-    selected = selected.sort_values(
-        ["tradeDate", "scenario", "ranking_score"],
-        ascending=[True, True, False],
+    selected = expand_scenario_candidates(
+        all_signals,
+        call_start=args.start,
+        put_start=put_start,
     )
 
     output_dir = Path(args.output_dir)
@@ -1672,6 +2041,7 @@ def command_analyze(args: argparse.Namespace) -> None:
         "scenario",
         "buy_surface_tier",
         "sell_archetype",
+        "buy_first_put_tail_inventory",
         "ranking_score",
         "stockPrice",
         "return_5d_pct",
@@ -1685,6 +2055,8 @@ def command_analyze(args: argparse.Namespace) -> None:
         "rr25_pct252",
         "callskew",
         "callskew_pct252",
+        "putskew",
+        "putskew_pct252",
         "call_wing_30",
         "call_wing_10",
         "call_wing_10_pct252",
@@ -1712,7 +2084,8 @@ def command_analyze(args: argparse.Namespace) -> None:
     )
     summary = {
         "generated_at": datetime.now(UTC).isoformat(),
-        "start": args.start,
+        "call_start": args.start,
+        "put_start": put_start,
         "end": args.end,
         "dates": target_dates,
         "input_universe_csv": args.universe_csv,
@@ -1729,12 +2102,16 @@ def command_analyze(args: argparse.Namespace) -> None:
         "method": {
             "percentiles": "strict share of prior 252 sessions below current; min 126",
             "broad_universe": (
-                "equity sector; avgOptVolu20d>=150; OI>=1,000; price>=5; "
-                "market cap>=100m"
+                "single-stock metadata with fund/index denylist; equity sector; "
+                "avgOptVolu20d>=150; OI>=1,000; price>=5; market cap>=100m"
             ),
             "liquid_final": (
                 "avgOptVolu20d>=2,000; OI>=25,000; stock dollar volume>=20m; "
                 "ORATS confidence>=50"
+            ),
+            "put_tail_surface": (
+                "IV Rank<=35; RR25 prior-252 percentile<=50; "
+                "25-delta put-skew prior-252 percentile<=25"
             ),
         },
     }
@@ -1753,7 +2130,11 @@ def build_parser() -> argparse.ArgumentParser:
     """Build the command-line interface."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--cache-dir", default=str(DEFAULT_CACHE))
-    parser.add_argument("--start", default=DEFAULT_START)
+    parser.add_argument("--start", default=DEFAULT_START, help="call-method start date")
+    parser.add_argument(
+        "--put-start",
+        help="put-tail inventory start date; defaults to the call-method start",
+    )
     parser.add_argument("--end", default=DEFAULT_END)
     parser.add_argument("--output-dir", default=str(DEFAULT_OUTPUT))
     parser.add_argument(
