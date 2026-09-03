@@ -160,3 +160,69 @@ Read it this way: every $10 of credit costs, on average, $76 of failed-attempt l
 bombs pay — the whole edge is in the inventory, which is a single correlated position in
 a September decline. The failure-cost side is what the pre-registered candidates target;
 the inventory side resolves on the calendar (09-11 first).
+
+## 7. Two adjustments tested (2026-09-03): $0.30 minimum credit, $150 hard stop
+
+Offline counterfactual over all 29 trades using the chain caches; the frozen engine was not
+touched. Mechanics: resting limit at leg1 ∓ credit (0.10 grid, rounded against us), fill =
+minute closing-NBBO marketable from signal+2 through the 60-min clock; the stop closes the
+lone leg at the conservative NBBO side on the first minute its mark-to-market loss reaches
+the level. Flow exits (scratch / veto_exit) are kept at their recorded minutes. **Self-check:
+at 0.10 / no stop the replay reproduces all 29 actual outcomes and fill minutes exactly.**
+
+### 7.1 The 2×2
+
+| scenario | fills | stops | credits | losses | **net $** | worst |
+|---|---|---|---|---|---|---|
+| baseline (0.10, no stop) | 16 | — | +160 | −1,210 | **−1,050** | −300 |
+| 0.30 credit only | 15 | — | +450 | −1,180 | **−730** | −300 |
+| $150 stop only | 13 | 10 | +130 | −2,050 | **−1,920** | −240 |
+| both | 12 | 10 | +360 | −2,020 | **−1,660** | −240 |
+
+### 7.2 $0.30 minimum credit: +$320, zero A fills lost — ADOPTED as the leading candidate
+
+All 13 A fills still fill at 0.30 (A fill rate unchanged at 0.59); the only casualty is the
+slowest B fill (08-12 11:35, 51 min), which becomes a +$30 timeout. Credits $160 → $450.
+This confirms the in-sample "0.30 keeps every A fill" finding (conclusions §10) on the
+full 22-trade A sample and adds out-of-sample support (5/5 OOS A fills held; the 08-25 B
+fill held at 34 min). It is the one adjustment the data backs. Governance: it is R7.2
+candidate (3); the frozen $0.10 stays live until the candidate is promoted through its
+evidence bar — but the shadow ledger at 0.30 now runs alongside every session.
+
+### 7.3 $150 hard stop: −$870 — REJECTED
+
+The stop fires on 10 of 29 trades. It rescues the two big losers (−290 → −160, −300 →
+−160; +$270) and pays for it by (a) **killing three winners** — 08-20 10:51, 08-28 11:19,
+08-28 12:04 went ≥ $150 underwater and THEN filled (minutes 32/22/15) — and (b) inflating
+five small timeouts (−10/−20/−50/−70/−90) into full −$150…−$170 stops.
+
+Mechanism: A's fills come from volatility, and volatility means adverse excursion first.
+Winners' max adverse excursion before the fill: $0–$100 for ten of thirteen, but **$160,
+$180, $300** for the other three (23% of A winners). A $150 stop sits inside the working
+range of the trade. Stop-level sensitivity with the 0.30 credit held: none −730 · $150
+−1,660 · $200 −1,300 · $250 −1,470 · $300 −1,290 · $350 −730 (= the frozen 3.5-pt cap).
+**No stop level below the existing cap improves the book.** The loss we want to cut (the
+−$300 timeout) has the same early shape as the excursion a winner survives; a price stop
+cannot tell them apart. The lever that can is entry selection (the regime panel), not a
+tighter exit. Decision (user + engine, 2026-09-03): take the credit, not the stop.
+
+### 7.4 Per-trade, both adjustments (Δ vs actual)
+
+| date | br | actual | → new | Δ |
+|---|---|---|---|---|
+| 08-12 10:15 | B | fill +10 | fill +30 | +20 |
+| 08-12 11:35 | B | fill +10 (51m) | timeout +30 | +20 |
+| 08-13 ×2, 08-14, 08-18, 08-19 ×2, 08-20 11:28 | A | fill +10 | fill +30 | +20 each |
+| 08-17 13:43 | A | timeout −90 | stop −170 | −80 |
+| 08-19 11:45 | A | timeout −10 | stop −170 | −160 |
+| 08-20 10:51 | A | fill +10 | stop −240 | −250 |
+| 08-20 11:48 | A | timeout −290 | stop −160 | +130 |
+| 08-25 10:46 | B | fill +10 | fill +30 (34m) | +20 |
+| 08-25 11:03 | A | timeout −300 | stop −160 | +140 |
+| 08-26 | A | timeout −50 | stop −150 | −100 |
+| 08-27 | A | timeout −70 | stop −170 | −100 |
+| 08-28 11:19 | A | fill +10 | stop −150 | −160 |
+| 08-28 11:55, 09-01 ×2 | A | fill +10 | fill +30 | +20 each |
+| 08-28 12:04 | A | fill +10 | stop −150 | −160 |
+| 09-02 | A | timeout −20 | stop −150 | −130 |
+| scratches / veto exits (4) | B | unchanged | unchanged | 0 |

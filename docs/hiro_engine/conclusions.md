@@ -379,3 +379,17 @@ levels_invalid) + 14 LATE across 16 sessions.
 sample must be tested on the full sample BEFORE it is written up as a
 finding. §14's headline survived one review round because the review saw
 the same partial table I did. The full-sample test took 20 lines of code.
+
+## 16. Two adjustments tested on the full book: take the credit, not the stop (2026-09-03)
+
+Counterfactual over all 29 trades (`branch_accounting_2026-09-03.md` §7; replay
+self-checked against every actual outcome and fill minute). **$0.30 minimum
+credit: −$1,050 → −$730, zero A fills lost** (13/13 hold; one slow B fill →
++$30 timeout). **$150 hard stop: −$1,050 → −$1,920** — it kills three
+winners whose adverse excursion hit $160/$180/$300 before they filled, and
+inflates five small timeouts; no stop level below the frozen 3.5-pt cap
+improves the book. Both together: −$1,660. Decision agreed with the user:
+the credit is the leading R7.2 candidate (shadow ledger at 0.30 runs from
+now on); the stop is rejected — the −$300 timeout and a winner's excursion
+look identical for the first 20 minutes, so exit tightening cannot separate
+them; entry selection can.
