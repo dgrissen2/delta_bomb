@@ -221,7 +221,7 @@ its unpaired exposure is LONG downside in the regime where downside extends.
 - **A went 0-for-2 on fills** against its 0.55 in-sample floor. Both A
   entries fired on SHALLOW negative-flow readings — 08-25: r30 = −0.11B
   (essentially flat), close<mid30 by 0.65 pts, bounce 3.18; 08-26:
-  r15 = −0.44B, bounce 5.24 — and both bought the put at what proved to be
+  r15 = −0.44B (but r30 = −1.83B — a deep reading; see §15 correction), bounce 5.24 — and both bought the put at what proved to be
   the START of an upswing, not a pause in a downswing. 08-25's 10:30 low
   (7650.92) was the LOW OF THE DAY; the "bounce" the signal bought into was
   minute one of a V-reversal that ran +12.8 pts through the 60-min clock
