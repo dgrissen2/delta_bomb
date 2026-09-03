@@ -1,6 +1,6 @@
 # Implementation Tasks — hiro_watch
 
-*Build spec v1.0 (2026-09-03) for `requirements.md` v1.2 and `design.md` v1.1. Written for a junior
+*Build spec v1.1 (2026-09-03) for `requirements.md` v1.2a and `design.md` v1.2. Written for a junior
 engineer: every task says what to build, where, what "done" looks like, and what NOT to touch. Order
 is dependency order; every task ends green (`pytest scripts/hiro_watch/tests`) before the next starts.
 When this file and the requirements disagree, the requirements win; when this file and the design
@@ -53,7 +53,9 @@ docs/replay/hiro_watch/marks/         (mark cache)
       minutes, 10 sessions minimum, [0.5, 2.0]), W6.2 (0.50, 5%, 3 minutes), W6.5 (DRAWS/SEED
       imported from `hiro_engine.register`), W6.6 shock list, W6.4 reconciliation 0.50, plus
       `classifier_columns` / `scorer_inputs` per candidate, `registration_date`,
-      `engine_config_hash`, `frozen_manifest_hash`, `schema_version = 1`.
+      `engine_config_hash`, `frozen_manifest_hash`, `schema_version = 1`, and the sha of
+      `docs/hiro_watch/nyse_holidays.csv` (task 3 writes the file; task 2's test uses a fixture
+      copy).
     - `watch_hash(payload)`: canonical JSON (sorted keys, `separators=(",", ":")`), sha256; the
       payload never contains the hash. `code_hash()`: sha256 over sorted `*.py` under the package
       excluding `tests/` and `__pycache__`.
@@ -75,8 +77,11 @@ docs/replay/hiro_watch/marks/         (mark cache)
     - `calendar_gaps(reg, upto)`: weekdays from the registration date to `upto` that are not in
       `nyse_holidays.csv` and have no disposition row. Write the holidays file (NYSE 2026–2027) and
       register its sha.
-    - DONE: tests with a temp directory tree — all four refusal types; a holiday is not a gap; an
-      event_standdown day (has a disposition row) is not a gap; a missing weekday is.
+    - Manifest-declared shas are re-hashed from bytes and compared → `InputTampered(path)` on
+      mismatch (never trust a manifest).
+    - DONE: tests with a temp directory tree — all four refusal types plus `InputTampered`; a
+      holiday is not a gap; an event_standdown day (has a disposition row) is not a gap; a missing
+      weekday is.
 
 - [ ] **4. Shadow harness** (`shadow.py`) — design §3. THE load-bearing task; budget half the build.
     - `Policy`, `MemoryLog`, `ShadowSession`, `ShadowRuleEngine`, `ShadowExecutor`, `run_shadow`,
@@ -101,8 +106,12 @@ docs/replay/hiro_watch/marks/         (mark cache)
 
 - [ ] **5. Panel** (`panel.py`) — W2, design §4
     - `W22_COLUMNS`, `REFUSAL_MAP_V1` + precedence, `build_panel(run, reg, baseline=None)`,
-      `attach_outcomes(panel, trades, chains)`, `r30_scale`, `scale_monitor`, health mapping,
-      `eligibility` enum, `set` labeling from the registration date.
+      `attach_outcomes(panel, trades, chains)` (join on `(candidate_id, session_date, trade_id)`;
+      adds `trade_id`, `bomb_id`, `passed_theta_star`, `forgone`, `credit_variant`,
+      `refused_table`), the COMPLETE eligibility mapping from design §4 (write it as one dict),
+      `assert_features_match_log(panel, log_path)` (the per-session panel self-check),
+      `r30_scale`, `scale_monitor` (zero/missing denominator → INSUFFICIENT), health mapping (raw
+      `health` kept), `set` labeling from the registration date.
     - DONE: dedup (`gate_fail` + `skip` same minute → one row, `vt_broken` wins); unknown note →
       `other:` unscored; NaN r30 → `unclassifiable`; MAE ≤ 0 ≤ MFE; `flow_accel` formula; scale
       monitor INSUFFICIENT / OK / SCALE_DRIFT on a synthetic history; integration: panel features
@@ -115,17 +124,21 @@ docs/replay/hiro_watch/marks/         (mark cache)
 
 - [ ] **7. Refused-B tables** (`refused.py`) — W5, design §6
     - population, three portfolio runs, sole-blocker attribution by `entry` event, isolated runs
-      under the GLOBAL `MAX_ISOLATED` cap with the stated priority, `naked_short_min`.
+      under the GLOBAL `MAX_ISOLATED` cap with the stated priority, `naked_short_min`;
+      capacity-refused setups written with `table = capacity`, `layer = reported`, unscored.
     - DONE: attributed-but-`data_invalid` is reported not scored; `multi_blocked` when no entry
       event; cap enforced across tables; integration: 2026-08-24's five vt_broken refusals produce
       a table (values are whatever they are — the test checks shape, attribution, and that the
       baseline ledger is untouched).
 
 - [ ] **8. Book** (`book.py`) — W6, design §7
-    - `trades_from_events`, `bombs_from_trades`, `MarkCache` (full chain, one pull, persisted),
-      `quality`, `closing_quote` ([L−3, L]), `mark_inventory`, `settle` (expiry-session,
-      clamp 0..5 ×100, provenance + reconciliation), `book_state(candidate, date, prev)` with the
-      cumulative contract and split columns, `shock_grid`.
+    - `trades_from_events`, `bombs_from_trades`, `MarkCache` (full chain via
+      `hiro_engine.chains._sdk_pull_day`, ONE pull, atomic `.tmp`+`os.replace` write, sha
+      re-verified on read → `MarkTampered`, `mark_sha` on every inventory/book row), `quality`,
+      `closing_quote` ([L−3, L]), `mark_inventory` (nullable `Int64` marks), `settle`
+      (expiry-session, clamp 0..5 ×100, provenance + reconciliation, PINNED into the row — never
+      re-read), `book_state(candidate, date, prev)` where the open set is `prev.inventory` rows
+      with `session_date == prev.date` only, cumulative + split columns, `shock_grid`.
     - Junior note: the ThetaData client is reached ONLY through `hiro_engine.live.theta_client`;
       in tests it is a stub that counts calls — the second mark of the same (date, expiry) must
       make zero calls.
@@ -137,18 +150,23 @@ docs/replay/hiro_watch/marks/         (mark cache)
 
 - [ ] **9. Stats + verdicts + ledger** (`stats.py`, `verdicts.py`, `ledger.py`) — W6.5, W3.4–3.7,
   W4.3, W5.4, W9.3–9.4, W8.3
-    - `lb95` (bootstrap + Clopper–Pearson min; `None` below 2 sessions), `is_checkpoint`,
-      `representation`, `cohort_expectancy`; verdict state machines with every status; snapshot
-      layout, `stage`, `commit` (rename + `current` pointer), `open_current`, `chronology_guard`
-      (discovery + confirmation, backfill order), `verify_identity`, `rebuild`, `prune`, `Stamp`
-      (code_hash in manifest only).
+    - `lb95(…, draws, seed)` with the constants PASSED from `reg` (no defaults), Clopper–Pearson
+      min, `None` below 2 sessions; `is_checkpoint(n, reg)`, `representation(panel, reg)`,
+      `cohort_expectancy`; `a_depth_tables(reg, panel, cpanel)` (the Θ ladder diagnostic + θ*
+      portfolio table); verdict state machines with every status incl. the terminal-checkpoint
+      rule (any deferral at the last checkpoint → `REJECT-EXPIRED`); snapshot layout with
+      `prev_snapshot` chain, `stage`, `commit` (rename + `current` pointer), `open_current`,
+      orphan detection off the chain, `chronology_guard` (discovery + confirmation, backfill
+      order), `verify_identity`, `rebuild`, `single_writer_lock` (flock; second writer →
+      `LedgerLocked`), `Stamp` (code_hash in manifest only). NO prune.
     - DONE: LB95 1-session None, 10/10 ≈ 0.74, empty sessions excluded; checkpoint gating (session
       9 none, 10 verdict); each A-DEPTH status on fixture registrations; CREDIT variants (0.30
       REJECT while 0.20 PROMOTE; B < 5 fills no verdict; −$150 immediate; MAE < −$350); B-REFUSED
       never PROMOTE; crash injected after `os.rename` before the pointer write → `current`
       unchanged and orphan removed on next run; byte-identical re-run no-op; input sha mismatch
       refuses; chronology refusal names the missing session; `credit_ladder` key unique across two
-      sessions; `calendar_sha` in stamps.
+      sessions; `calendar_sha` in stamps; second writer refused; terminal-checkpoint deferral →
+      REJECT-EXPIRED; settlement unchanged after an EOD value appears later.
 
 - [ ] **10. Main loop + report + shadow-guarantee test** (`cli.py`, `report.py`) — design §Main loop
     - Wire `watch <date>`, `backfill`, `report`, `register --supersede`, `rebind`, `rebuild` (no prune); `report.py` prints
@@ -157,8 +175,8 @@ docs/replay/hiro_watch/marks/         (mark cache)
     - DONE: `test_engine_artifacts_untouched` — sha256 of every file under `scripts/hiro_engine/`,
       `docs/hiro_engine/registration.json`, `config.yaml`, and every `paper_log*.csv` before and
       after `watch backfill` + `watch <date>` on the real store are identical (integration);
-      `watch report` output contains every table header; runtime of one session printed and
-      < 120 s.
+      `watch report` output contains every table header; `test_runtime_budget`: one real session
+      end-to-end < 120 s (integration).
 
 - [ ] **11. Register for real + backfill + first confirmation session** (ops, not code)
     - `watch register` with the v1.2 constants (the user confirms the payload before the hash is
