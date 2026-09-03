@@ -351,3 +351,31 @@ of the out-of-sample period.** Every bomb is held at negative cost; the
 - Store-manifest running totals had silently missed the 08-19/20/21
   partitions; totals are now recomputed from per-session entries (the
   authoritative source) — 15 sessions, 1,083,583 raw / 590,239 normalized.
+
+## 15. Full-book accounting + the r30 hypothesis withdrawn (2026-09-03)
+
+OOS day 8 (09-02, no levels row → long-first-only): one A entry on r30 −0.61,
+timeout −$20 on an up day. Then a full accounting of both branches across all
+16 sessions (`branch_accounting_2026-09-03.md`). Two corrections to §13/§14:
+
+1. **08-26 was mislabeled.** Its signal r30 was −1.83 $B (I reported only
+   r15 −0.44). It is a deep-r30 loss, not a thin one.
+2. **The r30-depth hypothesis is FALSIFIED at −1.0 on the full 22-trade A
+   sample:** ≤ −1.0 → 7/12 fills (0.58), > −1.0 → 6/10 (0.60). The mid
+   bucket (−4, −1] is the WORST (2/7, −$420); only the extreme ≤ −4 tail is
+   5/5 — from three already-falling sessions. Non-monotonic = regime, not
+   flow depth. The Charlie-review strawman gate (r30 ≤ −1.0) would have
+   changed nothing. Withdrawn as stated; the surviving candidate is far
+   narrower ("A only when r30 ≤ −4", n=5, shadow-track only).
+
+**Whole book (16 sessions):** A 22 entries / 13 fills (0.59) / −$790;
+B 7 / 3 (0.43) / −$260; realized −$1,050 (credits +$160, 13 failed attempts
+−$1,210, avg −$93 each); 16 open bombs marked $1,265 at the 09-02 close →
+MTM +$215 — one correlated bet on a September decline. B's binding
+constraint is opportunity: 33 sell-first setups refused (31 vt_broken, 2
+levels_invalid) + 14 LATE across 16 sessions.
+
+**Process lesson (binding):** a discriminator proposed from a partial
+sample must be tested on the full sample BEFORE it is written up as a
+finding. §14's headline survived one review round because the review saw
+the same partial table I did. The full-sample test took 20 lines of code.
