@@ -6,9 +6,9 @@ These are three different strategies. They are not Good, Better, and Best versio
 
 They can use the same surface vocabulary, but they enter opposite regimes, take different first-leg risks, and need different events to make money.
 
-1. **Pandar-style puke convexity spread:** buy a tiny, complete bull-call spread after a selloff as right-tail rebound inventory.
-2. **White-paper 15-delta call leg-in:** buy a directional call in a constructive trend, then try to sell the next strike into a chase.
-3. **P1 call-wing grab sale-and-convert:** sell an overpriced front call tail, then try to buy the adjacent nearer call after the grab collapses.
+1. **Buy-first call puke:** buy a tiny, complete bull-call spread after a selloff as right-tail rebound inventory.
+2. **Buy-first call standard:** buy a directional call in a constructive trend, then try to sell the next strike into a chase.
+3. **Sell-first call grab:** sell an overpriced front call tail, then try to buy the adjacent nearer call after the grab collapses.
 
 The shortest accurate identities are:
 
@@ -20,13 +20,13 @@ The shortest accurate identities are:
 
 | What the tape is saying | First action | Durable method |
 |---|---|---|
-| The stock has puked and upside is priced as implausible | Buy the complete cheap spread | Pandar-style puke convexity spread |
-| The trend is intact, calls are cheap, and a chase may arrive | Buy the lower call | White-paper 15-delta call leg-in |
-| The stock is ripping and the front call wing is being grabbed | Sell the far call | P1 call-wing grab sale-and-convert |
+| The stock has puked and upside is priced as implausible | Buy the complete cheap spread | Buy-first call puke |
+| The trend is intact, calls are cheap, and a chase may arrive | Buy the lower call | Buy-first call standard |
+| The stock is ripping and the front call wing is being grabbed | Sell the far call | Sell-first call grab |
 
 ## Detailed three-way comparison
 
-| Dimension | Pandar-style puke convexity spread | White-paper 15-delta call leg-in | P1 call-wing grab sale-and-convert |
+| Dimension | Buy-first call puke | Buy-first call standard | Sell-first call grab |
 |---|---|---|---|
 | Core purpose | Accumulate cheap right-tail convexity after a selloff: the “what if we moon?” hedge. | Exploit a prospective repricing window and use a rip to finance a vertical. | Monetize temporary right-tail demand and, if the buy fills, retain a credit-carried bull spread. |
 | Provenance | Substantially Pandar-style. His examples bought complete far-OTM call spreads on puke days. | White paper’s call-side mirror plus our surface and technical screen. Not Pandar’s documented call method. | Pandar explicitly sold rich front call tails. P1’s systematic call buyback is a mechanized extension with only partial full-cycle fidelity. |
@@ -76,7 +76,7 @@ Standard buys a materially larger naked call first. Its Good/Better/Best tiers t
 
 Sell-first uses IV Rank 30–70 for a different reason. It wants the local call tail to be abnormally rich without selling a very cheap surface or confusing a broad event-vol shock with a one-sided grab.
 
-## Method 1: Pandar-style puke convexity spread
+## Method 1: Buy-first call puke
 
 The stock has already undergone forced selling. Puts remain bid, while the market treats a sharp upside rebound as implausible.
 
@@ -93,7 +93,7 @@ The accurate claim is “Pandar-style,” not “Pandar’s exact rule.”
 3. Treat the debit as hedge inventory, not as a precision directional entry.
 4. Scale out into a rebound, commonly near 2×/3×/5×.
 
-## Method 2: White-paper 15-delta call leg-in
+## Method 2: Buy-first call standard
 
 This trade needs more than cheap calls. It needs a reason for those calls to become expensive soon.
 
@@ -110,7 +110,7 @@ Until the upper call sells, this is simply a long call with theta, vega, and dir
 
 A gap or ripping morning works best because both adjacent calls can jump together. A slow grind may lift spot while falling IV prevents the upper call from reaching the sale.
 
-## Method 3: P1 call-wing grab sale-and-convert
+## Method 3: Sell-first call grab
 
 This is the opposite surface and tape from the puke trade. Calls are being grabbed while the stock is already near its recent high.
 
@@ -174,9 +174,9 @@ The expanded replay contains 87 assigned ticker/date rows across 49 unique ticke
 
 | Method | Surface rows | Unique tickers | Exact-chain rows | Exact-chain tickers |
 |---|---:|---:|---:|---:|
-| Pandar-style puke convexity spread | 41 | 24 | 15 | 10 |
-| White-paper 15-delta call leg-in | 25 | 13 | 0 | 0 |
-| P1 call-wing grab sale-and-convert | 21 | 13 | 4 | 1 |
+| Buy-first call puke | 41 | 24 | 15 | 10 |
+| Buy-first call standard | 25 | 13 | 0 | 0 |
+| Sell-first call grab | 21 | 13 | 4 | 1 |
 | **Total** | **87** | **49 across the complete set** | **19** | **11 finalists after scenario/ticker deduplication** |
 
 These rows are repeated daily observations. They are not independent episodes, completed trades, fills, profits, or expectancy estimates.
@@ -220,11 +220,12 @@ The proper sell-first validation unit is the squeeze episode, with intraday NBBO
 
 Use these names in reports and code:
 
-1. **Pandar-style puke convexity spread**
-2. **White-paper 15-delta call leg-in**
-3. **P1 call-wing grab sale-and-convert**
+1. **Buy-first call puke**
+2. **Buy-first call standard**
+3. **Sell-first call grab**
+4. **Buy-first put-tail inventory** — Pandar's separate penny put-spread inventory program; it is not one of the three call methods analyzed above.
 
-For the third method, the optional subtitle is **Pandar-derived spot-up/vol-up fade**.
+For **Sell-first call grab**, the optional subtitle is **Pandar-derived spot-up/vol-up fade**.
 
 Avoid calling all three “call bombs” without the qualifier. The shared payoff shape hides three different first legs and three different ways to lose.
 
