@@ -141,7 +141,8 @@ class RuleEngine:
         # W2.1 knob a_r30_lt: the A signal additionally needs r30 < a_r30_lt (v1-equivalent 0.0,
         # already implied by a_conditions). Applied HERE, not in a_conditions, so A episodes are
         # numbered exactly as v1 numbers them (the watch joins candidates on episode).
-        a_deep = row.r30 is not None and row.r30 < float(self.e6["a_r30_lt"])
+        a_deep = (self.tier.price_a_conditions                        # price tier: v1 has no r30 clause
+                  or (row.r30 is not None and row.r30 < float(self.e6["a_r30_lt"])))
         a_fires = (row.a_conditions and a_deep and row.episode_a is not None
                    and state.entered_episode_a != row.episode_a and in_window and a_ok_time
                    and row.episode_a_start is not None

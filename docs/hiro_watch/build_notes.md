@@ -50,3 +50,28 @@ guard also reads paper-log banners; `compare.load_log` checks `config_hash == sh
 sessions path derives from `logging.sessions_log`; `lb95` resamples every confirmation session (zero-
 trade sessions included); `scripts/hiro_engine_v2/config.yaml` == `baseline_v2.yaml` is a test; marks
 moved to `~/Dev/central_trade_data/thetadata/spxw_marks/` per the data-sources rule.
+
+## Review round 2 (`/code-review` verification pass on dfb8dc5, 2026-09-04) — 10 findings, all fixed; loop closed
+
+| # | finding | fix |
+|---|---|---|
+| 1 | `book()` ignored `asof` — an earlier `--asof` counted future cash and marked not-yet-opened bombs | `book()` filters `session_date <= asof` |
+| 2 | a_depth expectancy mixed A-only cash with whole-portfolio inventory | expectancy terms use A-only confirmation books (`cbA/bbA`); MTM terms keep the whole-portfolio books (W5.2a) |
+| 3 | candidate A trades are not necessarily the "passed" cohort (baseline first-signal r30 at 2 dp vs the per-minute gate) | scored cohort = candidate A trades whose setup is a passed baseline signal; strays reported as "outside the passed cohort, unscored" |
+| 4 | settlement demanded a complete session at expiry → a half-day expiry Friday would have stopped every evening's report | settlement uses the last stored close (`require_complete=False`); only `asof` must be complete |
+| 5 | terminal verdict re-marked at a moving `asof` after session 40 | books for verdicts pinned at `conf[-1]` once `n_conf >= 40`; printed as `[terminal — books pinned at …]` |
+| 6 | REJECT-EXPIRED only reachable through the count-bar branch | every non-PROMOTE/REJECT tail past 40 signals returns REJECT-EXPIRED (wrapping the reason) |
+| 7 | `--rebuild` deleted the log dir before discovering an SPX day the baseline lacks | stored SPX days in range must equal the baseline sessions BEFORE any rmtree; compare also refuses candidate-minus-baseline sessions |
+| 8 | `a_deep` applied in the price tier, where v1 has no r30 clause | `a_deep = tier.price_a_conditions or (r30 < a_r30_lt)` |
+| 9 | the engine logs one short-block reason per setup, so a co-active `flow_veto` was invisible | `flow_veto` mapped; `other_reasons` also read from the diag run's own skip rows |
+| 10 | a setup refused early but entered by the baseline later in the episode was scored as knob-attributed | anti-join baseline-entered setups out of the refused population |
+
+Overflow items taken: zero-row SPX parquet → REFUSED; type hints on the verdict/report functions.
+Accepted as-is: `BARS["a_depth"]["theta"]` duplicates the yaml knob (asserting equality would couple
+compare.py to one candidate's file; the value is frozen in requirements W5.3 alongside); name-keyed
+verdict dispatch refuses an unmapped promotable rather than skipping it (loud > silent); registry's
+path resolution mirrors `config._expand` for the two keys it needs.
+
+**Loop closed after two rounds** (review-loop discipline: no endless nitpick loops; every finding
+either fixed with a test or accepted here in writing). Further defects go through the normal
+"found in use → fix → note" path.

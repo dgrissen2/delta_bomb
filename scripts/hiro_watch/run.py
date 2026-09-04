@@ -74,6 +74,11 @@ def rebuild(name: str) -> None:
     if not cands:
         raise SystemExit(f"REFUSED: no candidate named {name!r}")
     days = baseline_sessions()
+    spx_dir = Path(baseline_data()["spx_dir"]).expanduser()
+    stored = sorted(p.stem for p in spx_dir.glob("????-??-??.parquet") if days[0] <= p.stem <= days[-1])
+    if stored != days:                     # the engine enumerates spx_dir over --from/--to; refuse BEFORE deleting anything
+        raise SystemExit(f"REFUSED: stored SPX days in {days[0]}..{days[-1]} differ from baseline sessions: "
+                         f"extra {sorted(set(stored) - set(days))}, missing {sorted(set(days) - set(stored))}")
     for c in cands:
         if c.log_dir.exists():
             if c.log_dir.parent != WATCH_ROOT or c.log_dir.name != c.name:     # registry guarantees this

@@ -3,14 +3,14 @@
 Single page that says exactly where the WATCH program is and what happens next. Update this file
 whenever the state changes; it is the first thing to read after a context reset.
 
-## Where we are — BUILT 2026-09-04, backfilled, `/code-review` round 1 applied (10/10 fixed)
+## Where we are — BUILT 2026-09-04, two `/code-review` rounds applied (20/20 fixed), confirmation session 1 logged
 
 | piece | where | size |
 |---|---|---|
 | clone | `scripts/hiro_engine_v2/` | v1 minus live/ops/spikes/parity/register/verify/sweep; +4 knobs (≈10 edited lines); 140 tests green incl. W0.2 byte-identity over the 16 stored sessions |
 | candidates | `docs/hiro_watch/configs/*.yaml` (+ `README.md` with hashes) | 6 files: `baseline_v2` (control), `credit030` (v1 engine), `a_depth_m4`, `diag_vt_off`, `diag_levels_off`, `diag_late_off` |
 | evening command | `scripts/hiro_watch/run.py` | 109 lines |
-| registry + accounting | `scripts/hiro_watch/registry.py`, `compare.py` | validated candidate list; accounting; 15 tests |
+| registry + accounting | `scripts/hiro_watch/registry.py`, `compare.py` | validated candidate list; accounting; 16 tests |
 | outputs | `docs/replay/hiro_watch/<name>/` (engine-written logs); marks in `~/Dev/central_trade_data/thetadata/spxw_marks/` | rebuildable |
 | spec | `requirements.md` v2.0, `design.md` v2.0, `tasks.md` v2.0 | 250 lines total |
 
@@ -55,7 +55,7 @@ sit beside.
 1. Owner decides the credit030 bar question above.
 2. Next capture: 2026-09-04 (this evening) — `python scripts/daily_session.py 2026-09-04` then
    `python scripts/hiro_watch/compare.py`.
-3. `/code-review` verification pass on the fix round is running / recorded in `build_notes.md`.
+3. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 
 ## Standing constraints that bind this program
 

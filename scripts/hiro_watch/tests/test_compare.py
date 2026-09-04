@@ -124,13 +124,16 @@ def test_book_marks_settles_and_flags_unmarked(tmp_path):
     pd.DataFrame(dict(min=[959, 960], close=[7397.0, 7398.0])).to_parquet(spx)
     pd.DataFrame(dict(min=[930], close=[7397.0])).to_parquet(tmp_path / "2026-09-05.parquet")
     with pytest.raises(SystemExit):
-        C.spx_close("2026-09-05", tmp_path)                    # incomplete session refused
-    b = C.book(t, asof="2026-09-08", marks=_Marks({7500.0: 40.0, 7495.0: 38.5}), spx_dir=tmp_path)
+        C.spx_close("2026-09-05", tmp_path)                    # incomplete asof session refused
+    assert C.spx_close("2026-09-05", tmp_path, require_complete=False) == 7397.0   # half-day expiry settles
+    b = C.book(t, asof=D2, marks=_Marks({7500.0: 40.0, 7495.0: 38.5}), spx_dir=tmp_path)
     assert b["cash"] == -100.0
+    early = C.book(t, asof=D1, marks=_Marks({7500.0: 40.0, 7495.0: 38.5}), spx_dir=tmp_path)
+    assert early["cash"] == 10.0 and early["n_bombs"] == 1                # D2's trade is after asof
     assert b["table"].state.tolist() == ["MARKED", "SETTLED"]
     assert b["table"].value_usd.tolist() == [150.0, 200.0]     # 1.5 mid × 100; (7400−7398) − 0 = 2 × 100
     assert b["mtm"] == -100.0 + 350.0 and b["unmarked"] == []
-    b2 = C.book(t, asof="2026-09-08", marks=_Marks({}), spx_dir=tmp_path)
+    b2 = C.book(t, asof=D2, marks=_Marks({}), spx_dir=tmp_path)
     assert len(b2["unmarked"]) == 1 and np.isnan(b2["table"].value_usd.iloc[0])
 
 
@@ -151,33 +154,68 @@ def test_lost_fill_join_survives_a_later_signal_minute():
     assert len(C.lost_fills(bt, ct, "A")) == 0
 
 
+def _many_days(n: int):
+    """n confirmation days, each with the two fixture A setups (episodes 1 and 2, both passed)."""
+    bt, sig = C.trades(_base_log()), C.signals(_base_log())
+    bt.loc[bt.session_date == D2, "episode"] = 2
+    sig.loc[sig.session_date == D2, "episode"] = 2
+    days = [f"2026-10-{i:02d}" for i in range(1, n + 1)]
+    big_sig = pd.concat([sig.assign(session_date=d, r30=-4.5) for d in days], ignore_index=True)
+    big_t = pd.concat([bt.assign(session_date=d) for d in days], ignore_index=True)
+    return days, big_sig, big_t
+
+
 def test_verdict_a_depth_needs_counts_then_defers_on_unmarked():
     bt = C.trades(_base_log())
     sig = C.signals(_base_log())
     ok = dict(unmarked=[], mtm=0.0, inventory=0.0)
-    text, immediate = C.verdict_a_depth(bt, sig, bt, ok, ok, [D1, D2])
+    text, immediate = C.verdict_a_depth(bt, sig, bt, ok, ok, ok, ok, [D1, D2])
     assert text.startswith("INCONCLUSIVE — A signals 2/20") and not immediate
-    days = [f"2026-10-{i:02d}" for i in range(1, 21)]
-    big_sig = pd.concat([sig.assign(session_date=d, r30=-4.5) for d in days])
-    big_t = pd.concat([bt.assign(session_date=d) for d in days])
+    days, big_sig, big_t = _many_days(15)                                          # 30 signals: counts met, not expired
     bad = dict(unmarked=["x"], mtm=0.0, inventory=0.0)
-    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, bad, ok, days)
+    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, bad, ok, ok, ok, days)
     assert text.startswith("DEFERRED") and not immediate
-    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, ok, ok, days)
+    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, ok, ok, ok, ok, days)
     assert text.startswith("REJECT — passed completion LB95") and not immediate   # half the trades timed out
+
+
+def test_verdict_a_depth_scores_only_the_passed_cohort_and_expires():
+    ok = dict(unmarked=[], mtm=0.0, inventory=0.0)
+    days, big_sig, big_t = _many_days(20)                                          # 40 signals = the expiry budget
+    ct = big_t.copy(); ct.loc[ct.index[0], "pnl_usd"] = -500.0                          # loss on a passed setup
+    text, immediate = C.verdict_a_depth(big_t, big_sig, ct, ok, ok, ok, ok, days)
+    assert text.startswith("REJECT — passed loss -500") and immediate
+    stray_sig = big_sig.copy(); stray_sig.loc[stray_sig.index[0], "r30"] = -3.0          # first setup NOT passed
+    text, immediate = C.verdict_a_depth(big_t, stray_sig, ct, ok, ok, ok, ok, days)
+    assert not immediate and "1 candidate A trade(s) outside the passed cohort" in text   # the -500 is unscored
+    assert text.startswith("REJECT — passed completion LB95")                           # a real REJECT is not an expiry
+    bad = dict(unmarked=["x"], mtm=0.0, inventory=0.0)
+    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, bad, ok, ok, ok, days)
+    assert text.startswith("REJECT-EXPIRED") and "DEFERRED" in text                     # 40 signals + no verdict → expired
 
 
 def test_diag_table_sole_blocker():
     ref = C.refusals(_base_log())
     entered = pd.DataFrame(dict(session_date=[D2], branch=["B"], signal_min=[720], episode=[2], bomb=[True],
                                 pnl_usd=[10.0], mae=[-20.0], outcome_type=["fill"], set=["CONFIRMATION"]))
-    d = C.diag_table(ref, entered, "vt_broken")
+    none_ref = ref.iloc[0:0]
+    base_t = C.trades(_base_log())
+    d = C.diag_table(ref, base_t, none_ref, entered, "vt_broken")
     assert d.scored.tolist() == [True] and d.other_reasons.tolist() == [""]
-    d2 = C.diag_table(ref, entered.iloc[0:0], "vt_broken")
+    d2 = C.diag_table(ref, base_t, none_ref, entered.iloc[0:0], "vt_broken")
     assert d2.scored.tolist() == [False]
     both = pd.concat([ref, ref.assign(reason="late")], ignore_index=True)
-    d3 = C.diag_table(both, entered, "vt_broken")
+    d3 = C.diag_table(both, base_t, none_ref, entered, "vt_broken")
     assert d3.other_reasons.tolist() == ["late"]
+    d4 = C.diag_table(ref, base_t, ref.assign(reason="flow_veto"), entered, "vt_broken")
+    assert d4.other_reasons.tolist() == ["flow_veto"]                 # second veto seen only in the diag log
+    base_entered_later = pd.concat([base_t, entered.assign(trade_id=9, side="sell_first", k1=7400.0, k2=7405.0,
+                                                           expiry="2026-10-09", leg1_fill=30.0, k_long=7405.0,
+                                                           k_short=7400.0, signal_min=730, entry_min=731,
+                                                           leg2_fill=None, outcome_minutes=None, leg_liq_loss_usd=20.0)],
+                                   ignore_index=True)
+    d5 = C.diag_table(ref, base_entered_later, none_ref, entered, "vt_broken")
+    assert len(d5) == 0                                                # baseline entered the episode later → not refused
 
 
 def test_registry_refuses_a_yaml_pointing_at_the_baseline_ledger(tmp_path, monkeypatch):

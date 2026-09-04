@@ -110,6 +110,7 @@ def signals(ev: pd.DataFrame) -> pd.DataFrame:
 
 REFUSAL = [("late_no_entry", None, "late"), ("skip", "short blocked: vt_broken", "vt_broken"),
            ("skip", "short blocked: levels_invalid", "levels_invalid"),
+           ("skip", "short blocked: flow_veto", "flow_veto"),
            ("skip", "entries/day", "capacity"), ("skip", "one unpaired leg", "capacity")]
 
 
@@ -177,23 +178,29 @@ class MarkCache:
 
 
 def spx_close(date: str, spx_dir: Path, require_complete: bool = True) -> float:
+    """Last regular-hours SPX 1-min close of `date`. require_complete refuses a session whose bars stop
+    before 16:00 (used for `asof`); settlement passes False because an expiry can be a half day."""
     p = spx_dir / f"{date}.parquet"
     if not p.exists():
         raise SystemExit(f"REFUSED: SPX bars for {date} missing: {p}")
     d = pd.read_parquet(p)
+    if not len(d):
+        raise SystemExit(f"REFUSED: SPX bars for {date} are empty: {p}")
     if require_complete and int(d["min"].max()) < CLOSE_MIN:
         raise SystemExit(f"REFUSED: SPX bars for {date} stop at minute {int(d['min'].max())} — session incomplete")
     return float(d[d["min"] <= CLOSE_MIN].sort_values("min").close.iloc[-1])
 
 
 def book(t: pd.DataFrame, asof: str, marks: MarkCache, spx_dir: Path) -> dict:
-    """cash + marks on open bombs + settled payoffs on expired bombs = MTM. bomb = long k_long / short k_short put."""
+    """cash + marks on open bombs + settled payoffs on expired bombs = MTM, for trades up to `asof`.
+    bomb = long k_long / short k_short put."""
+    t = t[t.session_date <= asof]
     rows, unmarked = [], []
     for _, b in t[t.bomb].iterrows():
         width = b.k_long - b.k_short
         base = dict(session_date=b.session_date, branch=b.branch, k_long=b.k_long, k_short=b.k_short, expiry=b.expiry)
         if b.expiry <= asof:
-            s = spx_close(b.expiry, spx_dir)
+            s = spx_close(b.expiry, spx_dir, require_complete=False)
             rows.append(dict(base, state="SETTLED", value_usd=(max(0.0, b.k_long - s) - max(0.0, b.k_short - s)) * USD,
                              spx_settle=s))
         else:
@@ -237,39 +244,51 @@ def checkpoint(n_conf: int) -> bool:
 
 
 # ---- verdicts (W5.3): every function takes CONFIRMATION-only frames and books; returns (text, immediate) ----
-def verdict_a_depth(bt, bsig, ct, cb, bb, conf: list[str]) -> tuple[str, bool]:
-    """bt/bsig: baseline confirmation trades/signals (all branches); ct: candidate confirmation trades;
-    cb/bb: confirmation-only books (whole portfolio — the gate's capacity spill into B is part of the candidate)."""
+def verdict_a_depth(bt: pd.DataFrame, bsig: pd.DataFrame, ct: pd.DataFrame, cb: dict, bb: dict,
+                    cbA: dict, bbA: dict, conf: list[str]) -> tuple[str, bool]:
+    """bt/bsig: baseline confirmation trades/signals; ct: candidate confirmation trades.
+    cb/bb: confirmation whole-portfolio books (MTM terms — the gate's capacity spill into B is part of
+    the candidate); cbA/bbA: confirmation A-only books (expectancy terms).
+    Scored cohort = candidate A trades whose setup is a PASSED baseline signal (r30 < θ at the
+    baseline's first signal minute); candidate A trades outside it are reported, never scored."""
     B = BARS["a_depth"]
     sig = bsig[bsig.branch == "A"]
     passed = sig[sig.r30 < B["theta"]]
     ctA, btA = ct[ct.branch == "A"], bt[bt.branch == "A"]
-    if len(ctA) and ctA.pnl_usd.min() < B["max_loss"]:
-        return f"REJECT — passed loss {ctA.pnl_usd.min():+.0f} < {B['max_loss']:+.0f}", True
+    ctP = passed[SETUP].merge(ctA, on=SETUP, how="inner")
+    stray = len(ctA) - len(ctP)
+    note = f" [{stray} candidate A trade(s) outside the passed cohort, unscored]" if stray else ""
+    if len(ctP) and ctP.pnl_usd.min() < B["max_loss"]:
+        return f"REJECT — passed loss {ctP.pnl_usd.min():+.0f} < {B['max_loss']:+.0f}{note}", True
+    expired = len(sig) >= B["expire_signals"]
     counts_ok = (len(sig) >= B["signals"] and sig.session_date.nunique() >= B["signal_days"]
                  and len(passed) >= B["passed"] and passed.session_date.nunique() >= B["passed_days"]
                  and (passed.session_date.value_counts().max() / max(len(passed), 1)) <= B["day_share"])
+
+    def tail(text: str) -> tuple[str, bool]:        # every non-PROMOTE/REJECT outcome past the budget expires
+        if expired:
+            return f"REJECT-EXPIRED — {len(sig)} confirmation A signals without PROMOTE or REJECT ({text})", False
+        return text, False
+
     if not counts_ok:
-        if len(sig) >= B["expire_signals"]:
-            return f"REJECT-EXPIRED — {len(sig)} confirmation A signals without meeting the count bars", False
-        return (f"INCONCLUSIVE — A signals {len(sig)}/{B['signals']} over {sig.session_date.nunique()}/{B['signal_days']} days; "
-                f"passed {len(passed)}/{B['passed']} over {passed.session_date.nunique()}/{B['passed_days']} days"), False
-    if cb["unmarked"] or bb["unmarked"]:
-        return f"DEFERRED — unmarked bombs: {cb['unmarked'] + bb['unmarked']}", False
-    lb = lb95(per_session(ctA, conf))
-    exp_c = (ctA.pnl_usd.sum() + cb["inventory"]) / max(len(passed), 1)
-    exp_b = (btA.pnl_usd.sum() + bb["inventory"]) / max(len(sig), 1)
-    credits = float(ctA[ctA.bomb].pnl_usd.sum())
+        return tail(f"INCONCLUSIVE — A signals {len(sig)}/{B['signals']} over {sig.session_date.nunique()}/{B['signal_days']} days; "
+                    f"passed {len(passed)}/{B['passed']} over {passed.session_date.nunique()}/{B['passed_days']} days{note}")
+    if cb["unmarked"] or bb["unmarked"] or cbA["unmarked"] or bbA["unmarked"]:
+        return tail(f"DEFERRED — unmarked bombs: {sorted(set(cb['unmarked'] + bb['unmarked']))}")
+    lb = lb95(per_session(ctP, conf))
+    exp_c = (ctP.pnl_usd.sum() + cbA["inventory"]) / max(len(passed), 1)
+    exp_b = (btA.pnl_usd.sum() + bbA["inventory"]) / max(len(sig), 1)
+    credits = float(ctP[ctP.bomb].pnl_usd.sum())
     if lb <= B["lb95"]:
-        return f"REJECT — passed completion LB95 {lb:.2f} <= {B['lb95']}", False
+        return f"REJECT — passed completion LB95 {lb:.2f} <= {B['lb95']}{note}", False
     if exp_c <= exp_b:
-        return f"REJECT — passed expectancy {exp_c:+.0f}/signal <= baseline {exp_b:+.0f}/signal", False
+        return f"REJECT — passed expectancy {exp_c:+.0f}/signal <= baseline {exp_b:+.0f}/signal{note}", False
     if cb["mtm"] < bb["mtm"] - credits:
-        return f"REJECT — candidate MTM {cb['mtm']:+.0f} < baseline {bb['mtm']:+.0f} − credits {credits:.0f}", False
+        return f"REJECT — candidate MTM {cb['mtm']:+.0f} < baseline {bb['mtm']:+.0f} − credits {credits:.0f}{note}", False
     if cb["mtm"] < bb["mtm"]:
-        return f"INCONCLUSIVE — candidate MTM {cb['mtm']:+.0f} < baseline {bb['mtm']:+.0f}", False
+        return tail(f"INCONCLUSIVE — candidate MTM {cb['mtm']:+.0f} < baseline {bb['mtm']:+.0f}{note}")
     return (f"PROMOTE — LB95 {lb:.2f}, expectancy {exp_c:+.0f} vs {exp_b:+.0f}/signal, "
-            f"MTM {cb['mtm']:+.0f} vs {bb['mtm']:+.0f}"), False
+            f"MTM {cb['mtm']:+.0f} vs {bb['mtm']:+.0f}{note}"), False
 
 
 def lost_fills(bt: pd.DataFrame, ct: pd.DataFrame, branch: str) -> pd.DataFrame:
@@ -278,7 +297,7 @@ def lost_fills(bt: pd.DataFrame, ct: pd.DataFrame, branch: str) -> pd.DataFrame:
     return b[~b.bomb_c.fillna(False).astype(bool)]
 
 
-def verdict_credit(bt, ct, branch, cb, bb) -> tuple[str, bool]:
+def verdict_credit(bt: pd.DataFrame, ct: pd.DataFrame, branch: str, cb: dict, bb: dict) -> tuple[str, bool]:
     """bt/ct: confirmation trades; cb/bb: confirmation-only, branch-only books (W1: read per branch)."""
     B = BARS["credit"]
     btB, ctB = bt[bt.branch == branch], ct[ct.branch == branch]
@@ -308,12 +327,18 @@ def verdict_credit(bt, ct, branch, cb, bb) -> tuple[str, bool]:
             f"MTM {cb['mtm']:+.0f} vs {bb['mtm']:+.0f}"), False
 
 
-def diag_table(base_ref: pd.DataFrame, cand_t: pd.DataFrame, reason: str) -> pd.DataFrame:
-    """Sole-blocker attribution (W4.3): a refused baseline setup is scored only if the diag run entered it.
-    `other_reasons` lists the other refusals the same setup carried (still blocked by them = not sole)."""
+def diag_table(base_ref: pd.DataFrame, base_t: pd.DataFrame, cand_ref: pd.DataFrame, cand_t: pd.DataFrame,
+               reason: str) -> pd.DataFrame:
+    """Sole-blocker attribution (W4.3): a baseline setup refused for `reason` — and never entered by the
+    baseline later in the episode — is scored only if the diag run entered it. `other_reasons` = the
+    other refusals the setup carried in the baseline log OR in the diag run's own log (the engine logs
+    one short-block reason per setup, so a second veto shows up only in the diag run)."""
     r = base_ref[base_ref.reason == reason][SETUP].drop_duplicates()
-    others = (base_ref[base_ref.reason != reason].groupby(SETUP).reason
-              .apply(lambda x: ",".join(sorted(set(x)))).rename("other_reasons").reset_index())
+    r = r.merge(base_t[SETUP], on=SETUP, how="left", indicator=True)
+    r = r[r._merge == "left_only"].drop(columns="_merge")            # baseline entered it later → not refused
+    pool = pd.concat([base_ref[base_ref.reason != reason], cand_ref[cand_ref.reason != reason]])
+    others = (pool.groupby(SETUP).reason.apply(lambda x: ",".join(sorted(set(x))))
+              .rename("other_reasons").reset_index())
     j = r.merge(others, on=SETUP, how="left").merge(
         cand_t[SETUP + ["bomb", "pnl_usd", "mae", "outcome_type", "set"]], on=SETUP, how="left")
     j["other_reasons"] = j.other_reasons.fillna("")
@@ -341,21 +366,25 @@ def _split(t: pd.DataFrame) -> str:
     return "\n".join(lines)
 
 
-def _books(t, bt, asof, marks, spx_dir, branch=None):
+def _books(t: pd.DataFrame, bt: pd.DataFrame, asof: str, marks: MarkCache, spx_dir: Path, branch: str | None = None) -> tuple[dict, dict]:
     sel = lambda df: df[(df.set == "CONFIRMATION") & ((df.branch == branch) if branch else True)]   # noqa: E731
     return book(sel(t), asof, marks, spx_dir), book(sel(bt), asof, marks, spx_dir)
 
 
-def report_candidate(c: Candidate, base_ev, base_sess, asof, marks, spx_dir) -> None:
+def report_candidate(c: Candidate, base_ev: pd.DataFrame, base_sess: pd.DataFrame, asof: str, marks: MarkCache, spx_dir: Path) -> None:
     ev = load_log([c.paper_log], expect_hash=c.config_hash)
     sess = load_sessions(c.sessions)
     missing = sorted(set(base_sess.date) - set(sess.date))
     if missing:
         raise SystemExit(f"REFUSED: {c.name} lacks sessions {missing} (W0.3 — run.py them)")
+    extra = sorted(set(sess.date) - set(base_sess.date))
+    if extra:
+        raise SystemExit(f"REFUSED: {c.name} has sessions the baseline lacks {extra} (W0.3 — rebuild it)")
     conf = confirmation_dates(base_sess, c.registered)
     n_conf = len(conf)
-    t, bt, bsig, bref = trades(ev), trades(base_ev), signals(base_ev), refusals(base_ev)
-    for df in (t, bt, bsig, bref):
+    asof_v = conf[-1] if n_conf >= TERMINAL else asof          # W5.2: the 40-session verdict stands
+    t, bt, bsig, bref, cref = trades(ev), trades(base_ev), signals(base_ev), refusals(base_ev), refusals(ev)
+    for df in (t, bt, bsig, bref, cref):
         df["set"] = label(df.session_date, c.registered, conf)
     cb_all, bb_all = book(t, asof, marks, spx_dir), book(bt, asof, marks, spx_dir)
     nxt = next((k for k in CHECKPOINTS if k > n_conf), TERMINAL)
@@ -378,8 +407,9 @@ def report_candidate(c: Candidate, base_ev, base_sess, asof, marks, spx_dir) -> 
                 x = a[(a.set == s) & (a.r30 < th) & a.bomb.notna()]
                 cells.append(f"{s[:4]} {x.bomb.mean() if len(x) else float('nan'):.2f}|{len(x):>2}")
             print(f"    θ {th:+.0f}  " + "   ".join(cells))
-        cb, bb = _books(t, bt, asof, marks, spx_dir)
-        verdicts = [verdict_a_depth(conf_bt, bsig[bsig.set == "CONFIRMATION"], conf_t, cb, bb, conf)]
+        cb, bb = _books(t, bt, asof_v, marks, spx_dir)
+        cbA, bbA = _books(t, bt, asof_v, marks, spx_dir, branch="A")
+        verdicts = [verdict_a_depth(conf_bt, bsig[bsig.set == "CONFIRMATION"], conf_t, cb, bb, cbA, bbA, conf)]
     elif c.name == "credit030":
         verdicts = []
         for br in ("A", "B"):
@@ -387,20 +417,21 @@ def report_candidate(c: Candidate, base_ev, base_sess, asof, marks, spx_dir) -> 
                 lost = lost_fills(bt[bt.set == s], t, br)
                 print(f"  {br} {s:<12} baseline fills {int(bt[(bt.set == s) & (bt.branch == br)].bomb.sum()):>2}, "
                       f"lost at 0.30: {len(lost)}" + (f" {lost[SETUP].values.tolist()}" if len(lost) else ""))
-            cb, bb = _books(t, bt, asof, marks, spx_dir, branch=br)
+            cb, bb = _books(t, bt, asof_v, marks, spx_dir, branch=br)
             verdicts.append(verdict_credit(conf_bt, conf_t, br, cb, bb))
     elif c.kind == "diagnostic":
         if c.name not in DIAG_REASON:
             raise SystemExit(f"REFUSED: diagnostic {c.name} has no refusal reason mapped in compare.py")
-        d = diag_table(bref, t, DIAG_REASON[c.name])
+        d = diag_table(bref, bt, cref, t, DIAG_REASON[c.name])
+        d["set"] = label(d.session_date, c.registered, conf) if len(d) else d.set
         for s in ("DISCOVERY", "CONFIRMATION"):
-            x = d[d.set.fillna(label(d.session_date, c.registered, conf)) == s] if len(d) else d
+            x = d[d.set == s]
             sc = x[x.scored]
             print(f"  {s:<12} refused({DIAG_REASON[c.name]}): {len(x)} episodes ({int((x.other_reasons != '').sum())} also "
                   f"blocked otherwise), entered when rule off: {len(sc)}, bombs {int(sc.bomb.sum())}, "
                   f"cash {sc.pnl_usd.sum():+.0f}, worst {sc.pnl_usd.min() if len(sc) else 0:+.0f}, "
                   f"share MAE<-150: {(sc.mae < -150).mean() if len(sc) else 0:.2f}")
-        n_ep = int((label(d.session_date, c.registered, conf) == "CONFIRMATION").sum()) if len(d) else 0
+        n_ep = int((d.set == "CONFIRMATION").sum()) if len(d) else 0
         verdicts = [(f"INCONCLUSIVE — {n_ep}/{BARS['diag']['episodes']} confirmation refused episodes [never promoted]"
                      if n_ep < BARS["diag"]["episodes"] else "REPORTED (diagnostic, never promoted)", False)]
     elif c.kind == "control":
@@ -409,7 +440,8 @@ def report_candidate(c: Candidate, base_ev, base_sess, asof, marks, spx_dir) -> 
         raise SystemExit(f"REFUSED: promotable candidate {c.name} has no verdict function in compare.py")
     for text, immediate in verdicts:
         if checkpoint(n_conf) or immediate or c.kind != "promotable":
-            print(f"  VERDICT: {text}" + ("  [immediate path]" if immediate and not checkpoint(n_conf) else ""))
+            print(f"  VERDICT: {text}" + ("  [immediate path]" if immediate and not checkpoint(n_conf) else "")
+                  + (f"  [terminal — books pinned at {asof_v}]" if n_conf >= TERMINAL else ""))
         else:
             print(f"  status: INCONCLUSIVE ({n_conf}/{nxt}) — verdicts print at checkpoints only")
 
