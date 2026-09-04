@@ -15,7 +15,7 @@ from hiro_engine_v2.config import REPO_ROOT, Config
 from hiro_engine_v2.models import EngineState, TIER_FULL, Vetoes
 from hiro_engine_v2.rules import Core, RuleEngine, a_conditions
 
-from helpers import b_fire_row
+from helpers import a_fire_row, b_fire_row
 
 
 def _cfg_with(config: Config, section: str, key: str, value) -> Config:
@@ -35,19 +35,25 @@ def _types(evs):
     return [e.event_type for e in evs]
 
 
-# ---- a_r30_max -----------------------------------------------------------------
-def test_a_r30_max_at_v1_value_matches_strict_negative(config):
-    assert config.num("r6_entries", "a_r30_max") == 0.0
+# ---- a_r30_lt ------------------------------------------------------------------
+def test_a_conditions_unchanged_from_v1(config):
+    assert config.num("r6_entries", "a_r30_lt") == 0.0
     assert a_conditions(_core(-0.01), config, TIER_FULL)
-    assert not a_conditions(_core(0.01), config, TIER_FULL)
-    assert not a_conditions(_core(None), config, TIER_FULL)      # NaN r30 never passes
+    assert not a_conditions(_core(0.0), config, TIER_FULL)        # v1: strict r30 < 0
+    assert not a_conditions(_core(None), config, TIER_FULL)
 
 
-def test_a_r30_max_minus4_gates_shallow_flow(config):
-    cfg = _cfg_with(config, "r6_entries", "a_r30_max", -4.0)
-    assert not a_conditions(_core(-3.9), cfg, TIER_FULL)
-    assert a_conditions(_core(-4.0), cfg, TIER_FULL)             # boundary inclusive
-    assert a_conditions(_core(-5.2), cfg, TIER_FULL)
+def test_a_r30_lt_minus4_gates_the_signal_not_the_episode(config):
+    cfg = _cfg_with(config, "r6_entries", "a_r30_lt", -4.0)
+    eng = RuleEngine(cfg, TIER_FULL)
+    shallow = eng.evaluate(a_fire_row(700, r30=-3.9), EngineState())
+    assert "signal" not in _types(shallow)
+    deep = RuleEngine(cfg, TIER_FULL).evaluate(a_fire_row(700, r30=-4.1), EngineState())
+    assert "signal" in _types(deep) and next(e for e in deep if e.event_type == "signal").branch == "A"
+    boundary = RuleEngine(cfg, TIER_FULL).evaluate(a_fire_row(700, r30=-4.0), EngineState())
+    assert "signal" not in _types(boundary)                      # strict: -4.0 is not < -4.0
+    nan = RuleEngine(cfg, TIER_FULL).evaluate(a_fire_row(700, r30=None), EngineState())
+    assert "signal" not in _types(nan)
 
 
 # ---- late_enabled --------------------------------------------------------------
@@ -81,7 +87,7 @@ def test_veto_knob_off_clears_that_veto_only(config, knob, veto):
 
 # ---- W0.2 byte-identity control ------------------------------------------------
 @pytest.mark.integration
-def test_baseline_byte_identity_with_v1_logs(config, tmp_path):
+def test_baseline_byte_identity_with_v1_logs(config, tmp_path, monkeypatch):
     """v2 at v1 knob values over every stored session == v1's own logs, except config_hash."""
     from hiro_engine_v2.backtest import available_spx_days, run_backtest
     from hiro_engine_v2.eventlog import EventLog
@@ -98,6 +104,8 @@ def test_baseline_byte_identity_with_v1_logs(config, tmp_path):
             if d in set(v1.session_date)]
     log_path = tmp_path / "v2.csv"
     log = EventLog(log_path, echo=False)
+    from hiro_engine_v2.session import Session
+    monkeypatch.setattr(Session, "_write_session_row", lambda self, row: None)   # never touch the ledger
     run_backtest(config, TIER_FULL, days, log)
     log.close()
     v2 = pd.read_csv(log_path, dtype=str, keep_default_na=False)
@@ -107,3 +115,10 @@ def test_baseline_byte_identity_with_v1_logs(config, tmp_path):
     want = [f for f in EVENT_FIELDS if f != "config_hash"]
     assert list(a.columns) == want == list(b.columns)
     assert len(a) == len(b) and a.equals(b), "v2 baseline drifted from v1's log (W0.2)"
+
+
+def test_package_config_is_the_baseline_yaml(config):
+    """scripts/hiro_engine_v2/config.yaml must be byte-identical to docs/hiro_watch/configs/baseline_v2.yaml."""
+    a = (REPO_ROOT / "scripts/hiro_engine_v2/config.yaml").read_bytes()
+    b = (REPO_ROOT / "docs/hiro_watch/configs/baseline_v2.yaml").read_bytes()
+    assert a == b

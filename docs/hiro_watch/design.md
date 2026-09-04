@@ -9,19 +9,20 @@ scripts/hiro_engine/            frozen v1 — untouched
 scripts/hiro_engine_v2/         copy of v1 + 4 knobs − live/ops/spikes/parity/register/verify/sweep
   tests/                        v1 tests renamed + test_knobs.py (W0.2 byte-identity, each knob)
 scripts/hiro_watch/
+  registry.py                   the validated candidate list (one home for run.py + compare.py)
   run.py                        the evening command (W3)
   compare.py                    the accounting (W4, W5)
-  tests/test_compare.py         fixture-log tests for the joins, LB95, checkpoint guard, book
+  tests/test_compare.py         fixture-log tests for the joins, LB95, firewall, book, verdict paths, registry
 docs/hiro_watch/configs/        one yaml per candidate (W1) — full copies of config.yaml
 docs/replay/hiro_watch/<name>/  paper_log_backtest.csv, sessions_backtest.csv (engine-written)
-docs/replay/hiro_watch/marks/   <date>_<expiry>.parquet mark cache (compare-written, pull once)
+~/Dev/central_trade_data/thetadata/spxw_marks/<date>_<expiry>.parquet   mark cache (fetched data → the store)
 ```
 
 ## The clone — exact edits (all line refs = v1)
 
 | v1 file:line | edit in v2 |
 |---|---|
-| `rules.py:67` | `(c.r30 is not None and c.r30 < 0)` → `(c.r30 is not None and c.r30 <= cfg.num("r6_entries", "a_r30_max"))`. Differs from v1 only at r30 == 0.0 exactly (never observed; noted). |
+| `rules.py:143` (`a_fires`) | `a_fires = (row.a_conditions and a_deep and …)` with `a_deep = r30 is not None and r30 < e6["a_r30_lt"]`. `a_conditions` (rules.py:67) is byte-identical to v1 so the A-episode tracker (features.py:272) numbers episodes exactly as v1. `0.0` is exactly v1 (strict `<`; HIRO gaps reindex to 0.0, so `<=` would not be). |
 | `rules.py:149,175` | `row.late_state` → `(row.late_state and self.e6["late_enabled"])` at both uses. |
 | `session.py:128-130` | `Vetoes(vt_broken=self.vt_broken and cfg.get("r4_vetoes","vt_broken_enabled"), levels_invalid=(not self.levels.valid) and cfg.get("r4_vetoes","levels_invalid_enabled"), …)`. |
 | `chains.py:52-55` | `_sdk_pull_day` and `ChainStore.fetch` raise `RuntimeError("hiro_engine_v2 never fetches chains — run the v1 daily loop")`. |
@@ -73,21 +74,31 @@ of `docs/replay/hiro/paper_log_backtest.csv` and `paper_log_oos_*.csv` (the way 
 
 ```
 load_log(path) -> DataFrame[EVENT_FIELDS]           refuse duplicate session_date
-setup_id = (session_date, branch, signal_min, episode)   the join key across candidates
+SETUP = (session_date, branch, episode)              the join key across candidates (signal_min varies)
 trades(ev)  -> one row per trade_id: branch, signal_min, entry_min, k1, k2, side, expiry,
                leg1_fill, leg2_fill, outcome_type, pnl_usd, leg_liq_loss_usd, minutes_to_fill
 signals(ev) -> one row per baseline `signal` event + r30 parsed from notes (A only)
 refusals(ev)-> `skip`/`late_no_entry` rows with reason ∈ {vt_broken, levels_invalid, late, capacity}
 book(trades, asof) -> cash, marks (MarkCache), settlements, MTM   (W4.2)
 lb95(fills_by_session) -> min(bootstrap_p5, clopper_pearson_lo)    (W4.4)
-label(ev, registered) -> DISCOVERY | CONFIRMATION                  (W5.1)
-verdict_a_depth / verdict_credit(branch) / status_diag             (W5.3), gated by checkpoint(n)
-main: print per-candidate tables; verdict lines only if checkpoint (W5.2)
+confirmation_dates(sessions, registered) -> first 40 countable dates after registration
+label(dates, registered, conf) -> DISCOVERY | CONFIRMATION | EXCLUDED     (W5.1)
+verdict_*(confirmation frames, confirmation books) -> (text, immediate)  (W5.3)
+report: tables; verdict line only if checkpoint(n) or immediate           (W5.2)
 ```
 
-`MarkCache.get(date, expiry)` → `chains._sdk_pull_day(date, expiry)` from **v1** (read-only library
-use), written once to `marks/<date>_<expiry>.parquet`. Closing mark = mid at the last minute ≤ 16:00
-with a valid two-sided quote on both legs, else `UNMARKED`.
+`MarkCache.frame(date, expiry)` → `chains._sdk_pull_day(date, expiry)` from **v1** (read-only library
+use), written once to the store; a pull that is empty or stops > 5 min before the close is refused and
+not cached. Closing mark = mid at the last minute ≤ 16:00 with a valid two-sided quote on both legs,
+else `UNMARKED`. `run()` refuses an `asof` whose SPX bars do not reach 16:00.
+
+## Guards (what the engines' loaders do not check)
+
+`registry.candidates()` refuses: no `watch:` section; `watch.name` ≠ file stem; unknown engine/kind;
+`logging` paths outside `docs/replay/hiro_watch/<name>/` (so `--rebuild`'s `rmtree` can never touch
+the baseline ledger); two yamls with identical bytes. `compare.load_log` refuses duplicate sessions
+and a `config_hash` that is not the sha256 of the yaml as it stands. `run.py` refuses a date already
+present in a candidate's sessions file **or** paper log (an aborted run leaves a banner).
 
 ## What is deliberately absent
 

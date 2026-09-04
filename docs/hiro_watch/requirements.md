@@ -37,7 +37,7 @@ Corollaries:
 |---|---|---|---|
 | `baseline_v2` | v2 | none (knobs at v1 values) — the W0.2 check | control |
 | `credit030` | v1 | `r1v3_limits.credit: 0.30` | promotable |
-| `a_depth_m4` | v2 | `r6_entries.a_r30_max: -4.0` (Branch A only when r30 ≤ −4 $B) | promotable |
+| `a_depth_m4` | v2 | `r6_entries.a_r30_lt: -4.0` (Branch A signal only when r30 < −4 $B) | promotable |
 | `diag_vt_off` | v2 | `r4_vetoes.vt_broken_enabled: false` | diagnostic — never promoted |
 | `diag_levels_off` | v2 | `r4_vetoes.levels_invalid_enabled: false` | diagnostic — never promoted |
 | `diag_late_off` | v2 | `r6_entries.late_enabled: false` | diagnostic — never promoted |
@@ -48,9 +48,10 @@ applies to both branches; results are read per branch off the log's `branch` col
 ## W2. The clone (`scripts/hiro_engine_v2/`)
 
 - **W2.1** A copy of `scripts/hiro_engine/` with four config knobs, each defaulting (in
-  `baseline_v2.yaml`) to the v1-equivalent value: `r6_entries.a_r30_max` (v1: `< 0` → `0.0`),
-  `r4_vetoes.vt_broken_enabled`, `r4_vetoes.levels_invalid_enabled`, `r6_entries.late_enabled`
-  (all `true`). The knobs are read fail-closed like every other key.
+  `baseline_v2.yaml`) to the v1-equivalent value: `r6_entries.a_r30_lt` (the A **signal** needs
+  `r30 < a_r30_lt`; `0.0` is exactly v1's `r30 < 0`; applied in `a_fires`, NOT in `a_conditions`, so
+  A episodes are numbered exactly as v1 numbers them), `r4_vetoes.vt_broken_enabled`,
+  `r4_vetoes.levels_invalid_enabled`, `r6_entries.late_enabled` (all `true`). Read fail-closed.
 - **W2.2** Removed from the clone: live loop, ops checks, spikes, parity, R9a registration, golden
   verify, sweep. The clone only backtests and scorecards. It never fetches chains (`fetch` raises;
   the daily loop populates the shared cache through v1).
@@ -73,26 +74,39 @@ Reads the baseline log(s) and every candidate log; prints, per candidate:
 - **W4.1 Trades:** n signals / entries / fills (bombs), fill rate, net cash (credits + failed-attempt
   P&L), worst loss, MAE worst, minutes-to-fill median — per branch, split DISCOVERY | CONFIRMATION.
 - **W4.2 Book:** every completed bomb still open, marked at the latest session's close (closing-NBBO
-  mid of the spread × 100; `UNMARKED` if either leg has no valid closing quote); settled payoff for
-  expired bombs (max(0, K_long − S_settle) − max(0, K_short − S_settle), S_settle = last regular-hours
-  SPX 1-min close of expiry day); MTM = cash + marks + settlements. Baseline gets the same book.
+  mid of the spread × 100, capped at the width; `UNMARKED` if either leg has no valid closing quote);
+  settled payoff for expired bombs (max(0, K_long − S_settle) − max(0, K_short − S_settle), S_settle =
+  last regular-hours SPX 1-min close of expiry day); MTM = cash + marks + settlements. Baseline gets
+  the same book. Quotes are pulled once per (date, expiry) and cached in
+  `~/Dev/central_trade_data/thetadata/spxw_marks/`; a pull that stops before the close is refused,
+  not cached. The `asof` session must itself be complete (bars to 16:00).
 - **W4.3 Per-candidate detail:** `credit030` — baseline fills lost at 0.30 (join on setup);
   `a_depth_m4` — the Θ ladder {−1,…,−5} over baseline A signals (r30 parsed from the signal note)
   plus passed/rejected cohorts; `diag_*` — sole-blocker attribution: a refused baseline setup is
-  scored only if the diag run actually entered it.
+  scored only if the diag run actually entered it, and the other refusal reasons the same setup
+  carried are shown. **Setup identity** = (session_date, branch, episode): one entry per episode
+  (R11.1) and episodes are numbered identically in every candidate (W2.1). Signal minute is NOT part
+  of the key — a candidate whose earlier trade was still open re-signals the same episode later.
 - **W4.4 LB95:** completion lower bound = min(session-bootstrap 5th percentile, Clopper–Pearson),
   `DRAWS`/`SEED` imported from `hiro_engine.register`.
 
 ## W5. Firewall and checkpoints
 
-- **W5.1** A session is DISCOVERY if its date ≤ the candidate's `watch.registered` date, else
-  CONFIRMATION. Only countable confirmation sessions (baseline disposition `countable`) feed a bar.
-- **W5.2** Verdict lines print only when the number of countable confirmation sessions is in
-  {10, 20, 30, 40}; otherwise `INCONCLUSIVE (n/10)`. The 40th checkpoint is terminal. Immediate
-  REJECT paths (below) fire on the session they occur.
+- **W5.1** A session is DISCOVERY if its date ≤ the candidate's `watch.registered` date;
+  CONFIRMATION if it is after that date, countable (baseline disposition `countable`) and among the
+  first 40 such sessions; otherwise EXCLUDED (partial / event_standdown / post-terminal). Only
+  CONFIRMATION rows feed a bar, a verdict, or an immediate path; EXCLUDED rows are shown, not counted.
+- **W5.2** Verdict lines print only when the number of confirmation sessions is in {10, 20, 30, 40};
+  otherwise `INCONCLUSIVE (n/next)`. The 40th is terminal: sessions after it are EXCLUDED and the
+  40-session verdict stands. The ONLY immediate paths (print on the session they occur) are: a
+  passed A loss < −$150 (`a_depth_m4`), a baseline fill lost at 0.30, a trade P&L < −$150
+  (`credit030`). Every other REJECT/PROMOTE waits for a checkpoint.
+- **W5.2a** Books used by a verdict are built on CONFIRMATION rows only: whole-portfolio for
+  `a_depth_m4` (the gate's capacity spill into B is part of the candidate), branch-only for
+  `credit030` (W1: read per branch). The all-sessions book is printed for context only.
 - **W5.3 Bars (frozen with this file):**
-  - `a_depth_m4`: ≥ 20 confirmation A signals over ≥ 10 days AND ≥ 10 passed over ≥ 5 days, no day
-    > 25 % of passed; passed completion LB95 > 0.55; passed cash + book per signal > baseline's per
+  - `a_depth_m4` (passed = baseline confirmation A signals with r30 < −4): ≥ 20 confirmation A
+    signals over ≥ 10 days AND ≥ 10 passed over ≥ 5 days, no day > 25 % of passed; passed completion LB95 > 0.55; passed cash + book per signal > baseline's per
     signal on the same sessions; candidate MTM ≥ baseline MTM; no passed loss < −$150 → PROMOTE.
     REJECT: LB95 ≤ 0.55, or expectancy ≤ baseline, or any passed loss < −$150 (immediate), or
     candidate MTM < baseline MTM − credits earned. 40 confirmation A signals without either →
@@ -114,3 +128,5 @@ Reads the baseline log(s) and every candidate log; prints, per candidate:
   (`credit030` +$320, 13/13 A fills held).
 - `run.py <date>` on a new session appends exactly one session to every candidate and refuses on a
   second invocation.
+- `/code-review` round 1 (2026-09-04): 10 findings, all fixed in the same day
+  (`build_notes.md` §"Review round 1").

@@ -58,7 +58,7 @@ r6_entries:
   late_r30: 1.0               # R6.3 suppression 30-min flow ($B)
   entries_per_day: 3          # R6.4
   rest_offset: 0.10           # R6.1/R6.2 resting-limit offset vs first leg
-  a_r30_max: 0.0              # W2.1 knob — Branch A needs r30 <= this ($B); v1-equivalent 0.0; -4.0 = a_depth_m4
+  a_r30_lt: 0.0               # W2.1 knob — Branch A signal needs r30 < this ($B); 0.0 = v1 exactly; -4.0 = a_depth_m4
   late_enabled: false         # W2.1 knob — false = diag_late_off (R6.3 suppression off)
 
 r7_exits:

@@ -68,24 +68,45 @@ def test_signals_parse_r30_and_refusals_reasons():
     s = C.signals(_base_log())
     assert s.r30.tolist() == [-4.5, -0.3]
     r = C.refusals(_base_log())
-    assert r.reason.tolist() == ["vt_broken"] and int(r.signal_min.iloc[0]) == 720
+    assert r.reason.tolist() == ["vt_broken"] and int(r.episode.iloc[0]) == 2
 
 
-def test_firewall_label():
-    lab = C.label(pd.Series([D1, D2]), registered=D1)
-    assert lab.tolist() == ["DISCOVERY", "CONFIRMATION"]
+def test_refusals_keep_every_reason_of_a_setup():
+    ev = _base_log()
+    extra = _log([_ev(session_date=D2, event_type="late_no_entry", rule_id="R6.3", branch="B", signal_min=719,
+                      episode=2, notes="LATE — NO ENTRY")])
+    r = C.refusals(pd.concat([ev, extra], ignore_index=True))
+    assert sorted(r.reason.tolist()) == ["late", "vt_broken"] and r.episode.nunique() == 1
+
+
+def test_firewall_label_and_countable_only():
+    sess = pd.DataFrame(dict(date=[D1, D2, "2026-09-10", "2026-09-11"],
+                             disposition=["countable", "countable", "partial", "countable"]))
+    conf = C.confirmation_dates(sess, registered=D1)
+    assert conf == [D2, "2026-09-11"]                              # partial excluded (W5.1)
+    lab = C.label(pd.Series([D1, D2, "2026-09-10", "2026-09-11"]), D1, conf)
+    assert lab.tolist() == ["DISCOVERY", "CONFIRMATION", "EXCLUDED", "CONFIRMATION"]
+
+
+def test_confirmation_dates_stop_at_the_terminal_checkpoint():
+    sess = pd.DataFrame(dict(date=[f"2026-{9 + i // 28:02d}-{1 + i % 28:02d}" for i in range(45)],
+                             disposition=["countable"] * 45))
+    assert len(C.confirmation_dates(sess, registered="2026-08-31")) == C.TERMINAL
 
 
 def test_checkpoint_guard():
     assert not C.checkpoint(9) and C.checkpoint(10) and not C.checkpoint(11) and C.checkpoint(40)
 
 
-def test_lb95_bounds():
+def test_lb95_bounds_and_zero_trade_sessions_in_the_unit():
     ten_of_ten = pd.DataFrame(dict(session_date=[f"d{i}" for i in range(10)], fills=[1] * 10, n=[1] * 10))
     assert 0.7 < C.lb95(ten_of_ten) < 1.0                     # Clopper-Pearson floors the 1.0 artefact
     none = pd.DataFrame(dict(session_date=["d0", "d1"], fills=[0, 0], n=[5, 5]))
     assert C.lb95(none) == 0.0
     assert C.lb95(pd.DataFrame(dict(session_date=[], fills=[], n=[]))) == 0.0
+    t = C.trades(_base_log())
+    ps = C.per_session(t, [D1, D2, "2026-09-10"])
+    assert ps.n.tolist() == [1, 1, 0] and ps.fills.tolist() == [1, 0, 0]
 
 
 class _Marks:
@@ -101,6 +122,9 @@ def test_book_marks_settles_and_flags_unmarked(tmp_path):
     t.loc[1, ["bomb", "expiry"]] = [True, "2026-09-04"]        # pretend the D2 trade filled and has expired
     spx = tmp_path / "2026-09-04.parquet"
     pd.DataFrame(dict(min=[959, 960], close=[7397.0, 7398.0])).to_parquet(spx)
+    pd.DataFrame(dict(min=[930], close=[7397.0])).to_parquet(tmp_path / "2026-09-05.parquet")
+    with pytest.raises(SystemExit):
+        C.spx_close("2026-09-05", tmp_path)                    # incomplete session refused
     b = C.book(t, asof="2026-09-08", marks=_Marks({7500.0: 40.0, 7495.0: 38.5}), spx_dir=tmp_path)
     assert b["cash"] == -100.0
     assert b["table"].state.tolist() == ["MARKED", "SETTLED"]
@@ -111,22 +135,36 @@ def test_book_marks_settles_and_flags_unmarked(tmp_path):
 
 
 def test_verdict_credit_lost_fill_is_immediate_reject():
-    bt = C.trades(_base_log()); bt["set"] = "CONFIRMATION"
+    bt = C.trades(_base_log())
     ct = bt.copy(); ct.loc[0, "bomb"] = False                   # the candidate lost the D1 fill
     nobook = dict(unmarked=[], mtm=0.0, inventory=0.0)
-    assert C.verdict_credit(bt, ct, "A", nobook, nobook).startswith("REJECT — 1 baseline A fill(s) lost")
-    assert C.verdict_credit(bt, bt, "A", nobook, nobook).startswith("INCONCLUSIVE — baseline A fills 1/15")
+    text, immediate = C.verdict_credit(bt, ct, "A", nobook, nobook)
+    assert text.startswith("REJECT (A) — 1 baseline fill(s) lost") and immediate
+    text, immediate = C.verdict_credit(bt, bt, "A", nobook, nobook)
+    assert text.startswith("INCONCLUSIVE (A) — baseline A fills 1/15") and not immediate
+
+
+def test_lost_fill_join_survives_a_later_signal_minute():
+    """The candidate re-signals the same episode 6 minutes later (capacity) — still the same setup."""
+    bt = C.trades(_base_log())
+    ct = bt.copy(); ct.loc[0, ["signal_min", "entry_min"]] = [646, 647]
+    assert len(C.lost_fills(bt, ct, "A")) == 0
 
 
 def test_verdict_a_depth_needs_counts_then_defers_on_unmarked():
-    bt = C.trades(_base_log()); bt["set"] = "CONFIRMATION"
-    sig = C.signals(_base_log()); sig["set"] = "CONFIRMATION"
+    bt = C.trades(_base_log())
+    sig = C.signals(_base_log())
     ok = dict(unmarked=[], mtm=0.0, inventory=0.0)
-    assert C.verdict_a_depth(bt, sig, bt, ok, ok).startswith("INCONCLUSIVE — A signals 2/20")
-    big_sig = pd.concat([sig.assign(session_date=f"2026-10-{i:02d}", r30=-4.5) for i in range(1, 21)])
-    big_t = pd.concat([bt.assign(session_date=f"2026-10-{i:02d}") for i in range(1, 21)])
+    text, immediate = C.verdict_a_depth(bt, sig, bt, ok, ok, [D1, D2])
+    assert text.startswith("INCONCLUSIVE — A signals 2/20") and not immediate
+    days = [f"2026-10-{i:02d}" for i in range(1, 21)]
+    big_sig = pd.concat([sig.assign(session_date=d, r30=-4.5) for d in days])
+    big_t = pd.concat([bt.assign(session_date=d) for d in days])
     bad = dict(unmarked=["x"], mtm=0.0, inventory=0.0)
-    assert C.verdict_a_depth(big_t, big_sig, big_t, bad, ok).startswith("DEFERRED")
+    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, bad, ok, days)
+    assert text.startswith("DEFERRED") and not immediate
+    text, immediate = C.verdict_a_depth(big_t, big_sig, big_t, ok, ok, days)
+    assert text.startswith("REJECT — passed completion LB95") and not immediate   # half the trades timed out
 
 
 def test_diag_table_sole_blocker():
@@ -134,6 +172,26 @@ def test_diag_table_sole_blocker():
     entered = pd.DataFrame(dict(session_date=[D2], branch=["B"], signal_min=[720], episode=[2], bomb=[True],
                                 pnl_usd=[10.0], mae=[-20.0], outcome_type=["fill"], set=["CONFIRMATION"]))
     d = C.diag_table(ref, entered, "vt_broken")
-    assert d.scored.tolist() == [True]
+    assert d.scored.tolist() == [True] and d.other_reasons.tolist() == [""]
     d2 = C.diag_table(ref, entered.iloc[0:0], "vt_broken")
     assert d2.scored.tolist() == [False]
+    both = pd.concat([ref, ref.assign(reason="late")], ignore_index=True)
+    d3 = C.diag_table(both, entered, "vt_broken")
+    assert d3.other_reasons.tolist() == ["late"]
+
+
+def test_registry_refuses_a_yaml_pointing_at_the_baseline_ledger(tmp_path, monkeypatch):
+    from hiro_watch import registry as R
+    good = (R.CONFIGS / "baseline_v2.yaml").read_text()
+    bad = good.replace("docs/replay/hiro_watch/baseline_v2/", "docs/replay/hiro/").replace("name: baseline_v2", "name: evil")
+    (tmp_path / "evil.yaml").write_text(bad)
+    monkeypatch.setattr(R, "CONFIGS", tmp_path)
+    with pytest.raises(SystemExit, match="never the baseline ledger"):
+        R.candidates()
+
+
+def test_load_log_refuses_a_hash_mismatch(tmp_path):
+    ev = _base_log().astype(str)
+    p = tmp_path / "log.csv"; ev.to_csv(p, index=False)
+    with pytest.raises(SystemExit, match="config_hash"):
+        C.load_log([p], expect_hash="deadbeef")

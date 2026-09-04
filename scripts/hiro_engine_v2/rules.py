@@ -64,9 +64,7 @@ def a_conditions(c: Core, cfg: Config, tier: TierPolicy) -> bool:
             and c.bounce30 >= cfg.num("r6_entries", "a_bounce_min_pts")
             and c.close < c.mid30)
     if not tier.price_a_conditions:
-        # W2.1 knob a_r30_max: v1 is `r30 < 0`; v1-equivalent value 0.0 (differs only at r30 == 0.0)
-        cond = cond and (c.r30 is not None
-                         and c.r30 <= cfg.num("r6_entries", "a_r30_max")) and c.hiro_fresh
+        cond = cond and (c.r30 is not None and c.r30 < 0) and c.hiro_fresh
     return bool(cond)
 
 
@@ -140,7 +138,11 @@ class RuleEngine:
 
         # R11.1: an A episode qualifies only if its FIRST minute is inside the
         # A window (>= 10:35); an episode that started earlier never fires
-        a_fires = (row.a_conditions and row.episode_a is not None
+        # W2.1 knob a_r30_lt: the A signal additionally needs r30 < a_r30_lt (v1-equivalent 0.0,
+        # already implied by a_conditions). Applied HERE, not in a_conditions, so A episodes are
+        # numbered exactly as v1 numbers them (the watch joins candidates on episode).
+        a_deep = row.r30 is not None and row.r30 < float(self.e6["a_r30_lt"])
+        a_fires = (row.a_conditions and a_deep and row.episode_a is not None
                    and state.entered_episode_a != row.episode_a and in_window and a_ok_time
                    and row.episode_a_start is not None
                    and row.episode_a_start >= self.k["branch_a_start_min"])
