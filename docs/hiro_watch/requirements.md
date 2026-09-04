@@ -18,9 +18,10 @@ accounting; verdict lines appear only at checkpoints.
 ## W0. The one rule (everything else follows from it)
 
 > A candidate is a yaml under `docs/hiro_watch/configs/`, committed to git **before its first
-> confirmation session**. Its `watch.registered` date is its registration date; its CONFIG_HASH on
-> every log row is its identity; it is **never edited** — any change is a new file with a new name
-> and a new registration date.
+> confirmation session**. Its `watch.registered` date is the LAST session whose data was inspected
+> when the candidate was defined (≤ the commit date; sessions after it are confirmation); its
+> CONFIG_HASH on every log row is its identity; it is **never edited** once a confirmation session
+> has been logged — any change after that is a new file with a new name and a new registration date.
 
 Corollaries:
 - **W0.1** `scripts/hiro_engine/` is never edited. The clone `scripts/hiro_engine_v2/` is edited
@@ -31,7 +32,7 @@ Corollaries:
 - **W0.3** No silent skips: a session either runs fully for every candidate or the evening command
   fails with the reason. Duplicate session rows in a candidate log are an error, not a dedup.
 
-## W1. The candidates (registered 2026-09-04)
+## W1. The candidates (committed 2026-09-04; `registered` = 2026-09-02, the last session inspected)
 
 | name | engine | change vs baseline | kind |
 |---|---|---|---|

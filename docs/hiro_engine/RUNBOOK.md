@@ -74,11 +74,18 @@ sessions; a missed day is gone forever):
 /Users/dgrissen/Dev/virtualenvs/HIRO_finder/bin/python -m hiro_tickers.historical_backfill --port 9222
 ```
 
-## hiro_watch (after the day's v1 backtest is in `docs/replay/hiro/`)
+## The whole evening loop in one command (stored-data replay days)
+
+```bash
+~/Dev/virtualenvs/gamma_chaser/bin/python scripts/daily_session.py <date>   # SPX → HIRO capture/identity/ingest → chain → v1 backtest → hiro_watch
+cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python hiro_watch/compare.py   # the table; verdicts only at checkpoints
+```
+Needs Chrome on :9222 logged in to SpotGamma and ThetaData creds. Each step refuses loudly and stops.
+
+## hiro_watch alone (if the v1 backtest is already in `docs/replay/hiro/`)
 
 ```bash
 cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python hiro_watch/run.py <date>   # ~20 s, six candidates
-~/Dev/virtualenvs/gamma_chaser/bin/python hiro_watch/compare.py                      # the table; verdicts only at checkpoints
 ```
 `run.py` refuses a date the baseline lacks and a date already logged; `--rebuild all` regenerates
 every candidate from the stored sessions. Candidate yamls in `docs/hiro_watch/configs/` are never

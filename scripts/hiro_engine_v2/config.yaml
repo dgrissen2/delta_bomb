@@ -9,7 +9,7 @@ watch:                          # hiro_watch registration (docs/hiro_watch/requi
   name: baseline_v2
   engine: hiro_engine_v2
   kind: control                 # control | promotable | diagnostic
-  registered: "2026-09-04"      # firewall date: sessions <= this are DISCOVERY
+  registered: "2026-09-02"      # firewall: LAST session inspected when this candidate was defined (committed 2026-09-04); sessions <= this are DISCOVERY
   change: "none — v1 rules with the four knobs at v1-equivalent values (W0.2 byte-identity control)"
 
 r1_instruments:

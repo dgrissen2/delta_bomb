@@ -14,9 +14,26 @@ whenever the state changes; it is the first thing to read after a context reset.
 | outputs | `docs/replay/hiro_watch/<name>/` (engine-written logs); marks in `~/Dev/central_trade_data/thetadata/spxw_marks/` | rebuildable |
 | spec | `requirements.md` v2.0, `design.md` v2.0, `tasks.md` v2.0 | 250 lines total |
 
-Registration date for all six candidates: **2026-09-04** (the yamls' `watch.registered`; commit
-date). Every stored session (2026-08-12 → 09-02) is DISCOVERY. First CONFIRMATION session = the
-next capture (2026-09-03 onward). Checkpoints at 10/20/30/40 countable confirmation sessions.
+Registration: committed **2026-09-04**; `watch.registered` = **2026-09-02**, the last session whose
+data was inspected when the candidates were defined (corrected on day 0, before any confirmation
+session was logged — the first cut had used the commit date, which would have made 09-03 discovery).
+DISCOVERY = 2026-08-12 → 09-02 (16 sessions). CONFIRMATION session 1 = **2026-09-03**. Checkpoints
+at 10/20/30/40 countable confirmation sessions.
+
+### Confirmation session 1 — 2026-09-03 (`docs/replay/hiro_watch/compare_2026-09-03.txt`)
+
+v1 took two Branch-A trades on shallow flow (r30 −0.96 and −1.20): cap −$350, timeout −$70 → −$420.
+SPX rallied; the 16-bomb inventory marked +$165 (was +$1,265) → baseline MTM −$1,305.
+`a_depth_m4` took neither trade (both gated) → 0 confirmation trades. `credit030` took both at the
+same prices and lost the same −$420; its A branch printed **REJECT (A) — trade P&L −350 < −150
+[immediate path]**. That bar is defective as frozen: the −$350 is the engine's cap exit on a trade
+the baseline took identically — the credit did not cause it. Decision pending from the owner: amend
+the credit bar to "no trade at c loses more than $150 MORE than the baseline's same-setup trade"
+(requirements v2.1 + new candidate file per W0), or keep it and accept that credit030 (A) is dead
+on session 1 for a reason unrelated to the credit.
+
+The daily loop is now one command: `scripts/daily_session.py <date>` (SPX → HIRO capture/identity/
+ingest → chain → v1 backtest → hiro_watch/run.py), then `hiro_watch/compare.py`.
 
 ### Backfill result on the 16 discovery sessions (asof 2026-09-02, marks pulled)
 
@@ -35,11 +52,10 @@ sit beside.
 
 ## What's next
 
-1. Daily loop gains one step (RUNBOOK): after the v1 backtest, `hiro_watch/run.py <date>`;
-   `compare.py` whenever you want the table.
-2. Next capture: 2026-09-03 (the first confirmation session).
-3. Review round 2 (`/code-review` on the fix diff) — optional; round 1's 10 findings are all fixed
-   and recorded in `build_notes.md`.
+1. Owner decides the credit030 bar question above.
+2. Next capture: 2026-09-04 (this evening) — `python scripts/daily_session.py 2026-09-04` then
+   `python scripts/hiro_watch/compare.py`.
+3. `/code-review` verification pass on the fix round is running / recorded in `build_notes.md`.
 
 ## Standing constraints that bind this program
 

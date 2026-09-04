@@ -440,6 +440,8 @@ def main(argv=None) -> int:
     ap.add_argument("--debug", action="store_true")
     a = ap.parse_args(argv)
     logging.basicConfig(level=logging.DEBUG if a.debug else logging.INFO, format="%(message)s")
+    for noisy in ("thetadata", "httpx", "httpcore"):          # the SDK logs its whole auth payload at INFO
+        logging.getLogger(noisy).setLevel(logging.WARNING)
     if a.debug:
         print("[debug on]")
     return run(a.asof, not a.no_marks)

@@ -9,7 +9,7 @@ watch:                          # hiro_watch registration (docs/hiro_watch/requi
   name: a_depth_m4
   engine: hiro_engine_v2
   kind: promotable                 # control | promotable | diagnostic
-  registered: "2026-09-04"      # firewall date: sessions <= this are DISCOVERY
+  registered: "2026-09-02"      # firewall: LAST session inspected when this candidate was defined (committed 2026-09-04); sessions <= this are DISCOVERY
   change: "r6_entries.a_r30_lt 0.0 -> -4.0 (Branch A signal only when r30 < -4 $B)"
 
 r1_instruments:
