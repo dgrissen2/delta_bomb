@@ -1,0 +1,114 @@
+# hiro_engine_v2 (watch clone) configuration — v1 config.yaml + the four W2.1 knobs at v1 values.
+# spec_version stamps the RULE SET so any rule change moves CONFIG_HASH (R8.2/R9 reset).
+# CONFIG_HASH = sha256 of this file's bytes (R8.2). Editing ANY byte changes the hash and
+# resets the 10-session acceptance test (R9). Do not touch during the test.
+
+spec_version: "3.0"   # v3.0: real resting-limit fills (requirements v3.0, 2026-08-23)
+
+watch:                          # hiro_watch registration (docs/hiro_watch/requirements.md W0/W5)
+  name: diag_vt_off
+  engine: hiro_engine_v2
+  kind: diagnostic                 # control | promotable | diagnostic
+  registered: "2026-09-04"      # firewall date: sessions <= this are DISCOVERY
+  change: "r4_vetoes.vt_broken_enabled true -> false (R4.1 short-block off; never promoted)"
+
+r1_instruments:
+  width_strikes: 5            # R1.1 vertical width in strike points
+  dte_target: 30              # R1.1 expiry nearest 30 DTE
+  dte_min: 20                 # R1.1 window low
+  dte_max: 40                 # R1.1 window high
+  delta_target: -0.20         # R1.2 base strike delta
+  size_contracts: 1           # R1.3 paper, always
+  fill_touch_pts: 3.0         # R1.4 completion proxy from S0
+
+r3_derived:
+  run_break_dd: 0.6           # R3.2 run-break drawdown ($B)
+  roll_window: 30             # R3.3 pull30/bounce30/mid30 window (strict min_periods)
+  range60_window: 60          # R3.3 prior-60-min range
+  range60_pctile: 0.75        # R3.3 expanding percentile
+  range60_min_obs: 300        # R3.3 warmup floor
+  context_im_frac: 0.10       # R3.4 |close - open0930| >= 0.10 * IM
+  context_vwap_share: 0.80    # R3.4 share of last 10 bars vs VWAP
+  context_vwap_bars: 10       # R3.4 lookback bars
+  context_reads_min: [630, 780]   # R3.4 10:30 and 13:00 ET (minutes since midnight)
+  episode_lapse_min: 3        # R3.5 conditions lapse >= 3 consecutive minutes
+
+r4_vetoes:
+  flow_veto_bps: -0.8         # R4.3 r15 AND r15n both below this ($B)
+  vt_broken_enabled: false    # W2.1 knob — false = diag_vt_off (R4.1 short-block off)
+  levels_invalid_enabled: true  # W2.1 knob — false = diag_levels_off (R4.2 short-block off)
+
+r5_clock:
+  observe_end_min: 600        # R5.1 09:30-10:00 observe only
+  entry_end_min: 870          # R5.2 no new unpaired leg after 14:30
+  branch_a_start_min: 635     # R5.2 Branch A additionally >= 10:35
+  clock_minutes: 60           # R5.3 per-leg clock
+  resolution_min: 930         # R5.4 15:30 hard resolution
+  session_end_min: 960        # 16:00 tracking stops
+
+r6_entries:
+  a_bounce_min_pts: 3.0       # R6.1(iii)
+  b_pull_min_pts: 3.0         # R6.2 arm pullback
+  b_dur_min: 10               # R6.2 run duration (min)
+  b_rate_min: 2.0             # R6.2 run rate ($B/hr)
+  b_cpr_min: 0.25             # R6.2 min/max of dC,dP
+  b_share_min: 0.5            # R6.2 nextExp share of run
+  b_weak_side_min: 0.15       # R6.2 gate: min(dC,dP) ($B)
+  late_rate: 4.0              # R6.3 suppression rate ($B/hr)
+  late_r30: 1.0               # R6.3 suppression 30-min flow ($B)
+  entries_per_day: 3          # R6.4
+  rest_offset: 0.10           # R6.1/R6.2 resting-limit offset vs first leg
+  a_r30_max: 0.0              # W2.1 knob — Branch A needs r30 <= this ($B); v1-equivalent 0.0; -4.0 = a_depth_m4
+  late_enabled: true          # W2.1 knob — false = diag_late_off (R6.3 suppression off)
+
+r7_exits:
+  scratch_drop_bps: 0.3       # R7.2 L drop below entry value ($B)
+  scratch_window_min: 3       # R7.2 within 3 minutes of entry
+  cap_option_pts: 3.5         # R7.3 option-mid move against leg-1 fill
+  cap_spot_pts: 15.0          # R7.3 spot fallback (quote-gap only, v3.0)
+  heartbeat_min: 5            # AC: heartbeat cadence while a trade is open
+
+r1v3_limits:                  # v3.0 resting-limit mechanics (R1.4)
+  credit: 0.10                # FROZEN — not a knob (R13.2)
+  limit_tick: 0.10            # premium grid at these strikes; L rounds AGAINST us
+  first_eligible_offset: 2    # first fill-eligible minute = signal + 2
+  quote_gap_invalid_after: 5  # consecutive gap minutes -> cancel + data_invalid (R10.4)
+  exit_stale_quote_max_min: 3 # last-valid NBBO allowance for exit BOOKING only
+
+chains:                        # R2.5 / R8.2 v3.0 pins (FROZEN rehearsal scope only)
+  root: ~/Dev/central_trade_data/thetadata/spxw_bomb_chains
+  frozen_manifest_hash: "682d9973aa6c73f8242907080aa8c85199f3d1db9d6c0915778e8e1ff775ee50"
+  sdk_version: "1.0.9"
+  control_frame_hash: "f1dc487378f0f50609a2d4c25a043fa27a2054e2d9f277fd3591b6cd74a3e4a6"  # rebuilt after BP2 F6/F7
+  r9a_formulas_hash: "500f2404267cada22c2520c6df3252894fc762fd905658235c6e2db34b7722c0"  # re-frozen after BP2 F1/F5 (p95 population per R11.3 text; constants in hash)
+  r9a_registration_hash: "5d4dcbc7c513c3ccc7b266c83c1a42150a171b864751c731b3c32bfeb21ff1ef"  # FINAL registration (countable population; run-once CLOSED)
+  verification_v2_hash: "28bd84b8893db104478037e7c4ee058c5291df90d5150948de8a2cadb4ccb651"  # task-18 R12.3 pin (19 trades, 10 fills)
+
+data:
+  spx_dir: ~/Dev/central_trade_data/thetadata/spx_index_1m_ohlc
+  hiro_root: ~/Dev/central_trade_data/spotgamma/hiro/sp500_basket/v1
+  spy_parquet: ~/Dev/central_trade_data/databento/spy_ohlcv_1m/spy_ohlcv_1m.parquet
+  levels_csv: ~/Dev/core_spotgamma_spx_vix_data/offset_historical_spotgamma_data.csv
+  calendar_csv: docs/hiro_engine/event_calendar.csv
+  hiro_era_start: "2026-08-12"   # R3.3 pooled range60 history starts here
+
+control_dataset:               # R11.4 / R11.5 frozen control dataset (R8.2)
+  days: ["2026-08-12", "2026-08-13", "2026-08-14", "2026-08-17",
+         "2026-08-18", "2026-08-19", "2026-08-20", "2026-08-21"]
+  data_hash: "0b167b71ab39cdf10a4722b9e18a62ff35af305d2b6a19d233aebae71bb4ac24"
+
+verification:                  # R12.1
+  artifact: docs/replay/hiro/verification_trades_v1.csv
+  artifact_hash: "a95ffe33cd75df9f05cd57f4612ee0dfac857c7028bcf29b853da7e10e3a9630"
+
+logging:
+  paper_log: docs/replay/hiro_watch/diag_vt_off/paper_log.csv
+  sessions_log: docs/replay/hiro_watch/diag_vt_off/sessions.csv
+
+r9_thresholds:                 # populated ONCE by R9a mechanical derivation (final, countable population)
+  fills_total_floor: 11
+  sessions_with_fill_floor: 7
+  b_fill_rate_floor: 0.1
+  a_fill_rate_floor: 0.55
+  max_single_trade_loss_usd: 150
+  median_scratch_loss_cap_usd: 140

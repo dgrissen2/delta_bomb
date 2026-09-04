@@ -74,6 +74,16 @@ sessions; a missed day is gone forever):
 /Users/dgrissen/Dev/virtualenvs/HIRO_finder/bin/python -m hiro_tickers.historical_backfill --port 9222
 ```
 
+## hiro_watch (after the day's v1 backtest is in `docs/replay/hiro/`)
+
+```bash
+cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python hiro_watch/run.py <date>   # ~20 s, six candidates
+~/Dev/virtualenvs/gamma_chaser/bin/python hiro_watch/compare.py                      # the table; verdicts only at checkpoints
+```
+`run.py` refuses a date the baseline lacks and a date already logged; `--rebuild all` regenerates
+every candidate from the stored sessions. Candidate yamls in `docs/hiro_watch/configs/` are never
+edited (W0) — see `docs/hiro_watch/requirements.md`.
+
 ## Grading
 
 ```bash

@@ -1,0 +1,21 @@
+"""Shared fixtures for hiro_engine_v2 tests."""
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+import os
+import pytest
+
+os.environ["HIRO_ENGINE_TEST"] = "1"   # gates prereg_override to test runs only
+
+# make `hiro_engine_v2` importable when pytest runs from repo root
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # helpers.py
+
+from hiro_engine_v2.config import load_config  # noqa: E402
+
+
+@pytest.fixture(scope="session")
+def config():
+    return load_config()
