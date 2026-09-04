@@ -182,9 +182,9 @@ def test_verdict_a_depth_needs_counts_then_defers_on_unmarked():
 def test_verdict_a_depth_scores_only_the_passed_cohort_and_expires():
     ok = dict(unmarked=[], mtm=0.0, inventory=0.0)
     days, big_sig, big_t = _many_days(20)                                          # 40 signals = the expiry budget
-    ct = big_t.copy(); ct.loc[ct.index[0], "pnl_usd"] = -500.0                          # loss on a passed setup
+    ct = big_t.copy(); ct.loc[ct.index[0], "pnl_usd"] = -500.0                          # a big loss is NOT a bar (v2.1)
     text, immediate = C.verdict_a_depth(big_t, big_sig, ct, ok, ok, ok, ok, days)
-    assert text.startswith("REJECT — passed loss -500") and immediate
+    assert not immediate and "REJECT — passed loss" not in text
     stray_sig = big_sig.copy(); stray_sig.loc[stray_sig.index[0], "r30"] = -3.0          # first setup NOT passed
     text, immediate = C.verdict_a_depth(big_t, stray_sig, ct, ok, ok, ok, ok, days)
     assert not immediate and "1 candidate A trade(s) outside the passed cohort" in text   # the -500 is unscored

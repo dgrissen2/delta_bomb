@@ -25,12 +25,12 @@ at 10/20/30/40 countable confirmation sessions.
 v1 took two Branch-A trades on shallow flow (r30 −0.96 and −1.20): cap −$350, timeout −$70 → −$420.
 SPX rallied; the 16-bomb inventory marked +$165 (was +$1,265) → baseline MTM −$1,305.
 `a_depth_m4` took neither trade (both gated) → 0 confirmation trades. `credit030` took both at the
-same prices and lost the same −$420; its A branch printed **REJECT (A) — trade P&L −350 < −150
-[immediate path]**. That bar is defective as frozen: the −$350 is the engine's cap exit on a trade
-the baseline took identically — the credit did not cause it. Decision pending from the owner: amend
-the credit bar to "no trade at c loses more than $150 MORE than the baseline's same-setup trade"
-(requirements v2.1 + new candidate file per W0), or keep it and accept that credit030 (A) is dead
-on session 1 for a reason unrelated to the credit.
+same prices and lost the same −$420. Its A branch first printed an immediate REJECT on v2.0's
+"no trade P&L < −$150" bar — a bar that measured the engine's own cap exit, not the credit. The
+owner asked what the data says: accounting §7 had already rejected a $150 stop (−$870; 3 of 16
+winners were > $150 underwater before filling). **Requirements v2.1 removes the $150 line from every
+bar** (note in W5.3); the engine's exits stay the 60-min clock and the 3.5-pt cap. No candidate
+yaml changed. Both promotable candidates now read INCONCLUSIVE (1/10).
 
 The daily loop is now one command: `scripts/daily_session.py <date>` (SPX → HIRO capture/identity/
 ingest → chain → v1 backtest → hiro_watch/run.py), then `hiro_watch/compare.py`.
@@ -52,10 +52,9 @@ sit beside.
 
 ## What's next
 
-1. Owner decides the credit030 bar question above.
-2. Next capture: 2026-09-04 (this evening) — `python scripts/daily_session.py 2026-09-04` then
+1. Next capture: 2026-09-04 (this evening) — `python scripts/daily_session.py 2026-09-04` then
    `python scripts/hiro_watch/compare.py`.
-3. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
+2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 
 ## Standing constraints that bind this program
 

@@ -53,7 +53,7 @@ hiro_watch compare | baseline v1 80c3a41026c8… | sessions 2026-08-12..2026-09-
   A CONFIRMATION baseline fills  0, lost at 0.30: 0
   B DISCOVERY    baseline fills  3, lost at 0.30: 2 [['2026-08-12', 'B', 4], ['2026-08-25', 'B', 1]]
   B CONFIRMATION baseline fills  0, lost at 0.30: 0
-  VERDICT: REJECT (A) — trade P&L -350 < -150  [immediate path]
+  status: INCONCLUSIVE (1/10) — verdicts print at checkpoints only
   status: INCONCLUSIVE (1/10) — verdicts print at checkpoints only
 
 ### diag_late_off  [diagnostic, hiro_engine_v2, b0154c3e7347…]  r6_entries.late_enabled true -> false (R6.3 suppression off; never promoted)
@@ -87,7 +87,7 @@ hiro_watch compare | baseline v1 80c3a41026c8… | sessions 2026-08-12..2026-09-
     CONFIRMATION B  —
   book, all sessions (asof 2026-09-03): cash -1840 + inventory +165 (16 bombs) = MTM -1675   | baseline MTM -1305 (16 bombs)
   DISCOVERY    refused(levels_invalid): 2 episodes (0 also blocked otherwise), entered when rule off: 2, bombs 0, cash -170, worst -90, share MAE<-150: 0.00
-  CONFIRMATION refused(levels_invalid): 2 episodes (0 also blocked otherwise), entered when rule off: 1, bombs 0, cash -200, worst -200, share MAE<-150: 0.00
+  CONFIRMATION refused(levels_invalid): 2 episodes (1 also blocked otherwise), entered when rule off: 1, bombs 0, cash -200, worst -200, share MAE<-150: 0.00
   VERDICT: INCONCLUSIVE — 2/20 confirmation refused episodes [never promoted]
 
 ### diag_vt_off  [diagnostic, hiro_engine_v2, d1f946ee6c13…]  r4_vetoes.vt_broken_enabled true -> false (R4.1 short-block off; never promoted)
@@ -103,6 +103,6 @@ hiro_watch compare | baseline v1 80c3a41026c8… | sessions 2026-08-12..2026-09-
     CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
     CONFIRMATION B  —
   book, all sessions (asof 2026-09-03): cash -1790 + inventory +265 (20 bombs) = MTM -1525   | baseline MTM -1305 (16 bombs)
-  DISCOVERY    refused(vt_broken): 31 episodes (11 also blocked otherwise), entered when rule off: 6, bombs 4, cash -320, worst -190, share MAE<-150: 0.00
+  DISCOVERY    refused(vt_broken): 31 episodes (26 also blocked otherwise), entered when rule off: 6, bombs 4, cash -320, worst -190, share MAE<-150: 0.00
   CONFIRMATION refused(vt_broken): 0 episodes (0 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
   VERDICT: INCONCLUSIVE — 0/20 confirmation refused episodes [never promoted]

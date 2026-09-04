@@ -33,13 +33,13 @@ USD = 100.0                                                    # SPX option mult
 CLOSE_MIN = 960                                                # 16:00 ET in minutes
 log = logging.getLogger("hiro_watch.compare")
 
-# W5 — frozen with requirements.md v2.0 (2026-09-04). Change = new requirements version.
+# W5 — frozen with requirements.md v2.1 (2026-09-04; v2.0's $150 per-trade line removed). Change = new requirements version.
 CHECKPOINTS = (10, 20, 30, 40)
 TERMINAL = CHECKPOINTS[-1]
 BARS = dict(
     a_depth=dict(theta=-4.0, signals=20, signal_days=10, passed=10, passed_days=5, day_share=0.25,
-                 lb95=0.55, max_loss=-150.0, expire_signals=40),
-    credit=dict(A=dict(fills=15), B=dict(entries=10, fills=5), max_loss=-150.0, max_mae=-350.0),
+                 lb95=0.55, expire_signals=40),
+    credit=dict(A=dict(fills=15), B=dict(entries=10, fills=5)),
     diag=dict(episodes=20),
 )
 THETAS = (-1.0, -2.0, -3.0, -4.0, -5.0)
@@ -258,8 +258,6 @@ def verdict_a_depth(bt: pd.DataFrame, bsig: pd.DataFrame, ct: pd.DataFrame, cb: 
     ctP = passed[SETUP].merge(ctA, on=SETUP, how="inner")
     stray = len(ctA) - len(ctP)
     note = f" [{stray} candidate A trade(s) outside the passed cohort, unscored]" if stray else ""
-    if len(ctP) and ctP.pnl_usd.min() < B["max_loss"]:
-        return f"REJECT — passed loss {ctP.pnl_usd.min():+.0f} < {B['max_loss']:+.0f}{note}", True
     expired = len(sig) >= B["expire_signals"]
     counts_ok = (len(sig) >= B["signals"] and sig.session_date.nunique() >= B["signal_days"]
                  and len(passed) >= B["passed"] and passed.session_date.nunique() >= B["passed_days"]
@@ -304,8 +302,6 @@ def verdict_credit(bt: pd.DataFrame, ct: pd.DataFrame, branch: str, cb: dict, bb
     lost = lost_fills(bt, ct, branch)
     if len(lost):
         return f"REJECT ({branch}) — {len(lost)} baseline fill(s) lost at 0.30: {lost[SETUP].values.tolist()}", True
-    if len(ctB) and ctB.pnl_usd.min() < B["max_loss"]:
-        return f"REJECT ({branch}) — trade P&L {ctB.pnl_usd.min():+.0f} < {B['max_loss']:+.0f}", True
     need = B[branch]
     if branch == "A":
         counts_ok = int(btB.bomb.sum()) >= need["fills"]
@@ -317,8 +313,6 @@ def verdict_credit(bt: pd.DataFrame, ct: pd.DataFrame, branch: str, cb: dict, bb
         return f"INCONCLUSIVE ({branch}) — {progress}", False
     if cb["unmarked"] or bb["unmarked"]:
         return f"DEFERRED ({branch}) — unmarked bombs: {cb['unmarked'] + bb['unmarked']}", False
-    if len(ctB) and ctB.mae.min() < B["max_mae"]:
-        return f"REJECT ({branch}) — MAE {ctB.mae.min():+.0f} < {B['max_mae']:+.0f}", False
     if ctB.pnl_usd.sum() < btB.pnl_usd.sum():
         return f"REJECT ({branch}) — net cash {ctB.pnl_usd.sum():+.0f} < baseline {btB.pnl_usd.sum():+.0f}", False
     if cb["mtm"] < bb["mtm"]:

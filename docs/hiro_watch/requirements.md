@@ -1,7 +1,7 @@
 # Requirements — hiro_watch v2 (the clone route)
 
-*v2.0, 2026-09-04. Replaces the shadow-harness spec (retired; see `decision_clone_2026-09-04.md`).
-Written to be read in five minutes.*
+*v2.1, 2026-09-04. v2.0 + the $150 per-trade line removed from every bar (see W5.3 note). Replaces the
+shadow-harness spec (retired; see `decision_clone_2026-09-04.md`). Written to be read in five minutes.*
 
 ## What this is
 
@@ -99,22 +99,30 @@ Reads the baseline log(s) and every candidate log; prints, per candidate:
   CONFIRMATION rows feed a bar, a verdict, or an immediate path; EXCLUDED rows are shown, not counted.
 - **W5.2** Verdict lines print only when the number of confirmation sessions is in {10, 20, 30, 40};
   otherwise `INCONCLUSIVE (n/next)`. The 40th is terminal: sessions after it are EXCLUDED and the
-  40-session verdict stands. The ONLY immediate paths (print on the session they occur) are: a
-  passed A loss < −$150 (`a_depth_m4`), a baseline fill lost at 0.30, a trade P&L < −$150
-  (`credit030`). Every other REJECT/PROMOTE waits for a checkpoint.
+  40-session verdict stands. The ONLY immediate path (prints on the session it occurs) is a
+  baseline fill lost at 0.30 (`credit030`). Every other REJECT/PROMOTE waits for a checkpoint.
 - **W5.2a** Books used by a verdict are built on CONFIRMATION rows only: whole-portfolio for
   `a_depth_m4` (the gate's capacity spill into B is part of the candidate), branch-only for
   `credit030` (W1: read per branch). The all-sessions book is printed for context only.
 - **W5.3 Bars (frozen with this file):**
   - `a_depth_m4` (passed = baseline confirmation A signals with r30 < −4): ≥ 20 confirmation A
-    signals over ≥ 10 days AND ≥ 10 passed over ≥ 5 days, no day > 25 % of passed; passed completion LB95 > 0.55; passed cash + book per signal > baseline's per
-    signal on the same sessions; candidate MTM ≥ baseline MTM; no passed loss < −$150 → PROMOTE.
-    REJECT: LB95 ≤ 0.55, or expectancy ≤ baseline, or any passed loss < −$150 (immediate), or
+    signals over ≥ 10 days AND ≥ 10 passed over ≥ 5 days, no day > 25 % of passed; passed completion
+    LB95 > 0.55; passed cash + book per signal > baseline's per signal on the same sessions;
+    candidate MTM ≥ baseline MTM → PROMOTE. REJECT: LB95 ≤ 0.55, or expectancy ≤ baseline, or
     candidate MTM < baseline MTM − credits earned. 40 confirmation A signals without either →
     REJECT-EXPIRED.
   - `credit030`, per branch: A — ≥ 15 confirmation baseline A fills, **zero** lost at 0.30
-    (immediate REJECT otherwise), no trade P&L < −$150 (immediate), no MAE < −$350, net cash ≥
-    baseline, MTM ≥ baseline → PROMOTE. B — same with ≥ 10 B entries and ≥ 5 baseline B fills.
+    (immediate REJECT otherwise), net cash ≥ baseline, MTM ≥ baseline → PROMOTE. B — same with
+    ≥ 10 B entries and ≥ 5 baseline B fills.
+  - **v2.1 note (2026-09-04, after confirmation session 1):** v2.0 carried "no trade P&L < −$150
+    (immediate REJECT)" for both candidates and "no MAE < −$350" for credit030. Removed. The engine's
+    exits are the 60-min clock and the 3.5-pt cap (≈ $350) and produce > $150 losses by design
+    (3 of 14 discovery losers; 3 of 16 discovery winners were > $150 underwater before filling —
+    `branch_accounting_2026-09-03.md` §7 rejected a $150 stop at −$870). Neither candidate changes
+    an exit, so a per-trade loss line measures nothing about them and would have killed both on the
+    first cap exit (it fired on credit030 on 09-03, on a trade the baseline took identically). This
+    is a bar REMOVED after seeing one confirmation session, on the strength of discovery analysis
+    that predates it; recorded here so it cannot be mistaken for tuning.
   - `diag_*`: never a verdict; table labeled INCONCLUSIVE until ≥ 20 refused episodes.
 - **W5.4** A verdict comparing books requires both books fully marked; otherwise it defers and
   names the unmarked bombs.
