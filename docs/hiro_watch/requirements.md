@@ -1,0 +1,116 @@
+# Requirements — hiro_watch v2 (the clone route)
+
+*v2.0, 2026-09-04. Replaces the shadow-harness spec (retired; see `decision_clone_2026-09-04.md`).
+Written to be read in five minutes.*
+
+## What this is
+
+The frozen engine (`scripts/hiro_engine/`, CONFIG_HASH `80c3a41026c8…`) is the **baseline**. The
+watch answers one question every evening: *would a small, pre-registered change to the rules have
+done better on today's session?* — without touching the engine, without a second rule
+implementation, and without letting the answer be edited after the data arrives.
+
+A **candidate** is a config file. It is run through the engine (or a knob-added clone of the
+engine) exactly as the baseline is run, producing its own event log stamped with its own
+CONFIG_HASH. A **compare** script lays the candidate logs beside the baseline log and prints the
+accounting; verdict lines appear only at checkpoints.
+
+## W0. The one rule (everything else follows from it)
+
+> A candidate is a yaml under `docs/hiro_watch/configs/`, committed to git **before its first
+> confirmation session**. Its `watch.registered` date is its registration date; its CONFIG_HASH on
+> every log row is its identity; it is **never edited** — any change is a new file with a new name
+> and a new registration date.
+
+Corollaries:
+- **W0.1** `scripts/hiro_engine/` is never edited. The clone `scripts/hiro_engine_v2/` is edited
+  once (knobs added, live code removed) and then frozen the same way.
+- **W0.2** At v1-equivalent knob values the clone must reproduce the baseline log **byte-for-byte
+  except `config_hash`** over every stored session. This is checked before any candidate exists and
+  re-checked by a test.
+- **W0.3** No silent skips: a session either runs fully for every candidate or the evening command
+  fails with the reason. Duplicate session rows in a candidate log are an error, not a dedup.
+
+## W1. The candidates (registered 2026-09-04)
+
+| name | engine | change vs baseline | kind |
+|---|---|---|---|
+| `baseline_v2` | v2 | none (knobs at v1 values) — the W0.2 check | control |
+| `credit030` | v1 | `r1v3_limits.credit: 0.30` | promotable |
+| `a_depth_m4` | v2 | `r6_entries.a_r30_max: -4.0` (Branch A only when r30 ≤ −4 $B) | promotable |
+| `diag_vt_off` | v2 | `r4_vetoes.vt_broken_enabled: false` | diagnostic — never promoted |
+| `diag_levels_off` | v2 | `r4_vetoes.levels_invalid_enabled: false` | diagnostic — never promoted |
+| `diag_late_off` | v2 | `r6_entries.late_enabled: false` | diagnostic — never promoted |
+
+One change per candidate, never combined (attribution at n≈40 breaks otherwise). The credit
+applies to both branches; results are read per branch off the log's `branch` column.
+
+## W2. The clone (`scripts/hiro_engine_v2/`)
+
+- **W2.1** A copy of `scripts/hiro_engine/` with four config knobs, each defaulting (in
+  `baseline_v2.yaml`) to the v1-equivalent value: `r6_entries.a_r30_max` (v1: `< 0` → `0.0`),
+  `r4_vetoes.vt_broken_enabled`, `r4_vetoes.levels_invalid_enabled`, `r6_entries.late_enabled`
+  (all `true`). The knobs are read fail-closed like every other key.
+- **W2.2** Removed from the clone: live loop, ops checks, spikes, parity, R9a registration, golden
+  verify, sweep. The clone only backtests and scorecards. It never fetches chains (`fetch` raises;
+  the daily loop populates the shared cache through v1).
+- **W2.3** Subcommands: `backtest`, `scorecard`. Nothing else.
+
+## W3. The evening command (`scripts/hiro_watch/run.py`)
+
+- **W3.1** `run.py <date>`: for every yaml in `configs/`, run `python -m <engine> backtest --day
+  <date> --config <yaml>` with the yaml's own log paths. Refuses (before running anything) if
+  `<date>` already appears in any candidate's `sessions_backtest.csv`, or if the baseline has no row
+  for `<date>`.
+- **W3.2** `run.py --rebuild <name>|all`: delete the candidate's log dir and backtest every stored
+  session in order. Candidate logs are deterministic outputs of (yaml, stored data) and may be
+  rebuilt at any time; the baseline log is the only ledger.
+- **W3.3** ≈ 3 s per candidate-session. Six candidates ≈ 20 s.
+
+## W4. The compare (`scripts/hiro_watch/compare.py`)
+
+Reads the baseline log(s) and every candidate log; prints, per candidate:
+- **W4.1 Trades:** n signals / entries / fills (bombs), fill rate, net cash (credits + failed-attempt
+  P&L), worst loss, MAE worst, minutes-to-fill median — per branch, split DISCOVERY | CONFIRMATION.
+- **W4.2 Book:** every completed bomb still open, marked at the latest session's close (closing-NBBO
+  mid of the spread × 100; `UNMARKED` if either leg has no valid closing quote); settled payoff for
+  expired bombs (max(0, K_long − S_settle) − max(0, K_short − S_settle), S_settle = last regular-hours
+  SPX 1-min close of expiry day); MTM = cash + marks + settlements. Baseline gets the same book.
+- **W4.3 Per-candidate detail:** `credit030` — baseline fills lost at 0.30 (join on setup);
+  `a_depth_m4` — the Θ ladder {−1,…,−5} over baseline A signals (r30 parsed from the signal note)
+  plus passed/rejected cohorts; `diag_*` — sole-blocker attribution: a refused baseline setup is
+  scored only if the diag run actually entered it.
+- **W4.4 LB95:** completion lower bound = min(session-bootstrap 5th percentile, Clopper–Pearson),
+  `DRAWS`/`SEED` imported from `hiro_engine.register`.
+
+## W5. Firewall and checkpoints
+
+- **W5.1** A session is DISCOVERY if its date ≤ the candidate's `watch.registered` date, else
+  CONFIRMATION. Only countable confirmation sessions (baseline disposition `countable`) feed a bar.
+- **W5.2** Verdict lines print only when the number of countable confirmation sessions is in
+  {10, 20, 30, 40}; otherwise `INCONCLUSIVE (n/10)`. The 40th checkpoint is terminal. Immediate
+  REJECT paths (below) fire on the session they occur.
+- **W5.3 Bars (frozen with this file):**
+  - `a_depth_m4`: ≥ 20 confirmation A signals over ≥ 10 days AND ≥ 10 passed over ≥ 5 days, no day
+    > 25 % of passed; passed completion LB95 > 0.55; passed cash + book per signal > baseline's per
+    signal on the same sessions; candidate MTM ≥ baseline MTM; no passed loss < −$150 → PROMOTE.
+    REJECT: LB95 ≤ 0.55, or expectancy ≤ baseline, or any passed loss < −$150 (immediate), or
+    candidate MTM < baseline MTM − credits earned. 40 confirmation A signals without either →
+    REJECT-EXPIRED.
+  - `credit030`, per branch: A — ≥ 15 confirmation baseline A fills, **zero** lost at 0.30
+    (immediate REJECT otherwise), no trade P&L < −$150 (immediate), no MAE < −$350, net cash ≥
+    baseline, MTM ≥ baseline → PROMOTE. B — same with ≥ 10 B entries and ≥ 5 baseline B fills.
+  - `diag_*`: never a verdict; table labeled INCONCLUSIVE until ≥ 20 refused episodes.
+- **W5.4** A verdict comparing books requires both books fully marked; otherwise it defers and
+  names the unmarked bombs.
+- **W5.5** PROMOTE means "eligible for the R7.2 → spec-edit → R9a re-registration path". The watch
+  changes nothing in the engine.
+
+## Acceptance
+
+- `pytest scripts/hiro_engine_v2/tests` green; a test asserts W0.2 on the stored sessions.
+- `run.py --rebuild all` over the 16 stored sessions, then `compare.py` reproduces
+  `branch_accounting_2026-09-03.md` §1 (baseline 29/16, A 22/13, B 7/3, realized −$1,050) and §7
+  (`credit030` +$320, 13/13 A fills held).
+- `run.py <date>` on a new session appends exactly one session to every candidate and refuses on a
+  second invocation.
