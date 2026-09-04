@@ -47,15 +47,46 @@ engine-identity guard that hashes `scripts/hiro_engine/` before and after every 
   portfolio (sequential) replays — Charlie's round-2 point.
 - Build acceptance ≠ investment approval: task 12 is a separate governance gate (CIO's point).
 
-## Open question — being answered now
+## Simplicity audit — DONE 2026-09-04: verdict OVER-ENGINEERED (both reviewers, independently)
 
-**Is this over-engineered?** The user wants the WATCH SIMPLE and easily understood. The next
-action is a simplicity audit of all four documents (requirements / design / tasks, plus this
-status) by the architect in-session and, in parallel, through `/codex-plan-review`, asking one
-question: what can be cut or collapsed without losing the pre-registration discipline (frozen
-definitions, firewall, checkpoints, no engine edits)? Expected outcome: a v2 of the trio that is
-materially shorter, or an explicit finding that the size is warranted. Nothing is built until that
-audit lands AND the user says go.
+Two audits ran in parallel on the whole trio with the same question ("what is weight vs
+load-bearing for the pre-registration discipline?"):
+
+- `simplicity_audit_architect_2026-09-04.md` — in-session architect, read the engine source.
+  Verdict: over-engineered, ~85% confidence. ~60% of mechanisms are weight.
+- `simplicity_audit_codex_2026-09-04.md` — `/codex-plan-review`, architect persona + generic.
+  Verdict: FAIL on over-engineering (8 + 11 findings, 13 synthesized, 8 HIGH).
+
+Where they agree (cut): cumulative snapshot chains / `current` / `prev_snapshot` / orphan GC;
+`.code` lineage + `rebind` + `active.txt` / `--supersede`; 14-class exception hierarchy;
+isolated per-trade replays + `MAX_ISOLATED` + `entry_filter`; the diagnostic CREDIT layer
+(`ladder.py` re-implements fill physics); dual-source settlement + pinning + reconciliation;
+mark-row shas / `MarkTampered`; `single_writer_lock`; holiday CSV; scale monitor; 9-value
+eligibility enum; per-run engine-artifact hashing (becomes a test); `constants.py`; 13 modules →
+5-8. Both put the honest size at ~500-850 production lines + ~400 tests, vs ~1,800.
+
+Where they agree (keep): WATCH_HASH over canonical JSON; discovery/confirmation firewall;
+checkpoint-only verdicts with the registered bars; portfolio (sequential) replay as the verdict
+basis; per-branch credit; sole-blocker attribution; UNMARKED as a first-class state; LB95 with
+the Clopper-Pearson floor; baseline-equals-engine-log runtime check; input shas + byte-identical
+re-run; per-session atomic directory.
+
+Two engine-source facts the audit surfaced (verified): (1) a simpler injection point exists —
+one row pre-transform in `RuleEngine.evaluate` (`session.py:272`, `rules.py:136-150`) covers
+A-DEPTH, LATE-off, vt_broken-off, levels_invalid-off; the design's `_entry_events` post-filter,
+gated-episode memory and `_vetoes` override are unnecessary. Two silencers are mandatory:
+`MemoryLog`, and a no-op `_write_session_row` (`Session.finish()` writes `sessions_backtest.csv`
+unconditionally, `session.py:365-381`). (2) `leg_liq_loss_usd` is updated EVERY bar
+(`executor.py:207,266`), so the spec's "recompute MAE from chains" clause (W2.6 / design §5) is
+wrong — use the engine's field.
+
+Codex also found three contract defects independent of size: the `attach_outcomes` join on
+`trade_id` before it exists; `rebind` vs `require_code_match` contradiction; CREDIT's `leg1_fill`
+dependency violating the W2.2-only classifier firewall as written. All three vanish in the
+minimal design.
+
+Decision pending from the user: rewrite the trio as v2 (target: requirements ~180 lines, design
+~150, tasks 7 tasks) on the minimal design, one review round, then go/no-go on build.
 
 ## What's next, in order
 
