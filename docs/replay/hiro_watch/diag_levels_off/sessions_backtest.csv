@@ -16,3 +16,4 @@ date,disposition,outage_min,mode,config_hash
 2026-09-01,countable,0,backtest,1d29de15b88e29e3fe68872a0e916ee4b6dee54c08c2d6255ff98855d0cefcee
 2026-09-02,countable,0,backtest,1d29de15b88e29e3fe68872a0e916ee4b6dee54c08c2d6255ff98855d0cefcee
 2026-09-03,countable,0,backtest,1d29de15b88e29e3fe68872a0e916ee4b6dee54c08c2d6255ff98855d0cefcee
+2026-09-04,event_standdown,0,backtest,1d29de15b88e29e3fe68872a0e916ee4b6dee54c08c2d6255ff98855d0cefcee

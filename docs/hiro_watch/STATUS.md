@@ -32,6 +32,12 @@ winners were > $150 underwater before filling). **Requirements v2.1 removes the 
 bar** (note in W5.3); the engine's exits stay the 60-min clock and the 3.5-pt cap. No candidate
 yaml changed. Both promotable candidates now read INCONCLUSIVE (1/10).
 
+**Session 2026-09-04** (NFP): engine stood down by rule (R4.4); no candidate traded; not a confirmation
+session. Inventory marked +$590 (SPX −30 on the day) → baseline MTM −$880. Tally + Charlie/Brent
+plain-language diagnosis + Feynman: `tally_review_2026-09-04.md`. Both reviewers: the trade's
+economics are broken ($160 earned vs $1,630 lost on naked legs), the inventory is one correlated
+guess, and the tape has confirmed nothing yet (1/10).
+
 The daily loop is now one command: `scripts/daily_session.py <date>` (SPX → HIRO capture/identity/
 ingest → chain → v1 backtest → hiro_watch/run.py), then `hiro_watch/compare.py`.
 
@@ -52,7 +58,7 @@ sit beside.
 
 ## What's next
 
-1. Next capture: 2026-09-04 (this evening) — `python scripts/daily_session.py 2026-09-04` then
+1. Next capture: 2026-09-08 (Tue, after Labor Day) — `python scripts/daily_session.py 2026-09-08` then
    `python scripts/hiro_watch/compare.py`.
 2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 
