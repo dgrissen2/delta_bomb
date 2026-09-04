@@ -50,3 +50,7 @@ Thumbs.db
 *.log
 tmp/
 scratch/
+
+# Tool scratch (codex review runs, Serena project state)
+.codex-review-runs/
+.serena/
