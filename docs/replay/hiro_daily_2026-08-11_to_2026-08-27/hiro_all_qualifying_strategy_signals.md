@@ -1,5 +1,7 @@
 # All qualifying HIRO call-path signals: 2026-08-11 through 2026-08-27
 
+> Historical three-call-method artifact. The active screened inventory is the [Pandar-approved two-method master](../hiro_daily_pandar_approved_2026-08-11_to_2026-09-04/README.md); this file remains unchanged below for point-in-time reproducibility.
+
 Complete frozen-and-appended set: **87 ticker/date rows across 49 unique tickers**. The original 58 rows through August 21 are preserved point-in-time; 29 later rows were appended for August 24-27. Surface qualification determines inclusion; exact-chain status is an execution annotation.
 
 The universe is the 398-symbol HIRO list refreshed from the authenticated SpotGamma screener on 2026-08-28. That current membership is applied retrospectively, so membership is not a historical snapshot; ORATS ranks and quotes are point-in-time.

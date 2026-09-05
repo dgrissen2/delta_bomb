@@ -5,6 +5,7 @@ Analysis of the Delta Bomb options strategy (SPX hedges + upside calls) from Dis
 ## Contents
 
 - `docs/strategy_names.md` — canonical names and aliases for the four single-name strategies: **Buy-first call puke**, **Buy-first call standard**, **Sell-first call grab**, and **Buy-first put-tail inventory**.
+- `docs/replay/hiro_daily_pandar_approved_2026-08-11_to_2026-09-04/README.md` — the active Pandar-only master: just **Sell-first call grab (Pandar core only)** and **Buy-first put-tail inventory**, with every evaluated session, exact-chain decisions, and deduplicated HIRO follow-through through September 4.
 - `docs/replay/hiro_daily_four_methods_2026-08-24_to_2026-09-02/README.md` — refreshed 398-ticker HIRO-universe scan through September 2, including the extra put-tail week, exact historical contracts, rejection evidence, and serial HIRO follow-through inventory.
 - `scripts/hiro_engine/` — **the Delta Bomb signal engine** (paper-only): live SPX 1-min + HIRO evaluation of the frozen rules, silent paper executor, console event stream, backtesting (verification / sweep / rehearsal), and the R9 scorecard. Docs: `docs/hiro_engine/` (requirements v2.2, design v1.1, tasks v1.2, build_notes, RUNBOOK). Run: `cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python -m hiro_engine {live|backtest|verify|scorecard|sweep}`. Tests: `pytest scripts/hiro_engine/tests`.
 - `docs/delta_bombs.html` — the analysis: mechanics, SPX put playbook, the 50/20 → 3 bombs walkthrough, call side, evidence, and a Charlie McElligott positioning read.

@@ -134,6 +134,36 @@ class SignalTests(unittest.TestCase):
             ],
         )
 
+    def test_scenario_expansion_can_limit_to_pandar_approved_methods(self) -> None:
+        signals = pd.DataFrame(
+            [
+                {
+                    "tradeDate": "2026-09-03",
+                    "ticker": "AAA",
+                    "liquid_final": True,
+                    "buy_first_puke": True,
+                    "buy_first_standard": True,
+                    "sell_first_actionable": True,
+                    "buy_first_put_tail_inventory": True,
+                    "buy_score": 10.0,
+                    "sell_score": 20.0,
+                    "put_inventory_score": 30.0,
+                }
+            ]
+        )
+
+        selected = SCREEN.expand_scenario_candidates(
+            signals,
+            call_start="2026-09-03",
+            put_start="2026-09-03",
+            scenarios=SCREEN.PANDAR_APPROVED_METHODS,
+        )
+
+        self.assertEqual(
+            set(selected["scenario"]),
+            {"sell-first call grab", "buy-first put-tail inventory"},
+        )
+
     def test_orats_synthetic_aliases_are_not_single_stocks(self) -> None:
         self.assertTrue(SCREEN.is_single_stock_ticker("NVDA"))
         self.assertFalse(SCREEN.is_single_stock_ticker("XLY_C"))

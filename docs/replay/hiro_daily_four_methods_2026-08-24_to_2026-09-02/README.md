@@ -1,5 +1,7 @@
 # Four-method HIRO single-name scan through 2026-09-02
 
+> Historical four-method artifact. The active screened inventory is the [Pandar-approved two-method master](../hiro_daily_pandar_approved_2026-08-11_to_2026-09-04/README.md); this file remains unchanged below for point-in-time reproducibility.
+
 ## Outcome
 
 The authenticated SpotGamma HIRO universe contained **398 tickers**. After excluding indices/funds and enforcing the frozen liquidity gates, the scan produced **822 surface-qualified method/date rows across 167 current tickers**. Exact historical chains confirmed **80 rows**, yielding **31 method/ticker finalists across 30 unique stocks**.

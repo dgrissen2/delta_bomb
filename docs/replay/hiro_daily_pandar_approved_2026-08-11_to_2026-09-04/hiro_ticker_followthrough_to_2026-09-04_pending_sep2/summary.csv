@@ -1,0 +1,3 @@
+ticker,start_date,end_date,status,available_sessions,unavailable_sessions,row_count,error,captured_at_utc
+MDB,2026-09-03,2026-09-04,success,2,0,56180,,2026-09-04T22:29:51.830319+00:00
+PDD,2026-09-03,2026-09-04,success,2,0,56174,,2026-09-04T22:30:02.800094+00:00

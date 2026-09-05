@@ -48,6 +48,9 @@ BUY_FIRST_CALL_PUKE = "buy-first call puke"
 BUY_FIRST_CALL_STANDARD = "buy-first call standard"
 SELL_FIRST_CALL_GRAB = "sell-first call grab"
 BUY_FIRST_PUT_TAIL_INVENTORY = "buy-first put-tail inventory"
+PANDAR_APPROVED_METHODS = frozenset(
+    {SELL_FIRST_CALL_GRAB, BUY_FIRST_PUT_TAIL_INVENTORY}
+)
 
 SUMMARY_FIELDS = (
     "ticker",
@@ -340,6 +343,7 @@ def expand_scenario_candidates(
     *,
     call_start: str,
     put_start: str,
+    scenarios: Iterable[str] | None = None,
 ) -> pd.DataFrame:
     """Return one row per qualifying method without masking overlaps."""
     rules = (
@@ -353,8 +357,17 @@ def expand_scenario_candidates(
             put_start,
         ),
     )
+    selected_scenarios = set(scenarios) if scenarios is not None else None
+    known_scenarios = {scenario for scenario, *_ in rules}
+    if selected_scenarios is not None:
+        unknown = selected_scenarios - known_scenarios
+        if unknown:
+            raise ValueError(f"unknown scenarios requested: {sorted(unknown)}")
+
     candidates: list[pd.DataFrame] = []
     for scenario, gate_column, score_column, start_date in rules:
+        if selected_scenarios is not None and scenario not in selected_scenarios:
+            continue
         mask = (
             all_signals["liquid_final"]
             & all_signals[gate_column]
@@ -2031,6 +2044,7 @@ def command_analyze(args: argparse.Namespace) -> None:
         all_signals,
         call_start=args.start,
         put_start=put_start,
+        scenarios=PANDAR_APPROVED_METHODS if args.pandar_approved_only else None,
     )
 
     output_dir = Path(args.output_dir)
@@ -2099,6 +2113,9 @@ def command_analyze(args: argparse.Namespace) -> None:
         "candidate_rows": int(len(selected)),
         "candidate_tickers": int(selected["ticker"].nunique()),
         "scenario_counts": selected["scenario"].value_counts().to_dict(),
+        "selection_scope": (
+            "pandar-approved-only" if args.pandar_approved_only else "all-four-methods"
+        ),
         "method": {
             "percentiles": "strict share of prior 252 sessions below current; min 126",
             "broad_universe": (
@@ -2140,6 +2157,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--universe-csv",
         help="optional CSV containing a Ticker column; limits analysis to that set",
+    )
+    parser.add_argument(
+        "--pandar-approved-only",
+        action="store_true",
+        help=(
+            "emit only sell-first call grab and buy-first put-tail inventory "
+            "candidates"
+        ),
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
