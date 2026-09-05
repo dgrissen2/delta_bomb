@@ -1,0 +1,24 @@
+## Codex Strategy Review — Charlie McElligott
+**Verdict**: FAIL (7 findings)
+
+### Persona Lens
+
+This lens asks what exposure you hold when supportive flow disappears, and what forces you to exit. B attempts to acquire downside protection by first taking bullish risk. The central problem is the transition between those positions. Positive HIRO does not establish durable price support or identify dealers’ gamma exposure.
+
+### Findings
+
+| # | Finding | Severity | Category | Details |
+|---|---------|----------|----------|---------|
+| 1 | B needs favorable movement before it becomes protection. | HIGH | Structural exposure | After selling the lower-strike put, B needs the higher-strike put to become cheap enough to complete the spread. Until then, it holds a short put: falling spot hurts, and negative gamma makes directional exposure worsen as spot falls, other things equal. This vulnerability belongs to sell-first sequencing; freeing capacity merely exposes more trades to it. The completed spread’s protection cannot protect the unfinished trade. [OIC gamma reference](https://prd-web.optionseducation.org/advancedconcepts/gamma) supports this distinction. |
+| 2 | The observed failure is loss of flow support before completion. | HIGH | Exit mechanics | Four scratches cost $320; three veto exits cost $330. All seven unsuccessful attempts ended through flow exits, before any timeout or cap. That is consistent with entry flow failing to persist long enough, although the brief lacks exit paths to establish the precise price/volatility mechanism. “Scratch” means an average $80 loss here. Its three-minute window also leaves later deterioration dependent on other exits; August 28 lost $220 after reaching −$290. Zero cap exits does not demonstrate safety. |
+| 3 | Capacity explains the deterioration, not the underlying weakness. | MEDIUM | Attribution | The original seven trades and all three bombs are unchanged. The additional trades contribute exactly −$360 and no inventory. Thus, the worse B result under `a_depth_m4` comes entirely from admitting previously blocked attempts. But v1 B was already −$205 including inventory. Capacity happened to shelter B from three more losers; it did not create the short-put vulnerability or establish that the sheltered version had an edge. |
+| 4 | These trades do not justify including B. | HIGH | Strategy selection | Ten attempts produced three spreads, $650 of failed-attempt losses, $30 of completion credits and $55 of current inventory: −$565. Successful assembly exists; demonstrated economic value does not. Even a successful attempt spent 51 minutes exposed and reached −$90. Keep B disabled on this evidence. This is a decision about the evidence available, not proof B can never work: all trades are discovery observations, and the confirmation session supplied no B trade. |
+| 5 | The LATE conclusion contradicts its own numbers. | MEDIUM | Gate interpretation | “Turning any of those blocks off loses money” conflicts with “late off +$45” if these figures share the stated comparison basis. Clarify whether +$45 is an improvement or another measure. August 25 also shows a setup suppressed at 11:34 but admitted at 11:37. That raises a specific concern that the threshold can clear as flow slows, without establishing renewed support. The supplied snapshots cannot prove that explanation. |
+| 6 | The overall improvement does not reconcile. | MEDIUM | Accounting | Moving from −$880 to −$270 is +$610. The stated contributions, A +$1,260 and B −$360, sum to +$900. A −$290 component is missing or one number is wrong. B’s isolated deterioration reconciles correctly, but the owner cannot assess the claimed whole-strategy improvement from the attribution presented. |
+| 7 | The bomb payoff description omits its main downside outcome. | MEDIUM | Payoff interpretation | For the stated same-expiry higher-strike long/lower-strike short put spread, settlement value rises from zero to $500 between the strikes and remains $500 below the lower strike. It does not require settlement between them. This matters when judging tail protection. The $55 is an interim mark, not final realized value; eventual payouts could change the result. [OIC payoff reference](https://www.optionseducation.org/strategies/all-strategies/bear-put-spread). |
+
+### Blind Spots And Missing Work
+
+- Entry snapshots cannot distinguish spot reversal, volatility repricing and execution costs as the immediate source of each loss.
+- Fill and inventory valuation conventions, including fees, are unstated.
+- Existing results need accounting reconciliation and eventual settlement values. Neither requires a new research programme, and neither currently supplies a reason to enable B.
