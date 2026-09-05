@@ -56,9 +56,16 @@ ingest → chain → v1 backtest → hiro_watch/run.py), then `hiro_watch/compar
 None of this is evidence (all discovery). It is the reference table the confirmation columns will
 sit beside.
 
+**Branch B (2026-09-05):** failure modes and actionable candidates from Charlie + Brent on GPT-6 Astra —
+`branch_b_review_2026-09-05.md`, `branch_b_actions_astra_*.md`, CIO memo `branch_b_cio_memo_2026-09-05.md`.
+Ranked single-knob candidates to register before the next session: B-PULL (pull30 ≥ 8), B-SIZE (run ≤ 1.0 $B),
+B-CREDIT-0 (B rests at fill − 0.00), B-OFF (control), then LATE-sticky and run-age ≤ 15. Rejected: wider
+scratch window; pull30 10 as a separate test. Owner's go needed to register (each needs a v2 knob).
+
 ## What's next
 
-1. Next capture: 2026-09-08 (Tue, after Labor Day) — `python scripts/daily_session.py 2026-09-08` then
+1. Owner's go on registering the Branch-B candidates (each = one knob in hiro_engine_v2 + one yaml).
+2. Next capture: 2026-09-08 (Tue, after Labor Day) — `python scripts/daily_session.py 2026-09-08` then
    `python scripts/hiro_watch/compare.py`.
 2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 

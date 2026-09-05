@@ -1,0 +1,26 @@
+## Codex Strategy Review — Charlie McElligott
+**Verdict**: CONDITIONAL PASS (8 findings)
+
+### Persona Lens
+
+This lens distinguishes flow intensity from remaining buying power: a large positive run can represent demand already spent. It also asks whether flow produces the price response needed to complete the trade. The evidence supports testing deeper pullbacks and limiting accumulated flow; it does not establish a dealer-positioning mechanism.
+
+### Findings
+
+| # | Finding | Severity | Category | Details |
+|---|---------|----------|----------|---------|
+| 1 | Complete the economic score before selecting a winner | HIGH | Measurement | The ten rows total **−$620**, including $30 from three fills. The brief also assigns terminal value to completed bombs but supplies no expiry outcomes. If excluded from recorded P&L, total economics are **−$620 plus those terminal payoffs**, less costs. Their stated maximum adds $1,500. This omission can change candidate rankings, particularly when a filter sacrifices a bomb. Report completion rate and full economic P&L separately. |
+| 2 | **Rank 1: B-PULL, minimum pull30 3 → 8 points** | MEDIUM | Entry selection | Retains only **08-12 10:14** and **08-25 10:45**: two fills, recorded **+$20**. Removes all seven losses but also **08-12 11:34**, the 51-minute fill. This best expresses the hypothesis that meaningful price displacement creates room for recovery. Reject 10 as a separate candidate: no observation lies between 8 and 10, so both thresholds select identically. Two observations justify a confirmation test, not an established edge. |
+| 3 | **Rank 2: B-SIZE, maximum run flow uncapped → $1.0B** | MEDIUM | Flow exhaustion | Using displayed values, retains **08-12 10:14, 10:47, 11:34; 08-13 12:09; 08-25 10:45**: all three fills, two scratches, recorded **−$110**. Removes five losses totaling $510. It tests whether accumulated buying has already exhausted the opportunity. Do not combine size and age: that prevents attribution. Verify unrounded flow at the inclusive $1.0B boundary, especially 08-12 10:14. |
+| 4 | **Rank 4: B-AGE, maximum run age uncapped → 15 minutes** | MEDIUM | Candidate priority | Removes **08-25 11:37 (−$80)** and **08-28 12:53 (−$220)**; retains eight trades, all three fills, recorded **−$320**. It leaves five losses, including young, fast runs on **08-14** and **08-17**. Size therefore has stronger discovery discrimination. Keep age as an independent alternative, with lower priority; neither age nor size proves that marginal buying power is exhausted. |
+| 5 | **Rank 3: B-CREDIT-0, required credit $0.10 → $0.00** | MEDIUM | Execution economics | Raising the buy limit by $0.10 should make the three existing completions available no later under identical quote paths and fill assumptions. Any of the seven failed completions might also fill; the supplied observations cannot identify which. Existing fills sacrifice up to $30 aggregate credit at their limits. Reject a simultaneous debit variant: first test zero credit alone. Rank using terminal payoff and execution costs, not merely additional bombs. |
+| 6 | **Rank 5: B-LATE-STICKY, maximum prior LATE hits per episode uncapped → 0** | MEDIUM | State persistence | **08-25 11:37** is the sole documented qualifying rejection: its rate slipping below 4 did not establish renewed opportunity. Removing that row alone changes recorded P&L to **−$540**. Effects on the other nine are unknown because their prior LATE histories are absent. Register only after defining an episode reset; otherwise the threshold has no reproducible meaning. |
+| 7 | **Reject B-SCRATCH-10 as the proposed cure** | MEDIUM | Exit logic | Expanding eligibility from 3 to 10 minutes does **not** postpone existing scratches. It can introduce later exits. The alternative, drawdown threshold **$0.3B → $0.5B**, would cease triggering on the supplied +3-minute flow readings for **08-12 10:47, 08-13 12:09, 08-14 11:36**, while **08-25 11:37** still breaches. Earlier paths and run-break triggers could preserve those exits. One subsequent recovery does not justify tolerating deeper deterioration; replacement P&Ls are unknown. |
+| 8 | **B-OFF: retain as a control, reject as the demonstrated winner** | MEDIUM | Opportunity cost | Set B’s daily entry allowance **3 → 0**. All ten B trades disappear, giving zero direct B P&L and zero B bombs. Incremental A performance requires replay. The cited **−$360** capacity spill does not establish what A earns when B is disabled, and the missing bomb payoffs prevent an economic verdict. |
+
+### Blind Spots And Missing Work
+
+- These are fixed-row exclusions, not strategy replays. Capacity changes can admit replacement trades.
+- Sixty-minute extrema cannot establish “down first”; later SPX appreciation cannot prove an option limit would fill. Obtain ordered price, flow, and executable option quotes.
+- Freeze thresholds before confirmation. Sixteen sessions and ten trades provide weak evidence; one confirmation session without B activity validates nothing.
+- Record price response per unit of flow and contemporaneous positioning context. That would distinguish exhausted demand from temporarily ineffective demand without prematurely adding another gate.
