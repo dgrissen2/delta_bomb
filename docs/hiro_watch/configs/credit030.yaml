@@ -60,6 +60,10 @@ r6_entries:
   rest_offset: 0.10           # R6.1/R6.2 resting-limit offset vs first leg
   a_r30_lt: 0.0               # W2.1 knob — Branch A signal needs r30 < this ($B); 0.0 = v1 exactly; -4.0 = a_depth_m4
   late_enabled: true          # W2.1 knob — false = diag_late_off (R6.3 suppression off)
+  late_sticky: false          # W2.1 knob — true = once LATE fires, the episode stays suppressed (B-LATE-STICKY)
+  b_enabled: true             # W2.1 knob — false = no Branch-B entries (B-OFF control)
+  b_run_max: 1.0e9            # W2.1 knob — Branch-B signal needs run <= this ($B); 1e9 = v1 (unbounded); 1.0 = B-SIZE
+  b_dur_max: 1.0e9            # W2.1 knob — Branch-B signal needs run age <= this (min); 1e9 = v1; 15 = B-AGE
 
 r7_exits:
   scratch_drop_bps: 0.3       # R7.2 L drop below entry value ($B)
@@ -70,6 +74,7 @@ r7_exits:
 
 r1v3_limits:                  # v3.0 resting-limit mechanics (R1.4)
   credit: 0.30                # THE CHANGE (v1: 0.10) — hiro_watch candidate credit030
+  credit_b: 0.10              # W2.1 knob — Branch-B resting credit (v1 = credit); 0.00 = B-CREDIT-0
   limit_tick: 0.10            # premium grid at these strikes; L rounds AGAINST us
   first_eligible_offset: 2    # first fill-eligible minute = signal + 2
   quote_gap_invalid_after: 5  # consecutive gap minutes -> cancel + data_invalid (R10.4)

@@ -29,6 +29,15 @@ Decisions taken while building that are not in the spec, and why.
   first backfill already showed why: `credit030` loses 2 of 3 B fills under the engine's own exits
   where the isolated replay had predicted a fill.
 
+## Branch-B knobs (2026-09-05/06)
+
+Added to the clone at v1-equivalent defaults after the Charlie/Brent failure-mode reviews:
+`b_enabled`, `b_run_max`, `b_dur_max` (in `_entry_events`, on `b_qualifies`), `late_sticky` (uses the
+engine's own `_late_logged_episode`), `credit_b` (executor: booking and the R1.4e invariant pick the
+branch's credit). Tests per knob; byte-identity holds. The candidate yamls gained the five lines (hashes
+changed, behaviour and tally identical — `configs/README.md` note). `b_pull_min_pts` needed no code.
+Diagnostic replays and the 60-cell grid: `knob_results_2026-09-05.md`; none registered yet.
+
 ## Review round 1 (`/code-review`, 2026-09-04) — 10 findings, all fixed
 
 | # | finding | fix |

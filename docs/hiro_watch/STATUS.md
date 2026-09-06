@@ -62,9 +62,17 @@ Ranked single-knob candidates to register before the next session: B-PULL (pull3
 B-CREDIT-0 (B rests at fill − 0.00), B-OFF (control), then LATE-sticky and run-age ≤ 15. Rejected: wider
 scratch window; pull30 10 as a separate test. Owner's go needed to register (each needs a v2 knob).
 
+**Knobs built (2026-09-05/06):** the five Branch-B knobs exist in v2 at v1 defaults (160 tests green,
+byte-identity holds; candidate hashes regenerated, tally identical). Diagnostic replays of every knob,
+the A-gate combos and a 60-cell grid: `knob_results_2026-09-05.md`; the rules in plain English:
+`rules_in_english.md`. Owner's higher-N pick: `r30 < −2` + `run ≤ 1.0` + A credit 0.30 / B 0.10 →
+12 bombs, cash +$160, MTM +$620 on discovery data. Nothing new registered yet.
+
 ## What's next
 
-1. Owner's go on registering the Branch-B candidates (each = one knob in hiro_engine_v2 + one yaml).
+1. Owner's go on WHICH candidates to register (each = one yaml; the knobs exist). Suggested set:
+   `a_depth_m2` (−2 alone), `b_size1` (run ≤ 1.0 alone), `b_pull8`, `b_off` (control), and the named
+   three-knob pick `a2_size1_c30` — so confirmation can tell which knob earns.
 2. Next capture: 2026-09-08 (Tue, after Labor Day) — `python scripts/daily_session.py 2026-09-08` then
    `python scripts/hiro_watch/compare.py`.
 2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).

@@ -147,11 +147,18 @@ class RuleEngine:
                    and state.entered_episode_a != row.episode_a and in_window and a_ok_time
                    and row.episode_a_start is not None
                    and row.episode_a_start >= self.k["branch_a_start_min"])
+        # W2.1 knobs (v1-equivalent: b_enabled true, b_run_max/b_dur_max unbounded)
+        b_knobs = (bool(self.e6["b_enabled"])
+                   and (row.run is None or row.run <= float(self.e6["b_run_max"]))
+                   and (row.dur is None or row.dur <= float(self.e6["b_dur_max"])))
         b_qualifies = (self.tier.branch_b_enabled and row.b_armed and row.b_gates
                        and row.episode_b is not None
-                       and state.entered_episode_b != row.episode_b and in_window)
+                       and state.entered_episode_b != row.episode_b and in_window
+                       and b_knobs)
         # R6.3 late suppression: one line per episode
         late = row.late_state and bool(self.e6["late_enabled"])      # W2.1 knob late_enabled
+        if bool(self.e6["late_sticky"]) and self._late_logged_episode == row.episode_b:
+            late = True                                               # W2.1 knob: LATE never clears within an episode
         if (self.tier.branch_b_enabled and row.b_armed and late
                 and row.episode_b is not None
                 and self._late_logged_episode != row.episode_b and in_window):

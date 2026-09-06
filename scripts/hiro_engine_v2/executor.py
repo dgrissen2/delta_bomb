@@ -33,6 +33,7 @@ class Executor:
         self.cap_option = cfg.num("r7_exits", "cap_option_pts")
         self.rest_offset = cfg.num("r6_entries", "rest_offset")
         self.credit = cfg.num("r1v3_limits", "credit")
+        self.credit_b = cfg.num("r1v3_limits", "credit_b")      # W2.1 knob: Branch-B credit (v1 = same as credit)
         self.tick = cfg.num("r1v3_limits", "limit_tick")
         self.first_off = cfg.i("r1v3_limits", "first_eligible_offset")
         self.stale_max = cfg.i("r1v3_limits", "exit_stale_quote_max_min")
@@ -167,7 +168,8 @@ class Executor:
                           notes="entry ABORTED — working-strike quotes missing/invalid (R10.4)")]
         sell = pe.side == "sell_first"
         leg1_fill = q1.bid if sell else q1.ask                     # conservative (R1.4b)
-        raw_l = leg1_fill - self.credit if sell else leg1_fill + self.credit
+        credit = self.credit_b if pe.branch == "B" else self.credit
+        raw_l = leg1_fill - credit if sell else leg1_fill + credit
         lim_side = "buy" if sell else "sell"
         L = round_limit_against(raw_l, lim_side, self.tick)
         lim = RestingLimit(side=lim_side, strike=pe.k2, price=L, placed_min=bar.min,
@@ -243,9 +245,10 @@ class Executor:
             L = tr.limit.price
             tr.leg2_fill = L
             tr.credit = round(abs(tr.leg1_fill - L), 10)
-            if tr.credit < self.credit - 1e-9:               # R1.4e invariant, hard
+            credit = self.credit_b if tr.branch == "B" else self.credit
+            if tr.credit < credit - 1e-9:                    # R1.4e invariant, hard
                 raise AssertionError(
-                    f"credit invariant violated: {tr.credit} < {self.credit}")
+                    f"credit invariant violated: {tr.credit} < {credit}")
             tr.limit.status = "filled"
             return self._close(state, tr, "fill", L, minutes=row.min - tr.entry_min)
         # spot_touch legacy: fill at the SPX target touch

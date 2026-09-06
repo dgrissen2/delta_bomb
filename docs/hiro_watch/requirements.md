@@ -53,6 +53,11 @@ applies to both branches; results are read per branch off the log's `branch` col
   `r30 < a_r30_lt`; `0.0` is exactly v1's `r30 < 0`; applied in `a_fires`, NOT in `a_conditions`, so
   A episodes are numbered exactly as v1 numbers them), `r4_vetoes.vt_broken_enabled`,
   `r4_vetoes.levels_invalid_enabled`, `r6_entries.late_enabled` (all `true`). Read fail-closed.
+- **W2.1a (2026-09-06) five Branch-B knobs**, all at v1-equivalent defaults: `r6_entries.b_enabled`
+  (true), `b_run_max` (1e9 — Branch-B signal needs run ≤ this, $B), `b_dur_max` (1e9 — run age ≤ this,
+  min), `late_sticky` (false — true keeps a LATE-suppressed episode suppressed), `r1v3_limits.credit_b`
+  (= credit — the Branch-B resting credit; `credit` now applies to A only in v2). Plus the existing
+  `b_pull_min_pts` (3.0) is a candidate knob. English meanings: `rules_in_english.md`.
 - **W2.2** Removed from the clone: live loop, ops checks, spikes, parity, R9a registration, golden
   verify, sweep. The clone only backtests and scorecards. It never fetches chains (`fetch` raises;
   the daily loop populates the shared cache through v1).

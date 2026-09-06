@@ -122,3 +122,43 @@ def test_package_config_is_the_baseline_yaml(config):
     a = (REPO_ROOT / "scripts/hiro_engine_v2/config.yaml").read_bytes()
     b = (REPO_ROOT / "docs/hiro_watch/configs/baseline_v2.yaml").read_bytes()
     assert a == b
+
+
+# ---- Branch-B knobs (2026-09-05): b_enabled, b_run_max, b_dur_max, late_sticky, credit_b ----------
+def test_b_enabled_false_refuses_every_b_entry(config):
+    off = RuleEngine(_cfg_with(config, "r6_entries", "b_enabled", False), TIER_FULL)
+    evs = off.evaluate(b_fire_row(700), EngineState())
+    assert "signal" not in _types(evs) and "pending_entry" not in _types(evs)
+    assert "signal" in _types(RuleEngine(config, TIER_FULL).evaluate(b_fire_row(700), EngineState()))
+
+
+def test_b_run_max_and_b_dur_max_gate_the_b_signal(config):
+    assert config.num("r6_entries", "b_run_max") >= 1e8 and config.num("r6_entries", "b_dur_max") >= 1e8
+    size = RuleEngine(_cfg_with(config, "r6_entries", "b_run_max", 1.0), TIER_FULL)
+    assert "signal" not in _types(size.evaluate(b_fire_row(700, run=1.3), EngineState()))
+    assert "signal" in _types(RuleEngine(_cfg_with(config, "r6_entries", "b_run_max", 1.0), TIER_FULL)
+                              .evaluate(b_fire_row(700, run=1.0), EngineState()))       # boundary inclusive
+    age = RuleEngine(_cfg_with(config, "r6_entries", "b_dur_max", 15), TIER_FULL)
+    assert "signal" not in _types(age.evaluate(b_fire_row(700, dur=34.0), EngineState()))
+    assert "signal" in _types(RuleEngine(_cfg_with(config, "r6_entries", "b_dur_max", 15), TIER_FULL)
+                              .evaluate(b_fire_row(700, dur=15.0), EngineState()))
+
+
+def test_late_sticky_keeps_the_episode_suppressed(config):
+    assert config.get("r6_entries", "late_sticky") is False
+    eng = RuleEngine(_cfg_with(config, "r6_entries", "late_sticky", True), TIER_FULL)
+    assert "late_no_entry" in _types(eng.evaluate(b_fire_row(700, late_state=True), EngineState()))
+    later = eng.evaluate(b_fire_row(703, late_state=False), EngineState())      # LATE cleared 3 min later
+    assert "signal" not in _types(later)                                          # sticky: still suppressed
+    fresh = eng.evaluate(b_fire_row(720, episode=2, late_state=False), EngineState())
+    assert "signal" in _types(fresh)                                              # new episode is free
+    v1 = RuleEngine(config, TIER_FULL)
+    v1.evaluate(b_fire_row(700, late_state=True), EngineState())
+    assert "signal" in _types(v1.evaluate(b_fire_row(703, late_state=False), EngineState()))   # v1 re-admits
+
+
+def test_credit_b_applies_to_branch_b_only(config):
+    from hiro_engine_v2.executor import Executor
+    assert config.num("r1v3_limits", "credit_b") == config.num("r1v3_limits", "credit")
+    ex = Executor(_cfg_with(config, "r1v3_limits", "credit_b", 0.0), TIER_FULL)
+    assert ex.credit == config.num("r1v3_limits", "credit") and ex.credit_b == 0.0
