@@ -1,0 +1,428 @@
+[
+  {
+    "sample": "all_signals",
+    "era": "all",
+    "horizon": 2,
+    "population_cases": 1163,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 843,
+    "month_blocks": 18,
+    "mean_difference": 28.94021352313167,
+    "median_difference": 0.29999999999999827,
+    "ci95": [
+      8.099771140768162,
+      57.72384713282552
+    ],
+    "both_complete_risk_cases": 33,
+    "mean_worst_cover_difference": 150.33333333333334
+  },
+  {
+    "sample": "all_signals",
+    "era": "all",
+    "horizon": 4,
+    "population_cases": 1163,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 610,
+    "month_blocks": 15,
+    "mean_difference": 37.27868852459017,
+    "median_difference": -6.699999999999999,
+    "ci95": [
+      -5.441079529851153,
+      92.45569838056674
+    ],
+    "both_complete_risk_cases": 32,
+    "mean_worst_cover_difference": 222.21874999999997
+  },
+  {
+    "sample": "all_signals",
+    "era": "2024-2025",
+    "horizon": 2,
+    "population_cases": 521,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 327,
+    "month_blocks": 13,
+    "mean_difference": 8.485626911314986,
+    "median_difference": 0.0,
+    "ci95": [
+      1.7735787664956013,
+      19.782148362627936
+    ],
+    "both_complete_risk_cases": 1,
+    "mean_worst_cover_difference": 1.0000000000000009
+  },
+  {
+    "sample": "all_signals",
+    "era": "2024-2025",
+    "horizon": 4,
+    "population_cases": 521,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 169,
+    "month_blocks": 10,
+    "mean_difference": -2.4710059171597627,
+    "median_difference": -2.6999999999999984,
+    "ci95": [
+      -10.217041281087335,
+      15.087198743575046
+    ],
+    "both_complete_risk_cases": 1,
+    "mean_worst_cover_difference": 1.0000000000000009
+  },
+  {
+    "sample": "all_signals",
+    "era": "2026",
+    "horizon": 2,
+    "population_cases": 642,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 516,
+    "month_blocks": 6,
+    "mean_difference": 41.902713178294576,
+    "median_difference": 0.29999999999999893,
+    "ci95": [
+      14.295389507154212,
+      90.8447765921888
+    ],
+    "both_complete_risk_cases": 32,
+    "mean_worst_cover_difference": 155.0
+  },
+  {
+    "sample": "all_signals",
+    "era": "2026",
+    "horizon": 4,
+    "population_cases": 642,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 441,
+    "month_blocks": 6,
+    "mean_difference": 52.51156462585035,
+    "median_difference": -7.700000000000002,
+    "ci95": [
+      -5.737110481586395,
+      121.00546874999999
+    ],
+    "both_complete_risk_cases": 31,
+    "mean_worst_cover_difference": 229.35483870967738
+  },
+  {
+    "sample": "common_nonoverlap",
+    "era": "all",
+    "horizon": 2,
+    "population_cases": 273,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 180,
+    "month_blocks": 18,
+    "mean_difference": 21.431666666666676,
+    "median_difference": 0.2999999999999996,
+    "ci95": [
+      2.889824691199177,
+      56.69233211512105
+    ],
+    "both_complete_risk_cases": 8,
+    "mean_worst_cover_difference": 286.625
+  },
+  {
+    "sample": "common_nonoverlap",
+    "era": "all",
+    "horizon": 4,
+    "population_cases": 273,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 142,
+    "month_blocks": 14,
+    "mean_difference": 38.72042253521127,
+    "median_difference": -4.199999999999999,
+    "ci95": [
+      -7.940622146496396,
+      118.77648701079615
+    ],
+    "both_complete_risk_cases": 8,
+    "mean_worst_cover_difference": 531.2499999999999
+  },
+  {
+    "sample": "common_nonoverlap",
+    "era": "2024-2025",
+    "horizon": 2,
+    "population_cases": 146,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 100,
+    "month_blocks": 13,
+    "mean_difference": 9.022,
+    "median_difference": 3.3,
+    "ci95": [
+      2.3736047434314953,
+      16.02057026663405
+    ],
+    "both_complete_risk_cases": 1,
+    "mean_worst_cover_difference": 1.0000000000000009
+  },
+  {
+    "sample": "common_nonoverlap",
+    "era": "2024-2025",
+    "horizon": 4,
+    "population_cases": 146,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 63,
+    "month_blocks": 9,
+    "mean_difference": -5.919047619047618,
+    "median_difference": -0.6999999999999968,
+    "ci95": [
+      -12.534659151193635,
+      3.222894736842064
+    ],
+    "both_complete_risk_cases": 1,
+    "mean_worst_cover_difference": 1.0000000000000009
+  },
+  {
+    "sample": "common_nonoverlap",
+    "era": "2026",
+    "horizon": 2,
+    "population_cases": 127,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 80,
+    "month_blocks": 6,
+    "mean_difference": 36.94375,
+    "median_difference": -0.3499999999999991,
+    "ci95": [
+      -4.461290322580646,
+      108.81368695175438
+    ],
+    "both_complete_risk_cases": 7,
+    "mean_worst_cover_difference": 327.42857142857144
+  },
+  {
+    "sample": "common_nonoverlap",
+    "era": "2026",
+    "horizon": 4,
+    "population_cases": 127,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 79,
+    "month_blocks": 6,
+    "mean_difference": 74.31898734177214,
+    "median_difference": -5.700000000000001,
+    "ci95": [
+      -8.604918032786887,
+      190.06387383900923
+    ],
+    "both_complete_risk_cases": 7,
+    "mean_worst_cover_difference": 606.9999999999999
+  },
+  {
+    "sample": "common_nonoverlap_excluding_prior_six",
+    "era": "all",
+    "horizon": 2,
+    "population_cases": 184,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 96,
+    "month_blocks": 15,
+    "mean_difference": 13.789583333333338,
+    "median_difference": 3.3,
+    "ci95": [
+      6.1658474576271205,
+      23.65279011311269
+    ],
+    "both_complete_risk_cases": 0,
+    "mean_worst_cover_difference": null
+  },
+  {
+    "sample": "common_nonoverlap_excluding_prior_six",
+    "era": "all",
+    "horizon": 4,
+    "population_cases": 184,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 58,
+    "month_blocks": 10,
+    "mean_difference": 13.696551724137931,
+    "median_difference": 0.1499999999999998,
+    "ci95": [
+      -6.521270712510359,
+      60.96783333333332
+    ],
+    "both_complete_risk_cases": 0,
+    "mean_worst_cover_difference": null
+  },
+  {
+    "sample": "common_nonoverlap_excluding_prior_six",
+    "era": "2024-2025",
+    "horizon": 2,
+    "population_cases": 128,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 82,
+    "month_blocks": 11,
+    "mean_difference": 11.078048780487807,
+    "median_difference": 3.3,
+    "ci95": [
+      3.425965073529415,
+      17.57320604395605
+    ],
+    "both_complete_risk_cases": 0,
+    "mean_worst_cover_difference": null
+  },
+  {
+    "sample": "common_nonoverlap_excluding_prior_six",
+    "era": "2024-2025",
+    "horizon": 4,
+    "population_cases": 128,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 45,
+    "month_blocks": 7,
+    "mean_difference": -2.682222222222223,
+    "median_difference": 0.2999999999999996,
+    "ci95": [
+      -8.651724137931037,
+      12.61
+    ],
+    "both_complete_risk_cases": 0,
+    "mean_worst_cover_difference": null
+  },
+  {
+    "sample": "common_nonoverlap_excluding_prior_six",
+    "era": "2026",
+    "horizon": 2,
+    "population_cases": 56,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 14,
+    "month_blocks": 4,
+    "mean_difference": 29.671428571428574,
+    "median_difference": 2.8000000000000003,
+    "ci95": [
+      1.1000000000000003,
+      38.593548387096774
+    ],
+    "both_complete_risk_cases": 0,
+    "mean_worst_cover_difference": null
+  },
+  {
+    "sample": "common_nonoverlap_excluding_prior_six",
+    "era": "2026",
+    "horizon": 4,
+    "population_cases": 56,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 13,
+    "month_blocks": 3,
+    "mean_difference": 70.39230769230768,
+    "median_difference": 0.0,
+    "ci95": [
+      -8.35,
+      93.18
+    ],
+    "both_complete_risk_cases": 0,
+    "mean_worst_cover_difference": null
+  },
+  {
+    "sample": "common_nonoverlap_both_entered_priced",
+    "era": "all",
+    "horizon": 2,
+    "population_cases": 8,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 8,
+    "month_blocks": 3,
+    "mean_difference": 248.625,
+    "median_difference": -14.499999999999996,
+    "ci95": [
+      -53.00000000000001,
+      343.0
+    ],
+    "both_complete_risk_cases": 8,
+    "mean_worst_cover_difference": 286.625
+  },
+  {
+    "sample": "common_nonoverlap_both_entered_priced",
+    "era": "all",
+    "horizon": 4,
+    "population_cases": 8,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 8,
+    "month_blocks": 3,
+    "mean_difference": 488.4999999999999,
+    "median_difference": -15.499999999999996,
+    "ci95": [
+      -31.999999999999996,
+      660.3333333333331
+    ],
+    "both_complete_risk_cases": 8,
+    "mean_worst_cover_difference": 531.2499999999999
+  },
+  {
+    "sample": "common_nonoverlap_both_entered_priced",
+    "era": "2024-2025",
+    "horizon": 2,
+    "population_cases": 1,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 1,
+    "month_blocks": 1,
+    "mean_difference": -15.999999999999996,
+    "median_difference": -15.999999999999996,
+    "ci95": null,
+    "both_complete_risk_cases": 1,
+    "mean_worst_cover_difference": 1.0000000000000009
+  },
+  {
+    "sample": "common_nonoverlap_both_entered_priced",
+    "era": "2024-2025",
+    "horizon": 4,
+    "population_cases": 1,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 1,
+    "month_blocks": 1,
+    "mean_difference": -21.999999999999993,
+    "median_difference": -21.999999999999993,
+    "ci95": null,
+    "both_complete_risk_cases": 1,
+    "mean_worst_cover_difference": 1.0000000000000009
+  },
+  {
+    "sample": "common_nonoverlap_both_entered_priced",
+    "era": "2026",
+    "horizon": 2,
+    "population_cases": 7,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 7,
+    "month_blocks": 2,
+    "mean_difference": 286.42857142857144,
+    "median_difference": -12.999999999999998,
+    "ci95": [
+      -53.00000000000001,
+      343.0
+    ],
+    "both_complete_risk_cases": 7,
+    "mean_worst_cover_difference": 327.42857142857144
+  },
+  {
+    "sample": "common_nonoverlap_both_entered_priced",
+    "era": "2026",
+    "horizon": 4,
+    "population_cases": 7,
+    "draws": 2000,
+    "seed": 20260908,
+    "paired_cases": 7,
+    "month_blocks": 2,
+    "mean_difference": 561.4285714285713,
+    "median_difference": -9.0,
+    "ci95": [
+      -31.999999999999996,
+      660.3333333333331
+    ],
+    "both_complete_risk_cases": 7,
+    "mean_worst_cover_difference": 606.9999999999999
+  }
+]

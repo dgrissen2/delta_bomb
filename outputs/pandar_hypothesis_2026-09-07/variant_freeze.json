@@ -1,0 +1,16 @@
+{
+  "frozen_at": "2026-09-08T02:55:17.154103+00:00",
+  "before_additional_variant_outcome_requests": true,
+  "basis": "Original entry gates only; no P&L based selection",
+  "hashes": {
+    "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/variant_frozen_contracts.csv": "9bea962d7352b52e5f55103bcb44da3672a4a134d81ad157854f329d5e0d9fdb",
+    "/Users/dgrissen/Dev/delta_bomb/hypothesis_tracking/pandar_round2_delta_variant.md": "9bb9da8b5fa89cd8c04cad253d5f67239554622da6efda0a6af3b7086631a444",
+    "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/selected_population.csv": "c4ef0d114dad6ed078d66406d079997a696ddcc6b796afa172d9bfe9bdc7e79a"
+  },
+  "counts": {
+    "selected": 47,
+    "no_call_in_delta_band": 2,
+    "no_expiry_in_dte_band": 1
+  },
+  "previously_acquired_leg_overlap": 11
+}

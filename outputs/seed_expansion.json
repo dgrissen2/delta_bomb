@@ -1,0 +1,104 @@
+{
+  "round": 1,
+  "engine_mode": "codex_only",
+  "personas": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round1/seed/charlie-mcelligott.json",
+        "raw_sha256": "ed3c293eed9380d847c2421da56cdf13b1bad656e9afa34c7741f1ff2d6dea92",
+        "response": {
+          "persona": "Canonical Charlie McElligott persona simulation; no contact with the actual person. The economic question is whether fading upside demand makes executable call inventory cheaper before the next CRASH-UP consumes the premium.",
+          "hypotheses": [
+            {
+              "claim": "Among comparably rich far-OTM calls, two completed sessions of wing rollover predict greater subsequent short-call gains than continued wing expansion.",
+              "outcome": "Net far-call sale-to-cover P&L at a common second-session deadline; separately measure comparable bid-IV-excess normalization.",
+              "pass_criterion": "Positive mean incremental P&L with multiplicity-adjusted, date/episode-blocked 95% lower confidence bound above zero in a new chronological evaluation period.",
+              "controls": "Match starting richness, ATM IV, expiry, delta and forward-moneyness bins. Keep age descriptive. Test rollover independently of HIRO and delayed conversion; require identical entry rules."
+            },
+            {
+              "claim": "An observed reversal in upside call flow, confirmed by falling price, improves the economics of selling rich calls relative to a fixed clock.",
+              "outcome": "Net P&L per eligible episode and short-phase maximum adverse liquidation exposure under HIRO versus 10:01 entry policies.",
+              "pass_criterion": "Positive incremental policy P&L with adjusted blocked lower confidence bound above zero; disclose coverage, abstentions and adverse exposure before claiming useful improvement.",
+              "controls": "Same frozen contracts, available decision information, quote gates and calendar exit. Evaluate both policies on common HIRO-covered eligibility; count no-entry episodes as zero deployed P&L, with data-unavailable episodes separately identified."
+            },
+            {
+              "claim": "After call premiums retreat, buying the preselected nearer call provides enough subsequent spread value to justify its cost relative to covering the original short immediately.",
+              "outcome": "Net incremental final wealth of conversion versus covering the short at the identical conversion timestamp, plus comparison with immediate spread purchase.",
+              "pass_criterion": "Positive incremental mean net P&L with adjusted blocked lower confidence bound above zero on new episodes; successful financing alone cannot pass.",
+              "controls": "Identical initial short sale, contracts and common exit. Retain failed conversions and unpriced outcomes. Same-day, next-day and second-day acquisition are prespecified experimental arms, not three additional economic hypotheses."
+            }
+          ],
+          "simple_protocol": [
+            "Freeze HIRO membership, ticker-date population, coverage ledger and chronological evaluation block before outcome quotes. Treat the existing 2024\u20132026 results as exploratory. Require point-in-time earnings clearance excluding signal/entry date through +30 calendar days inclusive; stale or unknown calendars exclude admission.",
+            "Freeze expiry choice, delta bands, OTM bins and deterministic nearer-strike selection. Suggested starting grid: 7\u201314 calendar DTE, 2\u20135 versus 5\u201310 delta, and 0\u201310%, 10\u201320%, above-20% OTM. Preserve continuous forward distance and ATM expected-move distance. No post-outcome strike substitutions.",
+            "Obtain exact signal and actual-entry chains; recheck Greeks, distance, spreads and size. Require 60 strictly prior valid comparable observations separately at delta/DTE and forward-moneyness/DTE. Measure call-bid IV minus matched ATM IV using mean/dispersion and percentile; interpolate only inside supported smiles.",
+            "Reuse existing call entry: evaluate every five minutes, 10:00\u201314:30 ET; current 15-minute call-HIRO change negative, preceding change positive, price below preceding 15-minute low. Execute earliest next-minute valid quote. EOD signals begin eligibility next session.",
+            "Hold each initial sale fixed across acquisition arms: first fee-covering nearer-call ask within day 0, +1 or +2; compare existing fixed 15:50 purchases. Use common day-4 exit, day-5 sensitivity, or earlier expiry. Freeze noncompletion handling before replay.",
+            "Use actual minute NBBO and archived All Trades call HIRO, timestamped causally. Include fees, adverse slippage, sizes, quote conditions/staleness, failures, missingness and short-phase exposure."
+          ],
+          "failure_modes": [
+            "Richness persists while upside demand accelerates.",
+            "Cheap completion destroys more remaining premium than it adds.",
+            "Unknown earnings, missing HIRO, thin wing quotes or unbounded short-phase exposure defeat apparent profitability."
+          ],
+          "suggested_round_followups": [
+            "Quant freezes numeric gates, paired estimands and data feasibility before collection.",
+            "After each round, retain, reject or mark inconclusive; any revised rule requires a new chronological block."
+          ]
+        }
+      }
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round1/seed/quant.json",
+        "raw_sha256": "b830eef0b1faf3aeb8e855c7a8401ad8cea1ebddc9f2e5aa07a45b2c3728ff8d",
+        "response": {
+          "hypotheses": [
+            {
+              "claim": "Waiting until the next session to buy the fixed nearer call improves net profit relative to buying the spread immediately.",
+              "target": "Within-episode difference in D4 net P&L: next-session policy minus immediate spread.",
+              "pass_criterion": "Validation paired mean and median exceed zero; the 97.5% date-block-bootstrap interval for the mean excludes zero. Require at least 20 distinct admitted entry dates; otherwise inconclusive.",
+              "controls": "Identical original short sale, fixed nearer contract, quantity, costs and exit deadline. Include failed conversions. Same-day and second-day policies are secondary comparisons, never substitutes for a failed primary hypothesis."
+            },
+            {
+              "claim": "The next-session nearer-call purchase adds economic value relative to simply covering the original short at the common deadline.",
+              "target": "Within-episode difference in D4 net P&L: next-session conversion policy minus short-only policy.",
+              "pass_criterion": "Validation paired mean and median exceed zero; the 97.5% date-block-bootstrap interval for the mean excludes zero, with at least 20 distinct admitted entry dates.",
+              "controls": "Same initial short and exit. Report protection, adverse exposure and loss tails separately; superior profit alone does not establish risk-adjusted superiority."
+            }
+          ],
+          "simple_protocol": {
+            "freeze_and_cohort": "Before new outcome retrieval, hash the protocol and manifests. Select four stock symbols with lowest SHA256(ticker) from the frozen September 3 HIRO stock universe. No replacements for missing data. This remains a current-universe retrospective design.",
+            "chronology": "Use January\u2013July 2026 for feasibility and descriptive replay, taking each ticker's first six qualifying nonoverlapping episodes. All ten reviewed examples and existing surface results are training/descriptive. Freeze prospective validation for September 8\u2013December 31, 2026, again first six episodes per ticker, with exits collected afterward. Insufficient observations mean inconclusive; do not extend dates after inspecting profits.",
+            "selection": "Signal EOD requires existing front-wing rank >=85 and positive wing. Select expiration nearest 10 calendar days within 7\u201314 DTE, earlier expiry breaking ties; select OTM call with delta 0.02\u20130.10 nearest 0.05, lower strike breaking ties. Nearer call is the adjacent lower listed strike in that expiry, still OTM at signal. Freeze both identities. Block overlapping episodes through D5 regardless of entry rejection.",
+            "earnings": "At signal and actual short entry exclude earnings occurring that date through 30 calendar days afterward, inclusive, using schedules demonstrably available then. Repeat before deferred purchases; a failed purchase gate leaves the short-only policy active until the fixed exit. Unknown or stale schedules cannot clear admission.",
+            "entry": "Attempt next-session 10:01 ET only. Recompute actual short delta, DTE, %OTM and log(K/F)/(ATM-IV*sqrt(T)); require original delta band and OTM status. Record both legs' actual Greeks/distances again at every purchase. Require valid contemporary Greeks, standard verified deliverables, firm uncrossed NBBO, quote age <=5 seconds and executable-side size >=1. Short bid >=$0.20; each entry spread <=30% of midpoint. No strike replacement.",
+            "purchase_and_exit": "Immediate buys at entry. Same-day searches 10:02\u201315:30; next-day and second-day each search 09:31\u201315:30 in their designated session. Deferred purchase uses the first valid minute whose adverse-slippage ask plus purchase fee does not exceed net original-sale proceeds. Never buying leaves the original short open. Close at 15:50 on holding session four, counting sale as session one; D5 is secondary. Earlier expiry caps either deadline. Hold contracts constant.",
+            "accounting": "One contract; bid sales, ask purchases, $0.65 per contract-action plus $0.01/share adverse slippage; repeat with $0.02 slippage. Record rejected entries, uncompleted conversions, missing exits, assignment and zero-bid longs separately. Zero-bid long valuation is a conservative mark, not a completed sale. Report naked-phase duration, maximum short-cover loss, underlying rally, peak delta, worst P&L and worst-decile average.",
+            "analysis": "Paired means/medians; 2,000 bootstrap draws of five-session date blocks containing the full cross-section. Report separate predeclared delta 2\u20135/5\u201310, %OTM <10/>=10 and ATM-distance <2/>=2 bins descriptively. No grid, classifier, fitted weights or winning-arm selection."
+          },
+          "minimal_feasible_dataset": [
+            "Prior 126-session historical bid-IV-minus-matched-ATM surfaces, requiring >=60 valid prior observations separately at current delta/DTE and forward-moneyness/DTE. Interpolate only inside supported strikes/expiries. Report both z-scores and percentiles; neither is exact-strike lifetime history.",
+            "Signal chains, actual-entry Greeks/forwards, timestamped NBBO/underlying histories through exits, PIT earnings versions and corporate-action/deliverable records.",
+            "Actual timestamped HIRO archives where available; missing older HIRO permits the clock-policy study but no HIRO contribution claim."
+          ],
+          "data_stopping_rules": [
+            "Pilot four tickers first; stop tradable inference if PIT earnings, deliverables, entry Greeks, forwards or comparable-history support cannot be verified.",
+            "Cap requests at 600 total: 400 daily-chain batches, 100 entry/metadata calls, 100 contract-history calls; failures and retries count. Check entitlements first; no subscription purchase.",
+            "Retain missing coverage and censored outcomes. Never replace missing PIT calendars with today's calendar, proxy ranks with strike z-scores, or unavailable history with extrapolation."
+          ]
+        }
+      }
+    }
+  ]
+}

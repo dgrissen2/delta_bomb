@@ -1,0 +1,7 @@
+reason,count,horizon
+complete,17457,1
+missing_intervening_iv,1,1
+complete,17456,2
+missing_intervening_iv,2,2
+complete,17454,4
+missing_intervening_iv,4,4

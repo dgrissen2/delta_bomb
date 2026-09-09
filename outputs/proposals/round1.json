@@ -1,0 +1,80 @@
+{
+  "round": 1,
+  "engine_mode": "codex_only",
+  "blocks": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "engine": "codex",
+      "producer_status": "ok",
+      "raw_path": "outputs/persona_raw/round1/proposals/charlie-mcelligott.json",
+      "raw_sha256": "917b4de2b4cf89e9511665a26eb2e6c6974051ca3085fa573e9df347c4aa7ed4",
+      "candidates": [
+        {
+          "candidate_key": "audit-short-phase-exposure",
+          "kind": "experiment",
+          "title": "Audit adverse exposure before the nearer call is acquired",
+          "priority": "high",
+          "parent": "H-PNDR-001",
+          "rationale": "A better short-sale entry is economically useful only alongside the exposure carried before conversion or cover. The current round has no exact-quote path evidence, and aggregate flow cannot bound a right-tail rally.",
+          "falsification": "For the frozen initial entries, reconstruct every available minute's short-cover cost, underlying rally and far-call delta through conversion or the common exit. Report missing intervals and quote-age limitations. A profit advantage accompanied by larger sampled losses or unknown exposure cannot establish reduced short-phase risk.",
+          "decision_impact": "Expose whether apparent timing value is compensation for carrying more short-call risk, and determine which cases support only quoted-price diagnostics."
+        },
+        {
+          "candidate_key": "test-conversion-controls",
+          "kind": "experiment",
+          "title": "Compare financed conversion with immediate purchase and same-minute short cover",
+          "priority": "high",
+          "parent": "H-PNDR-002",
+          "rationale": "A credit remaining after construction is not the value added by purchasing the nearer call. Only controls sharing the initial short sale can isolate the second decision.",
+          "falsification": "Replay the fixed next-session conversion policy against immediate spread purchase and covering the short at conversion, using identical D4 deadlines, all fees, fixed-timestamp one-cent/two-cent costs and preserved failed or censored attempts. Nonpositive incremental net wealth against either primary control fails the corresponding economic comparison; fewer than twenty dates remains statistically inconclusive.",
+          "decision_impact": "Determine whether the nearer call adds measured value, merely finances a position, or consumes premium that an immediate short cover would preserve."
+        }
+      ],
+      "reprioritize": []
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "engine": "codex",
+      "producer_status": "ok",
+      "raw_path": "outputs/persona_raw/round1/proposals/quant.json",
+      "raw_sha256": "19875727d48e7af567307c11ebb2c872ac61d7679ede0f6da57aa3b829e4d43c",
+      "candidates": [
+        {
+          "candidate_key": "audit-contract-identity",
+          "kind": "experiment",
+          "title": "Audit the frozen calls' identities and entry evidence",
+          "priority": "high",
+          "parent": "H-PNDR-001",
+          "rationale": "For the fixed 50-episode population, verify each selected far and adjacent nearer call against its historical root, expiry, right, strike, multiplier and deliverables. Reconcile signal-chain identity with the quoted contract, relevant splits and renames. Audit entry Greeks, bid/ask, displayed size, condition and actual quote-event age at the clock or causally valid HIRO order. Produce one reason-coded result per episode and leg before making executable-trade claims; use the shared request budget and never replace an unavailable selection.",
+          "falsification": "A contract mismatch, unresolved deliverable, unsupported Greek, absent executable quote, or unverified event age defeats an executable-inference claim for that episode. A split calendar or minute sample timestamp alone cannot clear the missing field. Preserve any permissible quoted-price diagnostic separately, with unresolved identity explicitly shown.",
+          "decision_impact": "Determine which frozen episodes support executable replay, which support only labeled diagnostics, and which remain unavailable. This repairs measurement scope without selecting profitable contracts or asserting a trading edge."
+        },
+        {
+          "candidate_key": "test-conversion-controls",
+          "kind": "experiment",
+          "title": "Replay the fixed conversion policy against all three short-sale controls",
+          "priority": "high",
+          "parent": "H-PNDR-002",
+          "rationale": "For every frozen episode with sufficient evidence, preserve one initial sale and fixed nearer call while replaying immediate, same-day, next-session and second-session purchases. At the common D4 deadline compare the primary next-session policy with immediate spread, short cover at the identical conversion timestamp, and short cover at the final deadline. If no conversion timestamp occurs, the conversion-time-cover policy falls back to final-deadline cover. Use the existing one-contract fees/slippage and fixed-timestamp stress. Keep failed entries, uncompleted conversions, missing exits, zero-bid long marks and observed adverse naked-short exposure in the ledger.",
+          "falsification": "A nonpositive primary paired mean or median does not support the claimed incremental value. Fewer than 20 distinct admitted entry dates or incomplete evidence prevents the frozen statistical pass regardless of a positive pilot estimate. A positive premium balance or profitable standalone spread cannot substitute for either primary paired comparison.",
+          "decision_impact": "Show whether purchasing the nearer call added measured value beyond the original short decision in this descriptive pilot, and whether the apparent benefit persists after costs and explicit exposure accounting. Secondary timing arms cannot rescue a failed primary contrast."
+        },
+        {
+          "candidate_key": "audit-richness-support",
+          "kind": "experiment",
+          "title": "Audit independent prior-history support for the two richness coordinates",
+          "priority": "medium",
+          "parent": "H-PNDR-003",
+          "rationale": "For the same frozen selected calls, enumerate the last 126 supplied exchange sessions strictly before signal and compute at most one bid-IV-minus-matched-ATM value per date in each coordinate. Report delta/DTE and forward-moneyness/DTE counts, support failures, sample dispersion, z-score and midrank percentile independently. Use explicit verified forwards, ATM at K=F and only adjacent supported strike/expiry brackets. Reuse cached chains and batch supported requests within the existing shared budget; do not query outcomes to choose history dates or contracts.",
+          "falsification": "Fewer than 60 valid prior dates, unsupported ATM or forward inputs, extrapolation, duplicate-date inflation or zero dispersion prevents the affected history-based z-score claim. Reference history from a different coordinate or the fixed 5-delta surface cannot fill the gap. Valid percentiles may still be reported for constant histories with adequate count, while z remains unavailable.",
+          "decision_impact": "Establish which richness measurements can enter the descriptive rollover comparison and quantify the missingness. Keep every episode in the baseline replay ledger and make no new admission filter or economic claim from coverage alone."
+        }
+      ],
+      "reprioritize": []
+    }
+  ]
+}

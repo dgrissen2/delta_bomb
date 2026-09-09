@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "candidate_key": "verify-dated-contract-deliverables",
+      "kind": "experiment",
+      "title": "Verify historical deliverables for the six admitted contract pairs",
+      "priority": "high",
+      "parent": "H-PNDR-001",
+      "rationale": "Actual event timestamps now resolve quote age, but exact historical contract deliverables remain the outstanding prerequisite for interpreting the assumed 100-share cash flows.",
+      "falsification": "For each frozen pair, compare dated official contract and corporate-action records with the exact option identity and assumed deliverable. Any conflict or missing historical record leaves that case unverified; no replacement strike is allowed.",
+      "decision_impact": "Determine which existing diagnostics can support contract-level economic interpretation and which must remain unavailable for an executable inference. This changes evidence quality, not selection thresholds."
+    },
+    {
+      "candidate_key": "test-fixed-nearer-d1-hiro-confirmation",
+      "kind": "experiment",
+      "title": "Compare next-session financing with one frozen bullish HIRO confirmation",
+      "priority": "medium",
+      "parent": "H-PNDR-002",
+      "rationale": "The current second-leg rule contains no new flow confirmation, and most completed purchases underperform covering the short at that minute. A separate test can isolate whether a fresh bullish flow/price reversal improves the second decision.",
+      "falsification": "On newly collected complete next-session All Trades histories, freeze one fifteen-minute bullish call-flow/price confirmation and next-minute action before outcomes. Keep D1, the original nearer strike, financing and quote gates, D4 exit and costs unchanged. Reject the claim if its paired increment over financing-only and same-minute cover is not positive under the existing support criteria; no trigger remains a known no-purchase and missing flow remains censored.",
+      "decision_impact": "Decide whether a later confirmation earns a place in the purchase policy. Requires future adequate HIRO data and a separate pre-outcome freeze; it cannot relabel the present five-date results."
+    }
+  ],
+  "reprioritize": []
+}

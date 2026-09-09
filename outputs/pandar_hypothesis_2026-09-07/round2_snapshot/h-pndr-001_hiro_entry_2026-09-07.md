@@ -1,0 +1,127 @@
+---
+id: H-PNDR-001
+round: 2
+hypothesis_status: active
+phase: recorded
+---
+
+# H-PNDR-001: HIRO call-flow reversal improves the initial short-call entry.
+
+## Claim and decision summary
+
+HIRO call-flow reversal improves the initial short-call entry. No new option outcome histories have been evaluated in round 1. This is a descriptive historical pilot until the predeclared sample and execution requirements are met.
+
+## Target / Outcome Definition
+
+Net policy P&L per eligible episode: first HIRO reversal entry minus 10:01 clock entry, fixed contracts and D4 exit. USD per one-contract episode after $0.65 per action and one-cent per-share adverse slippage. Two-cent cost stress holds trade timestamps fixed. A known no-entry has zero trading P&L in the policy denominator; missing evidence is censored, not zero. Primary horizon is holding session four at 15:50 ET, sale day counted as session one; session five is secondary.
+
+## Data, inputs and supporting documents
+
+[Seed and frozen protocol](pandar_seed_and_frozen_protocol.md), [hypothesis index](RESEARCH_HYPOTHESIS_INDEX.md), [memo](memo-pndr_pandar_call_research.md), [raw persona seeds](../outputs/seed_expansion.json), [data readiness](../outputs/pandar_hypothesis_2026-09-07/data_readiness.md).
+
+[All population rows](../outputs/pandar_hypothesis_2026-09-07/population_ledger.csv), [selected population](../outputs/pandar_hypothesis_2026-09-07/selected_population.csv), [population hashes](../outputs/pandar_hypothesis_2026-09-07/population_manifest.json), [earnings](../data/pandar_hypothesis_2026-09-07/earnings.parquet), [split metadata](../data/pandar_hypothesis_2026-09-07/splits.parquet), [HIRO causal windows](../outputs/pandar_hypothesis_2026-09-07/hiro_pre_august_decisions.parquet), [budget](../outputs/pandar_hypothesis_2026-09-07/api_budget.json).
+
+## Sample Integrity and alignment
+
+The 323-stock current HIRO membership is applied backward; it is not historical membership. All 41,864 supplied ledger rows remain, including failure reasons. Fifty nonoverlapping ticker episodes pass the population gate across five entry dates, June 12–18, 2026. Seventeen otherwise eligible rows are blocked by an earlier five-session holding window. The population is a pre-outcome freeze, not fifty entered trades.
+
+Refreshed actual earnings exclude signal and entry dates through +30 calendar days, inclusive. The user authorized this retrospective event purge. It does not prove an earnings schedule was available at entry. Eight stocks lack dated earnings history; no successor ticker is substituted. Nine invalid date placeholders are quarantined. Existing 2024–2026 surface results and ten earlier hand-reviewed option examples are exploratory.
+
+## Method
+
+| Test | Fixed rule | Pass criterion |
+|---|---|---|
+| Primary economic contrast | Net policy P&L per eligible episode: first HIRO reversal entry minus 10:01 clock entry, fixed contracts and D4 exit. | Positive paired mean and median, at least 20 distinct entry dates and date/episode-blocked 97.5% interval above zero |
+| Execution validity | Fixed identities, actual-entry Greeks, quote spread/size/condition, event age, deliverables | Every required input verified for an executable-trade claim |
+| Data repair | Actual-event exclusion, unchanged HIRO membership, no aliases | Every failure retained; no missing result converted to a winner |
+
+All expiry, delta, OTM, ATM-distance, richness and timing details are frozen in the linked protocol. The 2–10 delta band is a project test assumption; it is not attributed to Pandar. Comparable richness uses at least 60 valid strictly prior dates independently in delta/DTE and forward-moneyness/DTE. IV and ATM total variance are interpolated separately before computing their IV difference.
+
+## Results
+
+| Round | Evidence | Result |
+|---|---|---|
+| 1 | ORATS earnings refresh | 26,510 valid event records; 315 of 323 stock names; nine invalid dates quarantined |
+| 1 | Frozen eligible population | 50 stocks on five entry dates; 41,864 rows retained; 17 overlap exclusions |
+| 1 | Preliminary HIRO audit before earnings | 72 candidates; 122 triggers across 57; eight first observed triggers have earlier missing decisions |
+| 1 | Economic outcome | Not yet collected or tested; no profit claim |
+
+## What worked and what did not
+
+Actual earnings history repairs the otherwise empty next-earnings fields for retrospective filtering. June archives expand the stock sample. They provide only five independent entry dates, which cannot meet the predeclared twenty-date statistical threshold regardless of the number of stocks.
+
+## Threats To Validity
+
+Current-universe selection, retrospective earnings knowledge, previously seen surface results, five-date cross-sectional concentration, quote sampling and corporate-action identity remain material limitations. Raw quote history cannot establish execution if contract deliverables or quote age remain unknown. HIRO describes observed classified options flow; it is not direct proof of dealer hedges.
+
+## Final Verdict
+
+inconclusive
+
+The population and causal signal data are ready for exact-contract testing. There is no new outcome evidence yet, and this five-date archive cannot establish statistical replication.
+
+## Decision Impact
+
+Proceed to frozen signal chains and entry snapshots, then exact leg histories. Preserve descriptive economics even when the statistical conclusion remains inconclusive. Do not promote a live trading rule from this round.
+
+## Other Experiments To Run
+
+Round 1 Charlie/Quant proposals will be indexed and backlinked by the native research adapter before closure. No follow-up is treated as completed until its evidence exists.
+
+## Independent Persona Commentary
+
+[Actual round 1 commentary](../outputs/commentary/round1/H-PNDR-001.json)
+
+### charlie-mcelligott
+
+Round 1 establishes a usable historical decision population, not an entry advantage. Fifty frozen episodes share only five June entry dates, so the cross-section cannot satisfy the twenty-date replication requirement. The preliminary 72-candidate HIRO audit found 122 flow triggers, but eight first observed triggers had earlier missing decisions. A fading call-flow line with a price break is evidence of estimated downward hedging pressure; it does not prove a profitable short sale or observed dealer execution.
+
+Proceed with the first frozen HIRO action and 10:01 clock on the same contracts. Treat an earlier missing HIRO window as censored first-trigger selection. Preserve known no-trigger and known quote-gate failures as zero-trading policy outcomes, while missing evidence remains unavailable. Measure the short-phase exposure before comparing profit. Keep the verdict inconclusive irrespective of attractive individual June cases.
+
+### quant
+
+The population manifest establishes 50 frozen, nonoverlapping episodes from 41,864 retained rows, with 17 overlap exclusions. It explicitly records outcomes_read=false and only entry-session HIRO archive presence. This is a valid sample-construction result, not evidence that HIRO improves entry or that any of the 50 episodes became executable trades. Five June entry dates fail the predeclared minimum of 20 dates; adding cross-sectional stocks or bootstrap draws cannot repair that limitation. The preliminary 72-candidate HIRO audit is not the final earnings-filtered cohort. Its eight first observed triggers preceded by missing decisions show why first observed and first causally valid trigger cannot be conflated. The authorized actual-earnings purge is retrospective; no as-known schedule claim follows.
+
+Keep the verdict inconclusive. Audit the causal HIRO decision history and fixed contract identities for every frozen episode. A complete observed no-trigger path may receive zero policy trading profit; a missing earlier decision must remain unavailable when it could change the first entry. Then compare the HIRO and clock policies by eligible episode, preserving entry failures and the shared dated sample. Report descriptive paired means and medians only for this five-date pilot; do not interpret its interval as satisfying the frozen statistical criterion.
+
+## Reproduction
+
+`/Users/dgrissen/Dev/virtualenvs/gamma_chaser/bin/python scripts/pandar_hypothesis_population.py`
+
+[Population implementation](../scripts/pandar_hypothesis_population.py), [batched acquisition](../scripts/pandar_hypothesis_api.py), [HIRO implementation](../scripts/pandar_hypothesis_hiro.py), [richness implementation](../scripts/pandar_hypothesis_richness.py), [contract selection](../scripts/pandar_hypothesis_contracts.py), [round verifier](../scripts/_research_loop/verify_round.py).
+
+## Feynman Explanation
+
+The clock gives a fixed starting point. HIRO can improve it only if waiting for call demand to reverse produces better profit after costs, including times when it never signals.
+
+We now have a list fixed before looking at new option profits, with earnings conflicts and missing data shown explicitly. The next step is to follow the same two contracts from the first sale through the planned exit, charging the prices and costs a trader would face.
+
+## Round 2 appended evidence — entries and identities
+
+The original expiry/delta rules selected 49 pairs; Z had no eligible expiry. Theta supplied 83 clock/causal-HIRO selected-expiry entry chains, plus six batches of signal-date quoted-contract listings. The original pairs failed the observed bid/delta/distance/spread gates in all 83 snapshots. ASML's far call was $0.50/$4.70; QCOM's clock quote was $1.00/$1.60, both wider than the frozen 30%-of-midpoint limit. This is a failure to enter under project quote rules, not evidence that Pandar has no call opportunities.
+
+Both legs' minute quote and Greek histories were acquired for all 49 original pairs (196 files). Serial retries recovered the initially failed histories. No new P&L was used to choose the variant below. ORATS intraday returned 403; the first implementation issued 83 denied requests before a persistent denial circuit breaker was added. These attempts remain charged in the shared budget. Theta entry chains provide the fallback source with explicit provenance.
+
+The contract audit preserves 98 original selected legs plus the no-expiry row. It found SERV history belonging to a former issuer, same-root strike adjustments, and distinct adjusted option roots including DVN1's 70-share deliverable. Exact historical deliverable verification remains missing; all eventual P&L is a quoted-price diagnostic until that requirement is satisfied.
+
+[The one higher-delta follow-up](pandar_round2_delta_variant.md) is now frozen: signal delta 5–15, target 10, at least 5% OTM, identical expiry/nearer selection and quote/cost rules. It selects 47 pairs, has two no-call failures and the original no-expiry failure. Eleven legs overlap previously acquired original raw histories; the arm is an exploratory follow-up, not pristine validation. Six stocks pass the variant's preliminary entry-chain checks (seven policy entries): PLTR, DIS, MRVL, ORCL, QCOM and CRM. Displayed size, quote conditions, staleness and exact deliverables are still separate checks.
+
+Evidence: [original entry gates](../outputs/pandar_hypothesis_2026-09-07/entry_chain_preliminary_gates.csv), [contract freeze](../outputs/pandar_hypothesis_2026-09-07/contract_freeze.json), [Theta entry manifest](../outputs/pandar_hypothesis_2026-09-07/theta_entry_manifest.json), [minute histories](../outputs/pandar_hypothesis_2026-09-07/minute_history_manifest.json), [identity audit](../outputs/pandar_hypothesis_2026-09-07/contract_reference_audit.md), [variant freeze](../outputs/pandar_hypothesis_2026-09-07/variant_freeze.json), [variant entry gates](../outputs/pandar_hypothesis_2026-09-07/variant_entry_chain_preliminary_gates.csv), [50-row IV/RR/journey table](../outputs/pandar_hypothesis_2026-09-07/eligibility_features.csv), [metric definitions](../outputs/pandar_hypothesis_2026-09-07/feature_definitions.md).
+
+Round 2 verdict: inconclusive. Preserve the original no-entry outcomes, test the single higher-delta arm without further tuning, and allocate prior-smile requests using causal entry feasibility, never profit. No trade is yet claimed to have passed every execution requirement.
+
+## Round 2 independent persona commentary
+
+[Actual round 2 commentary](../outputs/commentary/round2/H-PNDR-001.json)
+
+### charlie-mcelligott
+
+Round 2 establishes a saleability problem for the original project rule: none of 83 clock/HIRO entry snapshots passes the preliminary gates for the 49 selected pairs. ASML's 0.50/4.70 and QCOM's 1.00/1.60 quotes show why a visible premium is not necessarily a usable sale. These are observed entry failures, not evidence that HIRO lacks economic information or that Pandar has no other opportunities. All 196 original quote/Greek files are now available, but availability does not establish event quote age or exact deliverables.
+
+Preserve original observed entry failures and censored HIRO histories. Carry the single frozen higher-delta arm forward without changing the liquidity rules, then apply displayed-size, condition, timestamp and identity checks to its seven preliminary policy entries. Keep the comparison by eligible episode and the twenty-date replication requirement. No live-entry or profitable-timing claim follows from six preliminary stocks on this five-date sample.
+
+### quant
+
+Round 2 establishes an entry-feasibility failure for the original project specification: all 83 observed clock/HIRO entry-chain snapshots for the 49 fixed pairs fail its preliminary bid/delta/distance/spread gates. That is not a measured loss and does not establish an advantage for either entry policy. The 196 downloaded minute quote/Greek files establish file availability, not correct deliverables, complete causal HIRO windows, quote freshness, or executable fills. The variant's seven preliminary entries belong to six stocks; they are not seven independent dates. The original five-date population still cannot meet the twenty-date criterion.
+
+Retain the original known quote-gate failures as no-entry outcomes, while preserving unavailable HIRO-first-trigger paths as censored. Keep original and higher-delta results separate. Reconcile policy pairing by frozen episode, verify the date denominator and first-trigger chronology, and distinguish preliminary price checks from the remaining displayed-size, condition, quote-age and deliverable gates. No claim of an executable HIRO advantage is justified in this round.

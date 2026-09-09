@@ -1,0 +1,20 @@
+row_id,ticker,scenario,clock,hiro,hiro_minus_clock
+1,MSTR,sell-first call grab,65.7,51.7,-14.0
+2,MSTR,sell-first call grab,11.7,15.7,4.0
+19,AMZN,buy-first put-tail inventory,-5.3,-5.3,0.0
+21,BMNR,buy-first put-tail inventory,-1.3,-2.3000000000000007,-1.0000000000000007
+26,AMZN,buy-first put-tail inventory,-5.3,-5.3,0.0
+27,CRWV,buy-first put-tail inventory,-7.3,-5.3,2.0
+31,NVDA,buy-first put-tail inventory,-2.3000000000000007,-3.3000000000000007,-1.0
+32,PLTR,buy-first put-tail inventory,-0.2999999999999991,0.7000000000000017,1.0000000000000009
+35,CVNA,buy-first put-tail inventory,-6.3,-6.3,0.0
+37,HOOD,buy-first put-tail inventory,-10.3,-9.3,1.0
+39,NVDA,buy-first put-tail inventory,-3.3,-3.3,0.0
+42,BMNR,buy-first put-tail inventory,-12.3,-12.3,0.0
+46,HOOD,buy-first put-tail inventory,-8.3,-8.3,0.0
+47,MRVL,buy-first put-tail inventory,-6.3,-6.3,0.0
+66,IREN,buy-first put-tail inventory,-3.3000000000000007,-0.3000000000000005,3.0
+69,SOFI,buy-first put-tail inventory,-2.3000000000000003,-4.3,-1.9999999999999996
+72,BMNR,buy-first put-tail inventory,-5.3,-5.3,0.0
+78,NBIS,buy-first put-tail inventory,-17.3,-16.3,1.0
+79,NVDA,buy-first put-tail inventory,-2.3,-2.3,0.0

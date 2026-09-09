@@ -1,0 +1,832 @@
+[
+  {
+    "ticker": "AAL",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 39,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/6a7dbe2ce3c88d7557e2c3afba011207012bcc62faae51c6b8e62669f5fa5076.parquet"
+  },
+  {
+    "ticker": "AAL",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:46:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 39,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/e02985ef23927a0a7f1557e5d63452eea7de330bd68a08b04a4c7addfc678228.parquet"
+  },
+  {
+    "ticker": "ASML",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 230,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/f80458dc45bfc8f27d8188f40f9869ab039e09aa12d308e153cf191211ac0001.parquet"
+  },
+  {
+    "ticker": "ASML",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:31:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 230,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/d8a08c69542669ec426d7f4a706261ff2044c035dcd69d5761d4214bf4df22f4.parquet"
+  },
+  {
+    "ticker": "ASTS",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 103,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/64f448716030e3ebd6548cbbc42a739a7317c0faa0849460e5bbe81bdff4e703.parquet"
+  },
+  {
+    "ticker": "CPNG",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 45,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c45280149fe1af888be38aef53aebd3a1453b73540c6ab6b13c4ecfc1d69693c.parquet"
+  },
+  {
+    "ticker": "CPNG",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:51:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 45,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/9fb48aa52ba3b7c599bbc4370690dfed05477f0b7012ca382ad0fd7e5532d514.parquet"
+  },
+  {
+    "ticker": "CRSP",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 59,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/f5938ec951e6d9021bc3f5e64c3bb6c160913769c1e811de37463a2b72d57b6b.parquet"
+  },
+  {
+    "ticker": "CRSP",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:51:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 59,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/48dc3ebc1745bb01c46b6cdab13bd88bd3b1c0444454e72eb68094bc02d8d839.parquet"
+  },
+  {
+    "ticker": "DKNG",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 47,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/4f2c55dd283a4b8485cbf31e79362e1c727fadc47276e5a9fc4b0540ffba68aa.parquet"
+  },
+  {
+    "ticker": "DKNG",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:41:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 47,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/45968692360501b487c64478e98b56b01875ae913bfaa6a925a50ff7c643d6fd.parquet"
+  },
+  {
+    "ticker": "DVN",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 51,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/3dcdb066e43aea720adc71474ed5a9bb771b4d804ca017f950ad14b030f5665f.parquet"
+  },
+  {
+    "ticker": "DVN",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:21:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 51,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/d3ab23f902bc384767e6f38f6470bf7383aaa282f71dd0a1ed494df4f0165028.parquet"
+  },
+  {
+    "ticker": "GILD",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 60,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/09494926381e3aff1d133317b1831b36a1b6f401aacfc84f846d0cc22adce7e3.parquet"
+  },
+  {
+    "ticker": "GILD",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 13:41:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 60,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/2878408d27c3f70b901f7c8e54883d96e05e876bca68cd7f0e87278ec3a94b42.parquet"
+  },
+  {
+    "ticker": "HPQ",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 48,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/11a46b77518917ad0b347cb6c05aec0566ab6ae9ac6168af4e444240b73408cd.parquet"
+  },
+  {
+    "ticker": "HPQ",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:51:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 48,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/015657770dab374a1b64059088b118963ac38afe548aa1fd2adf8afe8fd9010d.parquet"
+  },
+  {
+    "ticker": "MO",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 45,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/5fa6fa6ad02df115148e25e9167cb5345d1c9237464c83079ffd31cfe01e4c25.parquet"
+  },
+  {
+    "ticker": "MO",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:21:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 45,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/a4bd4b88d3d5d2eec921b5f690e00181c2186e272c94d61c777b42ca7747275b.parquet"
+  },
+  {
+    "ticker": "NET",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 95,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/f47eccebd829421c514b0aff4a0fd5cd148fdae6552962b55f6fbabce1dc99d8.parquet"
+  },
+  {
+    "ticker": "PLTR",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 116,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/43be9648a6e8db2eb4b013540d87691a39987cc562199dd238ce8276492627d0.parquet"
+  },
+  {
+    "ticker": "PLTR",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:46:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 116,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/684fe6076a34aaa7b6d8065c837bc601386e345859c36dcc3630e1c8c1be27c9.parquet"
+  },
+  {
+    "ticker": "RBLX",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 84,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/036089c5990fb72d8df72ee305efb16a0bd1153e16a5edf86fee1fe2b14dbf73.parquet"
+  },
+  {
+    "ticker": "RF",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 26,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/60036d1e53796a00deef4da312ca8b99cd397c7db757c5f969e73049a17a4a3a.parquet"
+  },
+  {
+    "ticker": "SPOT",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 149,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/042ef7e95d370c370e69483f1b2fe5beb6f23c8a261fad4103677b69d4feab25.parquet"
+  },
+  {
+    "ticker": "SPOT",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 12:51:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 149,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/a66f2175f9594c76d44d190e070a1d7e7582672085152230d0efef9bc427220c.parquet"
+  },
+  {
+    "ticker": "T",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 32,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/1322620ecfddcebf453be25108daa7e6ac569553bc9816b5bf8ec309311db0e6.parquet"
+  },
+  {
+    "ticker": "T",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:21:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 32,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/cb91ae08048eb2030731d412604c45bc87ddb7c1cb3106f1b1cb8e4c778c2468.parquet"
+  },
+  {
+    "ticker": "TWLO",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 80,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/4b905e9280b7f25b2f098cf09e01be56c196d546efb88250093cab5c405d2ea2.parquet"
+  },
+  {
+    "ticker": "TWLO",
+    "signal_date": "2026-06-11",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:41:00-04:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 80,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/9062fafe6fab50210b8503319dd49ba9cff90a6000f04b634dcab53debe48e50.parquet"
+  },
+  {
+    "ticker": "VST",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 85,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/ef6aad2e92633e1e384a653aaf25fffaf0e98b88c4e53fe337351c49894585b4.parquet"
+  },
+  {
+    "ticker": "ZIM",
+    "signal_date": "2026-06-11",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "expiry": "2026-06-18",
+    "status": "ok",
+    "rows": 59,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/30f174f40243932cfeafce1d1bfa5b04613f558625c00a41ee019e0407283b0d.parquet"
+  },
+  {
+    "ticker": "BKNG",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 57,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/548f33e74e536f7e74072975d43bcc396ea4bab9c2641dc7a9213998da08ae16.parquet"
+  },
+  {
+    "ticker": "BKNG",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 10:16:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 57,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/15a92397cb398ec14f4f6e03a6869952942b46fa526999ac96bf61cdf7afd493.parquet"
+  },
+  {
+    "ticker": "CAT",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 168,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c85350b621d87fc55f206024d0ae462484b5770b0ce307f92581ad8e50e2dde0.parquet"
+  },
+  {
+    "ticker": "CAT",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 10:01:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 168,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c85350b621d87fc55f206024d0ae462484b5770b0ce307f92581ad8e50e2dde0.parquet"
+  },
+  {
+    "ticker": "DDOG",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 114,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/2f961be62241040701ef42ffb5d1d96505235af535768752db5ea835ed7e550d.parquet"
+  },
+  {
+    "ticker": "DDOG",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:56:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 114,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/0b92b3cfdcd53470a833173705c9e6cf0727b9f86e38bc4461743c4e529a3554.parquet"
+  },
+  {
+    "ticker": "DIS",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 46,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/28b7f9167d78f7e30d09c098ad546b4b834817358f1c39c94de3ab9b635d24ea.parquet"
+  },
+  {
+    "ticker": "ETSY",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 45,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/23c6741f4c82f75560a92b8ac9990d8cc7c2a61e25dbdfb2b8d4827232d038fb.parquet"
+  },
+  {
+    "ticker": "ETSY",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:36:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 45,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/a4c0e4282c82c93b3d117dad4f447abb5c343bfc1e00115a46bfd06ea4a92895.parquet"
+  },
+  {
+    "ticker": "F",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 41,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/dd5b9eb07af479e59941c30d6fbf513193259bd95d652fd479c5a5a70ff87718.parquet"
+  },
+  {
+    "ticker": "FTNT",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 96,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/cb9fe0cc5a7da00d560e9df33e10873b6a542dcae7c0419849fd2ad640eb6477.parquet"
+  },
+  {
+    "ticker": "FTNT",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 11:21:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 96,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/d08e707356d947ad5404b1d8cf1573f74fdffa1d5eab44c83d7645728f2c3bae.parquet"
+  },
+  {
+    "ticker": "HD",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 73,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c3041fde0282baeb2d7386bb3eabe4ff7da2c4dad1bfe915fbe7de617fc6f7bb.parquet"
+  },
+  {
+    "ticker": "HD",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:41:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 73,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/d4a528acd724e6de2bba90d1c28d91860299cc568d1a05f1ae2c3b8b72408670.parquet"
+  },
+  {
+    "ticker": "LUV",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 42,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/3f83118653047f0e13c55d515d4fd7737f120569809fba9e130b8b59512d3bee.parquet"
+  },
+  {
+    "ticker": "LUV",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 11:56:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 42,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/ca8ce806d12bdf604bda8a7757c03981b51c0c082e1bb23b0ecf0a7142a3bbae.parquet"
+  },
+  {
+    "ticker": "MRK",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 53,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/1e3c72409e52d908db056f4bbb21db3b4a444d675173cfd38f42cef1d754521e.parquet"
+  },
+  {
+    "ticker": "PG",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 50,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/f8b328c2f0c477bc7ad2c2b8ae750cc88583a7e4db06c3fab42505d923a2d197.parquet"
+  },
+  {
+    "ticker": "RDW",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 66,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/1bcdc32d1a06190d2dcd4ef7ad86c606bf0594335323d2e1b41809410253b3ff.parquet"
+  },
+  {
+    "ticker": "RDW",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 10:06:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 66,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/370c6de65e4d5154a40ffebbd5afbd1c867e364a306b90cbbf86e44d2ea67d41.parquet"
+  },
+  {
+    "ticker": "S",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 35,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/0dbdad0088367c46aab16ef32b0142b3653fe8bf1174e6594cab6d641befefb7.parquet"
+  },
+  {
+    "ticker": "S",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 11:06:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 35,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/efcdcabb1b9928526717639d54023686ddbcddd44d80e9a39195fb0aa81c1a14.parquet"
+  },
+  {
+    "ticker": "ULTA",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 102,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/cfbf8914a5461f5918b5fd9b02dc3607e43111f23ef7b837aa3b0369bbadd119.parquet"
+  },
+  {
+    "ticker": "WDAY",
+    "signal_date": "2026-06-12",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 76,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/813c6eec821ff92e6653e5fd48b81e519567257280e297530f0fa7896ea2883c.parquet"
+  },
+  {
+    "ticker": "WDAY",
+    "signal_date": "2026-06-12",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:11:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 76,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/38a467c072a1baf9552064a952e06d0d8fb153fd9d27b6a2630b68d3ecb5ddd2.parquet"
+  },
+  {
+    "ticker": "ANF",
+    "signal_date": "2026-06-15",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 63,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/1ec3346a652112a4a26c973d2ca3253e3ec27015fa48f51b63d0d76b36dfb7a7.parquet"
+  },
+  {
+    "ticker": "ANF",
+    "signal_date": "2026-06-15",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 10:26:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 63,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/82c1fb0b5c062c1e32183b57cf3db031f704b82f38d3a57c0ab9a02fe20cc0cf.parquet"
+  },
+  {
+    "ticker": "LVS",
+    "signal_date": "2026-06-15",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 41,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/28f45c64e58e75d97c0dcfc8781353d4bf95b4f7735bdc0213bc6fb4505e44f1.parquet"
+  },
+  {
+    "ticker": "LVS",
+    "signal_date": "2026-06-15",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 10:06:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 41,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c3a5456613b212904e172c9ecc0972ef0af9beb9030b2eb0697641378fed0f22.parquet"
+  },
+  {
+    "ticker": "MRVL",
+    "signal_date": "2026-06-15",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 125,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/326c60168eca1c408d7b773fc221849c496661a6b1f850bb79fd11582bd01a76.parquet"
+  },
+  {
+    "ticker": "MRVL",
+    "signal_date": "2026-06-15",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 14:16:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 125,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/ca8e5ef5dea9aa9968dc8c4e213eab0d898bca770f26cd904e1dde32e9a378e0.parquet"
+  },
+  {
+    "ticker": "ORCL",
+    "signal_date": "2026-06-15",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 86,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/43ee4ce1a029dce9b240252f023f063d8531db64064a74c8f1fedca155851b5a.parquet"
+  },
+  {
+    "ticker": "QCOM",
+    "signal_date": "2026-06-15",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 97,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/3dff6b838e7ec461963c2808f6d5a1b3c4a9db9b88de85ace4d59aa1d3ea3f3a.parquet"
+  },
+  {
+    "ticker": "QCOM",
+    "signal_date": "2026-06-15",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 11:11:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 97,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/2bca8670a2e4746970704b2b639bbb602ccf5840c86744c43215e66a10990f61.parquet"
+  },
+  {
+    "ticker": "CRM",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 57,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/b3f4fc91c47d410eff8ccc047dfa912f0ba6e4865645c17fb7a067995b466a33.parquet"
+  },
+  {
+    "ticker": "DE",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 125,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/5c0f0dbc355a3e9ed3c17e60ed16c6b0e8bb6b14cd58fd19c3f3c64cc0cf7226.parquet"
+  },
+  {
+    "ticker": "DG",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 57,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/354201ffaab7be198fee3687759525de598b0998558e7ac3ae2bbe2b945c393e.parquet"
+  },
+  {
+    "ticker": "DG",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 12:31:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 57,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/73020e55524a18da7f36105399e790b88120cbc17a181df77a438c654a0dd687.parquet"
+  },
+  {
+    "ticker": "ON",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 86,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c5f4fdaf60afeee1d4712ae89e8c65f85433fa2fbc6fa967f1e7f9729bd6522b.parquet"
+  },
+  {
+    "ticker": "ON",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 10:01:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 86,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/c5f4fdaf60afeee1d4712ae89e8c65f85433fa2fbc6fa967f1e7f9729bd6522b.parquet"
+  },
+  {
+    "ticker": "ROKU",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 75,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/1990c17227e3cc8eeec94f49e85f7016c2ff839544c9311a0457b35b4fef0ed4.parquet"
+  },
+  {
+    "ticker": "SE",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 51,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/a317eda118a621d7963b6cc69112ab9d3370d42b120d3696ad423e258aa138e0.parquet"
+  },
+  {
+    "ticker": "SE",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 11:51:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 51,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/13cbd195e94ee57035af0b827178c66abdb58a5e28ab68d728d3385613e4e0e2.parquet"
+  },
+  {
+    "ticker": "SERV",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 27,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/3ed3d09418538bdef230103ef7394f5167fd5269ef7471515c71b302a6655d7b.parquet"
+  },
+  {
+    "ticker": "SERV",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 10:01:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 27,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/3ed3d09418538bdef230103ef7394f5167fd5269ef7471515c71b302a6655d7b.parquet"
+  },
+  {
+    "ticker": "VRT",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 97,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/99ff05db1edd8745320a429564a8b152cec387f8b6d753fc27aebdb40ee2cea9.parquet"
+  },
+  {
+    "ticker": "VRT",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 11:11:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 97,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/0fc0b2cc373fc9d051952489d9ba4b516ed00b04e2a1271a2d2ebbb32ed04afd.parquet"
+  },
+  {
+    "ticker": "WDC",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 218,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/76715fa35f12112a742e06838f193238e04dc5a104c053c62f7c7604683f2bbe.parquet"
+  },
+  {
+    "ticker": "WDC",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 10:01:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 218,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/76715fa35f12112a742e06838f193238e04dc5a104c053c62f7c7604683f2bbe.parquet"
+  },
+  {
+    "ticker": "ZS",
+    "signal_date": "2026-06-16",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 87,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/e56c93fb1890c87c7c45903d287d1cb39be6171693e7d14fb3e78ab444c05147.parquet"
+  },
+  {
+    "ticker": "ZS",
+    "signal_date": "2026-06-16",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 13:06:00-04:00",
+    "expiry": "2026-06-26",
+    "status": "ok",
+    "rows": 87,
+    "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/theta/option_history_quote/278b4ba6d5a3be10abf6cbdacfaace7d92d978561948a5b2a8aa9599f04fea0b.parquet"
+  }
+]

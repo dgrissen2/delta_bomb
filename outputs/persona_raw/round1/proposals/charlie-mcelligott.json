@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "candidate_key": "audit-short-phase-exposure",
+      "kind": "experiment",
+      "title": "Audit adverse exposure before the nearer call is acquired",
+      "priority": "high",
+      "parent": "H-PNDR-001",
+      "rationale": "A better short-sale entry is economically useful only alongside the exposure carried before conversion or cover. The current round has no exact-quote path evidence, and aggregate flow cannot bound a right-tail rally.",
+      "falsification": "For the frozen initial entries, reconstruct every available minute's short-cover cost, underlying rally and far-call delta through conversion or the common exit. Report missing intervals and quote-age limitations. A profit advantage accompanied by larger sampled losses or unknown exposure cannot establish reduced short-phase risk.",
+      "decision_impact": "Expose whether apparent timing value is compensation for carrying more short-call risk, and determine which cases support only quoted-price diagnostics."
+    },
+    {
+      "candidate_key": "test-conversion-controls",
+      "kind": "experiment",
+      "title": "Compare financed conversion with immediate purchase and same-minute short cover",
+      "priority": "high",
+      "parent": "H-PNDR-002",
+      "rationale": "A credit remaining after construction is not the value added by purchasing the nearer call. Only controls sharing the initial short sale can isolate the second decision.",
+      "falsification": "Replay the fixed next-session conversion policy against immediate spread purchase and covering the short at conversion, using identical D4 deadlines, all fees, fixed-timestamp one-cent/two-cent costs and preserved failed or censored attempts. Nonpositive incremental net wealth against either primary control fails the corresponding economic comparison; fewer than twenty dates remains statistically inconclusive.",
+      "decision_impact": "Determine whether the nearer call adds measured value, merely finances a position, or consumes premium that an immediate short cover would preserve."
+    }
+  ],
+  "reprioritize": []
+}

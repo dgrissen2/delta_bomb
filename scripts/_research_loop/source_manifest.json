@@ -1,0 +1,67 @@
+{
+  "adaptation": "Native Codex primary personas; no cross-model twin claims or model subprocesses.",
+  "files": [
+    {
+      "source": "/Users/dgrissen/.config/skillshare/skills/_research_loop/contracts.py",
+      "source_sha256": "674b73fbbf200e82bebf800d147116ffb194b1203637feefabb759758bfa17ed",
+      "vendored_path": "scripts/_research_loop/contracts.py",
+      "adapted": true,
+      "vendored_sha256": "757c2b683e547e90ce3c27299ef23650ecc80d05c1f526ef60a77d7af76b07b2"
+    },
+    {
+      "source": "/Users/dgrissen/.config/skillshare/skills/_research_loop/verify_round.py",
+      "source_sha256": "2da2459be29412d0e7dc450cd984940147d65e50e0d9be6721bab28a18a6ea6a",
+      "vendored_path": "scripts/_research_loop/verify_round.py",
+      "adapted": true,
+      "vendored_sha256": "f902df247338547553ef9b0d348c05ff79cfed971a96d632cb1a7f5cf4c4f632"
+    },
+    {
+      "source": "/Users/dgrissen/.config/skillshare/skills/_research_loop/synthesize.py",
+      "source_sha256": "bd6508e20f33a31a85e4a046a8d4256a3ff868cc949062d44d83be0458862306",
+      "vendored_path": "scripts/_research_loop/synthesize.py",
+      "adapted": false,
+      "vendored_sha256": "bd6508e20f33a31a85e4a046a8d4256a3ff868cc949062d44d83be0458862306"
+    },
+    {
+      "source": "/Users/dgrissen/.config/skillshare/skills/_research_loop/promote.py",
+      "source_sha256": "a021825440c0cc3405455cdbd4af39379f34fb8f55bf4a891bf504e788b9e516",
+      "vendored_path": "scripts/_research_loop/promote.py",
+      "adapted": false,
+      "vendored_sha256": "a021825440c0cc3405455cdbd4af39379f34fb8f55bf4a891bf504e788b9e516"
+    },
+    {
+      "source": "/Users/dgrissen/Dev/research_loop-dev/framework/hypothesis_tracking/HYPOTHESIS_FINDINGS_TEMPLATE.md",
+      "source_sha256": "e81eda87309d71f3535abf7f5866a0a95ff798c9c01ed4bdbd1912f45939de3f",
+      "vendored_path": "hypothesis_tracking/HYPOTHESIS_FINDINGS_TEMPLATE.md",
+      "adapted": false,
+      "vendored_sha256": "e81eda87309d71f3535abf7f5866a0a95ff798c9c01ed4bdbd1912f45939de3f"
+    },
+    {
+      "source": "/Users/dgrissen/Dev/research_loop-dev/framework/hypothesis_tracking/DECISION_MAKER_MEMO_TEMPLATE.md",
+      "source_sha256": "599e9446b8ed43badd0fe29014fdac1f2b814eb18c36916334bd050e14b38c3d",
+      "vendored_path": "hypothesis_tracking/DECISION_MAKER_MEMO_TEMPLATE.md",
+      "adapted": false,
+      "vendored_sha256": "599e9446b8ed43badd0fe29014fdac1f2b814eb18c36916334bd050e14b38c3d"
+    }
+  ],
+  "native_adapter_files": [
+    {
+      "path": "scripts/_research_loop/emit.py",
+      "sha256": "2c761b0c9c24359b0516563d79c06c19ce435e41fc1603fdc6e711970e112939"
+    },
+    {
+      "path": "scripts/_research_loop/README.md",
+      "sha256": "6fa3a6b6b818207f491651b008e7b9ff7eb5ffcd906c1502b2cee5a186762d16"
+    },
+    {
+      "path": "tests/test_pandar_research_framework.py",
+      "sha256": "315825c8e98f0c1b93a952d69e835e3d92b4b7947f46bd2961681e1c55e0bcc1"
+    }
+  ],
+  "validation": {
+    "command": "/Users/dgrissen/Dev/virtualenvs/gamma_chaser/bin/python -m pytest tests/test_pandar_research_framework.py -q",
+    "failure_first": "10 setup errors: absent contracts/adapter modules",
+    "after_implementation": "12 passed",
+    "seed_outcome_compatibility": "New regression failed on missing target before the fix, then passed without changing raw bytes."
+  }
+}

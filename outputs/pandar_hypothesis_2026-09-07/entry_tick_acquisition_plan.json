@@ -1,0 +1,1733 @@
+{
+  "basis": "all frozen original and variant entry sessions; no profit selection",
+  "requests": [
+    {
+      "ticker": "AAL",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 16.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "AAL",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 16.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "ASML",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 2260.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "ASML",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 2250.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "ASTS",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 160.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "ASTS",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 155.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "CPNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 20.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "CPNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 19.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "CRSP",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 62.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "CRSP",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 61.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "DKNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 34.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "DKNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 33.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "DVN",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 50.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "DVN",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 49.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "GILD",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 135.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "GILD",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 134.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "HPQ",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 28.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "HPQ",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 27.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "MO",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 76.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "MO",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 75.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "NET",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 270.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "NET",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 267.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "PLTR",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 152.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "PLTR",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 150.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "RBLX",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 50.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "RBLX",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 49.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "RF",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 31.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "RF",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 30.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "SPOT",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 552.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "SPOT",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 550.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "T",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 25.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "T",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 24.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "TWLO",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 252.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "TWLO",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 250.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "VST",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 172.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "VST",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 170.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "ZIM",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 29.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "ZIM",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 29.16,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "original"
+    },
+    {
+      "ticker": "BKNG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 195.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "BKNG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 190.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "CAT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 1040.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "CAT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 1030.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "DDOG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 285.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "DDOG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 282.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "DIS",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 109.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "DIS",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 108.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "ETSY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 83.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "ETSY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 82.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "F",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 17.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "F",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 17.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "FTNT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 170.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "FTNT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 167.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "HD",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 380.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "HD",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 375.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "LUV",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 53.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "LUV",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 52.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "MRK",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 130.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "MRK",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 129.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "PG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 160.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "PG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 157.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "RDW",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 24.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "RDW",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 24.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "S",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 18.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "S",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 17.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "ULTA",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 522.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "ULTA",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 520.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "WDAY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 160.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "WDAY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 157.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "original"
+    },
+    {
+      "ticker": "ANF",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 110.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "ANF",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 107.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "LVS",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 55.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "LVS",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 54.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "MRVL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 470.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "MRVL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 460.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "ORCL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 235.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "ORCL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 232.5,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "QCOM",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 305.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "QCOM",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 300.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "original"
+    },
+    {
+      "ticker": "CRM",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 185.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "CRM",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 182.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "DE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 632.5,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "DE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 630.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "DG",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 129.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "DG",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 128.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "ON",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 152.5,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "ON",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 150.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "ROKU",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 155.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "ROKU",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 152.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "SE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 101.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "SE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 100.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "SERV",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 9.5,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "SERV",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 9.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "VRT",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 370.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "VRT",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 367.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "WDC",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 930.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "WDC",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 920.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "ZS",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 152.5,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "ZS",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 150.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "original"
+    },
+    {
+      "ticker": "AAL",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 16.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "AAL",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 15.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ASML",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 2150.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ASML",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 2140.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ASTS",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 140.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ASTS",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 135.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CPNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 19.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CPNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 19.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CRSP",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 60.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CRSP",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 59.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DKNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 33.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DKNG",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 32.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DVN",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 48.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DVN",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 48.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "GILD",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 133.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "GILD",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 132.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "HPQ",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 27.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "HPQ",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 27.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "NET",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 260.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "NET",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 257.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "PLTR",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 146.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "PLTR",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 145.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "RBLX",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 48.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "RBLX",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 48.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "SPOT",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 537.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "SPOT",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 535.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "T",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 24.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "T",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 24.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "TWLO",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 242.5,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "TWLO",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 240.0,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "VST",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 165.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "VST",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 162.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ZIM",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 29.0,
+      "leg": "far",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ZIM",
+      "signal_date": "2026-06-11",
+      "expiry": "2026-06-18",
+      "strike": 28.5,
+      "leg": "near",
+      "session": "2026-06-12",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "BKNG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 185.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "BKNG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 182.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CAT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 1010.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CAT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 1005.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DDOG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 270.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DDOG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 267.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DIS",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 107.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DIS",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 106.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ETSY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 80.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ETSY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 79.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "F",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 16.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "F",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 16.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "FTNT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 165.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "FTNT",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 162.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "HD",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 362.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "HD",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 360.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "LUV",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 52.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "LUV",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 51.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "MRK",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 127.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "MRK",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 126.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "PG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 157.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "PG",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 155.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "RDW",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 22.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "RDW",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 22.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "S",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 17.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "S",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 17.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ULTA",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 510.0,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ULTA",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 507.5,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "WDAY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 152.5,
+      "leg": "far",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "WDAY",
+      "signal_date": "2026-06-12",
+      "expiry": "2026-06-26",
+      "strike": 150.0,
+      "leg": "near",
+      "session": "2026-06-15",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ANF",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 105.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ANF",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 104.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "LVS",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 54.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "LVS",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 53.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "MRVL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 425.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "MRVL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 420.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ORCL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 222.5,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ORCL",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 220.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "QCOM",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 280.0,
+      "leg": "far",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "QCOM",
+      "signal_date": "2026-06-15",
+      "expiry": "2026-06-26",
+      "strike": 275.0,
+      "leg": "near",
+      "session": "2026-06-16",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CRM",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 180.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "CRM",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 177.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 620.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 617.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DG",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 125.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "DG",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 124.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ON",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 145.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ON",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 144.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ROKU",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 152.5,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ROKU",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 150.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "SE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 98.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "SE",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 97.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "SERV",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 9.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "SERV",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 8.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "VRT",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 355.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "VRT",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 352.5,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "WDC",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 870.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "WDC",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 860.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ZS",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 146.0,
+      "leg": "far",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    },
+    {
+      "ticker": "ZS",
+      "signal_date": "2026-06-16",
+      "expiry": "2026-06-26",
+      "strike": 145.0,
+      "leg": "near",
+      "session": "2026-06-17",
+      "variant": "delta10_otm5"
+    }
+  ]
+}

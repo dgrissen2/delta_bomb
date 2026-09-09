@@ -1,0 +1,9 @@
+prefix: PNDR
+engine_mode: codex_only
+personas: [charlie-mcelligott, quant]
+persona_source: global
+round_cap: 3
+K: 2
+# User chose Codex, Charlie/Quant, simple methods, and a continuing loop.
+# PNDR and this initial three-round batch are maintainer implementation choices.
+# Cross-model/Claude requirements are superseded by the explicit Codex-only instruction.

@@ -1,0 +1,187 @@
+{
+  "cutoff": "2026-09-04",
+  "request_cap": 20,
+  "attempts": 18,
+  "files": [
+    {
+      "ticker": "COIN",
+      "expiry": "2026-08-28",
+      "strike": 220.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/COIN_2026-08-28_220_call.parquet",
+      "status": "fetched",
+      "sha256": "7ad2901b5cc7f4796c6ca75961cf0fda7ce160d50497e8fa028f72964a67bd74",
+      "rows": 2346
+    },
+    {
+      "ticker": "COIN",
+      "expiry": "2026-08-28",
+      "strike": 215.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/COIN_2026-08-28_215_call.parquet",
+      "status": "fetched",
+      "sha256": "91b29f810578fedb2a2e678848b8557d9a3d88cefc115bee02a66867a013b986",
+      "rows": 2346
+    },
+    {
+      "ticker": "COIN",
+      "expiry": "2026-08-28",
+      "strike": 235.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/COIN_2026-08-28_235_call.parquet",
+      "status": "fetched",
+      "sha256": "2cbe6b9e6598e150edab49a2a55c1be125d400361ea4b6df12fd2db3154da1a5",
+      "rows": 1955
+    },
+    {
+      "ticker": "COIN",
+      "expiry": "2026-08-28",
+      "strike": 230.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/COIN_2026-08-28_230_call.parquet",
+      "status": "fetched",
+      "sha256": "9d7c4933b0147cb6694b625ea3f1807419a7887be8498d1a44269978c1350486",
+      "rows": 1955
+    },
+    {
+      "ticker": "STX",
+      "expiry": "2026-08-28",
+      "strike": 925.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/STX_2026-08-28_925_call.parquet",
+      "status": "fetched",
+      "sha256": "9bc14defa51e3a0ac0e8be39051ed7664c9c2d0ae0c9165a0fcedda9c6521c10",
+      "rows": 1564
+    },
+    {
+      "ticker": "STX",
+      "expiry": "2026-08-28",
+      "strike": 920.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/STX_2026-08-28_920_call.parquet",
+      "status": "fetched",
+      "sha256": "f8245fd21127440156b016525b8e822e8fdf941487e5693a2c6f6652b2538627",
+      "rows": 1564
+    },
+    {
+      "ticker": "NVDA",
+      "expiry": "2026-08-31",
+      "strike": 242.5,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/NVDA_2026-08-31_242.5_call.parquet",
+      "status": "fetched",
+      "sha256": "adfbccce41de4ba1bea602dcfd65e782b99ebedaefc271717859ed53731ee390",
+      "rows": 1173
+    },
+    {
+      "ticker": "NVDA",
+      "expiry": "2026-08-31",
+      "strike": 240.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/NVDA_2026-08-31_240_call.parquet",
+      "status": "fetched",
+      "sha256": "e6e7bfb002007cc5a3a45328c393fce6ada5d6dd339822bacc355182283b24ac",
+      "rows": 1173
+    },
+    {
+      "ticker": "BE",
+      "expiry": "2026-09-04",
+      "strike": 275.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/BE_2026-09-04_275_call.parquet",
+      "status": "fetched",
+      "sha256": "076414cff75959dd7f707f2a38dc3ec977e72a2d697c45328e808ee3fcdf9e47",
+      "rows": 1955
+    },
+    {
+      "ticker": "BE",
+      "expiry": "2026-09-04",
+      "strike": 272.5,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/BE_2026-09-04_272.5_call.parquet",
+      "status": "fetched",
+      "sha256": "046a140a6e87a4a580e28cf7498f3a50c6efdb0bfc6198a3c3650e2ecc9f1bf3",
+      "rows": 1955
+    },
+    {
+      "ticker": "MSTR",
+      "expiry": "2026-08-28",
+      "strike": 150.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_leg_timing_2026-09-05/data/quotes/MSTR_2026-08-28_150_call.parquet",
+      "status": "cached",
+      "sha256": "b3d80e034c80adfe17a7023d5cd2a4fc93b7fd7021bbffaeccd81325f3a0db97",
+      "rows": 2737
+    },
+    {
+      "ticker": "MSTR",
+      "expiry": "2026-08-28",
+      "strike": 145.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_leg_timing_2026-09-05/data/quotes/MSTR_2026-08-28_145_call.parquet",
+      "status": "cached",
+      "sha256": "4d38ff1d84a60a99e77b949711a18917e7e1591c75b3d10a1e28e4b20ab5170f",
+      "rows": 2737
+    },
+    {
+      "ticker": "SMCI",
+      "expiry": "2026-08-21",
+      "strike": 49.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/SMCI_2026-08-21_49_call.parquet",
+      "status": "fetched",
+      "sha256": "bbdfc6306a00a4e26aaa67a23ae6dc09a3abbe7eacf6d73075fa0b0c397ea8ab",
+      "rows": 2346
+    },
+    {
+      "ticker": "SMCI",
+      "expiry": "2026-08-21",
+      "strike": 48.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/SMCI_2026-08-21_48_call.parquet",
+      "status": "fetched",
+      "sha256": "e948f4e9e2dfd32f35f7835fda454a0110ec6c717b2827dd1c4fea7fdbc34f4d",
+      "rows": 2346
+    },
+    {
+      "ticker": "JNJ",
+      "expiry": "2026-08-28",
+      "strike": 282.5,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/JNJ_2026-08-28_282.5_call.parquet",
+      "status": "fetched",
+      "sha256": "7acd5677271483c944beed723eb0ab351661f73fca51e13b10bffecf7ca80845",
+      "rows": 1564
+    },
+    {
+      "ticker": "JNJ",
+      "expiry": "2026-08-28",
+      "strike": 280.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/JNJ_2026-08-28_280_call.parquet",
+      "status": "fetched",
+      "sha256": "9dd8046b7060f6534ad48543a7b609d7583d52ea60ae7b85e7817b95fd3e8291",
+      "rows": 1564
+    },
+    {
+      "ticker": "MRNA",
+      "expiry": "2026-08-28",
+      "strike": 195.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/MRNA_2026-08-28_195_call.parquet",
+      "status": "fetched",
+      "sha256": "40768794b70f95cc5542832cdbd53f411eafe28603873ab7dc68384ffac2cea1",
+      "rows": 1564
+    },
+    {
+      "ticker": "MRNA",
+      "expiry": "2026-08-28",
+      "strike": 192.5,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/MRNA_2026-08-28_192.5_call.parquet",
+      "status": "fetched",
+      "sha256": "deb37956b02f67348e8beacd290747d5f1e3f6d43ebc83104965d93afe69387d",
+      "rows": 1564
+    },
+    {
+      "ticker": "TSLA",
+      "expiry": "2026-09-09",
+      "strike": 407.5,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/TSLA_2026-09-09_407.5_call.parquet",
+      "status": "fetched",
+      "sha256": "d71c72130cb9e3a97ce0c404db53c48e58bd9dca83e374466b303552fc127f19",
+      "rows": 782
+    },
+    {
+      "ticker": "TSLA",
+      "expiry": "2026-09-09",
+      "strike": 405.0,
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/review_quotes/TSLA_2026-09-09_405_call.parquet",
+      "status": "fetched",
+      "sha256": "9d96cced00fb47aa24b7386fc4dda0c782ff087062b51d101887c1c24bd40628",
+      "rows": 782
+    }
+  ]
+}

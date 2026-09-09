@@ -1,0 +1,459 @@
+{
+  "audit_date": "2026-09-07",
+  "scope": "Bounded public-reference audit of frozen selections. Not a completed historical security master. No provider/API quote requests or outcome columns read.",
+  "counts": {
+    "population_signals": 50,
+    "selected_pairs": 49,
+    "selected_option_legs": 98,
+    "no_selected_expiry": 1,
+    "signal_chain_tuples_present": 98,
+    "exact_historical_series_verified": 0,
+    "exact_deliverables_verified": 0,
+    "stocks_with_targeted_primary_references": 15,
+    "stocks_with_local_split_only_review": 4,
+    "same_root_adjustment_terms_documented": 3,
+    "adjusted_root_distinctions_documented": 5,
+    "confirmed_metadata_issuer_collisions": 1,
+    "per_stock_reference_status": {
+      "not_individually_researched_exact_master_missing": 30,
+      "adjusted_root_distinction_pending": 5,
+      "foreign_listing_identity_only": 4,
+      "local_older_split_only": 4,
+      "root_terms_documented_exact_series_pending": 3,
+      "corporate_action_ratio_unreconciled": 1,
+      "issuer_identity_only": 1,
+      "issuer_history_collision": 1,
+      "not_applicable_no_selected_expiry": 1
+    }
+  },
+  "input_sha256": {
+    "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/frozen_contract_selections.csv": "ce22494b0da826cc86034c5a0cfe5b57ad76bcf41731a85652919dd0211a5304",
+    "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/signal_chains.parquet": "4d55bc5bc94c511dda443014d52ab7eb97979115cca6f231dcd96cee8c7d1dd0",
+    "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/splits.parquet": "8aae80a3db9d1b889ce4712da11af83ef40d52addab73552ea259ccd64bee577"
+  },
+  "csv_path": "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/contract_reference_audit.csv",
+  "csv_sha256": "a319c6f99047cd0b09c7abeba5a613f061d6f17b58c97e7b8db059839220f7c2",
+  "local_chain_schema": [
+    "ticker",
+    "tradeDate",
+    "expirDate",
+    "dte",
+    "strike",
+    "stockPrice",
+    "callVolume",
+    "callOpenInterest",
+    "callBidSize",
+    "callAskSize",
+    "putVolume",
+    "putOpenInterest",
+    "putBidSize",
+    "putAskSize",
+    "callBidPrice",
+    "callValue",
+    "callAskPrice",
+    "putBidPrice",
+    "putValue",
+    "putAskPrice",
+    "callBidIv",
+    "callMidIv",
+    "callAskIv",
+    "smvVol",
+    "putBidIv",
+    "putMidIv",
+    "putAskIv",
+    "residualRate",
+    "delta",
+    "gamma",
+    "theta",
+    "vega",
+    "rho",
+    "phi",
+    "driftlessTheta",
+    "extSmvVol",
+    "extCallValue",
+    "extPutValue",
+    "spotPrice",
+    "quoteDate",
+    "updatedAt",
+    "expiryTod"
+  ],
+  "local_chain_limitation": "No option root, OSI symbol, deliverable, premium/strike multiplier, CUSIP or time-valid security identifier in inspected chain schema. Ticker/expiry/strike tuple presence cannot establish standard contracts.",
+  "corporate_actions_local": [
+    {
+      "ticker": "BKNG",
+      "splitDate": "2026-04-06",
+      "divisor": 25.0
+    },
+    {
+      "ticker": "CRM",
+      "splitDate": "2013-04-18",
+      "divisor": 4.0
+    },
+    {
+      "ticker": "DE",
+      "splitDate": "2007-12-04",
+      "divisor": 2.0
+    },
+    {
+      "ticker": "FTNT",
+      "splitDate": "2011-06-02",
+      "divisor": 2.0
+    },
+    {
+      "ticker": "FTNT",
+      "splitDate": "2022-06-23",
+      "divisor": 5.0
+    },
+    {
+      "ticker": "GILD",
+      "splitDate": "2007-06-25",
+      "divisor": 2.0
+    },
+    {
+      "ticker": "GILD",
+      "splitDate": "2013-01-28",
+      "divisor": 2.0
+    },
+    {
+      "ticker": "HPQ",
+      "splitDate": "2015-11-02",
+      "divisor": 2.2
+    },
+    {
+      "ticker": "SERV",
+      "splitDate": "2018-10-01",
+      "divisor": 1.5
+    },
+    {
+      "ticker": "VST",
+      "splitDate": "2018-04-09",
+      "divisor": 0.615
+    },
+    {
+      "ticker": "WDC",
+      "splitDate": "2025-02-24",
+      "divisor": 1.333
+    }
+  ],
+  "ticker_findings": {
+    "BKNG": {
+      "reference_status": "root_terms_documented_exact_series_pending",
+      "source_ids": [
+        "BKNG_58460"
+      ],
+      "ambiguity": "Documented same-root split. Exact June 26 series membership and subsequent changes not established.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs.",
+      "supported_terms_scope": "BKNG root: 100 BKNG shares after April 6; factor 25 changes contract count, not premium multiplier."
+    },
+    "ZIM": {
+      "reference_status": "root_terms_documented_exact_series_pending",
+      "source_ids": [
+        "ZIM_55590",
+        "ZIM_58710"
+      ],
+      "ambiguity": "29.16 is arithmetically consistent with 30 minus 0.84, but origin of this exact June 18 series is unverified. Pending merger is not June cash settlement.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Trace 29.16 series without rounding to 29.5 or 30.",
+      "supported_terms_scope": "ZIM retained root and 100 ordinary-share deliverable after 2024 strike adjustment."
+    },
+    "F": {
+      "reference_status": "root_terms_documented_exact_series_pending",
+      "source_ids": [
+        "F_56018",
+        "F_58991"
+      ],
+      "ambiguity": "Same root can contain strike-adjusted series. May 2026 flex memo describes a different expiry/right.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs.",
+      "supported_terms_scope": "F root retained 100 F shares after February 2025 cash adjustment."
+    },
+    "WDC": {
+      "reference_status": "adjusted_root_distinction_pending",
+      "source_ids": [
+        "WDC_56202"
+      ],
+      "ambiguity": "An adjusted WDC1 product has a different deliverable; underlying ticker alone does not distinguish the selected root.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Explicitly separate WDC from WDC1; do not substitute the adjusted root.",
+      "supported_terms_scope": "WDC1 documented historical deliverable: 100 WDC +33 SNDK +$16.83 cash; not assigned to selected WDC series."
+    },
+    "HPQ": {
+      "reference_status": "adjusted_root_distinction_pending",
+      "source_ids": [
+        "HPQ_37659"
+      ],
+      "ambiguity": "An adjusted HPQ1 product has a different deliverable; underlying ticker alone does not distinguish the selected root.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Explicitly separate HPQ from HPQ1; do not substitute the adjusted root.",
+      "supported_terms_scope": "HPQ1 documented historical deliverable: 100 HPQ +100 HPE; not assigned to selected HPQ series."
+    },
+    "T": {
+      "reference_status": "adjusted_root_distinction_pending",
+      "source_ids": [
+        "T_50308"
+      ],
+      "ambiguity": "An adjusted T1 product has a different deliverable; underlying ticker alone does not distinguish the selected root.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Explicitly separate T from T1; do not substitute the adjusted root.",
+      "supported_terms_scope": "T1 documented historical deliverable: 100 T +24 WBD +cash in lieu (amount unresolved in this memo); not assigned to selected T series."
+    },
+    "MRK": {
+      "reference_status": "adjusted_root_distinction_pending",
+      "source_ids": [
+        "MRK_48683"
+      ],
+      "ambiguity": "An adjusted MRK1 product has a different deliverable; underlying ticker alone does not distinguish the selected root.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Explicitly separate MRK from MRK1; do not substitute the adjusted root.",
+      "supported_terms_scope": "MRK1 documented historical deliverable: 100 MRK +10 OGN; not assigned to selected MRK series."
+    },
+    "DVN": {
+      "reference_status": "adjusted_root_distinction_pending",
+      "source_ids": [
+        "DVN_58920"
+      ],
+      "ambiguity": "An adjusted DVN1 product has a different deliverable; underlying ticker alone does not distinguish the selected root.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Explicitly separate DVN from DVN1; do not substitute the adjusted root.",
+      "supported_terms_scope": "DVN1 documented historical deliverable: 70 DVN; not assigned to selected DVN series."
+    },
+    "SERV": {
+      "reference_status": "issuer_history_collision",
+      "source_ids": [
+        "SERV_old",
+        "SERV_new"
+      ],
+      "ambiguity": "Local 2018 SERV corporate-action row belongs to ServiceMaster, a different issuer from current Serve Robotics. Ticker-only history is not identity-safe.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Bind CIK/security ID to Serve Robotics; quarantine/reconcile the old event and any old-issuer price/earnings/features.",
+      "supported_terms_scope": "Confirmed old-issuer metadata collision, not proof that June 2026 quotes are wrong."
+    },
+    "VST": {
+      "reference_status": "corporate_action_ratio_unreconciled",
+      "source_ids": [
+        "VST_issuer"
+      ],
+      "ambiguity": "Local divisor 0.615 is untyped; issuer merger consideration 0.652 refers to Dynegy conversion, not a VST option multiplier.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Resolve vendor adjustment semantics and issuer mapping before using this divisor.",
+      "supported_terms_scope": "Issuer merger reference only."
+    },
+    "S": {
+      "reference_status": "issuer_identity_only",
+      "source_ids": [
+        "S_identity"
+      ],
+      "ambiguity": "SentinelOne security identity anchored; full time-valid symbol mapping and exact options master absent.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Require SentinelOne CIK 1583708 in historical identity mapping.",
+      "supported_terms_scope": ""
+    },
+    "ASML": {
+      "reference_status": "foreign_listing_identity_only",
+      "source_ids": [
+        "ASML_identity"
+      ],
+      "ambiguity": "Issuer listing class is documented; exact option deliverable and historical series identity remain unverified.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Match US-traded security class/identifier; distinguish ADS from ordinary shares.",
+      "supported_terms_scope": ""
+    },
+    "SE": {
+      "reference_status": "foreign_listing_identity_only",
+      "source_ids": [
+        "SE_identity"
+      ],
+      "ambiguity": "Issuer listing class is documented; exact option deliverable and historical series identity remain unverified.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Match US-traded security class/identifier; distinguish ADS from ordinary shares.",
+      "supported_terms_scope": ""
+    },
+    "SPOT": {
+      "reference_status": "foreign_listing_identity_only",
+      "source_ids": [
+        "SPOT_identity"
+      ],
+      "ambiguity": "Issuer listing class is documented; exact option deliverable and historical series identity remain unverified.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Match US-traded security class/identifier; distinguish ADS from ordinary shares.",
+      "supported_terms_scope": ""
+    },
+    "CRSP": {
+      "reference_status": "foreign_listing_identity_only",
+      "source_ids": [
+        "CRSP_identity"
+      ],
+      "ambiguity": "Issuer listing class is documented; exact option deliverable and historical series identity remain unverified.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs. Match US-traded security class/identifier; distinguish ADS from ordinary shares.",
+      "supported_terms_scope": ""
+    },
+    "CRM": {
+      "reference_status": "local_older_split_only",
+      "source_ids": [],
+      "ambiguity": "Cached older split events exist; no authoritative exact June series record was obtained.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs.",
+      "supported_terms_scope": ""
+    },
+    "DE": {
+      "reference_status": "local_older_split_only",
+      "source_ids": [],
+      "ambiguity": "Cached older split events exist; no authoritative exact June series record was obtained.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs.",
+      "supported_terms_scope": ""
+    },
+    "FTNT": {
+      "reference_status": "local_older_split_only",
+      "source_ids": [],
+      "ambiguity": "Cached older split events exist; no authoritative exact June series record was obtained.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs.",
+      "supported_terms_scope": ""
+    },
+    "GILD": {
+      "reference_status": "local_older_split_only",
+      "source_ids": [],
+      "ambiguity": "Cached older split events exist; no authoritative exact June series record was obtained.",
+      "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs.",
+      "supported_terms_scope": ""
+    }
+  },
+  "default_ticker_finding": {
+    "reference_status": "not_individually_researched_exact_master_missing",
+    "evidence_needed": "Dated OCC/provider security definition plus exact series listing (root, expiry, right, strike), deliverable components and multipliers, then effective updates through expiry; reconcile both selected legs."
+  },
+  "sources": {
+    "BKNG_58460": {
+      "url": "https://infomemo.theocc.com/infomemos?number=58460",
+      "finding": "25-for-1 split; roots BKNG/2BKNG unchanged; contract count factor 25 and strike divisor 25; premium multiplier 100; deliverable 100 BKNG shares, CUSIP 09857L108. Strike table includes 190 and 195.",
+      "effective_date": "2026-04-06",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "ZIM_55590": {
+      "url": "https://infomemo.theocc.com/infomemos?number=55590",
+      "finding": "Special dividend reduces strikes by $0.84, retaining ZIM root, premium multiplier 100, and 100 ZIM ordinary shares, CUSIP M9T951109.",
+      "effective_date": "2024-12-02",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "ZIM_58710": {
+      "url": "https://infomemo.theocc.com/infomemos?number=58710",
+      "finding": "April 2, 2026 memo anticipates merger cash settlement after consummation, expected Q4 2026. This is not a June effective adjustment.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "F_56018": {
+      "url": "https://infomemo.theocc.com/infomemos?number=56018",
+      "finding": "Supplemental dividend reduces strikes by $0.15; F/1F/2F roots unchanged; premium multiplier 100; 100 F common shares, CUSIP 345370860.",
+      "effective_date": "2025-02-18",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "F_58991": {
+      "url": "https://infomemo.theocc.com/infomemos?number=58991",
+      "finding": "Flex consolidation 1F to F concerns December 15, 2028 put strike 8, not the selected June 2026 calls.",
+      "effective_date": "2026-05-18",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "WDC_56202": {
+      "url": "https://infomemo.theocc.com/infomemos?number=56202",
+      "finding": "WDC1/1WDC1/2WDC1 distribution contracts deliver 100 WDC +33 SNDK +$16.83 cash, premium multiplier 100. Adjustment February 24, 2025; final cash March 14.",
+      "effective_date": "2025-02-24",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "HPQ_37659": {
+      "url": "https://www.miaxglobal.com/sites/default/files/alert-files/HPQ_Distribution_Name_37659.pdf",
+      "finding": "OCC memo hosted by MIAX: HPQ becomes HPQ1, with 100 HP Inc. +100 HPE shares; multiplier 100; strike unchanged.",
+      "effective_date": "2015-11-02",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "T_50308": {
+      "url": "https://infomemo.theocc.com/infomemos?number=50308",
+      "finding": "T1/2T1 delivers 100 T +24 WBD +cash in lieu of 0.1917 WBD; multiplier 100. This notice precedes final cash amount determination.",
+      "effective_date": "2022-04-11",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "MRK_48683": {
+      "url": "https://infomemo.theocc.com/infomemos?number=48683",
+      "finding": "MRK/1MRK/2MRK becomes MRK1/1MRK1/2MRK1: 100 MRK +10 OGN shares; premium multiplier 100; strikes unchanged.",
+      "effective_date": "2021-06-03",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "DVN_58920": {
+      "url": "https://infomemo.theocc.com/infomemos?number=58920",
+      "finding": "Former CTRA contracts adjust May 7 and change roots to DVN1/2DVN1 May 8; each delivers 70 DVN shares while premium multiplier remains 100.",
+      "effective_date": "2026-05-07",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "SERV_old": {
+      "url": "https://www.nasdaqtrader.com/TraderNews.aspx?id=ECA2018-147",
+      "finding": "ServiceMaster Global Holdings used SERV for its Frontdoor spinoff of 0.5 FTDR share per SERV on October 1, 2018.",
+      "effective_date": "2018-10-01",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "SERV_new": {
+      "url": "https://www.sec.gov/Archives/edgar/data/1832483/000121390024034160/ea020418201ex99-1_serve.htm",
+      "finding": "Serve Robotics announced Nasdaq SERV trading from April 18, 2024, previously OTCQB SBOT. CIK 1832483.",
+      "effective_date": "2024-04-18",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "VST_issuer": {
+      "url": "https://investor.vistracorp.com/2018-04-09-Vistra-Energy-Completes-Merger-with-Dynegy",
+      "finding": "Dynegy common shares converted to 0.652 Vistra share in April 2018; this does not explain the local VST divisor 0.615 or establish option deliverables.",
+      "effective_date": "2018-04-09",
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "S_identity": {
+      "url": "https://www.sec.gov/Archives/edgar/data/1583708/000110465922078372/tm2220669d1_sc13g.htm",
+      "finding": "SentinelOne Class A identity: CIK 1583708 and CUSIP 81730H109. A security identity anchor, not an option master.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "ASML_identity": {
+      "url": "https://www.asml.com/en/investors/shares",
+      "finding": "Nasdaq listing represents ASML registered ordinary shares; the issuer identifies Nasdaq ISIN USN070592100. Do not assume an ADS from foreign domicile.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "SE_identity": {
+      "url": "https://www.sec.gov/Archives/edgar/data/1703399/000114036126015366/ef20067274_ex2-4.htm",
+      "finding": "Sea NYSE SE security is ADS, each representing one Class A ordinary share as of December 31, 2025.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "SPOT_identity": {
+      "url": "https://www.sec.gov/Archives/edgar/data/1639920/000162828026006874/ck0001639920-20251231.htm",
+      "finding": "Spotify annual filing identifies NYSE SPOT ordinary shares; this does not specify listed option deliverables.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "CRSP_identity": {
+      "url": "https://www.sec.gov/Archives/edgar/data/1674416/000119312526048957/crsp-20251231.htm",
+      "finding": "CRISPR Therapeutics is Swiss domiciled with Nasdaq CRSP common shares, nominal CHF 0.03; not evidence of an ADS contract.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "OCC_master": {
+      "url": "https://www.theocc.com/getcontentasset/5bb03145-905b-4d83-b647-eaa2cb076e93/dfc3d011-8f63-43f6-9ed8-4b444333a1d0/encore_dds_guide_non_proprietary_transmissions.pdf%3B",
+      "finding": "ENCORE DDS v4.6 August 2026 documents full Security Definition and Security List files plus incremental product/deliverable and series/symbol/strike updates. Instrument multipliers and underlying components/CUSIPs are explicit fields.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    },
+    "OCC_access": {
+      "url": "https://www.theocc.com/data-subscriber-terms",
+      "finding": "OCC data access uses subscriber agreements and authorized services. This audit did not establish existing entitlement, historical archive availability or pricing.",
+      "effective_date": null,
+      "source_class": "primary_occ_exchange_or_issuer",
+      "retrieved_on": "2026-09-07"
+    }
+  },
+  "inventory_gap": {
+    "needed": "Historical Security Definition and Security List master for June 11-17 signals, with effective updates through June 18/26 expirations; exact root, expiry, right, strike, premium and strike multipliers, settlement type, deliverable securities/quantities/cash and persistent identifiers.",
+    "available": "Public OCC memo reference evidence; local ORATS signal tuples; Theta dated quoted-contract lists being handled by root.",
+    "missing": "No dated OCC full master/incremental history or equivalent authoritative contract reference found in audited local sources.",
+    "access": "OCC subscriber route or existing broker/authorized vendor historical reference. Historical inventory availability, existing entitlement and price not established; no new service or purchase requested.",
+    "stopping_rule": "Keep exact verification unresolved until that reference arrives. Generic 100-share specifications and silent root substitutions do not close it."
+  }
+}

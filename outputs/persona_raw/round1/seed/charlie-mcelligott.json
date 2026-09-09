@@ -1,0 +1,40 @@
+{
+  "persona": "Canonical Charlie McElligott persona simulation; no contact with the actual person. The economic question is whether fading upside demand makes executable call inventory cheaper before the next CRASH-UP consumes the premium.",
+  "hypotheses": [
+    {
+      "claim": "Among comparably rich far-OTM calls, two completed sessions of wing rollover predict greater subsequent short-call gains than continued wing expansion.",
+      "outcome": "Net far-call sale-to-cover P&L at a common second-session deadline; separately measure comparable bid-IV-excess normalization.",
+      "pass_criterion": "Positive mean incremental P&L with multiplicity-adjusted, date/episode-blocked 95% lower confidence bound above zero in a new chronological evaluation period.",
+      "controls": "Match starting richness, ATM IV, expiry, delta and forward-moneyness bins. Keep age descriptive. Test rollover independently of HIRO and delayed conversion; require identical entry rules."
+    },
+    {
+      "claim": "An observed reversal in upside call flow, confirmed by falling price, improves the economics of selling rich calls relative to a fixed clock.",
+      "outcome": "Net P&L per eligible episode and short-phase maximum adverse liquidation exposure under HIRO versus 10:01 entry policies.",
+      "pass_criterion": "Positive incremental policy P&L with adjusted blocked lower confidence bound above zero; disclose coverage, abstentions and adverse exposure before claiming useful improvement.",
+      "controls": "Same frozen contracts, available decision information, quote gates and calendar exit. Evaluate both policies on common HIRO-covered eligibility; count no-entry episodes as zero deployed P&L, with data-unavailable episodes separately identified."
+    },
+    {
+      "claim": "After call premiums retreat, buying the preselected nearer call provides enough subsequent spread value to justify its cost relative to covering the original short immediately.",
+      "outcome": "Net incremental final wealth of conversion versus covering the short at the identical conversion timestamp, plus comparison with immediate spread purchase.",
+      "pass_criterion": "Positive incremental mean net P&L with adjusted blocked lower confidence bound above zero on new episodes; successful financing alone cannot pass.",
+      "controls": "Identical initial short sale, contracts and common exit. Retain failed conversions and unpriced outcomes. Same-day, next-day and second-day acquisition are prespecified experimental arms, not three additional economic hypotheses."
+    }
+  ],
+  "simple_protocol": [
+    "Freeze HIRO membership, ticker-date population, coverage ledger and chronological evaluation block before outcome quotes. Treat the existing 2024–2026 results as exploratory. Require point-in-time earnings clearance excluding signal/entry date through +30 calendar days inclusive; stale or unknown calendars exclude admission.",
+    "Freeze expiry choice, delta bands, OTM bins and deterministic nearer-strike selection. Suggested starting grid: 7–14 calendar DTE, 2–5 versus 5–10 delta, and 0–10%, 10–20%, above-20% OTM. Preserve continuous forward distance and ATM expected-move distance. No post-outcome strike substitutions.",
+    "Obtain exact signal and actual-entry chains; recheck Greeks, distance, spreads and size. Require 60 strictly prior valid comparable observations separately at delta/DTE and forward-moneyness/DTE. Measure call-bid IV minus matched ATM IV using mean/dispersion and percentile; interpolate only inside supported smiles.",
+    "Reuse existing call entry: evaluate every five minutes, 10:00–14:30 ET; current 15-minute call-HIRO change negative, preceding change positive, price below preceding 15-minute low. Execute earliest next-minute valid quote. EOD signals begin eligibility next session.",
+    "Hold each initial sale fixed across acquisition arms: first fee-covering nearer-call ask within day 0, +1 or +2; compare existing fixed 15:50 purchases. Use common day-4 exit, day-5 sensitivity, or earlier expiry. Freeze noncompletion handling before replay.",
+    "Use actual minute NBBO and archived All Trades call HIRO, timestamped causally. Include fees, adverse slippage, sizes, quote conditions/staleness, failures, missingness and short-phase exposure."
+  ],
+  "failure_modes": [
+    "Richness persists while upside demand accelerates.",
+    "Cheap completion destroys more remaining premium than it adds.",
+    "Unknown earnings, missing HIRO, thin wing quotes or unbounded short-phase exposure defeat apparent profitability."
+  ],
+  "suggested_round_followups": [
+    "Quant freezes numeric gates, paired estimands and data feasibility before collection.",
+    "After each round, retain, reject or mark inconclusive; any revised rule requires a new chronological block."
+  ]
+}

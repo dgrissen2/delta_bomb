@@ -1,0 +1,18 @@
+[
+  {
+    "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_leg_timing_2026-09-05/data/MSTR_greeks_20260821_1041_150C.parquet",
+    "sha256": "539ab77a49dfd0d849962f863c776f74cb7e6e4f8566ff8f290c941dbcf5aac9"
+  },
+  {
+    "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_leg_timing_2026-09-05/data/MSTR_greeks_20260825_1127_145C.parquet",
+    "sha256": "c5e2a3e6919ee7e843255932071ab102c2f4f6973b3fcd06d1fcf44e0c68ca6a"
+  },
+  {
+    "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_leg_timing_2026-09-05/data/MSTR_greeks_20260824_1051_160C.parquet",
+    "sha256": "de9a05dc16c4d7c89e782329e8fa1d10dd13dc3226a8c8bcb4d7801622345253"
+  },
+  {
+    "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_leg_timing_2026-09-05/data/MSTR_greeks_20260826_1145_155C.parquet",
+    "sha256": "ae762b26fb4e906e4ba7edf1aff470064501f7ce2a6788a9c7e2f579fb78c806"
+  }
+]

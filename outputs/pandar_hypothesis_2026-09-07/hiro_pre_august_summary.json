@@ -1,0 +1,25 @@
+{
+  "signal_candidates": 72,
+  "stocks": 55,
+  "hiro_status_counts": {
+    "available": 58,
+    "partial": 13,
+    "unavailable": 1
+  },
+  "candidates_with_trigger": 57,
+  "total_triggers": 122,
+  "decision_status_counts": {
+    "available": 3840,
+    "unavailable": 120
+  },
+  "unavailable_reasons": {
+    "missing_5s_slots": 120
+  },
+  "coverage_sha256": "919538624b365dee020a97454ff1cc7acf5d3d37db7eac849c274892a09d1a41",
+  "quality_assumption": "Complete observed 5s slots in (t-30min,t]; no filling or substitutions",
+  "scope": "Individual stock All Trades call increments; RTH America/New_York",
+  "population_admission": "Not assessed; missing HIRO does not exclude clock-control eligibility",
+  "receipt_latency": "Historical captures; real-time receipt timestamp/latency not established",
+  "provider_requests": 0,
+  "option_outcomes_read": false
+}

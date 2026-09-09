@@ -1,0 +1,14 @@
+{
+  "persona": "Canonical Brent Kochuba persona; simulated analysis",
+  "decision": "Shortlist trades by dollars earned from plausible wing normalization versus adverse-path losses, not highest z-score.",
+  "key_points": [
+    "Pandar described recurring expansion/collapse, an unusually overpriced expiry, and survivable sizing; numerical mean-reversion rules are our proposed research.",
+    "Separate broad call slope, local strike residual, and term dislocation. MRVL's rich wing does not establish a local kink: neighboring mid-IVs rise smoothly.",
+    "Hold ATM, spot and time fixed; partially normalize only the wing and fully reprice. Subtract executable round-trip costs. Separately stress rallies, wing widening and overnight gaps.",
+    "Reprice both legs together. A higher-strike long caps the short call; a lower-strike long converts it into bullish exposure. Their economics and purpose differ.",
+    "Keep nondominated choices across normalization dollars, stress loss, liquidity and time exposure; delta and distance describe risk rather than impose universal cutoffs.",
+    "Estimate normalization frequency and speed from prior comparable episodes, including persistent and widening wings. Condition simply on episode age and expansion versus rollover; sparse evidence stays uncertain. HIRO helps time observable flow changes, not establish dealer gamma sign."
+  ],
+  "risks": "Verify kinks against synchronized bid/ask envelopes and neighboring quotes. My prohibition on naked convexity is my persona's risk preference; Pandar explicitly sold naked calls.",
+  "confidence": "High on mechanics; unproven predictive edge."
+}

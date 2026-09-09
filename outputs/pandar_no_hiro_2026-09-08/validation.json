@@ -1,0 +1,16 @@
+{
+  "checks": {
+    "full_candidate_slots": true,
+    "unique_ticker_signal_rows": true,
+    "rich_rows": true,
+    "nonoverlap_reservation": true,
+    "ledger_matches_selection_freeze": true,
+    "no_hiro_feature_columns": true,
+    "primary_call_iv_identity": true,
+    "conditional_denominators_preserved": true,
+    "all_sources_unchanged": true
+  },
+  "tests_passed": 10,
+  "ruff": "all checks passed",
+  "full_study_exit_code": 0
+}

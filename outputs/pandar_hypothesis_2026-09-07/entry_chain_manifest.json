@@ -1,0 +1,583 @@
+[
+  {
+    "ticker": "AAL",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "AAL",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:46:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ASML",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ASML",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:31:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ASTS",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CPNG",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CPNG",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:51:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CRSP",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CRSP",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:51:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DKNG",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DKNG",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 10:41:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DVN",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DVN",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:21:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "GILD",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "GILD",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 13:41:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "HPQ",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "HPQ",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:51:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "MO",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "MO",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:21:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "NET",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "PLTR",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "PLTR",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:46:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "RBLX",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "RF",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "SPOT",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "SPOT",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 12:51:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "T",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "T",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:21:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "TWLO",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "TWLO",
+    "policy": "hiro",
+    "timestamp": "2026-06-12 11:41:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "VST",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ZIM",
+    "policy": "clock",
+    "timestamp": "2026-06-12 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "BKNG",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "BKNG",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 10:16:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CAT",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CAT",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 10:01:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DDOG",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DDOG",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:56:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DIS",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ETSY",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ETSY",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:36:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "F",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "FTNT",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "FTNT",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 11:21:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "HD",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "HD",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:41:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "LUV",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "LUV",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 11:56:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "MRK",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "PG",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "RDW",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "RDW",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 10:06:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "S",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "S",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 11:06:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ULTA",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "WDAY",
+    "policy": "clock",
+    "timestamp": "2026-06-15 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "WDAY",
+    "policy": "hiro",
+    "timestamp": "2026-06-15 12:11:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ANF",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ANF",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 10:26:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "LVS",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "LVS",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 10:06:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "MRVL",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "MRVL",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 14:16:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ORCL",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "QCOM",
+    "policy": "clock",
+    "timestamp": "2026-06-16 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "QCOM",
+    "policy": "hiro",
+    "timestamp": "2026-06-16 11:11:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "CRM",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DE",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DG",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "DG",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 12:31:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ON",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ON",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 10:01:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ROKU",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "SE",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "SE",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 11:51:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "SERV",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "SERV",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 10:01:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "VRT",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "VRT",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 11:11:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "WDC",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "WDC",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 10:01:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ZS",
+    "policy": "clock",
+    "timestamp": "2026-06-17 10:01:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  },
+  {
+    "ticker": "ZS",
+    "policy": "hiro",
+    "timestamp": "2026-06-17 13:06:00-04:00",
+    "status": "error",
+    "error": "ORATS HTTP 403: historical/one-minute/strikes/chain"
+  }
+]

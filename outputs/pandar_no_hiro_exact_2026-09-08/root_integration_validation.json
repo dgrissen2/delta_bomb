@@ -1,0 +1,14 @@
+{
+  "reviewer": "root independent integration audit",
+  "priced_policy_horizon_rows": 1402,
+  "max_cashflow_error": 4.547473508864641e-13,
+  "economic_signals": 107,
+  "economic_entries": 33,
+  "economic_new_name_entries": 0,
+  "common_economic_priced_trades": 8,
+  "common_economic_pnl": -3211.4000000000005,
+  "primary_paired_cases": 142,
+  "primary_mean_difference": 38.72042253521127,
+  "unique_selection_and_trade_records": true,
+  "report_links_verified": 13
+}

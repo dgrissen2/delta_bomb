@@ -1,0 +1,16 @@
+{
+  "by_hid": {
+    "H-PNDR-001": {
+      "interpret": "Round 1 establishes a usable historical decision population, not an entry advantage. Fifty frozen episodes share only five June entry dates, so the cross-section cannot satisfy the twenty-date replication requirement. The preliminary 72-candidate HIRO audit found 122 flow triggers, but eight first observed triggers had earlier missing decisions. A fading call-flow line with a price break is evidence of estimated downward hedging pressure; it does not prove a profitable short sale or observed dealer execution.",
+      "act": "Proceed with the first frozen HIRO action and 10:01 clock on the same contracts. Treat an earlier missing HIRO window as censored first-trigger selection. Preserve known no-trigger and known quote-gate failures as zero-trading policy outcomes, while missing evidence remains unavailable. Measure the short-phase exposure before comparing profit. Keep the verdict inconclusive irrespective of attractive individual June cases."
+    },
+    "H-PNDR-002": {
+      "interpret": "The later call purchase remains the economic question. Financing a nearer call merely changes the position: it spends premium to acquire upside and remove the unbounded short-call phase. Round 1 contains no new option profit evidence showing that this purchase adds more value than simply covering the short. Fifty population selections are not fifty entered or completed spreads.",
+      "act": "Hold the original short sale fixed across immediate, day-zero, next-session and second-session purchase arms, with identical D4 and D5 deadlines. For each valid conversion compare final net wealth with covering the short at that exact minute and holding cash. Preserve the short when the purchase never qualifies, censor missing paths, and separate zero-bid residual marks from actual quoted closes. Apply the two-cent cost stress at the primary one-cent policy's fixed timestamps."
+    },
+    "H-PNDR-003": {
+      "interpret": "The earlier surface work suggested modest volatility cooling after wing rollover; it did not establish rich exact-strike short-call profit. A persistent upside chase can keep expanding the wing, and a stock decline with rising volatility can damage the intended normalization mechanism. The June population repair does not resolve either issue, and five shared dates are insufficient for the frozen statistical claim.",
+      "act": "Keep two-session contraction versus expansion as the single primary journey contrast. Build separate strictly prior sixty-date comparable delta/DTE and forward-moneyness/DTE histories, then retain observed starting richness and entry Greeks alongside short-only P&L. Do not substitute the fixed-five-delta summary for executable bid-IV excess, and do not add age, acceleration or variance-gap combinations to rescue a weak contrast."
+    }
+  }
+}

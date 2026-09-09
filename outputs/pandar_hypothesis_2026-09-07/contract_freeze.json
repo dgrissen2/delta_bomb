@@ -1,0 +1,16 @@
+{
+  "frozen_at": "2026-09-08T02:37:58.352658+00:00",
+  "before_outcome_histories": true,
+  "source_hashes": {
+    "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/selected_population.csv": "c4ef0d114dad6ed078d66406d079997a696ddcc6b796afa172d9bfe9bdc7e79a",
+    "/Users/dgrissen/Dev/delta_bomb/hypothesis_tracking/pandar_seed_and_frozen_protocol.md": "0ffa3c5505e8d7cf46d4f6d8d078d862406d6811811fcbe61085059e9252085e"
+  },
+  "selection_counts": {
+    "selected": 49,
+    "no_expiry_in_dte_band": 1
+  },
+  "sha256": {
+    "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/frozen_contract_selections.csv": "ce22494b0da826cc86034c5a0cfe5b57ad76bcf41731a85652919dd0211a5304",
+    "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/signal_chains.parquet": "4d55bc5bc94c511dda443014d52ab7eb97979115cca6f231dcd96cee8c7d1dd0"
+  }
+}

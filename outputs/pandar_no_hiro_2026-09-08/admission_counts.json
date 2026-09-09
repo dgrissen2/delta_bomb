@@ -1,0 +1,52 @@
+{
+  "background_sessions": 921,
+  "background_start": "2023-01-03",
+  "background_end": "2026-09-03",
+  "membership_stocks": 323,
+  "evaluation_sessions": 671,
+  "candidate_stock_dates": 216733,
+  "quality_valid": {
+    "stock_dates": 175006,
+    "stocks": 312,
+    "signal_dates": 671,
+    "reference_dates": 670,
+    "reference_months": 33,
+    "first_signal": "2024-01-02",
+    "last_signal": "2026-09-03",
+    "episodes": 13590,
+    "unknown_start_rows": 4
+  },
+  "quality_earnings_valid": {
+    "stock_dates": 104328,
+    "stocks": 308,
+    "signal_dates": 649,
+    "reference_dates": 649,
+    "reference_months": 32,
+    "first_signal": "2024-01-02",
+    "last_signal": "2026-08-04",
+    "episodes": 9671,
+    "unknown_start_rows": 2
+  },
+  "rich_eligible": {
+    "stock_dates": 17458,
+    "stocks": 304,
+    "signal_dates": 643,
+    "reference_dates": 643,
+    "reference_months": 32,
+    "first_signal": "2024-01-02",
+    "last_signal": "2026-08-04",
+    "episodes": 7939,
+    "unknown_start_rows": 2
+  },
+  "nonoverlap_admitted": {
+    "stock_dates": 6364,
+    "stocks": 304,
+    "signal_dates": 633,
+    "reference_dates": 633,
+    "reference_months": 32,
+    "first_signal": "2024-01-02",
+    "last_signal": "2026-08-04",
+    "episodes": 5798,
+    "unknown_start_rows": 1
+  }
+}

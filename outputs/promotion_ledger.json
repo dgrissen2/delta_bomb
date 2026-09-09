@@ -1,0 +1,57 @@
+{
+  "round1/audit-short-phase-exposure": {
+    "id": "E-PNDR-001",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round1/test-conversion-controls": {
+    "id": "E-PNDR-002",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round1/audit-contract-identity": {
+    "id": "E-PNDR-003",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round1/audit-richness-support": {
+    "id": "E-PNDR-004",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round2/freeze-delta10-otm5": {
+    "id": "E-PNDR-005",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round2/audit-entry-event-age-deliverables": {
+    "id": "E-PNDR-006",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round2/audit-paired-censoring-deadlines": {
+    "id": "E-PNDR-007",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round3/verify-dated-contract-deliverables": {
+    "id": "E-PNDR-008",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round3/test-fixed-nearer-d1-hiro-confirmation": {
+    "id": "E-PNDR-009",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round3/replicate-fixed-entry-conversion-chronologically": {
+    "id": "E-PNDR-010",
+    "kind": "experiment",
+    "table": "followup"
+  },
+  "round3/test-rollover-common-support": {
+    "id": "E-PNDR-011",
+    "kind": "experiment",
+    "table": "followup"
+  }
+}

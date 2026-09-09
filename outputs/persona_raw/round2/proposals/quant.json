@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "candidate_key": "freeze-delta10-otm5",
+      "kind": "experiment",
+      "title": "Execute the single frozen delta10 and minimum-5%-OTM feasibility variant",
+      "priority": "high",
+      "parent": "H-PNDR-002",
+      "rationale": "Preserve the existing variant freeze as one exploratory follow-up to the original zero-entry finding. Signal and actual-entry far-call delta must be 0.05–0.15 inclusive and OTM distance at least 5%; signal selection targets 0.10 delta, breaking ties by lower strike. Keep the same nearest-ten-calendar-day expiry within 7–14 DTE, adjacent nearer call, original quote/cost rules and fixed identities. Retain all 50 episodes, including the 47 selected pairs and three failed selections. Record the eleven overlapping previously acquired legs. No further parameter search or profit-based replacement is part of this experiment.",
+      "falsification": "The variant fails to supply executable inference wherever identity, displayed size, quote condition or five-second age remains unverified, even if preliminary price gates pass. A nonpositive primary paired mean or median fails the incremental-value criterion; fewer than twenty distinct dates prevents statistical support regardless of sign. Any change made after inspecting this arm's P&L requires a separately declared future experiment and cannot repair this frozen result.",
+      "decision_impact": "Determine whether this one explicit delta-plus-distance change permits informative conversion diagnostics, while keeping the original no-entry result intact. Treat it as a project research arm, not an optimal or Pandar-endorsed placement rule."
+    },
+    {
+      "candidate_key": "audit-paired-censoring-deadlines",
+      "kind": "experiment",
+      "title": "Audit policy pairing, censoring and session-counted deadlines before interpreting P&L",
+      "priority": "high",
+      "parent": "H-PNDR-001",
+      "rationale": "Perform a bounded local audit of the fixed population and replay ledger before economic interpretation. Check that every arm preserves its episode key and initial sale; D4/D5 count the sale session as one, use actual exchange sessions and cap at expiry; control exits share the intended deadline. Verify that missing earlier HIRO decisions, missing quote/Greek minutes and unavailable exits censor affected policies, while fully observed no-trigger/no-entry paths retain zero trading P&L. Check that repeated clock/HIRO entries and stock cross-sections do not inflate independent-date counts. Include the no-conversion fallback for conversion-time cover and cost stress at fixed timestamps.",
+      "falsification": "Any wrong-session deadline, silent missing-to-zero conversion, skipped earlier potential trigger, many-to-many join, duplicate episode weight, or unequal control deadline invalidates the affected paired estimate until corrected. Passing this audit establishes accounting consistency only, not execution quality or strategy profitability.",
+      "decision_impact": "Make the forthcoming paired diagnostics interpretable without adding a new trading predictor. Continue the existing identity and richness experiments instead of duplicating them as additional proposals."
+    }
+  ],
+  "reprioritize": []
+}

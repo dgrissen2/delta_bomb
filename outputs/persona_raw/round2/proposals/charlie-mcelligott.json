@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "candidate_key": "freeze-delta10-otm5",
+      "kind": "experiment",
+      "title": "Execute the single frozen target-10-delta, minimum-5%-OTM follow-up",
+      "priority": "high",
+      "parent": "H-PNDR-002",
+      "rationale": "The original 49 pairs produced zero preliminary entries across 83 snapshots. The separately frozen 5–15 delta arm addresses observed entry feasibility while preserving costs and liquidity limits. Its 47 pairs and eleven overlapping acquired legs must remain identified as an exploratory follow-up; the new band is a project assumption.",
+      "falsification": "Keep all frozen identities and failure rows. If final quote, Greek and earnings gates produce no entries, this arm has failed feasibility. Where entries exist, evaluate the fixed next-session purchase against immediate purchase and same-minute short cover; nonpositive incremental net wealth fails the corresponding economic comparison. Do not select another band from the results, and do not claim statistical validation below twenty entry dates.",
+      "decision_impact": "Determine whether the one authorized exposure change yields a usable diagnostic sample and whether buying the nearer call adds value, while retaining the original failed-entry result."
+    },
+    {
+      "candidate_key": "audit-entry-event-age-deliverables",
+      "kind": "experiment",
+      "title": "Verify event quote age and exact deliverables for preliminary variant entries",
+      "priority": "high",
+      "parent": "H-PNDR-001",
+      "rationale": "Seven preliminary policy entries across six stocks remain dependent on displayed size, regular quote conditions, event timestamps and historical contract identity. The audit has already exposed issuer reuse and adjusted deliverables elsewhere in the population, so a standard root and a minute label cannot establish a standard executable contract.",
+      "falsification": "For only the frozen candidate order times and contracts, reconcile quote-event history against the five-second maximum age and verify dated root, strike, expiry, multiplier and deliverable terms. Preserve any stale, missing, conflicting or adjusted result. Without both event-age and identity support, the case fails executable-inference validation even if its quoted-price diagnostic is positive.",
+      "decision_impact": "Determine which observations can support an execution claim and which must remain explicitly limited quoted-price diagnostics before interpreting a HIRO timing advantage."
+    }
+  ],
+  "reprioritize": []
+}

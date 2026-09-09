@@ -1,0 +1,854 @@
+{
+  "max_calls": 500,
+  "used": 414,
+  "initial_used": 337,
+  "attempts": [
+    {
+      "at": "2026-09-05T12:11:15.584004+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-15",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:16.273486+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-18",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:16.694610+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-19",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:17.063984+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-20",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:17.421598+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-21",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:17.779648+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-22",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:18.130944+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-26",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:18.557635+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-27",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:18.966075+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-28",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:19.324928+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-05-29",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:19.832371+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-01",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:20.315991+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-02",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:20.989588+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-03",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:21.361076+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-04",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:21.868155+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-05",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:22.238889+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-08",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:22.616803+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-09",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:23.000398+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-10",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:23.365406+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-11",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:23.798302+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-12",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:24.164433+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-15",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:24.513019+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-16",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:25.131919+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-17",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:25.662976+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-18",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:26.169517+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-22",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:26.637163+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-23",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:26.934573+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-24",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:27.342329+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-25",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:27.791778+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-26",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:28.135183+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-29",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:28.492718+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-06-30",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:28.980606+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-01",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:29.407102+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-02",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:29.713851+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-06",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:30.126140+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-07",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:30.418312+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-08",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:30.819297+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-09",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:31.165278+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-10",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:31.599045+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-13",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:32.359592+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-14",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:32.801155+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-15",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:33.131313+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-16",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:33.555248+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-17",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:33.921525+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-20",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:34.282596+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-21",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:34.717950+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-22",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:35.107310+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-23",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:35.453840+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-24",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:35.936061+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-27",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:36.213774+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-28",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:36.635766+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-29",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:36.998334+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-30",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:37.422741+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-07-31",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:37.728748+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-03",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:38.296046+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-04",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:38.605522+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-05",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:38.946506+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-06",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:39.286736+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-07",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:39.821181+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-10",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:40.218249+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-11",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:40.519030+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-12",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:40.833266+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-13",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:41.216595+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-14",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:41.652594+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-17",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:42.071887+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-18",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:42.693115+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-19",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:43.188252+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-20",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:43.641465+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-21",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:44.016626+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-24",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:44.496427+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-25",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:44.952371+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-26",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:45.422533+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-27",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:45.765674+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-28",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:46.105773+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-08-31",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:46.405786+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-09-01",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:11:46.700436+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-09-02",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    },
+    {
+      "at": "2026-09-05T12:13:59.316197+00:00",
+      "endpoint": "hist/strikes",
+      "params": {
+        "ticker": "MSTR",
+        "tradeDate": "2026-09-03",
+        "dte": "1,30",
+        "delta": ".005,.80",
+        "fields": "ticker,tradeDate,expirDate,dte,strike,stockPrice,delta,smvVol,callValue,callBidPrice,callAskPrice,callBidIv,callMidIv,callAskIv,callVolume,callOpenInterest,putValue,putBidPrice,putAskPrice,putBidIv,putMidIv,putAskIv,putVolume,putOpenInterest"
+      }
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "by_hid": {
+    "H-PNDR-001": {
+      "interpret": "Round 2 establishes a saleability problem for the original project rule: none of 83 clock/HIRO entry snapshots passes the preliminary gates for the 49 selected pairs. ASML's 0.50/4.70 and QCOM's 1.00/1.60 quotes show why a visible premium is not necessarily a usable sale. These are observed entry failures, not evidence that HIRO lacks economic information or that Pandar has no other opportunities. All 196 original quote/Greek files are now available, but availability does not establish event quote age or exact deliverables.",
+      "act": "Preserve original observed entry failures and censored HIRO histories. Carry the single frozen higher-delta arm forward without changing the liquidity rules, then apply displayed-size, condition, timestamp and identity checks to its seven preliminary policy entries. Keep the comparison by eligible episode and the twenty-date replication requirement. No live-entry or profitable-timing claim follows from six preliminary stocks on this five-date sample."
+    },
+    "H-PNDR-002": {
+      "interpret": "The original arm supplies no admitted initial sale under its preliminary quote rules, so it cannot yet establish the value of buying the nearer call later. The frozen 5–15 delta, target-10, minimum-5%-OTM arm is a reasonable bounded feasibility experiment: a nearer far call may carry more saleable premium, but it also carries more upside exposure before protection. Its 47 pairs and seven preliminary entries are not profitable trades. Eleven legs overlap previously acquired histories, so the follow-up is explicitly exploratory even though new P&L did not select its rule.",
+      "act": "Execute this one frozen variant with unchanged strikes, expiry, costs and liquidity gates; attribute the band to the project, not Pandar. Keep original results alongside it. For any admitted sale, compare next-session conversion with immediate spread purchase and covering the same short at the conversion minute, using common D4/D5 deadlines and fixed-time cost stress. If it cannot enter, cannot finance or lacks a quoted close, preserve that result without another parameter adjustment."
+    },
+    "H-PNDR-003": {
+      "interpret": "The contract-level work has not established that wing contraction improves short-call profit. Zero preliminary entries in the original arm means there is no original admitted trade sample on which to resolve that claim. The higher-delta arm changes the contract exposure, so any later rollover contrast belongs to that separately labeled arm. Acquiring more files and finding six preliminary stocks cannot convert the earlier modest surface-normalization association into a demonstrated option edge.",
+      "act": "Retain the two-session contraction-versus-expansion contrast and its starting-state controls. Allocate comparable prior-smile work using frozen entry feasibility, never subsequent profit, and require independent sixty-date support for delta/DTE and forward-moneyness/DTE. Report missing richness beside the baseline replay; do not add age, acceleration or variance-gap combinations to manufacture a favorable subset. Continue to mark statistical support inconclusive with only five entry dates."
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "candidates": [
+    {
+      "candidate_key": "replicate-fixed-entry-conversion-chronologically",
+      "kind": "experiment",
+      "title": "Replicate the frozen entry and conversion controls in one later chronological block",
+      "priority": "high",
+      "parent": "H-PNDR-002",
+      "rationale": "Designate one block of 20 consecutive later exchange sessions before collecting or inspecting its option outcomes, preferably with prospectively archived HIRO. Retain every eligible episode and every missing/no-entry result. Reuse the original and separately labeled delta10/OTM5 rules, fixed contracts, next-session D4 primary comparison, immediate-spread and conversion-time-cover controls, final short cover, fees and unchanged-time cost stress. Do not replace dates, names or methods because this June sample favored them. This is a proposal for a new bounded sample, not a claim that suitable unseen history already exists; continue existing identity verification rather than creating duplicate audits.",
+      "falsification": "Fewer than 20 represented independent entry dates, incomplete causal source history or unverified deliverables prevents the corresponding support claim. A nonpositive primary paired mean or median, or failure of the predeclared date-block criterion, fails promotion. Do not extend the block until a favorable result appears or treat repeated bootstrap draws as new dates.",
+      "decision_impact": "Determine whether the observed improvement over immediate purchase survives the more meaningful short-cover controls outside the inspected June sample, without adding a predictor or changing thresholds."
+    },
+    {
+      "candidate_key": "test-rollover-common-support",
+      "kind": "experiment",
+      "title": "Test the existing rollover contrast only where the later fixed sample has both states",
+      "priority": "medium",
+      "parent": "H-PNDR-003",
+      "rationale": "Within that same separately frozen later block, first tabulate the existing two-session rollover and expansion states and their predeclared starting-state bins. Preserve all cases and unsupported measurements. For genuinely comparable admitted states, compare D4 short-only P&L and supported exact-call bid-IV-minus-matched-ATM normalization using the already fixed contracts and observation times. Keep independent prior-60-date requirements for delta/DTE and forward-moneyness/DTE. No extra dates, fitted weights, alternative rollover definition or feature search is part of this experiment.",
+      "falsification": "No admitted rollover cases, no common starting-state support, or unavailable exact-call normalization leaves the mechanism untested. Where the comparison is measurable, nonpositive mean or median differences and failure of the frozen date criterion prevent support. High historical percentiles alone cannot count as positive absolute bid-wing richness or successful normalization.",
+      "decision_impact": "Separate an actual contracting-skew test from the current young high-wing examples, while sharing the same bounded data collection and keeping the method simple."
+    }
+  ],
+  "reprioritize": []
+}

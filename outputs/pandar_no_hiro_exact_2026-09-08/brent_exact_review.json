@@ -1,0 +1,14 @@
+{
+  "persona": "Canonical Brent Kochuba persona; simulated analysis",
+  "decision": "No profitable or robustly superior strike-selection method is established.",
+  "key_points": [
+    "The economic rule selected 107 signal contracts, admitted 33 at the next daily snapshot, and entered eight on the common nonoverlap sample. All 33 entries come from the previously selected six-stock richness cache; only five of those stocks actually entered.",
+    "The eight common economic trades lost $3,211.40, versus $7,119.40 lost by the mechanical contracts on those same dates. Their positive $3,908 difference means smaller losses. Another $1,590.30 of paired advantage comes from 134 cases where the economic rule stayed flat. Outside the prior six names, economic-policy advantages entirely reflect not trading.",
+    "Strikes remain fixed and entry is rechecked at the next-session snapshot. This is a material improvement over interpreting a rolling delta surface as a held option. It still is not executable-fill or intraday-risk evidence.",
+    "131 of 260 mechanical common-sample entries lack the four-session exit. Short-DTE cache truncation makes complete-case comparisons depend on the policy's expiry choices. Missing cases cannot be assumed neutral, profitable or losing.",
+    "Existing stress/squeeze caches and deustrader_wins_recreate are research-selected sources; deterministic file resolution does not remove their acquisition bias. The winning-source label especially requires explicit provenance, not an unseen-sample claim."
+  ],
+  "practical_implication": "Retain economic strike/expiry comparisons, but treat the 25% wing-collapse versus 1% rally score as a limited sensitivity, not expected value or sufficient risk sizing. Compare actual remaining premium, several joint spot/wing scenarios and optional hedges on the same cases. No spread or kink-normalization benefit was tested here, and no outcome-driven filter tightening is justified.",
+  "risks": "Per-contract returns are not matched risk or capital exposure. Naked-call losses are unbounded; a small local rally calculation does not measure gap risk. Deliverables and full historical comparable-surface richness remain unverified.",
+  "confidence": "High on these mechanical and denominator distinctions; low on generalizable trading-edge claims."
+}

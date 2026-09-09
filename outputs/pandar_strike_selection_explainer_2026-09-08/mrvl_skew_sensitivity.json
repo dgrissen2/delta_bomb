@@ -1,0 +1,26 @@
+{
+  "basis": "Local Greek approximation; constant spot/time/ATM/quote width except named shocks",
+  "source_sha256": "4d55bc5bc94c511dda443014d52ab7eb97979115cca6f231dcd96cee8c7d1dd0",
+  "provider_calls": 0,
+  "new_backtest": false,
+  "contract_multiplier_assumed": 100,
+  "vega_dollars_per_vol_point": 8.934726171177777,
+  "bid_ask_width_dollars": 25.99999999999998,
+  "break_even_wing_fall_quote_cost_only_points": 2.9099940503909876,
+  "break_even_wing_fall_with_fees_and_slippage_points": 3.279339449094459,
+  "one_pct_rally_delta_gamma_short_mark_loss_dollars": 31.625669915369905,
+  "neighbor_mid_iv_interpolated_pct": 126.79361357495952,
+  "target_mid_minus_neighbor_mid_points": -0.14508317914763147,
+  "target_bid_minus_neighbor_bid_points": 0.5711745688316228,
+  "target_bid_minus_neighbor_ask_points": -3.777555911207564,
+  "long420_short425_parallel_wing_vega_dollars_per_point": 1.2704983087897692,
+  "short425_long430_parallel_wing_vega_dollars_per_point": 0.05514608426370471,
+  "limitations": [
+    "Provider Greeks are model-based local sensitivities, not exact bid/ask repricing.",
+    "Larger shocks need full repricing and coherent smile dynamics.",
+    "An unchanged quote width is a scenario assumption, not a future liquidity forecast.",
+    "Adjacent-IV interpolation is a diagnostic, not an executable arbitrage or fair-value proof.",
+    "Spot shock uses frozen strike IV; changing smile dynamics can alter the result.",
+    "A finite rally stress is not the maximum loss of an uncovered call."
+  ]
+}

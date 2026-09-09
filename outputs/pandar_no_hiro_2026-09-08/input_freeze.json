@@ -1,0 +1,40 @@
+{
+  "frozen_at_utc": "2026-09-09T01:45:59.371988+00:00",
+  "experiment": "E-PNDR-012",
+  "provider_calls": 0,
+  "input_files": [
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/hypothesis_tracking/pandar_no_hiro_surface_protocol_2026-09-08.md",
+      "sha256": "921e42edaa2e8ffe2dd7b08d717edf6aa45d5fbd36dd6cce5a5cfbe8c9f42fe5"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/scripts/pandar_no_hiro_surface.py",
+      "sha256": "78cff852e8526d45a016b2b4e00ecee2b5762f914a046b53f5eec887a61a1494"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/summaries.parquet",
+      "sha256": "6b7a07a0c3deb374abe78547fd71d6d3f4a6b846256432ad23393c19b0fdccc1"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/dailies.parquet",
+      "sha256": "cbd574c5af47631a21c1ff46d1bc391e951910e3f9cd5c971856388a3a6c81f8"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/hiro_universe.csv",
+      "sha256": "4090e0d71c406c1d20451842e9c2bf2ad53d5e14309e079f5a9a6e179c1a22bf"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/earnings.parquet",
+      "sha256": "dad6abc29b4c1c68e6fa86709aaf0c42a99ec1273ea1777892de4ae0f8d66079"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/metadata_coverage.csv",
+      "sha256": "6662b53acbeb7a1bcc9f15dec4e68d8f91152b7be6b46561ce1ec418500c2543"
+    },
+    {
+      "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/splits.parquet",
+      "sha256": "8aae80a3db9d1b889ce4712da11af83ef40d52addab73552ea259ccd64bee577"
+    }
+  ],
+  "statement": "Frozen before this run; historical panel previously examined."
+}

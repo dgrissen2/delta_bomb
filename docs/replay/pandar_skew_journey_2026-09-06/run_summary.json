@@ -1,0 +1,8 @@
+{
+  "data_end": "2026-09-03",
+  "feature_rows": 212707,
+  "observed_stocks": 317,
+  "eligible_signal_days": 173413,
+  "high_rank_signal_days": 29025,
+  "result_kind": "daily spot/surface study; not exact-contract P&L or historical HIRO flow backtest"
+}

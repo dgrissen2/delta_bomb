@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "frozen_at_utc": "2026-09-08T02:35:45.647452+00:00",
+  "implementation": {
+    "path": "/Users/dgrissen/Dev/delta_bomb/scripts/pandar_hypothesis_population.py",
+    "sha256": "8392429964093997de09f9277ed8542db14ddf998e2dfa277e3e872a54d00c30"
+  },
+  "config": {
+    "signal_start": "2024-01-02",
+    "signal_end": "2026-08-05",
+    "observation_cutoff": "2026-09-04",
+    "earnings_days": 30,
+    "rank_minimum": 85.0,
+    "entry_session_offset": 1,
+    "holding_sessions": 5
+  },
+  "inputs": {
+    "features": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/high_rank_signal_ledger.csv",
+      "sha256": "2b19610fc6cf7792b3133312eecd90da337f8473bb3553b1c93c8be6d84abba4"
+    },
+    "membership": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/hiro_universe.csv",
+      "sha256": "4090e0d71c406c1d20451842e9c2bf2ad53d5e14309e079f5a9a6e179c1a22bf"
+    },
+    "hiro": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/hiro_archive_coverage.csv",
+      "sha256": "919538624b365dee020a97454ff1cc7acf5d3d37db7eac849c274892a09d1a41"
+    },
+    "earnings": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/earnings.parquet",
+      "sha256": "dad6abc29b4c1c68e6fa86709aaf0c42a99ec1273ea1777892de4ae0f8d66079"
+    },
+    "splits": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/splits.parquet",
+      "sha256": "8aae80a3db9d1b889ce4712da11af83ef40d52addab73552ea259ccd64bee577"
+    },
+    "coverage": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/metadata_coverage.csv",
+      "sha256": "6662b53acbeb7a1bcc9f15dec4e68d8f91152b7be6b46561ce1ec418500c2543"
+    },
+    "sessions": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/docs/replay/pandar_skew_journey_2026-09-06/daily_features_and_outcomes.parquet",
+      "sha256": "1622aab3a9429a97489176e623415a6d1ed8369d7fe1aa656d2f90e439c01cc2"
+    }
+  },
+  "outputs": {
+    "population_ledger.csv": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/population_ledger.csv",
+      "sha256": "5170a4072082efafc6cdf12a303bed2aca7e43f1690885220bbe631eda9253a6",
+      "rows": 41864
+    },
+    "selected_population.csv": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/selected_population.csv",
+      "sha256": "c4ef0d114dad6ed078d66406d079997a696ddcc6b796afa172d9bfe9bdc7e79a",
+      "rows": 50
+    },
+    "future_earnings_horizon.csv": {
+      "path": "/Users/dgrissen/Dev/delta_bomb/outputs/pandar_hypothesis_2026-09-07/future_earnings_horizon.csv",
+      "sha256": "19e2dbc6d67d4e2533534b74fd5a6f96b12486533adf11f06fafc387034bf5e8",
+      "rows": 1001
+    }
+  },
+  "selection_counts": {
+    "failed_population_filters": 41797,
+    "selected": 50,
+    "holding_window_overlap": 17
+  },
+  "source_feature_columns": [
+    "tradeDate",
+    "stockPrice",
+    "confidence",
+    "exErnIv10d",
+    "exErnIv30d",
+    "exErnIv60d",
+    "iv10d",
+    "iv30d",
+    "iv60d",
+    "dlt5Iv10d",
+    "dlt5Iv30d",
+    "wing",
+    "callskew30",
+    "wing_rank",
+    "callskew30_rank",
+    "age",
+    "episode_id",
+    "intensity",
+    "peak_minus_wing",
+    "exit_age",
+    "left_censored",
+    "rv30",
+    "variance_premium30",
+    "rv60",
+    "variance_premium60",
+    "earnings_premium10",
+    "price_acceleration",
+    "prior_three_return",
+    "wing_slope",
+    "wing_acceleration",
+    "iv10_slope",
+    "iv10_acceleration",
+    "rolling_over",
+    "expanding",
+    "charlie_exhaustion",
+    "premia_available",
+    "both_premia_positive",
+    "dollar_turnover20",
+    "confidence_pct",
+    "eligible",
+    "ticker",
+    "session_index"
+  ],
+  "provider_calls": 0,
+  "outcomes_read": false,
+  "earnings_policy": "retrospective_actual_event_exclusion_user_authorized",
+  "strict_as_known_schedule_is_not_admission_policy": true,
+  "nonoverlap": "Chronological first eligible signal; block ticker through fifth holding session",
+  "hiro_gate": "Entry-session archive presence only; downstream minute validity required",
+  "exact_contracts": "Not selected; downstream chain, quote, deliverable and execution gates remain",
+  "universe": "Current HIRO stock set applied backward; not historical point-in-time membership",
+  "evaluation": "Previously examined 2024\u20132026 surface outputs are exploratory",
+  "calendar": "Observed session dates from input surface panel; no business-day shortcut"
+}

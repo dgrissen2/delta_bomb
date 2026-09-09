@@ -1,0 +1,2751 @@
+[
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "PLTR",
+      "tradeDate": "2025-12-09",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 344
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "PLTR",
+      "tradeDate": "2025-12-09"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 20
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "DIS,PLTR",
+      "tradeDate": "2025-12-10",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 598
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "DIS,PLTR",
+      "tradeDate": "2025-12-10"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 38
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-11",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1440
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-11"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 100
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-12",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1707
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-12"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 121
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-15",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1658
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-15"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-16",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1658
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-16"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-17",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1658
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-17"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-18",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1676
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-18"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-19",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1676
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-19"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-22",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1669
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-22"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-23",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1669
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-23"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-24",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1688
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-24"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-26",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1688
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-26"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-29",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1593
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-29"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-30",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1593
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-30"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-31",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1601
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2025-12-31"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 121
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-02",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1614
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-02"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 121
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-05",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1570
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-05"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-06",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1570
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-06"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-07",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1570
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-07"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-08",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1579
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-08"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-09",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1581
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-09"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-12",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1551
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-12"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-13",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1551
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-13"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-14",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1551
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-14"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-15",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1574
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-15"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-16",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1574
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-16"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-20",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1496
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-20"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 112
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-21",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1496
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-21"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 112
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-22",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1612
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-22"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-23",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1615
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-23"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-26",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1561
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-26"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-27",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1561
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-27"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-28",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1563
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-28"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-29",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1574
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-29"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-30",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1682
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-01-30"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-02",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1586
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-02"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-03",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1587
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-03"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-04",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1587
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-04"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-05",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1663
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-05"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-06",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1691
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-06"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-09",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1715
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-09"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-10",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1715
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-10"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-11",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1723
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-11"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-12",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1741
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-12"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 121
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-13",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1798
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-13"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-17",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1707
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-17"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-18",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1707
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-18"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-19",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1712
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-19"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-20",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1794
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-20"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 119
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-23",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1785
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-23"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-24",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1823
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-24"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-25",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1823
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-25"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-26",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1830
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-26"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-27",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2115
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-02-27"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-02",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1692
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-02"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-03",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1692
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-03"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-04",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1701
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-04"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-05",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1708
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-05"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 123
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-06",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1708
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-06"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 123
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-09",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1602
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-09"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-10",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1602
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-10"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-11",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1605
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-11"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-12",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1742
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-12"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 123
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-13",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1746
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-13"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 123
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-16",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1626
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-16"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-17",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1626
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-17"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-18",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1626
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-18"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-19",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1633
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-19"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-20",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1633
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-20"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 120
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-23",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1631
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-23"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-24",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1631
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-24"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-25",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1633
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-25"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-26",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1677
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-26"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 121
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-27",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1677
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-27"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 121
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-30",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1582
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-30"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-31",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1582
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-03-31"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-01",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1582
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-01"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-02",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1728
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-02"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-06",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1652
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-06"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-07",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1652
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-07"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-08",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1707
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-08"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-09",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1748
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-09"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-10",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1813
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-10"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 122
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-13",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1807
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-13"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-14",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1807
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-14"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-15",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1846
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-15"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-16",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1883
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-16"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-17",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1925
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-17"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-20",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1959
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-20"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 110
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-21",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1959
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-21"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 110
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-22",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2014
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-22"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-23",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2043
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-23"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-24",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2107
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-24"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-27",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2035
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-27"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-28",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2035
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-28"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-29",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2046
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-29"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-30",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2064
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-04-30"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-01",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2113
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-01"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-04",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2105
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-04"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-05",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2105
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-05"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-06",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2188
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-06"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 111
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-07",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2208
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-07"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 117
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-08",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2208
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-08"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 118
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-11",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2083
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-11"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-12",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2214
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-12"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-13",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2214
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-13"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 113
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-14",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2237
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-14"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-15",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2561
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-15"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-18",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2258
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-18"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 108
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-19",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2258
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-19"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 108
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-20",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2258
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-20"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 108
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-21",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2263
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-21"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-22",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2263
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-22"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 114
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-26",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2069
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-26"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 108
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-27",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2142
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-27"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 109
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-28",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2164
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-28"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-29",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2516
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-05-29"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-01",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2129
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-01"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 109
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-02",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2164
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-02"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 109
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-03",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2386
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-03"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 109
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-04",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2447
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-04"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 115
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-05",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2453
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-05"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 116
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-08",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2274
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-08"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 110
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-09",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2274
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-09"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 110
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-10",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 2332
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,PLTR,QCOM",
+      "tradeDate": "2026-06-10"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 110
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,QCOM",
+      "tradeDate": "2026-06-11",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1918
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,DIS,MRVL,ORCL,QCOM",
+      "tradeDate": "2026-06-11"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 96
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM,MRVL,ORCL,QCOM",
+      "tradeDate": "2026-06-12",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 1734
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM,MRVL,ORCL,QCOM",
+      "tradeDate": "2026-06-12"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 78
+  },
+  {
+    "endpoint": "hist/strikes",
+    "params": {
+      "ticker": "CRM",
+      "tradeDate": "2026-06-15",
+      "dte": "1,35"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 266
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM",
+      "tradeDate": "2026-06-15"
+    },
+    "role": "prior",
+    "status": "ok",
+    "rows": 18
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "PLTR",
+      "tradeDate": "2026-06-11"
+    },
+    "role": "signal",
+    "status": "ok",
+    "rows": 20
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "DIS",
+      "tradeDate": "2026-06-12"
+    },
+    "role": "signal",
+    "status": "ok",
+    "rows": 18
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "MRVL,ORCL,QCOM",
+      "tradeDate": "2026-06-15"
+    },
+    "role": "signal",
+    "status": "ok",
+    "rows": 56
+  },
+  {
+    "endpoint": "hist/monies/implied",
+    "params": {
+      "ticker": "CRM",
+      "tradeDate": "2026-06-16"
+    },
+    "role": "signal",
+    "status": "ok",
+    "rows": 18
+  }
+]

@@ -1,0 +1,16 @@
+ticker,date,chosen_path,alternate_path,shared_contracts,conflicting_contracts,different_coverage
+AKAM,2025-04-04,/Users/dgrissen/Dev/central_trade_data/orats/strikes/AKAM/2025-04-04.json,/Users/dgrissen/Dev/central_trade_data/orats/deustrader_wins_recreate_20260823/strikes/AKAM/2025-04-04.json,317,0,True
+CRM,2026-01-14,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains/2026-01-14__0.parquet,/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/richness_hist_strikes.parquet,263,0,True
+CRM,2026-01-14,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains/2026-01-14__0.parquet,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2026-01-14__0.parquet,850,0,False
+CRM,2026-01-29,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains/2026-01-29__0.parquet,/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/richness_hist_strikes.parquet,260,0,True
+CRM,2026-01-29,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains/2026-01-29__0.parquet,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2026-01-29__0.parquet,840,0,False
+DIS,2025-12-12,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2025-12-12__0.parquet,/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/richness_hist_strikes.parquet,259,0,True
+DIS,2025-12-29,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2025-12-29__0.parquet,/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/richness_hist_strikes.parquet,252,0,True
+EBAY,2024-06-17,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_funnel_entry/2024-06-17__0.parquet,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_funnel_forward/2024-06-17__0.parquet,341,0,False
+GNRC,2024-11-01,/Users/dgrissen/Dev/central_trade_data/orats/strikes/GNRC/2024-11-01.json,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_funnel_entry/2024-11-01__0.parquet,560,0,False
+GNRC,2024-11-04,/Users/dgrissen/Dev/central_trade_data/orats/strikes/GNRC/2024-11-04.json,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_funnel_forward/2024-11-04__0.parquet,539,0,False
+HPQ,2024-07-29,/Users/dgrissen/Dev/central_trade_data/orats/strikes/HPQ/2024-07-29.json,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains/2024-07-29__0.parquet,317,0,True
+HPQ,2024-07-29,/Users/dgrissen/Dev/central_trade_data/orats/strikes/HPQ/2024-07-29.json,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2024-07-29__0.parquet,317,0,True
+QCOM,2025-12-19,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2025-12-19__1.parquet,/Users/dgrissen/Dev/delta_bomb/data/pandar_hypothesis_2026-09-07/richness_hist_strikes.parquet,223,0,True
+UPS,2025-03-26,/Users/dgrissen/Dev/central_trade_data/orats/strikes/UPS/2025-03-26.json,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_liquid/2025-03-26__0.parquet,339,0,True
+VLO,2025-11-28,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_funnel_entry/2025-11-28__0.parquet,/Users/dgrissen/Dev/central_trade_data/orats/squeeze_strikes/chains_funnel_forward/2025-11-28__0.parquet,600,0,False

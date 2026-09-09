@@ -1,0 +1,33 @@
+{
+  "round": 1,
+  "engine_mode": "codex_only",
+  "hypothesis_id": "H-PNDR-003",
+  "personas": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round1/commentary/charlie-mcelligott.json",
+        "raw_sha256": "937e2921cef1f128b51c305a973ffe2daccb0770d5f6685c0374a11b9a82a22e",
+        "interpret": "The earlier surface work suggested modest volatility cooling after wing rollover; it did not establish rich exact-strike short-call profit. A persistent upside chase can keep expanding the wing, and a stock decline with rising volatility can damage the intended normalization mechanism. The June population repair does not resolve either issue, and five shared dates are insufficient for the frozen statistical claim.",
+        "act": "Keep two-session contraction versus expansion as the single primary journey contrast. Build separate strictly prior sixty-date comparable delta/DTE and forward-moneyness/DTE histories, then retain observed starting richness and entry Greeks alongside short-only P&L. Do not substitute the fixed-five-delta summary for executable bid-IV excess, and do not add age, acceleration or variance-gap combinations to rescue a weak contrast."
+      }
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round1/commentary/quant.json",
+        "raw_sha256": "5aba60290bc72ac78b6357fafb1e2251be8d0c796e132ed0ca429f38f484ba43",
+        "interpret": "The frozen metadata sample does not test whether rollover predicts short-call profit or exact-call bid-wing normalization. Prior surface findings are already seen exploratory evidence and cannot substitute for a new exact-contract result. The two historical richness coordinates measure different reference distributions: delta/DTE and forward-moneyness/DTE must retain separate valid-date counts and support failures. At least 60 valid prior dates establish minimum reference-history coverage; they do not create 60 independent strategy outcomes. Rollover-versus-expansion comparisons across different stocks remain observational even when starting-state bins match.",
+        "act": "Audit the two 126-session prior windows for each frozen selected contract before claiming history-based richness. Use executable bid-IV minus matched call-mid ATM IV at K=F, verified forwards, adjacent supported smiles and total-variance tenor interpolation. Keep insufficient history, zero dispersion, missing forwards and unsupported brackets visible beside baseline replay results; do not turn richness availability into an unannounced trade filter. Report rollover and expansion sample counts and common support in the frozen starting-state bins before comparing simple means and medians. An empty or thin comparison remains inconclusive without new thresholds, fitted weights or favorable subgroup selection."
+      }
+    }
+  ]
+}

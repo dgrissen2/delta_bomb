@@ -1,0 +1,33 @@
+{
+  "round": 1,
+  "engine_mode": "codex_only",
+  "hypothesis_id": "H-PNDR-001",
+  "personas": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round1/commentary/charlie-mcelligott.json",
+        "raw_sha256": "937e2921cef1f128b51c305a973ffe2daccb0770d5f6685c0374a11b9a82a22e",
+        "interpret": "Round 1 establishes a usable historical decision population, not an entry advantage. Fifty frozen episodes share only five June entry dates, so the cross-section cannot satisfy the twenty-date replication requirement. The preliminary 72-candidate HIRO audit found 122 flow triggers, but eight first observed triggers had earlier missing decisions. A fading call-flow line with a price break is evidence of estimated downward hedging pressure; it does not prove a profitable short sale or observed dealer execution.",
+        "act": "Proceed with the first frozen HIRO action and 10:01 clock on the same contracts. Treat an earlier missing HIRO window as censored first-trigger selection. Preserve known no-trigger and known quote-gate failures as zero-trading policy outcomes, while missing evidence remains unavailable. Measure the short-phase exposure before comparing profit. Keep the verdict inconclusive irrespective of attractive individual June cases."
+      }
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round1/commentary/quant.json",
+        "raw_sha256": "5aba60290bc72ac78b6357fafb1e2251be8d0c796e132ed0ca429f38f484ba43",
+        "interpret": "The population manifest establishes 50 frozen, nonoverlapping episodes from 41,864 retained rows, with 17 overlap exclusions. It explicitly records outcomes_read=false and only entry-session HIRO archive presence. This is a valid sample-construction result, not evidence that HIRO improves entry or that any of the 50 episodes became executable trades. Five June entry dates fail the predeclared minimum of 20 dates; adding cross-sectional stocks or bootstrap draws cannot repair that limitation. The preliminary 72-candidate HIRO audit is not the final earnings-filtered cohort. Its eight first observed triggers preceded by missing decisions show why first observed and first causally valid trigger cannot be conflated. The authorized actual-earnings purge is retrospective; no as-known schedule claim follows.",
+        "act": "Keep the verdict inconclusive. Audit the causal HIRO decision history and fixed contract identities for every frozen episode. A complete observed no-trigger path may receive zero policy trading profit; a missing earlier decision must remain unavailable when it could change the first entry. Then compare the HIRO and clock policies by eligible episode, preserving entry failures and the shared dated sample. Report descriptive paired means and medians only for this five-date pilot; do not interpret its interval as satisfying the frozen statistical criterion."
+      }
+    }
+  ]
+}

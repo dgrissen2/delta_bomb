@@ -1,0 +1,23 @@
+[
+  {
+    "path": "/Users/dgrissen/Dev/central_trade_data/orats/earnings/earnings_long.parquet",
+    "rows": 178141,
+    "date_field": "earnDate",
+    "last_date": "2026-06-25 00:00:00",
+    "sha256": "53480df9aa20b1de3b2545cb65c21680efb7119bba2611715f19c9f52408e66d"
+  },
+  {
+    "path": "/Users/dgrissen/Dev/central_trade_data/orats/earnings/pit_constituents_earnings_long.parquet",
+    "rows": 119871,
+    "date_field": "earnDate",
+    "last_date": "2026-07-29 00:00:00",
+    "sha256": "84aa9d3bc5204fdab36c80631f7e535b397dae73f4c4af0bfedad44a31743870"
+  },
+  {
+    "path": "/Users/dgrissen/Dev/central_trade_data/orats/stable_rrs_earnings_2026-07-29-v1/normalized/earnings.parquet",
+    "rows": 1041918,
+    "date_field": "tradeDate",
+    "last_date": "2026-07-29 00:00:00",
+    "sha256": "3e846c19b239d33f25a45a18762b031bd86c9bbd815a8af434c98273aa56741e"
+  }
+]

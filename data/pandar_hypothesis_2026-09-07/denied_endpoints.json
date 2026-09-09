@@ -1,0 +1,7 @@
+{
+  "historical/one-minute/strikes/chain": {
+    "http_status": 403,
+    "first_attempt": 99,
+    "attempts_before_circuit_breaker_added": 83
+  }
+}

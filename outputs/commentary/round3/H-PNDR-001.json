@@ -1,0 +1,33 @@
+{
+  "round": 3,
+  "engine_mode": "codex_only",
+  "hypothesis_id": "H-PNDR-001",
+  "personas": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round3/commentary/charlie-mcelligott.json",
+        "raw_sha256": "c9f7d6c65ca92ca46c291131e9ac5a8e37fe3dcfbe39bd512b553c91d061c8eb",
+        "interpret": "The event-required replay preserves zero admitted original sales and seven exploratory variant sale-policy cases across six stocks. Eight HIRO entries per variant remain unavailable, not known no-trades. MRVL is the sole admitted clock/HIRO pair: its D4 short-only result is $168.70 at 10:01 versus $69.70 at 14:16, with collected bid falling from $2.24 to $1.25, delta from 8.73 to 5.47 points, and OTM distance rising from 36.31% to 45.47%. This demonstrates changed entry exposure, not a general benefit or failure of HIRO. Actual-event age checks support the quoted timestamps; exact deliverables and the assumed 100-share multiplier remain unverified. Sources: event_admitted_case_comparisons.csv and event_replay_summary.json.",
+        "act": "Keep all 100 stock/policy slots per variant, including known skips and unavailable flow histories. Do not condition the initial-timing comparison on successful sales or read classified HIRO flow as direct dealer-hedging evidence. Audit dated contract deliverables before upgrading these cash-flow diagnostics. Retain event-level short-phase exposure: next-session clock paths show adverse displayed cover losses of $279.30 for MRVL, $220.30 for CRM and $919.30 for ORCL. The ORCL observation is a fresh one-sided opening ask, not a traded loss or a maximum-risk bound. Source: tick_short_phase_exposure.csv."
+      }
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round3/commentary/quant.json",
+        "raw_sha256": "6f352e9500a029700c55102a8a436dd0536f14edf3dea24620943ce99a44d900",
+        "interpret": "Round 3 preserves all 50 episodes in each arm and all 4,000 policy rows. Actual event quotes leave the original arm with zero admitted sales, 92 known skipped stock/policy slots and eight unavailable HIRO entries. The variant has five clock and two HIRO sales across six stocks, with MRVL appearing in both policies. For next-session conversion at D4 and one-cent slippage, HIRO minus clock averages -$1.381 over 42 fully priced episode pairs out of 50; its median is zero. The short-only comparison is also negative (-$3.190 per priced pair). Other timing arms have different signs, which does not justify selecting a favorable method after inspection. Five shared entry dates are one frozen five-session block: all 2,000 block draws repeat the same sample, so there is no confidence interval or statistical pass.",
+        "act": "Close this pilot as inconclusive for a HIRO entry advantage. Retain the eight missing HIRO paths as unavailable and the observed no-entry policies as zero; do not compare only the two successful HIRO entries with the five successful clock entries. Keep the original zero-entry finding separate from the exploratory delta10/OTM5 result. Event age is now checked, but assumed 100-share deliverables, retrospective earnings exclusions and current-universe membership still limit execution and historical inference. Any replication should use one later chronological block and the unchanged rules, with no choice among timing results based on this sample."
+      }
+    }
+  ]
+}

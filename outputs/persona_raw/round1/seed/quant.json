@@ -1,0 +1,36 @@
+{
+  "hypotheses": [
+    {
+      "claim": "Waiting until the next session to buy the fixed nearer call improves net profit relative to buying the spread immediately.",
+      "target": "Within-episode difference in D4 net P&L: next-session policy minus immediate spread.",
+      "pass_criterion": "Validation paired mean and median exceed zero; the 97.5% date-block-bootstrap interval for the mean excludes zero. Require at least 20 distinct admitted entry dates; otherwise inconclusive.",
+      "controls": "Identical original short sale, fixed nearer contract, quantity, costs and exit deadline. Include failed conversions. Same-day and second-day policies are secondary comparisons, never substitutes for a failed primary hypothesis."
+    },
+    {
+      "claim": "The next-session nearer-call purchase adds economic value relative to simply covering the original short at the common deadline.",
+      "target": "Within-episode difference in D4 net P&L: next-session conversion policy minus short-only policy.",
+      "pass_criterion": "Validation paired mean and median exceed zero; the 97.5% date-block-bootstrap interval for the mean excludes zero, with at least 20 distinct admitted entry dates.",
+      "controls": "Same initial short and exit. Report protection, adverse exposure and loss tails separately; superior profit alone does not establish risk-adjusted superiority."
+    }
+  ],
+  "simple_protocol": {
+    "freeze_and_cohort": "Before new outcome retrieval, hash the protocol and manifests. Select four stock symbols with lowest SHA256(ticker) from the frozen September 3 HIRO stock universe. No replacements for missing data. This remains a current-universe retrospective design.",
+    "chronology": "Use January–July 2026 for feasibility and descriptive replay, taking each ticker's first six qualifying nonoverlapping episodes. All ten reviewed examples and existing surface results are training/descriptive. Freeze prospective validation for September 8–December 31, 2026, again first six episodes per ticker, with exits collected afterward. Insufficient observations mean inconclusive; do not extend dates after inspecting profits.",
+    "selection": "Signal EOD requires existing front-wing rank >=85 and positive wing. Select expiration nearest 10 calendar days within 7–14 DTE, earlier expiry breaking ties; select OTM call with delta 0.02–0.10 nearest 0.05, lower strike breaking ties. Nearer call is the adjacent lower listed strike in that expiry, still OTM at signal. Freeze both identities. Block overlapping episodes through D5 regardless of entry rejection.",
+    "earnings": "At signal and actual short entry exclude earnings occurring that date through 30 calendar days afterward, inclusive, using schedules demonstrably available then. Repeat before deferred purchases; a failed purchase gate leaves the short-only policy active until the fixed exit. Unknown or stale schedules cannot clear admission.",
+    "entry": "Attempt next-session 10:01 ET only. Recompute actual short delta, DTE, %OTM and log(K/F)/(ATM-IV*sqrt(T)); require original delta band and OTM status. Record both legs' actual Greeks/distances again at every purchase. Require valid contemporary Greeks, standard verified deliverables, firm uncrossed NBBO, quote age <=5 seconds and executable-side size >=1. Short bid >=$0.20; each entry spread <=30% of midpoint. No strike replacement.",
+    "purchase_and_exit": "Immediate buys at entry. Same-day searches 10:02–15:30; next-day and second-day each search 09:31–15:30 in their designated session. Deferred purchase uses the first valid minute whose adverse-slippage ask plus purchase fee does not exceed net original-sale proceeds. Never buying leaves the original short open. Close at 15:50 on holding session four, counting sale as session one; D5 is secondary. Earlier expiry caps either deadline. Hold contracts constant.",
+    "accounting": "One contract; bid sales, ask purchases, $0.65 per contract-action plus $0.01/share adverse slippage; repeat with $0.02 slippage. Record rejected entries, uncompleted conversions, missing exits, assignment and zero-bid longs separately. Zero-bid long valuation is a conservative mark, not a completed sale. Report naked-phase duration, maximum short-cover loss, underlying rally, peak delta, worst P&L and worst-decile average.",
+    "analysis": "Paired means/medians; 2,000 bootstrap draws of five-session date blocks containing the full cross-section. Report separate predeclared delta 2–5/5–10, %OTM <10/>=10 and ATM-distance <2/>=2 bins descriptively. No grid, classifier, fitted weights or winning-arm selection."
+  },
+  "minimal_feasible_dataset": [
+    "Prior 126-session historical bid-IV-minus-matched-ATM surfaces, requiring >=60 valid prior observations separately at current delta/DTE and forward-moneyness/DTE. Interpolate only inside supported strikes/expiries. Report both z-scores and percentiles; neither is exact-strike lifetime history.",
+    "Signal chains, actual-entry Greeks/forwards, timestamped NBBO/underlying histories through exits, PIT earnings versions and corporate-action/deliverable records.",
+    "Actual timestamped HIRO archives where available; missing older HIRO permits the clock-policy study but no HIRO contribution claim."
+  ],
+  "data_stopping_rules": [
+    "Pilot four tickers first; stop tradable inference if PIT earnings, deliverables, entry Greeks, forwards or comparable-history support cannot be verified.",
+    "Cap requests at 600 total: 400 daily-chain batches, 100 entry/metadata calls, 100 contract-history calls; failures and retries count. Check entitlements first; no subscription purchase.",
+    "Retain missing coverage and censored outcomes. Never replace missing PIT calendars with today's calendar, proxy ranks with strike z-scores, or unavailable history with extrapolation."
+  ]
+}

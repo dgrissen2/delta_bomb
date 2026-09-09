@@ -1,0 +1,70 @@
+{
+  "round": 3,
+  "engine_mode": "codex_only",
+  "blocks": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "engine": "codex",
+      "producer_status": "ok",
+      "raw_path": "outputs/persona_raw/round3/proposals/charlie-mcelligott.json",
+      "raw_sha256": "b2c3844de50c025b1e3239de9fd4c78138e6fc0ece1afb3fe98fe014fad3062e",
+      "candidates": [
+        {
+          "candidate_key": "verify-dated-contract-deliverables",
+          "kind": "experiment",
+          "title": "Verify historical deliverables for the six admitted contract pairs",
+          "priority": "high",
+          "parent": "H-PNDR-001",
+          "rationale": "Actual event timestamps now resolve quote age, but exact historical contract deliverables remain the outstanding prerequisite for interpreting the assumed 100-share cash flows.",
+          "falsification": "For each frozen pair, compare dated official contract and corporate-action records with the exact option identity and assumed deliverable. Any conflict or missing historical record leaves that case unverified; no replacement strike is allowed.",
+          "decision_impact": "Determine which existing diagnostics can support contract-level economic interpretation and which must remain unavailable for an executable inference. This changes evidence quality, not selection thresholds."
+        },
+        {
+          "candidate_key": "test-fixed-nearer-d1-hiro-confirmation",
+          "kind": "experiment",
+          "title": "Compare next-session financing with one frozen bullish HIRO confirmation",
+          "priority": "medium",
+          "parent": "H-PNDR-002",
+          "rationale": "The current second-leg rule contains no new flow confirmation, and most completed purchases underperform covering the short at that minute. A separate test can isolate whether a fresh bullish flow/price reversal improves the second decision.",
+          "falsification": "On newly collected complete next-session All Trades histories, freeze one fifteen-minute bullish call-flow/price confirmation and next-minute action before outcomes. Keep D1, the original nearer strike, financing and quote gates, D4 exit and costs unchanged. Reject the claim if its paired increment over financing-only and same-minute cover is not positive under the existing support criteria; no trigger remains a known no-purchase and missing flow remains censored.",
+          "decision_impact": "Decide whether a later confirmation earns a place in the purchase policy. Requires future adequate HIRO data and a separate pre-outcome freeze; it cannot relabel the present five-date results."
+        }
+      ],
+      "reprioritize": []
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "engine": "codex",
+      "producer_status": "ok",
+      "raw_path": "outputs/persona_raw/round3/proposals/quant.json",
+      "raw_sha256": "7e2598b2dffd689693059714d60b0bb892565896cee83312a33378e95c637483",
+      "candidates": [
+        {
+          "candidate_key": "replicate-fixed-entry-conversion-chronologically",
+          "kind": "experiment",
+          "title": "Replicate the frozen entry and conversion controls in one later chronological block",
+          "priority": "high",
+          "parent": "H-PNDR-002",
+          "rationale": "Designate one block of 20 consecutive later exchange sessions before collecting or inspecting its option outcomes, preferably with prospectively archived HIRO. Retain every eligible episode and every missing/no-entry result. Reuse the original and separately labeled delta10/OTM5 rules, fixed contracts, next-session D4 primary comparison, immediate-spread and conversion-time-cover controls, final short cover, fees and unchanged-time cost stress. Do not replace dates, names or methods because this June sample favored them. This is a proposal for a new bounded sample, not a claim that suitable unseen history already exists; continue existing identity verification rather than creating duplicate audits.",
+          "falsification": "Fewer than 20 represented independent entry dates, incomplete causal source history or unverified deliverables prevents the corresponding support claim. A nonpositive primary paired mean or median, or failure of the predeclared date-block criterion, fails promotion. Do not extend the block until a favorable result appears or treat repeated bootstrap draws as new dates.",
+          "decision_impact": "Determine whether the observed improvement over immediate purchase survives the more meaningful short-cover controls outside the inspected June sample, without adding a predictor or changing thresholds."
+        },
+        {
+          "candidate_key": "test-rollover-common-support",
+          "kind": "experiment",
+          "title": "Test the existing rollover contrast only where the later fixed sample has both states",
+          "priority": "medium",
+          "parent": "H-PNDR-003",
+          "rationale": "Within that same separately frozen later block, first tabulate the existing two-session rollover and expansion states and their predeclared starting-state bins. Preserve all cases and unsupported measurements. For genuinely comparable admitted states, compare D4 short-only P&L and supported exact-call bid-IV-minus-matched-ATM normalization using the already fixed contracts and observation times. Keep independent prior-60-date requirements for delta/DTE and forward-moneyness/DTE. No extra dates, fitted weights, alternative rollover definition or feature search is part of this experiment.",
+          "falsification": "No admitted rollover cases, no common starting-state support, or unavailable exact-call normalization leaves the mechanism untested. Where the comparison is measurable, nonpositive mean or median differences and failure of the frozen date criterion prevent support. High historical percentiles alone cannot count as positive absolute bid-wing richness or successful normalization.",
+          "decision_impact": "Separate an actual contracting-skew test from the current young high-wing examples, while sharing the same bounded data collection and keeping the method simple."
+        }
+      ],
+      "reprioritize": []
+    }
+  ]
+}

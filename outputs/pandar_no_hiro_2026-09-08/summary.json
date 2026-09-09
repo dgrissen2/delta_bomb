@@ -1,0 +1,98 @@
+{
+  "experiment": "E-PNDR-012",
+  "counts": {
+    "background_sessions": 921,
+    "background_start": "2023-01-03",
+    "background_end": "2026-09-03",
+    "membership_stocks": 323,
+    "evaluation_sessions": 671,
+    "candidate_stock_dates": 216733,
+    "quality_valid": {
+      "stock_dates": 175006,
+      "stocks": 312,
+      "signal_dates": 671,
+      "reference_dates": 670,
+      "reference_months": 33,
+      "first_signal": "2024-01-02",
+      "last_signal": "2026-09-03",
+      "episodes": 13590,
+      "unknown_start_rows": 4
+    },
+    "quality_earnings_valid": {
+      "stock_dates": 104328,
+      "stocks": 308,
+      "signal_dates": 649,
+      "reference_dates": 649,
+      "reference_months": 32,
+      "first_signal": "2024-01-02",
+      "last_signal": "2026-08-04",
+      "episodes": 9671,
+      "unknown_start_rows": 2
+    },
+    "rich_eligible": {
+      "stock_dates": 17458,
+      "stocks": 304,
+      "signal_dates": 643,
+      "reference_dates": 643,
+      "reference_months": 32,
+      "first_signal": "2024-01-02",
+      "last_signal": "2026-08-04",
+      "episodes": 7939,
+      "unknown_start_rows": 2
+    },
+    "nonoverlap_admitted": {
+      "stock_dates": 6364,
+      "stocks": 304,
+      "signal_dates": 633,
+      "reference_dates": 633,
+      "reference_months": 32,
+      "first_signal": "2024-01-02",
+      "last_signal": "2026-08-04",
+      "episodes": 5798,
+      "unknown_start_rows": 1
+    }
+  },
+  "primary": {
+    "sample": "rich_all_signals",
+    "era": "all",
+    "outcome": "joint_compression_atm_up_2",
+    "months": 32,
+    "draws": 2000,
+    "seed": 20260908,
+    "slowing_minus_expanding": -0.019421505922370408,
+    "ci_low": -0.03281964806719051,
+    "ci_high": -0.0056475884708092295,
+    "valid_draws": 2000
+  },
+  "primary_support_criteria_pass": false,
+  "adjusted": {
+    "sample": "rich_all_signals",
+    "outcome": "joint_compression_atm_up_2",
+    "status": "ok",
+    "rows": 17456,
+    "months": 32,
+    "coefficient": -0.009093719176371896,
+    "standard_error": 0.006419978636017441,
+    "ci_low": -0.022187351930107138,
+    "ci_high": 0.003999913577363345,
+    "ticker_count": 304,
+    "tickers_both_groups": 296,
+    "ticker_month_cells": 4103,
+    "ticker_month_cells_both_groups": 2135,
+    "within_group_variance": 0.2295234413003351,
+    "iterations": 20,
+    "method": "Y ~ slowing + signal W + signal ATM + ticker FE + reference-month FE; month-clustered sandwich, finite-cluster t interval; observational"
+  },
+  "flags": {
+    "known_split_on_signal": 0,
+    "known_split_through_exit": 0,
+    "adjusted_unadjusted_basis_differs": 8653,
+    "adjusted_high_below_adjusted_close": 11,
+    "summary_raw_price_discrepancy": 10,
+    "adjustment_factor_jump": 2
+  },
+  "provider_calls": 0,
+  "frozen_at_utc": "2026-09-09T01:45:59.371988+00:00",
+  "completed_at_utc": "2026-09-09T01:46:20.929235+00:00",
+  "source_hashes_unchanged": true
+}

@@ -1,0 +1,33 @@
+{
+  "round": 3,
+  "engine_mode": "codex_only",
+  "hypothesis_id": "H-PNDR-003",
+  "personas": [
+    {
+      "persona_id": "charlie-mcelligott",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/market/charlie-mcelligott.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round3/commentary/charlie-mcelligott.json",
+        "raw_sha256": "c9f7d6c65ca92ca46c291131e9ac5a8e37fe3dcfbe39bd512b553c91d061c8eb",
+        "interpret": "The measured calls do not test mature skew rollover: all six names are in episode age one or two, and none has the frozen two-session contraction pattern. Only CPNG is a rollover case in the full fifty-episode feature table. Delta and OTM distance remain distinct coordinates: MRVL's admitted clock sale is 8.73 delta yet 36.31% OTM, versus DIS at 13.94 delta and 5.05% OTM. MRVL and QCOM lack sixty valid prior forward-moneyness/DTE observations, with only thirty and thirty-eight respectively. Only DIS has implied variance above trailing realized variance at both thirty and sixty days. Sources: eligibility_features.csv, strike_richness.csv and charlie_round3_feature_read.md.",
+        "act": "Keep episode age, accumulated richness, distance from the known peak and contraction separate; no fitted mixture or favorable subgroup is justified. Maintain both prior-history coordinates independently and retain missing richness beside the baseline replay. Do not turn a high historical wing percentile or profitable short into proof that broad implied volatility was expensive. H-PNDR-003 remains untested in the admitted rollover contrast. All three claims remain statistically inconclusive: five entry dates occupy one five-session block, below the frozen twenty-date minimum. Preserve the original and exploratory variant labels without another delta/OTM adjustment."
+      }
+    },
+    {
+      "persona_id": "quant",
+      "resolved_source": "global",
+      "resolved_path": "/Users/dgrissen/.config/skillshare/personas/strategy/quant.md",
+      "primary": {
+        "engine": "codex",
+        "producer_status": "ok",
+        "raw_path": "outputs/persona_raw/round3/commentary/quant.json",
+        "raw_sha256": "6f352e9500a029700c55102a8a436dd0536f14edf3dea24620943ce99a44d900",
+        "interpret": "There is no admitted rollover sample on which to test the frozen mechanism. All six measured/admitted stocks are only one or two sessions into their high-wing episode and none satisfies two-session rollover; the full population has one rollover case, CPNG, which did not enter. Thus the available short-call profits cannot establish that mature contracting skew beats expansion. The prior measurement audit is informative but separate: all six measured calls have at least 60 valid delta/DTE dates, while MRVL has only 30 and QCOM 38 forward-moneyness/DTE dates and remain unavailable in that coordinate. The other four have support in both coordinates. DIS has a negative exact bid-IV-minus-ATM spread despite a high relative historical score. IV30 and RR30 ranks and the older call-wing proxy do not substitute for those exact-call measurements. The 44 unrequested histories remain visible, and none of these prior observations increases the five-date strategy sample.",
+        "act": "Label H-PNDR-003 untested economically in the admitted sample and inconclusive overall. Keep separate support counts, the ORATS carry-model forward limitation, negative absolute richness and RV jump flags. Do not relabel young high-wing episodes as rollover, change the two-session rule, or construct a fitted combination of age, acceleration and variance premium from these profits. In a separately frozen later sample, report rollover/expansion counts and common starting-state support first; only then show simple fixed-control means and medians. If there are no admitted comparable rollover cases or no supported bid-wing path, report that absence rather than replacing the comparison."
+      }
+    }
+  ]
+}

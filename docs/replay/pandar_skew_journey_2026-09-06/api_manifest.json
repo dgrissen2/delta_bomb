@@ -1,0 +1,535 @@
+{
+  "max_calls": 80,
+  "used": 66,
+  "initial_used": 0,
+  "attempts": [
+    {
+      "at": "2026-09-06T21:08:41.470586+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "AA,AAL,AAP,AAPL,ABBV,ABNB,ABR,ABT,ACHR,ACN",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:09:02.058564+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "AA,AAL,AAP,AAPL,ABBV,ABNB,ABR,ABT,ACHR,ACN",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:09:18.342837+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "ADBE,ADM,AFRM,AG,AGNC,AI,AKAM,ALAB,ALB,AMAT",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:09:37.480226+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "ADBE,ADM,AFRM,AG,AGNC,AI,AKAM,ALAB,ALB,AMAT",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:09:55.838992+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "AMC,AMD,AMGN,AMT,AMZN,ANET,ANF,APA,APLD,APO",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:10:08.333753+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "AMC,AMD,AMGN,AMT,AMZN,ANET,ANF,APA,APLD,APO",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:10:11.193988+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "APP,ARM,ASAN,ASML,ASTS,ATVI,AVGO,AXP,BA,BABA",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:10:24.305274+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "APP,ARM,ASAN,ASML,ASTS,ATVI,AVGO,AXP,BA,BABA",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:10:26.595058+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "BAC,BB,BBAI,BE,BIDU,BILI,BITF,BKNG,BLK,BLNK",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:10:42.104402+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "BAC,BB,BBAI,BE,BIDU,BILI,BITF,BKNG,BLK,BLNK",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:10:44.489334+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "BMBL,BMNR,BMY,BP,BTBT,BTU,BX,BYND,C,CART",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:11:03.378987+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "BMBL,BMNR,BMY,BP,BTBT,BTU,BX,BYND,C,CART",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:11:04.814497+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "CAT,CCJ,CCL,CEG,CELH,CHPT,CHWY,CIFR,CLF,CLSK",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:11:21.437511+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "CAT,CCJ,CCL,CEG,CELH,CHPT,CHWY,CIFR,CLF,CLSK",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:11:39.237046+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "CLX,CMCSA,CMG,COIN,COP,COST,CPNG,CRCL,CRDO,CRM",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:11:56.053267+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "CLX,CMCSA,CMG,COIN,COP,COST,CPNG,CRCL,CRDO,CRM",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:12:10.614234+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "CRSP,CRWD,CRWV,CSCO,CVNA,CVS,CVX,DAL,DASH,DDOG",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:12:26.561772+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "CRSP,CRWD,CRWV,CSCO,CVNA,CVS,CVX,DAL,DASH,DDOG",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:12:35.196341+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "DE,DELL,DG,DIS,DJT,DKNG,DOCU,DVN,DWAC,EBAY",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:12:45.452373+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "DE,DELL,DG,DIS,DJT,DKNG,DOCU,DVN,DWAC,EBAY",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:12:55.550868+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "EDU,ENPH,ENVX,ET,ETSY,EXPE,F,FANG,FCX,FDX",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:13:13.539919+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "EDU,ENPH,ENVX,ET,ETSY,EXPE,F,FANG,FCX,FDX",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:13:26.147419+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "FHN,FSLR,FSLY,FSR,FTNT,FUBO,GAP,GE,GILD,GM",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:13:43.647618+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "FHN,FSLR,FSLY,FSR,FTNT,FUBO,GAP,GE,GILD,GM",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:14:00.280828+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "GME,GNRC,GOLD,GOOG,GOOGL,GPS,GS,HBAN,HD,HIMS",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:14:22.692480+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "GME,GNRC,GOLD,GOOG,GOOGL,GPS,GS,HBAN,HD,HIMS",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:14:41.025344+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "HOOD,HPE,HPQ,HTZ,HUM,HUT,IBM,IMGN,INOD,INTC",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:15:00.518458+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "HOOD,HPE,HPQ,HTZ,HUM,HUT,IBM,IMGN,INOD,INTC",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:15:21.945181+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "INTU,IONQ,IOVA,IREN,IVR,JBLU,JD,JMIA,JNJ,JPM",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:15:39.216870+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "INTU,IONQ,IOVA,IREN,IVR,JBLU,JD,JMIA,JNJ,JPM",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:15:53.909709+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "KHC,KMX,KO,KR,KTOS,LAZR,LCID,LEN,LI,LLY",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:16:05.775053+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "KHC,KMX,KO,KR,KTOS,LAZR,LCID,LEN,LI,LLY",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:16:26.962374+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "LMND,LMT,LOW,LRCX,LTBR,LULU,LUMN,LUNR,LUV,LVS",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:16:48.204822+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "LMND,LMT,LOW,LRCX,LTBR,LULU,LUMN,LUNR,LUV,LVS",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:17:20.657857+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "LYFT,M,MA,MARA,MCD,MDB,MELI,META,MGM,MMM",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:17:40.806005+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "LYFT,M,MA,MARA,MCD,MDB,MELI,META,MGM,MMM",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:18:06.736920+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "MO,MOS,MPC,MPW,MRK,MRNA,MRO,MRVL,MS,MSFT",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:18:34.004437+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "MO,MOS,MPC,MPW,MRK,MRNA,MRO,MRVL,MS,MSFT",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:19:02.891631+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "MSTR,MU,NBIS,NCLH,NEE,NEM,NET,NFLX,NIO,NKE",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:19:31.449616+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "MSTR,MU,NBIS,NCLH,NEE,NEM,NET,NFLX,NIO,NKE",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:19:58.982359+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "NKLA,NNE,NOK,NOW,NU,NVAX,NVDA,NVO,NYCB,OKLO",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:20:09.460974+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "NKLA,NNE,NOK,NOW,NU,NVAX,NVDA,NVO,NYCB,OKLO",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:20:10.945193+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "OKTA,ON,ONON,OPEN,ORCL,OXY,OZK,PACW,PANW,PARA",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:20:27.308838+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "OKTA,ON,ONON,OPEN,ORCL,OXY,OZK,PACW,PANW,PARA",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:20:39.810004+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "PATH,PBR,PDD,PENN,PEP,PFE,PG,PINS,PLTR,PLUG",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:00.611828+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "PATH,PBR,PDD,PENN,PEP,PFE,PG,PINS,PLTR,PLUG",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:15.827023+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "PTON,PYPL,QBTS,QCOM,QS,QUBT,RBLX,RCL,RDDT,RDW",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:22.779322+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "PTON,PYPL,QBTS,QCOM,QS,QUBT,RBLX,RCL,RDDT,RDW",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:24.035286+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "RF,RGTI,RH,RIG,RILY,RIOT,RIVN,RKLB,RKT,ROKU",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:32.594406+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "RF,RGTI,RH,RIG,RILY,RIOT,RIVN,RKLB,RKT,ROKU",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:34.979087+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "RTX,RUN,S,SAVE,SBUX,SCHW,SE,SEDG,SERV,SHOP",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:21:57.474926+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "RTX,RUN,S,SAVE,SBUX,SCHW,SE,SEDG,SERV,SHOP",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:22:09.426593+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "SLB,SMCI,SMR,SNAP,SNDK,SNDL,SNOW,SOFI,SOUN,SPCE",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:22:17.265686+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "SLB,SMCI,SMR,SNAP,SNDK,SNDL,SNOW,SOFI,SOUN,SPCE",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:22:18.467724+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "SPOT,SPWR,SPY,SQ,STX,T,TAL,TDOC,TEM,TEVA",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:22:34.395299+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "SPOT,SPWR,SPY,SQ,STX,T,TAL,TDOC,TEM,TEVA",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:22:52.643161+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "TFC,TGT,TLRY,TOST,TSLA,TSM,TTD,TWLO,TXN,U",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:23:04.491362+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "TFC,TGT,TLRY,TOST,TSLA,TSM,TTD,TWLO,TXN,U",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:23:14.477984+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "UAL,UBER,ULTA,UNH,UPS,UPST,V,VALE,VFC,VKTX",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:23:29.045081+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "UAL,UBER,ULTA,UNH,UPS,UPST,V,VALE,VFC,VKTX",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:23:31.584569+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "VLO,VOD,VRT,VST,VZ,W,WAL,WBA,WBD,WDAY",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:23:42.168957+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "VLO,VOD,VRT,VST,VZ,W,WAL,WBA,WBD,WDAY",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:23:57.800562+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "WDC,WFC,WMT,WULF,WYNN,X,XOM,XPEV,XYZ,Z",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:24:09.348205+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "WDC,WFC,WMT,WULF,WYNN,X,XOM,XPEV,XYZ,Z",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    },
+    {
+      "at": "2026-09-06T21:24:23.623442+00:00",
+      "endpoint": "hist/summaries",
+      "params": {
+        "ticker": "ZIM,ZION,ZM,ZS",
+        "fields": "ticker,tradeDate,stockPrice,confidence,mwAdj30,iv10d,iv30d,iv60d,exErnIv10d,exErnIv30d,exErnIv60d,dlt5Iv10d,dlt5Iv30d,dlt25Iv30d,dlt75Iv30d,exErnDlt25Iv30d,exErnDlt75Iv30d,rSlp30,rDrv30"
+      }
+    },
+    {
+      "at": "2026-09-06T21:24:27.709288+00:00",
+      "endpoint": "hist/dailies",
+      "params": {
+        "ticker": "ZIM,ZION,ZM,ZS",
+        "fields": "ticker,tradeDate,clsPx,open,hiPx,loPx,stockVolume,unadjClsPx"
+      }
+    }
+  ]
+}

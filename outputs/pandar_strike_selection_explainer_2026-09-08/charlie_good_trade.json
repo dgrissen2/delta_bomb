@@ -1,0 +1,14 @@
+{
+  "persona": "Charlie McElligott analytical lens",
+  "decision": "Seek removable premium with survivable upside exposure; delta and distance describe the trade.",
+  "key_points": [
+    "Documented: Pandar compared expiries, anticipated tail collapse, sized for NVDA190. No documented z-score selector or automatic call-spread conversion.",
+    "Separate ATM, call-minus-ATM, put-minus-ATM. Put buying can move risk reversal without cheapening the sold call.",
+    "Track excess depth, duration, slope and slowing expansion. Extremity alone is not exhaustion; pre-order HIRO call flow losing price impact supports it.",
+    "Distinguish broad wing, local kink and expiry bump using synchronized executable quotes; irregularity may be noise.",
+    "Reprice partial wing flattening with ATM unchanged; separately test ATM crush, no normalization and upside chase. Compare net dollars against stressed loss across strikes/expiries.",
+    "Prior independent comparable episodes’ median change, dispersion and continued-expansion frequency inform scenarios. Otherwise normalization is sensitivity, not expected return. Expanding demand favors patience or reduced exposure; stalled demand strengthens the bump-sale case."
+  ],
+  "risks": ["MRVL lacks forward-history support; kink unproven.", "HIRO cannot establish dealer inventory; naked-call loss is unbounded."],
+  "confidence": "High on interpretation and decomposition; unproven on predictive edge."
+}
