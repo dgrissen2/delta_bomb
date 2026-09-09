@@ -89,6 +89,8 @@ and the pick). Baseline through 09-08: cash **−1,840**, MTM **−1,175**; `a2_
 MTM +410. Per-day table: `python scripts/hiro_watch/daily_table.py [candidate]`. Confirmation
 counts: a_depth_m4 / credit030 / diag 3 of 10 (09-03, 09-04, 09-08); a2_size1_c30 1 of 10.
 Known: frozen v1 test `test_calendar_rules` fails by design (asserts an empty manual calendar).
+Regime tags (W6.5: `vt_break`, `vt_deep`, `sgi_low`) added to compare/daily_table for the below-VT thesis;
+the VT short-block stays.
 
 ## What's next
 

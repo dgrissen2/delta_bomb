@@ -171,3 +171,11 @@ Reads the baseline log(s) and every candidate log; prints, per candidate:
   timeout −$170 for v1 and for `a2_size1_c30`). The frozen v1 test `test_calendar_rules` asserts
   the manual CSV is empty and now fails by design — it is not edited (frozen); the v2 clone's copy
   asserts the policy instead.
+- **W6.5 Regime tags (2026-09-09):** `scripts/hiro_watch/regime.py` tags sessions `vt_break` (opened
+  at/above the Vol Trigger, closed ≥ 0.25 % below it), `vt_deep` (opened ≥ 0.5 % below it) and
+  `sgi_low` (SG Index ≤ −1.4, the bottom 20 % of 2025-01 → 2026-09). Purpose: test the below-VT
+  thesis (short-gamma tape → bigger moves, louder HIRO, whipsaw) on those sessions alone once there
+  are enough; on the 19 stored sessions the minute-level split showed no difference in realized vol
+  or |r30| and only a mild sign flip in corr(r30, next 30-min move) (+0.13 above / −0.08 below).
+  Reporting only — never a bar, never a rule. Tagged so far: 08-17, 09-08 `vt_break`; 08-18, 09-01,
+  09-02 `vt_deep`; no `sgi_low` yet.

@@ -24,6 +24,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hiro_engine.models import EVENT_FIELDS                    # noqa: E402  read-only library use of v1
 from hiro_engine.register import DRAWS, SEED                    # noqa: E402  W4.4: same bootstrap as R9a
 from hiro_watch.events import tag as event_tag  # noqa: E402
+from hiro_watch.regime import tag as regime_tag  # noqa: E402
 from hiro_watch.registry import BASELINE_DIR, Candidate, baseline_data, candidates   # noqa: E402
 
 V1_LOGS = [BASELINE_DIR / "paper_log_backtest.csv"] + sorted(
@@ -499,6 +500,9 @@ def run(asof: str | None, with_marks: bool) -> int:
     ev_days = [(d, event_tag(d), disp) for d, disp in zip(base_sess.date, base_sess.disposition) if event_tag(d)]
     print("event days (policy 2026-09-09: stand down on FOMC only; the rest traded + tagged): "
           + (", ".join(f"{d} {t}{'' if disp == 'countable' else ' [' + disp + ']'}" for d, t, disp in ev_days) or "none"))
+    rg = [(d, regime_tag(d)) for d in base_sess.date]
+    print("regime tags (vt_break / vt_deep / sgi_low — reporting only): "
+          + (", ".join(f"{d} {t}" for d, t in rg if t) or "none"))
     for c in cands:
         report_candidate(c, base_ev, base_sess, asof, marks, spx_dir)
     return 0
