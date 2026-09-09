@@ -1,4 +1,4 @@
-# hiro_watch — STATUS (2026-09-04)
+# hiro_watch — STATUS (2026-09-08)
 
 Single page that says exactly where the WATCH program is and what happens next. Update this file
 whenever the state changes; it is the first thing to read after a context reset.
@@ -8,7 +8,7 @@ whenever the state changes; it is the first thing to read after a context reset.
 | piece | where | size |
 |---|---|---|
 | clone | `scripts/hiro_engine_v2/` | v1 minus live/ops/spikes/parity/register/verify/sweep; +4 knobs (≈10 edited lines); 140 tests green incl. W0.2 byte-identity over the 16 stored sessions |
-| candidates | `docs/hiro_watch/configs/*.yaml` (+ `README.md` with hashes) | 6 files: `baseline_v2` (control), `credit030` (v1 engine), `a_depth_m4`, `diag_vt_off`, `diag_levels_off`, `diag_late_off` |
+| candidates | `docs/hiro_watch/configs/*.yaml` (+ `README.md` with hashes) | 7 files: `baseline_v2` (control), `credit030` (v1 engine), `a_depth_m4`, `a2_size1_c30` (three-knob pick, registered 09-08), `diag_vt_off`, `diag_levels_off`, `diag_late_off` |
 | evening command | `scripts/hiro_watch/run.py` | 109 lines |
 | registry + accounting | `scripts/hiro_watch/registry.py`, `compare.py` | validated candidate list; accounting; 16 tests |
 | outputs | `docs/replay/hiro_watch/<name>/` (engine-written logs); marks in `~/Dev/central_trade_data/thetadata/spxw_marks/` | rebuildable |
@@ -68,13 +68,27 @@ the A-gate combos and a 60-cell grid: `knob_results_2026-09-05.md`; the rules in
 `rules_in_english.md`. Owner's higher-N pick: `r30 < −2` + `run ≤ 1.0` + A credit 0.30 / B 0.10 →
 12 bombs, cash +$160, MTM +$620 on discovery data. Nothing new registered yet.
 
+### Session 2026-09-08 — levels gap found; three sessions re-run; `a2_size1_c30` registered (`session_2026-09-08.md`)
+
+The engine's SpotGamma levels CSV had stopped at 09-01: sessions 09-02/03/08 had run `levels_invalid`
+all day (B short-blocked for the wrong reason; the R4.2 banner was in the logs, unread). Rows appended
+from the scraped notes, v1 re-run for the three days, all candidates rebuilt over 19 sessions,
+`daily_session.py` now verifies the day's levels row before any engine runs. Only 09-03 changed: a B
+trade v1 takes with levels valid — `veto_exit` −$200 — so 09-03 is **−$620**, not −$420, and the
+baseline through 09-08 is A 24/13 −1,210, B 8/3 −460, cash −1,670, inventory +665 → **MTM −1,005**.
+09-08 itself: SPX below the trigger all day, two B signals > 1.0 $B, no A signal — v1 0 trades,
+`a2_size1_c30` 0 trades. `a2_size1_c30` (r30 < −2 + run ≤ 1.0 + A 0.30/B 0.10) registered
+2026-09-04, first confirmation session 09-08; over all 19 sessions cash +70, MTM +580 (discovery,
+not evidence). Its bar = W5.3 `portfolio`; `compare.py verdict_portfolio` (+1 test, 17 green).
+
 ## What's next
 
-1. Owner's go on WHICH candidates to register (each = one yaml; the knobs exist). Suggested set:
-   `a_depth_m2` (−2 alone), `b_size1` (run ≤ 1.0 alone), `b_pull8`, `b_off` (control), and the named
-   three-knob pick `a2_size1_c30` — so confirmation can tell which knob earns.
-2. Next capture: 2026-09-08 (Tue, after Labor Day) — `python scripts/daily_session.py 2026-09-08` then
-   `python scripts/hiro_watch/compare.py`.
+1. `a2_size1_c30` is registered. Still unregistered (owner's call): the singles `a_depth_m2`,
+   `b_size1`, `b_pull8` and the `b_off` control — without them confirmation on the pick cannot say
+   which knob earns.
+2. Next capture: 2026-09-09 — `python scripts/daily_session.py 2026-09-09` then
+   `python scripts/hiro_watch/compare.py`. Check the SpotGamma login in Chrome :9222 first (it had
+   expired on 09-08) and that the 09-09 Founders Note is scraped (the levels step refuses otherwise).
 2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 
 ## Standing constraints that bind this program
@@ -83,4 +97,4 @@ the A-gate combos and a 60-cell grid: `knob_results_2026-09-05.md`; the rules in
   backfill `--force` at the store (staging → ingest only).
 - HIRO `stock_price` and any SpotGamma `Ref Px` are verification-only, never a price source.
 - The daily capture loop continues regardless — vendor retention is ~5 sessions; a missed capture
-  is permanent data loss. Next session to capture: 2026-09-03.
+  is permanent data loss. Next session to capture: 2026-09-09.

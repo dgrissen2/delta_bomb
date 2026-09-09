@@ -128,6 +128,13 @@ Reads the baseline log(s) and every candidate log; prints, per candidate:
     first cap exit (it fired on credit030 on 09-03, on a trade the baseline took identically). This
     is a bar REMOVED after seeing one confirmation session, on the strength of discovery analysis
     that predates it; recorded here so it cannot be mistaken for tuning.
+  - `portfolio` (combined-knob candidates — `a2_size1_c30`; added 2026-09-08, the evening its
+    yaml was registered and before any confirmation trade of it existed): the knobs change the
+    signal set itself, so there is no baseline cohort to score — every candidate confirmation trade
+    counts, whole-portfolio confirmation books. ≥ 20 confirmation trades over ≥ 10 days, no day
+    > 25 % of trades; completion LB95 > 0.55; cash ≥ baseline cash and MTM ≥ baseline MTM on the
+    same sessions → PROMOTE. REJECT: LB95 ≤ 0.55, or MTM < baseline MTM − credits earned.
+    Otherwise INCONCLUSIVE; the 40-session terminal rule of W5.2 applies.
   - `diag_*`: never a verdict; table labeled INCONCLUSIVE until ≥ 20 refused episodes.
 - **W5.4** A verdict comparing books requires both books fully marked; otherwise it defers and
   names the unmarked bombs.

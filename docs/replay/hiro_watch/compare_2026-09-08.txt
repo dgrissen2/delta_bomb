@@ -1,0 +1,124 @@
+hiro_watch compare | baseline v1 80c3a41026c8… | sessions 2026-08-12..2026-09-08 | asof 2026-09-08 | marks on
+
+### a2_size1_c30  [promotable, hiro_engine_v2, 4c7de67e412a…]  three-knob pick (knob_results_2026-09-05.md): a_r30_lt 0.0 -> -2.0, b_run_max 1e9 -> 1.0, credit 0.10 -> 0.30 (A); credit_b stays 0.10
+  registered 2026-09-04 | countable confirmation sessions 1 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 11  bombs  8  rate 0.73  cash    +200  worst  -110  MAE  -160  fill-min med 6
+    DISCOVERY    B  trades  7  bombs  4  rate 0.57  cash    -130  worst   -90  MAE   -90  fill-min med 16
+    CONFIRMATION A  —
+    CONFIRMATION B  —
+  baseline: 
+    DISCOVERY    A  trades 24  bombs 13  rate 0.54  cash   -1210  worst  -350  MAE  -370  fill-min med 16
+    DISCOVERY    B  trades  8  bombs  3  rate 0.38  cash    -460  worst  -200  MAE  -130  fill-min med 12
+    CONFIRMATION A  —
+    CONFIRMATION B  —
+  book, all sessions (asof 2026-09-08): cash +70 + inventory +510 (12 bombs) = MTM +580   | baseline MTM -1005 (16 bombs)
+  status: INCONCLUSIVE (1/10) — verdicts print at checkpoints only
+
+### a_depth_m4  [promotable, hiro_engine_v2, 5cec98f771bf…]  r6_entries.a_r30_lt 0.0 -> -4.0 (Branch A signal only when r30 < -4 $B)
+  registered 2026-09-02 | countable confirmation sessions 2 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades  5  bombs  5  rate 1.00  cash     +50  worst   +10  MAE  -160  fill-min med 15
+    DISCOVERY    B  trades 10  bombs  3  rate 0.30  cash    -620  worst  -220  MAE  -290  fill-min med 12
+    CONFIRMATION A  —
+    CONFIRMATION B  trades  2  bombs  0  rate 0.00  cash    -290  worst  -200  MAE  -130  fill-min med nan
+  baseline: 
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  book, all sessions (asof 2026-09-08): cash -860 + inventory +240 (8 bombs) = MTM -620   | baseline MTM -1005 (16 bombs)
+  Θ ladder over baseline A signals that entered (bomb rate | n):
+    θ -1  DISC 0.58|12   CONF 0.00| 1
+    θ -2  DISC 0.71| 7   CONF nan| 0
+    θ -3  DISC 0.83| 6   CONF nan| 0
+    θ -4  DISC 1.00| 5   CONF nan| 0
+    θ -5  DISC 1.00| 2   CONF nan| 0
+  status: INCONCLUSIVE (2/10) — verdicts print at checkpoints only
+
+### baseline_v2  [control, hiro_engine_v2, b1a4fa6d001c…]  none — v1 rules with the four knobs at v1-equivalent values (W0.2 byte-identity control)
+  registered 2026-09-02 | countable confirmation sessions 2 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  baseline: 
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  book, all sessions (asof 2026-09-08): cash -1670 + inventory +665 (16 bombs) = MTM -1005   | baseline MTM -1005 (16 bombs)
+  VERDICT: control — no verdict
+
+### credit030  [promotable, hiro_engine, cbc2a005e82a…]  r1v3_limits.credit 0.10 -> 0.30 (both branches; read per branch off the log)
+  registered 2026-09-02 | countable confirmation sessions 2 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -460  worst  -290  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  1  rate 0.14  cash    -230  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  baseline: 
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  book, all sessions (asof 2026-09-08): cash -1310 + inventory +618 (14 bombs) = MTM -692   | baseline MTM -1005 (16 bombs)
+  A DISCOVERY    baseline fills 13, lost at 0.30: 0
+  A CONFIRMATION baseline fills  0, lost at 0.30: 0
+  B DISCOVERY    baseline fills  3, lost at 0.30: 2 [['2026-08-12', 'B', 4], ['2026-08-25', 'B', 1]]
+  B CONFIRMATION baseline fills  0, lost at 0.30: 0
+  status: INCONCLUSIVE (2/10) — verdicts print at checkpoints only
+  status: INCONCLUSIVE (2/10) — verdicts print at checkpoints only
+
+### diag_late_off  [diagnostic, hiro_engine_v2, d4108e4b3904…]  r6_entries.late_enabled true -> false (R6.3 suppression off; never promoted)
+  registered 2026-09-02 | countable confirmation sessions 2 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -240  worst  -100  MAE   -80  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  baseline: 
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  book, all sessions (asof 2026-09-08): cash -1650 + inventory +713 (16 bombs) = MTM -937   | baseline MTM -1005 (16 bombs)
+  DISCOVERY    refused(late): 14 episodes (12 also blocked otherwise), entered when rule off: 2, bombs 1, cash -30, worst -40, share MAE<-150: 0.00
+  CONFIRMATION refused(late): 0 episodes (0 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
+  VERDICT: INCONCLUSIVE — 0/20 confirmation refused episodes [never promoted]
+
+### diag_levels_off  [diagnostic, hiro_engine_v2, d6cc1c7f3405…]  r4_vetoes.levels_invalid_enabled true -> false (R4.2 short-block off; never promoted)
+  registered 2026-09-02 | countable confirmation sessions 2 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  baseline: 
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nanpulling marks 2026-09-08 exp 2026-10-09
+
+  book, all sessions (asof 2026-09-08): cash -1670 + inventory +665 (16 bombs) = MTM -1005   | baseline MTM -1005 (16 bombs)
+  DISCOVERY    refused(levels_invalid): 0 episodes (0 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
+  CONFIRMATION refused(levels_invalid): 0 episodes (0 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
+  VERDICT: INCONCLUSIVE — 0/20 confirmation refused episodes [never promoted]
+
+### diag_vt_off  [diagnostic, hiro_engine_v2, 60d425288b6d…]  r4_vetoes.vt_broken_enabled true -> false (R4.1 short-block off; never promoted)
+  registered 2026-09-02 | countable confirmation sessions 2 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades 15  bombs  7  rate 0.47  cash    -750  worst  -190  MAE  -130  fill-min med 10
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  3  bombs  1  rate 0.33  cash    -300  worst  -200  MAE  -130  fill-min med 23
+  baseline: 
+    DISCOVERY    A  trades 22  bombs 13  rate 0.59  cash    -790  worst  -300  MAE  -330  fill-min med 16
+    DISCOVERY    B  trades  7  bombs  3  rate 0.43  cash    -260  worst  -100  MAE   -90  fill-min med 12
+    CONFIRMATION A  trades  2  bombs  0  rate 0.00  cash    -420  worst  -350  MAE  -370  fill-min med nan
+    CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
+  book, all sessions (asof 2026-09-08): cash -2260 + inventory +950 (21 bombs) = MTM -1310   | baseline MTM -1005 (16 bombs)
+  DISCOVERY    refused(vt_broken): 33 episodes (26 also blocked otherwise), entered when rule off: 8, bombs 4, cash -490, worst -190, share MAE<-150: 0.00
+  CONFIRMATION refused(vt_broken): 2 episodes (0 also blocked otherwise), entered when rule off: 2, bombs 1, cash -100, worst -110, share MAE<-150: 0.00
+  VERDICT: INCONCLUSIVE — 2/20 confirmation refused episodes [never promoted]

@@ -194,6 +194,20 @@ def test_verdict_a_depth_scores_only_the_passed_cohort_and_expires():
     assert text.startswith("REJECT-EXPIRED") and "DEFERRED" in text                     # 40 signals + no verdict → expired
 
 
+def test_verdict_portfolio_counts_then_lb95_then_books():
+    bt = C.trades(_base_log())
+    ok = dict(unmarked=[], mtm=0.0, inventory=0.0)
+    text, immediate = C.verdict_portfolio(bt, bt, ok, ok, [D1, D2])
+    assert text.startswith("INCONCLUSIVE — trades 2/20") and not immediate
+    days, _, big_t = _many_days(15)                                                # 30 trades over 15 days
+    bad = dict(unmarked=["x"], mtm=0.0, inventory=0.0)
+    assert C.verdict_portfolio(big_t, big_t, bad, ok, days)[0].startswith("DEFERRED")
+    assert C.verdict_portfolio(big_t, big_t, ok, ok, days)[0].startswith("REJECT — completion LB95")   # half timed out
+    won = big_t.copy(); won["bomb"] = True; won["pnl_usd"] = 10.0
+    assert C.verdict_portfolio(big_t, won, dict(ok, mtm=-100.0), ok, days)[0].startswith("INCONCLUSIVE — cash")
+    assert C.verdict_portfolio(big_t, won, dict(ok, mtm=-400.0), ok, days)[0].startswith("REJECT — candidate MTM")
+    assert C.verdict_portfolio(big_t, won, ok, ok, days)[0].startswith("PROMOTE")
+
 def test_diag_table_sole_blocker():
     ref = C.refusals(_base_log())
     entered = pd.DataFrame(dict(session_date=[D2], branch=["B"], signal_min=[720], episode=[2], bomb=[True],

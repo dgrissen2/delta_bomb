@@ -8,6 +8,10 @@
      winner, median |basket px − SPX close| < 5 pts) → canonical ingest into the immutable store
      (new partition + manifest entry; NEVER `--force` at the store).
   2b. SPXW chain for the day → store (ChainStore.fetch + sanity).
+  2c. SpotGamma levels row for the day (offset CSV, R2.3): appended from the scraped Founders Note if
+      missing, then verified valid (VT and CW present, CW > VT). Without it the engine runs with
+      `levels_invalid` all day — every B setup short-blocked, `vt_broken` never evaluated. This bit
+      three sessions (09-02/03/08) before the check existed.
   3. v1 backtest --day <date> → docs/replay/hiro/paper_log_oos_<date>.csv (+ sessions_backtest row).
   4. hiro_watch/run.py <date> (every candidate) — then run compare.py yourself.
 
@@ -41,6 +45,9 @@ STORE = Path("~/Dev/central_trade_data").expanduser()
 HIRO_ROOT = STORE / "spotgamma/hiro/sp500_basket/v1"
 SPX_DIR = STORE / "thetadata/spx_index_1m_ohlc"
 BASELINE = REPO / "docs/replay/hiro"
+SG_REPO = Path("~/Dev/core_spotgamma_spx_vix_data").expanduser()
+SG_PY = SG_REPO / ".venv/bin/python"
+LEVELS_CSV = SG_REPO / "offset_historical_spotgamma_data.csv"      # == hiro_engine config data.levels_csv
 log = logging.getLogger("daily_session")
 
 
@@ -161,6 +168,24 @@ def chains(day: str) -> None:
     print(f"chain {day}: expiry {cd.expiry}, {len(cd.frame)} rows, sanity OK")
 
 
+# ---- 2c. levels ---------------------------------------------------------------------------
+def levels(day: str) -> None:
+    from hiro_engine.levels import LevelsLoader
+    lv = LevelsLoader(LEVELS_CSV).load(day)
+    if not lv.valid:
+        print(f"levels {day}: no valid row in {LEVELS_CSV.name} — appending from the scraped Founders Notes")
+        r = subprocess.run([str(SG_PY), "-c", "from daily_extraction.append_recent_data import "
+                            "append_recent_voltrigger_data as f; raise SystemExit(0 if f(debug=True) else 1)"],
+                           cwd=SG_REPO)
+        if r.returncode != 0:
+            refuse(f"levels append exited {r.returncode}")
+        lv = LevelsLoader(LEVELS_CSV).load(day)
+    if not lv.valid:
+        refuse(f"levels {day}: still no valid row (VT={lv.vt} CW={lv.cw}) — scrape the Founders Note first "
+               "(~/Dev/sg_note_scraper), then re-run")
+    print(f"levels {day}: VT {lv.vt:.0f} CW {lv.cw:.0f} sg_index {lv.sg_index} — valid")
+
+
 # ---- 3 + 4. engines ---------------------------------------------------------------------
 def v1_backtest(day: str) -> None:
     sess = BASELINE / "sessions_backtest.csv"
@@ -200,6 +225,7 @@ def main(argv=None) -> int:
     elif not (HIRO_ROOT / f"date={day}").exists():
         refuse(f"--skip-hiro but no HIRO partition for {day}")
     chains(day)
+    levels(day)
     v1_backtest(day)
     watch(day)
     print(f"\ndaily_session {day}: done — now `python hiro_watch/compare.py`")

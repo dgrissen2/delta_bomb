@@ -40,6 +40,7 @@ BARS = dict(
     a_depth=dict(theta=-4.0, signals=20, signal_days=10, passed=10, passed_days=5, day_share=0.25,
                  lb95=0.55, expire_signals=40),
     credit=dict(A=dict(fills=15), B=dict(entries=10, fills=5)),
+    portfolio=dict(trades=20, trade_days=10, day_share=0.25, lb95=0.55),
     diag=dict(episodes=20),
 )
 THETAS = (-1.0, -2.0, -3.0, -4.0, -5.0)
@@ -321,6 +322,31 @@ def verdict_credit(bt: pd.DataFrame, ct: pd.DataFrame, branch: str, cb: dict, bb
             f"MTM {cb['mtm']:+.0f} vs {bb['mtm']:+.0f}"), False
 
 
+def verdict_portfolio(bt: pd.DataFrame, ct: pd.DataFrame, cb: dict, bb: dict, conf: list[str]) -> tuple[str, bool]:
+    """Combined-knob candidates (W5.3, `portfolio` bar): the knobs change the signal set itself, so there
+    is no baseline cohort to score — every candidate confirmation trade counts, whole-portfolio books.
+    bt/ct: confirmation trades; cb/bb: confirmation whole-portfolio books."""
+    B = BARS["portfolio"]
+    counts_ok = (len(ct) >= B["trades"] and ct.session_date.nunique() >= B["trade_days"]
+                 and (ct.session_date.value_counts().max() / max(len(ct), 1)) <= B["day_share"])
+    if not counts_ok:
+        return (f"INCONCLUSIVE — trades {len(ct)}/{B['trades']} over {ct.session_date.nunique()}/{B['trade_days']} days"
+                f" (cash {ct.pnl_usd.sum():+.0f} vs baseline {bt.pnl_usd.sum():+.0f})"), False
+    if cb["unmarked"] or bb["unmarked"]:
+        return f"DEFERRED — unmarked bombs: {sorted(set(cb['unmarked'] + bb['unmarked']))}", False
+    lb = lb95(per_session(ct, conf))
+    credits = float(ct[ct.bomb].pnl_usd.sum())
+    if lb <= B["lb95"]:
+        return f"REJECT — completion LB95 {lb:.2f} <= {B['lb95']}", False
+    if cb["mtm"] < bb["mtm"] - credits:
+        return f"REJECT — candidate MTM {cb['mtm']:+.0f} < baseline {bb['mtm']:+.0f} − credits {credits:.0f}", False
+    if ct.pnl_usd.sum() < bt.pnl_usd.sum() or cb["mtm"] < bb["mtm"]:
+        return (f"INCONCLUSIVE — cash {ct.pnl_usd.sum():+.0f} vs {bt.pnl_usd.sum():+.0f}, "
+                f"MTM {cb['mtm']:+.0f} vs {bb['mtm']:+.0f}"), False
+    return (f"PROMOTE — LB95 {lb:.2f}, cash {ct.pnl_usd.sum():+.0f} vs {bt.pnl_usd.sum():+.0f}, "
+            f"MTM {cb['mtm']:+.0f} vs {bb['mtm']:+.0f}"), False
+
+
 def diag_table(base_ref: pd.DataFrame, base_t: pd.DataFrame, cand_ref: pd.DataFrame, cand_t: pd.DataFrame,
                reason: str) -> pd.DataFrame:
     """Sole-blocker attribution (W4.3): a baseline setup refused for `reason` — and never entered by the
@@ -341,6 +367,7 @@ def diag_table(base_ref: pd.DataFrame, base_t: pd.DataFrame, cand_ref: pd.DataFr
 
 
 DIAG_REASON = {"diag_vt_off": "vt_broken", "diag_levels_off": "levels_invalid", "diag_late_off": "late"}
+PORTFOLIO = {"a2_size1_c30"}          # combined-knob candidates scored with the whole-portfolio bar
 
 
 # ---- report -------------------------------------------------------------------------
@@ -413,6 +440,9 @@ def report_candidate(c: Candidate, base_ev: pd.DataFrame, base_sess: pd.DataFram
                       f"lost at 0.30: {len(lost)}" + (f" {lost[SETUP].values.tolist()}" if len(lost) else ""))
             cb, bb = _books(t, bt, asof_v, marks, spx_dir, branch=br)
             verdicts.append(verdict_credit(conf_bt, conf_t, br, cb, bb))
+    elif c.name in PORTFOLIO:
+        cb, bb = _books(t, bt, asof_v, marks, spx_dir)
+        verdicts = [verdict_portfolio(conf_bt, conf_t, cb, bb, conf)]
     elif c.kind == "diagnostic":
         if c.name not in DIAG_REASON:
             raise SystemExit(f"REFUSED: diagnostic {c.name} has no refusal reason mapped in compare.py")
