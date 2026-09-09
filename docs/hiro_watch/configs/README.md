@@ -10,7 +10,7 @@
 | `diag_levels_off` | hiro_engine_v2 | diagnostic | `d6cc1c7f3405…` | r4_vetoes.levels_invalid_enabled true -> false (R4.2 short-block off; never promoted) |
 | `diag_vt_off` | hiro_engine_v2 | diagnostic | `60d425288b6d…` | r4_vetoes.vt_broken_enabled true -> false (R4.1 short-block off; never promoted) |
 
-**Registration note (2026-09-08):** `a2_size1_c30` is the owner's higher-N pick from `knob_results_2026-09-05.md`; registered 2026-09-04 (last session inspected when it was defined), first confirmation session 2026-09-08. It bundles THREE knobs — the singles (`a_depth_m2`, `b_size1`) are not registered, so confirmation on this candidate cannot attribute earnings to one knob.
+**Registration note (2026-09-08; owner's choice confirmed 2026-09-09):** `a2_size1_c30` is the owner's higher-N pick from `knob_results_2026-09-05.md`; registered 2026-09-04 (last session inspected when it was defined), first confirmation session 2026-09-08. It bundles THREE knobs — the singles (`a_depth_m2`, `b_size1`) are not registered, so confirmation on this candidate cannot attribute earnings to one knob.
 
 **Hash note (2026-09-06):** five Branch-B knobs were added to the v2 schema at v1-equivalent values
 (`late_sticky`, `b_enabled`, `b_run_max`, `b_dur_max`, `credit_b`). Every yaml gained exactly those five lines

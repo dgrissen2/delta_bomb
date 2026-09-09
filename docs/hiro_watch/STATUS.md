@@ -92,6 +92,16 @@ Known: frozen v1 test `test_calendar_rules` fails by design (asserts an empty ma
 Regime tags (W6.5: `vt_break`, `vt_deep`, `sgi_low`) added to compare/daily_table for the below-VT thesis;
 the VT short-block stays.
 
+### 2026-09-09 — owner's choice confirmed: `a2_size1_c30` is THE v2 variant on the clock
+
+The 09-05 notes carried two front-runners (reviewers' B-PULL 8; owner's higher-N `r30 < −2` + `run ≤ 1.0`
++ A 0.30 / B 0.10). After the levels fix and the event policy the 60-cell grid was re-run on all 19
+sessions (`diagnostics/grid_2026-09-09_19sessions.csv`): no cell is cash-positive; the owner's pick has
+the highest MTM of all 60 (cash −100, inventory +510, MTM +410; 19 trades / 12 bombs, A 12/8 +30,
+B 7/4 −130, worst −170) and pull8 fell harder (the 09-03 B trade had pull30 ≈ 13 and ate the −200
+veto-exit the run cap scratched at $0). Owner (2026-09-09): keep `a2_size1_c30` as the chosen variant.
+v1 on the same 19 sessions: 33/16, cash −1,840, MTM −1,175.
+
 ## What's next
 
 1. `a2_size1_c30` is registered. Still unregistered (owner's call): the singles `a_depth_m2`,
