@@ -369,7 +369,7 @@ def diag_table(base_ref: pd.DataFrame, base_t: pd.DataFrame, cand_ref: pd.DataFr
 
 
 DIAG_REASON = {"diag_vt_off": "vt_broken", "diag_levels_off": "levels_invalid", "diag_late_off": "late"}
-PORTFOLIO = {"a2_size1_c30"}          # combined-knob candidates scored with the whole-portfolio bar
+PORTFOLIO = {"a2_size1_c30", "a2_pull8_c30"}          # combined-knob candidates scored with the whole-portfolio bar
 
 
 # ---- report -------------------------------------------------------------------------

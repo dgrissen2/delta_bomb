@@ -104,9 +104,10 @@ v1 on the same 19 sessions: 33/16, cash −1,840, MTM −1,175.
 
 ## What's next
 
-1. `a2_size1_c30` is registered. Still unregistered (owner's call): the singles `a_depth_m2`,
-   `b_size1`, `b_pull8` and the `b_off` control — without them confirmation on the pick cannot say
-   which knob earns.
+1. Registered: `a2_size1_c30` (the choice) and, since 2026-09-09, `a2_pull8_c30` — identical except the B
+   filter (pull30 ≥ 8 vs run ≤ 1.0), so the pair separates B-SIZE from B-PULL. Discovery: 15/10, cash −150,
+   MTM +318 (its B: 3/2 −180 — it took the 09-03 −200 veto-exit). Still unregistered: `a_depth_m2`,
+   `b_size1`, `b_off`.
 2. Next capture: 2026-09-09 — `python scripts/daily_session.py 2026-09-09` then
    `python scripts/hiro_watch/compare.py`. Check the SpotGamma login in Chrome :9222 first (it had
    expired on 09-08) and that the 09-09 Founders Note is scraped (the levels step refuses otherwise).

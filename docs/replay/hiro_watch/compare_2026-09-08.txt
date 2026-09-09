@@ -2,6 +2,22 @@ hiro_watch compare | baseline v1 80c3a41026c8… | sessions 2026-08-12..2026-09-
 event days (policy 2026-09-09: stand down on FOMC only; the rest traded + tagged): 2026-08-12 cpi, 2026-08-31 month_end_rebalance, 2026-09-04 nfp
 regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_break, 2026-08-18 vt_deep, 2026-09-01 vt_deep, 2026-09-02 vt_deep, 2026-09-08 vt_break
 
+### a2_pull8_c30  [promotable, hiro_engine_v2, c1de88368295…]  the pick with the reviewers B filter: a_r30_lt 0.0 -> -2.0, b_pull_min_pts 3.0 -> 8.0 (B-PULL 8; b_run_max stays v1), credit 0.10 -> 0.30 (A); credit_b 0.10 — differs from a2_size1_c30 in the B filter ONLY
+  registered 2026-09-08 | countable confirmation sessions 0 | next checkpoint at 10
+  candidate:
+    DISCOVERY    A  trades 12  bombs  8  rate 0.67  cash     +30  worst  -170  MAE  -180  fill-min med 6
+    DISCOVERY    B  trades  3  bombs  2  rate 0.67  cash    -180  worst  -200  MAE  -130  fill-min med 11
+    CONFIRMATION A  —
+    CONFIRMATION B  —
+  baseline: 
+    DISCOVERY    A  trades 25  bombs 13  rate 0.52  cash   -1380  worst  -350  MAE  -370  fill-min med 16
+    DISCOVERY    B  trades  8  bombs  3  rate 0.38  cash    -460  worst  -200  MAE  -130  fill-min med 12
+    CONFIRMATION A  —
+    CONFIRMATION B  —
+  event-day slice (traded, tagged): candidate 2 trades/1 bombs -160 [cpi,nfp] | baseline 4 trades/2 bombs -230 [cpi,nfp]
+  book, all sessions (asof 2026-09-08): cash -150 + inventory +468 (10 bombs) = MTM +318   | baseline MTM -1175 (16 bombs)
+  status: INCONCLUSIVE (0/10) — verdicts print at checkpoints only
+
 ### a2_size1_c30  [promotable, hiro_engine_v2, 4c7de67e412a…]  three-knob pick (knob_results_2026-09-05.md): a_r30_lt 0.0 -> -2.0, b_run_max 1e9 -> 1.0, credit 0.10 -> 0.30 (A); credit_b stays 0.10
   registered 2026-09-04 | countable confirmation sessions 1 | next checkpoint at 10
   candidate:
