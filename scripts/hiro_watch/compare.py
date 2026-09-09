@@ -23,6 +23,7 @@ from scipy.stats import beta
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from hiro_engine.models import EVENT_FIELDS                    # noqa: E402  read-only library use of v1
 from hiro_engine.register import DRAWS, SEED                    # noqa: E402  W4.4: same bootstrap as R9a
+from hiro_watch.events import tag as event_tag  # noqa: E402
 from hiro_watch.registry import BASELINE_DIR, Candidate, baseline_data, candidates   # noqa: E402
 
 V1_LOGS = [BASELINE_DIR / "paper_log_backtest.csv"] + sorted(
@@ -371,6 +372,17 @@ PORTFOLIO = {"a2_size1_c30"}          # combined-knob candidates scored with the
 
 
 # ---- report -------------------------------------------------------------------------
+def _event_slice(t: pd.DataFrame, bt: pd.DataFrame) -> str:
+    """Trades on tagged event days (all sets), candidate vs baseline — reporting only, never a bar."""
+    def cell(df: pd.DataFrame) -> str:
+        x = df[df.session_date.map(event_tag) != ""]
+        if not len(x):
+            return "—"
+        tags = ",".join(sorted(set(x.session_date.map(event_tag))))
+        return f"{len(x)} trades/{int(x.bomb.sum())} bombs {x.pnl_usd.sum():+.0f} [{tags}]"
+    return f"candidate {cell(t)} | baseline {cell(bt)}"
+
+
 def _split(t: pd.DataFrame) -> str:
     lines = []
     for s in ("DISCOVERY", "CONFIRMATION", "EXCLUDED"):
@@ -414,6 +426,7 @@ def report_candidate(c: Candidate, base_ev: pd.DataFrame, base_sess: pd.DataFram
           f"{'CHECKPOINT' if checkpoint(n_conf) else f'next checkpoint at {nxt}'}{' (TERMINAL)' if n_conf >= TERMINAL else ''}")
     print("  candidate:"); print(_split(t))
     print("  baseline: "); print(_split(bt))
+    print("  event-day slice (traded, tagged): " + _event_slice(t, bt))
     print(f"  book, all sessions (asof {asof}): cash {cb_all['cash']:+.0f} + inventory {cb_all['inventory']:+.0f} "
           f"({cb_all['n_bombs']} bombs) = MTM {cb_all['mtm']:+.0f}   | baseline MTM {bb_all['mtm']:+.0f} ({bb_all['n_bombs']} bombs)"
           + (f"   UNMARKED {len(cb_all['unmarked'])}: {cb_all['unmarked'][:3]}{'…' if len(cb_all['unmarked']) > 3 else ''}"
@@ -483,6 +496,9 @@ def run(asof: str | None, with_marks: bool) -> int:
     marks = MarkCache(enabled=with_marks)
     print(f"hiro_watch compare | baseline v1 {base_ev.config_hash.iloc[0][:12]}… | sessions "
           f"{base_sess.date.min()}..{base_sess.date.max()} | asof {asof} | marks {'on' if with_marks else 'OFF'}")
+    ev_days = [(d, event_tag(d), disp) for d, disp in zip(base_sess.date, base_sess.disposition) if event_tag(d)]
+    print("event days (policy 2026-09-09: stand down on FOMC only; the rest traded + tagged): "
+          + (", ".join(f"{d} {t}{'' if disp == 'countable' else ' [' + disp + ']'}" for d, t, disp in ev_days) or "none"))
     for c in cands:
         report_candidate(c, base_ev, base_sess, asof, marks, spx_dir)
     return 0

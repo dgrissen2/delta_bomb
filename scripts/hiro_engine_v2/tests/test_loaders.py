@@ -54,10 +54,16 @@ def test_stale_levels_invalid(config, tmp_path):
 
 def test_calendar_rules(config, tmp_path):
     cal = CalendarLoader(config.path_of("calendar_csv"))
-    assert cal.check("2026-08-07").reason == "nfp"            # first Friday Aug 2026
-    assert cal.check("2026-09-18").reason == "quarterly_opex" # 3rd Friday Sep
-    assert cal.check("2026-08-31").reason == "month_end_rebalance"
-    assert cal.is_event_day("2026-08-12") is False            # manual CSV is empty
+    # docs/hiro_engine/event_calendar.csv is written by hiro_watch/events.py (policy 2026-09-09:
+    # stand down on FOMC decision days only; computed NFP / opex / month-end dates carry `not_event`)
+    assert cal.check("2026-08-07").reason == "nfp"            # first Friday Aug 2026 — before the CSV's range, computed rule
+    assert cal.is_event_day("2026-09-18") is False            # 3rd Friday Sep: overridden, traded + tagged
+    assert cal.is_event_day("2026-08-31") is False            # month-end: overridden, traded + tagged
+    assert cal.check("2026-09-16").reason == "fomc"           # FOMC decision day: stand down
+    assert cal.is_event_day("2026-08-12") is False            # CPI: never in the CSV, traded + tagged
+    computed = CalendarLoader(tmp_path / "missing.csv")       # no CSV → the computed rules alone
+    assert computed.check("2026-09-18").reason == "quarterly_opex"
+    assert computed.check("2026-08-31").reason == "month_end_rebalance"
     manual = tmp_path / "cal.csv"
     manual.write_text("date,reason\n2026-08-12,cpi\n")
     assert CalendarLoader(manual).check("2026-08-12").reason == "cpi"

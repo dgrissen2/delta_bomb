@@ -151,3 +151,23 @@ Reads the baseline log(s) and every candidate log; prints, per candidate:
   second invocation.
 - `/code-review` round 1 (2026-09-04): 10 findings, all fixed in the same day
   (`build_notes.md` §"Review round 1").
+
+## W6. Event-day policy (owner decision 2026-09-09)
+
+- **W6.1** The engine stands down on **FOMC decision days only**. NFP, quarterly opex, month-end
+  rebalance and CPI days are **traded** and **tagged** for after-the-fact reporting.
+- **W6.2** Applied as DATA, not code: `scripts/hiro_watch/events.py` writes
+  `docs/hiro_engine/event_calendar.csv` (the frozen engine's R2.4 manual calendar) with every FOMC
+  decision day as `fomc` and every computed NFP / opex / month-end date as the engine's own
+  `not_event` override, 2026-08-12 → 2027-12-31. CPI needs no row (never computed). No line of
+  `scripts/hiro_engine/` changes; CONFIG_HASH does not cover the CSV. Sources: Fed FOMC calendar,
+  BLS CPI schedule (2026 only — extend when 2027 is posted).
+- **W6.3** `events.tag(date)` ∈ {fomc, cpi, nfp, quarterly_opex, month_end_rebalance, ''} is the
+  reporting tag. `compare.py` prints the tagged sessions in its header and an event-day slice per
+  candidate; `daily_table.py` carries the tag column and event/plain subtotals. The tag is never a
+  bar and never a firewall label: an event session is countable like any other.
+- **W6.4** Consequence recorded: 08-31 (month-end) and 09-04 (NFP) had stood down under the
+  computed rule; both re-run 2026-09-09 (08-31: 0 trades, 5 B episodes vt-blocked; 09-04: A
+  timeout −$170 for v1 and for `a2_size1_c30`). The frozen v1 test `test_calendar_rules` asserts
+  the manual CSV is empty and now fails by design — it is not edited (frozen); the v2 clone's copy
+  asserts the policy instead.

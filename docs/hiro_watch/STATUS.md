@@ -1,4 +1,4 @@
-# hiro_watch — STATUS (2026-09-08)
+# hiro_watch — STATUS (2026-09-09)
 
 Single page that says exactly where the WATCH program is and what happens next. Update this file
 whenever the state changes; it is the first thing to read after a context reset.
@@ -80,6 +80,15 @@ baseline through 09-08 is A 24/13 −1,210, B 8/3 −460, cash −1,670, invento
 `a2_size1_c30` 0 trades. `a2_size1_c30` (r30 < −2 + run ≤ 1.0 + A 0.30/B 0.10) registered
 2026-09-04, first confirmation session 09-08; over all 19 sessions cash +70, MTM +580 (discovery,
 not evidence). Its bar = W5.3 `portfolio`; `compare.py verdict_portfolio` (+1 test, 17 green).
+
+### 2026-09-09 — event-day policy (W6): stand down on FOMC only; NFP / CPI / opex / month-end traded + tagged
+
+Applied as data (`scripts/hiro_watch/events.py` → `docs/hiro_engine/event_calendar.csv`); engine
+untouched. 08-31 and 09-04 re-run as trading days (08-31: 0 trades; 09-04: A timeout −$170 for v1
+and the pick). Baseline through 09-08: cash **−1,840**, MTM **−1,175**; `a2_size1_c30` cash −100,
+MTM +410. Per-day table: `python scripts/hiro_watch/daily_table.py [candidate]`. Confirmation
+counts: a_depth_m4 / credit030 / diag 3 of 10 (09-03, 09-04, 09-08); a2_size1_c30 1 of 10.
+Known: frozen v1 test `test_calendar_rules` fails by design (asserts an empty manual calendar).
 
 ## What's next
 
