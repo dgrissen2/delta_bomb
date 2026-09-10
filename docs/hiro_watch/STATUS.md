@@ -1,4 +1,4 @@
-# hiro_watch — STATUS (2026-09-09)
+# hiro_watch — STATUS (2026-09-10)
 
 Single page that says exactly where the WATCH program is and what happens next. Update this file
 whenever the state changes; it is the first thing to read after a context reset.
@@ -102,15 +102,26 @@ B 7/4 −130, worst −170) and pull8 fell harder (the 09-03 B trade had pull30 
 veto-exit the run cap scratched at $0). Owner (2026-09-09): keep `a2_size1_c30` as the chosen variant.
 v1 on the same 19 sessions: 33/16, cash −1,840, MTM −1,175.
 
+### Session 2026-09-09 (countable; `vt_deep` — opened 40 under the trigger, closed 7636; `compare_2026-09-09.txt`)
+
+v1: two Branch-A trades on shallow flow (r30 −0.96 and −0.27): 11:17 bought 7375P, filled in 6 min
+**+$10**; 11:30 bought 7330P, timed out **−$90** → −$80. Two B signals blocked `vt_broken`.
+**Both v2 variants: 0 trades** — neither A signal reached r30 < −2. Inventory re-marked with SPX
+−37 on the day: baseline MTM −830 (17 bombs, +1,090 inventory); `a2_size1_c30` cash −100, inventory
++810 → **MTM +710**; `a2_pull8_c30` cash −150, inventory +740 → MTM +590. Confirmation counts: pick
+2/10, pull8 1/10, a_depth_m4 / credit030 / diag 4/10. `diag_vt_off` took a B bomb (+$10) again.
+Disk had filled to 667 MB free mid-capture (ENOSPC, refused cleanly); rerun after space was freed.
+
 ## What's next
 
 1. Registered: `a2_size1_c30` (the choice) and, since 2026-09-09, `a2_pull8_c30` — identical except the B
    filter (pull30 ≥ 8 vs run ≤ 1.0), so the pair separates B-SIZE from B-PULL. Discovery: 15/10, cash −150,
    MTM +318 (its B: 3/2 −180 — it took the 09-03 −200 veto-exit). Still unregistered: `a_depth_m2`,
    `b_size1`, `b_off`.
-2. Next capture: 2026-09-09 — `python scripts/daily_session.py 2026-09-09` then
+2. Next capture: 2026-09-10 — `python scripts/daily_session.py 2026-09-10` then
    `python scripts/hiro_watch/compare.py`. Check the SpotGamma login in Chrome :9222 first (it had
-   expired on 09-08) and that the 09-09 Founders Note is scraped (the levels step refuses otherwise).
+   expired on 09-08) and scrape the day's Founders Note (`cd ~/Dev/core_spotgamma_spx_vix_data && .venv/bin/python daily_run.py --steps 2,4`)
+   — the levels step refuses otherwise. 09-11 is CPI (traded, tagged).
 2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 
 ## Standing constraints that bind this program
@@ -119,4 +130,4 @@ v1 on the same 19 sessions: 33/16, cash −1,840, MTM −1,175.
   backfill `--force` at the store (staging → ingest only).
 - HIRO `stock_price` and any SpotGamma `Ref Px` are verification-only, never a price source.
 - The daily capture loop continues regardless — vendor retention is ~5 sessions; a missed capture
-  is permanent data loss. Next session to capture: 2026-09-09.
+  is permanent data loss. Next session to capture: 2026-09-10.
