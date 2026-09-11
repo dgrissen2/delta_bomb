@@ -1,4 +1,4 @@
-# hiro_watch — STATUS (2026-09-10)
+# hiro_watch — STATUS (2026-09-11)
 
 Single page that says exactly where the WATCH program is and what happens next. Update this file
 whenever the state changes; it is the first thing to read after a context reset.
@@ -112,16 +112,31 @@ v1: two Branch-A trades on shallow flow (r30 −0.96 and −0.27): 11:17 bought 
 2/10, pull8 1/10, a_depth_m4 / credit030 / diag 4/10. `diag_vt_off` took a B bomb (+$10) again.
 Disk had filled to 667 MB free mid-capture (ENOSPC, refused cleanly); rerun after space was freed.
 
+### Sessions 2026-09-10 / 09-11 — the A gate's first real hit (`session_2026-09-11.md`)
+
+09-10 (`vt_deep`, SG Index −0.67): v1 filled three shallow-flow A trades **+$30**; both variants sat out
+(gate) → first day the gate cost money. 09-11 (**CPI**, first **`sgi_low`** session, SG Index −1.615):
+flow went deep (r30 −2.36 / −3.02), **the gate passed, and both variants took v1's two trades** —
+fill +$30 then a **cap exit −$380**, the worst trade of the program. Day: v1 −370, both variants −350
+(the 0.30 A credit is the whole difference). First confirmation evidence AGAINST the A-depth premise
+(n=1). Book after 22 sessions: v1 40/21, cash −2,260, MTM −1,260; `a2_size1_c30` 21/13, cash −450,
+MTM +495 (4/10); `a2_pull8_c30` 17/11, cash −500, MTM +445 (3/10).
+
+Ops: TradingView 2FA blocks `daily_run.py --steps 2,4`; SpotGamma headless auth fails. Working path —
+drive `IntegrationWorkflow` over CDP against the logged-in Chrome :9222 (`connect_over_cdp`), which
+scrapes the notes with no new login; then `append_recent_voltrigger_data`. Playwright chromium had to
+be installed for sg_note_scraper.
+
 ## What's next
 
 1. Registered: `a2_size1_c30` (the choice) and, since 2026-09-09, `a2_pull8_c30` — identical except the B
    filter (pull30 ≥ 8 vs run ≤ 1.0), so the pair separates B-SIZE from B-PULL. Discovery: 15/10, cash −150,
    MTM +318 (its B: 3/2 −180 — it took the 09-03 −200 veto-exit). Still unregistered: `a_depth_m2`,
    `b_size1`, `b_off`.
-2. Next capture: 2026-09-10 — `python scripts/daily_session.py 2026-09-10` then
+2. Next capture: 2026-09-14 (Mon) — `python scripts/daily_session.py 2026-09-14` then
    `python scripts/hiro_watch/compare.py`. Check the SpotGamma login in Chrome :9222 first (it had
    expired on 09-08) and scrape the day's Founders Note (`cd ~/Dev/core_spotgamma_spx_vix_data && .venv/bin/python daily_run.py --steps 2,4`)
-   — the levels step refuses otherwise. 09-11 is CPI (traded, tagged).
+   — the levels step refuses otherwise. 09-16 is FOMC (STAND DOWN); 09-18 is quarterly opex (traded, tagged).
 2. Review loop is CLOSED (two rounds, 20 findings, all fixed or accepted in `build_notes.md`).
 
 ## Standing constraints that bind this program
@@ -130,4 +145,4 @@ Disk had filled to 667 MB free mid-capture (ENOSPC, refused cleanly); rerun afte
   backfill `--force` at the store (staging → ingest only).
 - HIRO `stock_price` and any SpotGamma `Ref Px` are verification-only, never a price source.
 - The daily capture loop continues regardless — vendor retention is ~5 sessions; a missed capture
-  is permanent data loss. Next session to capture: 2026-09-10.
+  is permanent data loss. Next session to capture: 2026-09-14.
