@@ -127,6 +127,20 @@ drive `IntegrationWorkflow` over CDP against the logged-in Chrome :9222 (`connec
 scrapes the notes with no new login; then `append_recent_voltrigger_data`. Playwright chromium had to
 be installed for sg_note_scraper.
 
+### 2026-09-12 — the A gate does not select (`gate_selection_test_2026-09-12.md`)
+
+Owner's question: *how does it know to trade less?* It doesn't — `a_r30_lt` IS the depth premise and
+fewer trades is its side effect, so "trade fewer, lose smaller" was never an independent finding.
+Tested directly on all 32 baseline A trades: kept (r30 < −2) lose **−58/trade**, blocked lose
+**−55/trade**; against 20,000 random 10-of-32 subsets the gate's cash sits at the **45th percentile**
+and its completion rate at the 45th — chance. The ladder is not monotone: only r30 < −4 beats chance
+(94th/95th, n=5, regime-confounded), and the −2…−4 band holds the three worst A trades (−170, −110,
+−380). `a2_size1_c30`'s Branch-A +1,480 decomposes as **+1,220 (82 %) just not being in the blocked
+trades**, +120 credit, +140 freed capacity. Branch B has the same shape.
+Consequence: Branch A is 80 % of v1's loss and loses ≈$56/trade regardless of depth; the untested
+control is **A-OFF** (we built `b_enabled: false` but never the mirror). Diagnostic:
+`python scripts/hiro_watch/gate_test.py`.
+
 ## What's next
 
 1. Registered: `a2_size1_c30` (the choice) and, since 2026-09-09, `a2_pull8_c30` — identical except the B
