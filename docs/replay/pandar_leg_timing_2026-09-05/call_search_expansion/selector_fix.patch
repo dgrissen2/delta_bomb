@@ -1,0 +1,182 @@
+--- a/scripts/single_name_call_screen.py
++++ b/scripts/single_name_call_screen.py
+@@ -25,7 +25,6 @@
+ import math
+ import os
+ from pathlib import Path
+-import sys
+ import time
+ from typing import Any
+ 
+@@ -1090,52 +1089,65 @@
+ def select_sell_contract(
+     chain: pd.DataFrame,
+     event_expiries: set[str],
++    *,
++    delta_min: float = 0.02,
++    delta_max: float = 0.06,
+ ) -> dict[str, Any]:
+-    """Select the nearest 5--12 DTE 4-delta short call and nearer call."""
++    """Check every candidate, then prefer the nearest valid expiry and four-delta call.
++
++    The delta bounds are project parameters, not Pandar prescriptions. Keeping the
++    original defaults separates the selection correction from wider-band research.
++    """
++    if not 0 < delta_min <= 0.04 <= delta_max < 1:
++        raise ValueError("call delta bounds must contain 0.04 and lie strictly within (0, 1)")
+     eligible = chain[
+-        chain["dte"].between(5, 19) & chain["delta"].between(0.02, 0.06)
++        chain["dte"].between(5, 19) & chain["delta"].between(delta_min, delta_max)
+     ].copy()
+     if eligible.empty:
+-        return empty_contract("no 2-6 delta call in 5-19 DTE")
+-    preferred = eligible[eligible["dte"].between(5, 12)]
+-    pool = preferred if not preferred.empty else eligible
+-    selected_dte = int(pool["dte"].min())
+-    pool = pool[pool["dte"] == selected_dte]
+-    wing = pool.loc[(pool["delta"] - 0.04).abs().idxmin()]
+-    expiry = str(wing["expirDate"])
+-    expiry_rows = chain[chain["expirDate"].astype(str) == expiry]
+-    nearer_rows = expiry_rows[expiry_rows["strike"] < wing["strike"]]
+-    if nearer_rows.empty:
+-        return empty_contract("no nearer listed call strike")
+-    nearer = nearer_rows.loc[nearer_rows["strike"].idxmax()]
+-    atm = expiry_rows.loc[(expiry_rows["delta"] - 0.50).abs().idxmin()]
+-    wing_iv = float((wing["callMidIv"] - atm["callMidIv"]) * 100)
+-    event_inside = expiry in event_expiries
+-    reasons: list[str] = []
+-    if float(wing["callBidPrice"]) < 0.20:
+-        reasons.append("far-call bid below 0.20")
+-    if quote_width(wing) > 0.10 + 1e-9:
+-        reasons.append("far-call quote wider than 0.10")
+-    if int(wing["callOpenInterest"]) < 25:
+-        reasons.append("far-call OI below 25")
+-    if float(nearer["callAskPrice"]) <= 0:
+-        reasons.append("nearer call has no ask")
+-    if wing_iv < 2:
+-        reasons.append("selected call less than 2 vol points above ATM")
+-    if event_inside:
+-        reasons.append("earnings inside expiry")
+-    return contract_record(
+-        wing,
+-        nearer,
+-        leg1_action="STO",
+-        leg2_action="BTO",
+-        entry_cash=float(wing["callBidPrice"]),
+-        target_leg2_price=max(float(wing["callBidPrice"]) - 0.10, 0.10),
+-        contract_wing_iv_points=wing_iv,
+-        event_inside_expiry=event_inside,
+-        confirmed=not reasons,
+-        reasons=reasons,
+-    )
++        return empty_contract(f"no {delta_min*100:g}-{delta_max*100:g} delta call in 5-19 DTE")
++    assessed: list[tuple[tuple[float, ...], dict[str, Any]]] = []
++    for _, wing in eligible.iterrows():
++        order = (float(wing["dte"] > 12), float(wing["dte"]),
++                 abs(float(wing["delta"]) - 0.04), float(wing["strike"]))
++        expiry = str(wing["expirDate"])
++        expiry_rows = chain[chain["expirDate"].astype(str) == expiry]
++        nearer_rows = expiry_rows[expiry_rows["strike"] < wing["strike"]]
++        if nearer_rows.empty:
++            assessed.append((order, empty_contract("no nearer listed call strike")))
++            continue
++        nearer = nearer_rows.loc[nearer_rows["strike"].idxmax()]
++        atm = expiry_rows.loc[(expiry_rows["delta"] - 0.50).abs().idxmin()]
++        wing_iv = float((wing["callMidIv"] - atm["callMidIv"]) * 100)
++        event_inside = expiry in event_expiries
++        reasons: list[str] = []
++        if not math.isfinite(float(wing["callBidPrice"])) or float(wing["callBidPrice"]) < 0.20:
++            reasons.append("far-call bid below 0.20 or unavailable")
++        if (not math.isfinite(float(wing["callAskPrice"]))
++                or float(wing["callAskPrice"]) < float(wing["callBidPrice"])):
++            reasons.append("far-call quote crossed or unavailable")
++        if quote_width(wing) > 0.10 + 1e-9:
++            reasons.append("far-call quote wider than 0.10")
++        if int(wing["callOpenInterest"]) < 25:
++            reasons.append("far-call OI below 25")
++        if not math.isfinite(float(nearer["callAskPrice"])) or float(nearer["callAskPrice"]) <= 0:
++            reasons.append("nearer call has no ask")
++        if not math.isfinite(wing_iv) or float(atm["callMidIv"]) <= 0 or wing_iv < 2:
++            reasons.append("selected call less than 2 vol points above valid ATM")
++        if event_inside:
++            reasons.append("earnings inside expiry")
++        record = contract_record(
++            wing, nearer, leg1_action="STO", leg2_action="BTO",
++            entry_cash=float(wing["callBidPrice"]),
++            target_leg2_price=max(float(wing["callBidPrice"]) - 0.10, 0.10),
++            contract_wing_iv_points=wing_iv, event_inside_expiry=event_inside,
++            confirmed=not reasons, reasons=reasons,
++        )
++        assessed.append((order, record))
++    _, selected = min(assessed, key=lambda item: (not item[1]["chain_confirmed"], *item[0]))
++    selected.update(contracts_checked=len(assessed),
++                    passing_contracts=sum(item[1]["chain_confirmed"] for item in assessed),
++                    call_delta_min=delta_min, call_delta_max=delta_max)
++    return selected
+ 
+ 
+ def select_standard_buy_contract(
+@@ -1457,7 +1469,10 @@
+         else:
+             event_expiries = candidate_event_expiries(chain, candidate, earnings)
+             if candidate["scenario"] == SELL_FIRST_CALL_GRAB:
+-                contract = select_sell_contract(chain, event_expiries)
++                contract = select_sell_contract(
++                    chain, event_expiries,
++                    delta_min=args.call_delta_min, delta_max=args.call_delta_max,
++                )
+             elif candidate["scenario"] == BUY_FIRST_CALL_STANDARD:
+                 contract = select_standard_buy_contract(chain, event_expiries)
+             elif candidate["scenario"] == BUY_FIRST_CALL_PUKE:
+@@ -2216,6 +2231,10 @@
+         "confirm",
+         help="select exact contracts and write chain-confirmed finalists",
+     )
++    confirm_parser.add_argument("--call-delta-min", type=float, default=0.02,
++                                help="project call-search minimum delta as a fraction")
++    confirm_parser.add_argument("--call-delta-max", type=float, default=0.06,
++                                help="project call-search maximum delta; use 0.10 for wider research")
+     confirm_parser.set_defaults(function=command_confirm)
+ 
+     evaluate_parser = subparsers.add_parser(
+--- a/tests/test_single_name_call_screen.py
++++ b/tests/test_single_name_call_screen.py
+@@ -266,6 +266,38 @@
+ 
+ 
+ class ContractSelectionTests(unittest.TestCase):
++    def test_sell_first_checks_other_strikes_after_closest_delta_fails(self) -> None:
++        chain = pd.DataFrame([
++            self._row(100, .50, 5., 5.1, .40),
++            self._row(105, .10, .8, .9, .45),
++            self._row(110, .04, .10, .15, .50),
++            self._row(115, .03, .25, .30, .55),
++        ])
++        selected = SCREEN.select_sell_contract(chain, set())
++        self.assertTrue(selected['chain_confirmed'])
++        self.assertEqual(selected['leg1_strike'], 115)
++
++    def test_sell_first_uses_later_expiry_when_front_quotes_fail(self) -> None:
++        front = [self._row(100, .5, 5., 5.1, .4), self._row(110, .04, .1, .2, .5)]
++        later = [self._row(100, .5, 6., 6.1, .4, dte=17),
++                 self._row(115, .04, .3, .35, .5, dte=17)]
++        selected = SCREEN.select_sell_contract(pd.DataFrame(front+later), set())
++        self.assertTrue(selected['chain_confirmed'])
++        self.assertEqual(selected['dte'], 17)
++
++    def test_sell_first_delta_band_is_explicit_and_does_not_relax_quotes(self) -> None:
++        chain = pd.DataFrame([
++            self._row(100, .5, 5., 5.1, .4),
++            self._row(105, .09, .25, .3, .5),
++            self._row(110, .04, .1, .15, .55),
++        ])
++        self.assertFalse(SCREEN.select_sell_contract(chain, set())['chain_confirmed'])
++        selected = SCREEN.select_sell_contract(chain, set(), delta_max=.10)
++        self.assertTrue(selected['chain_confirmed'])
++        self.assertEqual(selected['leg1_strike'], 105)
++        chain.loc[chain.strike.eq(105), 'callAskPrice'] = .8
++        self.assertFalse(SCREEN.select_sell_contract(chain, set(), delta_max=.10)['chain_confirmed'])
++
+     def test_sell_first_selects_four_delta_weekly_with_tight_quote(self) -> None:
+         chain = pd.DataFrame(
+             [

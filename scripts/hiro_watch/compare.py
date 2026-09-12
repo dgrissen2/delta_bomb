@@ -179,6 +179,26 @@ class MarkCache:
         last = q.sort_values("min").iloc[-1]
         return float((last.bid + last.ask) / 2)
 
+    def spread_mid(self, date: str, expiry: str, k_long: float, k_short: float) -> float | None:
+        """Mid of the long vertical (long k_long / short k_short), both legs quoted at the SAME minute.
+
+        Marking each leg at its own last valid minute mixes quotes from different times and can price a
+        debit spread below zero (found 2026-09-11: three bombs marked −1.3 to −2.0 pts). The value of a
+        long put vertical is bounded by [0, width]; callers clamp. Returns None if the two strikes never
+        carry a valid quote in the same minute up to the close.
+        """
+        f = self.frame(date, expiry)
+        if f is None:
+            return None
+        q = f[(f["min"] <= CLOSE_MIN) & (f.bid > 0) & (f.ask > 0) & (f.ask >= f.bid)]
+        a = q[q.strike == k_long].drop_duplicates("min", keep="last").set_index("min")
+        b = q[q.strike == k_short].drop_duplicates("min", keep="last").set_index("min")
+        common = a.index.intersection(b.index)
+        if not len(common):
+            return None
+        m = common.max()
+        return float((a.loc[m].bid + a.loc[m].ask) / 2 - (b.loc[m].bid + b.loc[m].ask) / 2)
+
 
 def spx_close(date: str, spx_dir: Path, require_complete: bool = True) -> float:
     """Last regular-hours SPX 1-min close of `date`. require_complete refuses a session whose bars stop
@@ -207,12 +227,12 @@ def book(t: pd.DataFrame, asof: str, marks: MarkCache, spx_dir: Path) -> dict:
             rows.append(dict(base, state="SETTLED", value_usd=(max(0.0, b.k_long - s) - max(0.0, b.k_short - s)) * USD,
                              spx_settle=s))
         else:
-            ml, ms = marks.close_mid(asof, b.expiry, b.k_long), marks.close_mid(asof, b.expiry, b.k_short)
-            if ml is None or ms is None:
+            v = marks.spread_mid(asof, b.expiry, b.k_long, b.k_short)
+            if v is None:
                 unmarked.append(f"{b.session_date} {b.branch} {b.k_long:.0f}/{b.k_short:.0f} exp {b.expiry}")
                 rows.append(dict(base, state="UNMARKED", value_usd=np.nan, spx_settle=np.nan))
-            else:
-                rows.append(dict(base, state="MARKED", value_usd=min(ml - ms, width) * USD, spx_settle=np.nan))
+            else:                                   # a long vertical is worth [0, width] — never negative
+                rows.append(dict(base, state="MARKED", value_usd=min(max(v, 0.0), width) * USD, spx_settle=np.nan))
     inv = pd.DataFrame(rows, columns=["session_date", "branch", "k_long", "k_short", "expiry", "state", "value_usd", "spx_settle"])
     cash = float(t.pnl_usd.sum())
     inventory = float(inv.value_usd.sum()) if len(inv) else 0.0

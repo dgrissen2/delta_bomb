@@ -1,7 +1,3 @@
-pulling marks 2026-09-11 exp 2026-09-18
-pulling marks 2026-09-11 exp 2026-09-25
-pulling marks 2026-09-11 exp 2026-10-02
-pulling marks 2026-09-11 exp 2026-10-09
 hiro_watch compare | baseline v1 80c3a41026c8… | sessions 2026-08-12..2026-09-11 | asof 2026-09-11 | marks on
 event days (policy 2026-09-09: stand down on FOMC only; the rest traded + tagged): 2026-08-12 cpi, 2026-08-31 month_end_rebalance, 2026-09-04 nfp, 2026-09-11 cpi
 regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_break, 2026-08-18 vt_deep, 2026-09-01 vt_deep, 2026-09-02 vt_deep, 2026-09-08 vt_break, 2026-09-09 vt_deep, 2026-09-10 vt_deep, 2026-09-11 sgi_low
@@ -19,7 +15,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades  7  bombs  5  rate 0.71  cash    -420  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  —
   event-day slice (traded, tagged): candidate 4 trades/2 bombs -510 [cpi,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -500 + inventory +945 (11 bombs) = MTM +445   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -500 + inventory +1075 (11 bombs) = MTM +575   | baseline MTM -730 (21 bombs)
   status: INCONCLUSIVE (3/10) — verdicts print at checkpoints only
 
 ### a2_size1_c30  [promotable, hiro_engine_v2, 4c7de67e412a…]  three-knob pick (knob_results_2026-09-05.md): a_r30_lt 0.0 -> -2.0, b_run_max 1e9 -> 1.0, credit 0.10 -> 0.30 (A); credit_b stays 0.10
@@ -35,7 +31,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades  7  bombs  5  rate 0.71  cash    -420  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  —
   event-day slice (traded, tagged): candidate 6 trades/3 bombs -580 [cpi,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -450 + inventory +945 (13 bombs) = MTM +495   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -450 + inventory +1075 (13 bombs) = MTM +625   | baseline MTM -730 (21 bombs)
   status: INCONCLUSIVE (4/10) — verdicts print at checkpoints only
 
 ### a_depth_m4  [promotable, hiro_engine_v2, 5cec98f771bf…]  r6_entries.a_r30_lt 0.0 -> -4.0 (Branch A signal only when r30 < -4 $B)
@@ -51,7 +47,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades 10  bombs  5  rate 0.50  cash   -1010  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
   event-day slice (traded, tagged): candidate 4 trades/3 bombs -50 [cpi] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -850 + inventory +1055 (9 bombs) = MTM +205   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -850 + inventory +1055 (9 bombs) = MTM +205   | baseline MTM -730 (21 bombs)
   Θ ladder over baseline A signals that entered (bomb rate | n):
     θ -1  DISC 0.58|12   CONF 0.57| 7
     θ -2  DISC 0.71| 7   CONF 0.33| 3
@@ -73,7 +69,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades 10  bombs  5  rate 0.50  cash   -1010  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
   event-day slice (traded, tagged): candidate 6 trades/3 bombs -600 [cpi,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -2260 + inventory +1000 (21 bombs) = MTM -1260   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -2260 + inventory +1530 (21 bombs) = MTM -730   | baseline MTM -730 (21 bombs)
   VERDICT: control — no verdict
 
 ### credit030  [promotable, hiro_engine, cbc2a005e82a…]  r1v3_limits.credit 0.10 -> 0.30 (both branches; read per branch off the log)
@@ -89,7 +85,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades 10  bombs  5  rate 0.50  cash   -1010  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
   event-day slice (traded, tagged): candidate 6 trades/2 bombs -540 [cpi,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -1690 + inventory +685 (18 bombs) = MTM -1005   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -1690 + inventory +1215 (18 bombs) = MTM -475   | baseline MTM -730 (21 bombs)
   A DISCOVERY    baseline fills 13, lost at 0.30: 0
   A CONFIRMATION baseline fills  5, lost at 0.30: 1 [['2026-09-10', 'A', 1]]
   B DISCOVERY    baseline fills  3, lost at 0.30: 2 [['2026-08-12', 'B', 4], ['2026-08-25', 'B', 1]]
@@ -110,7 +106,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades 10  bombs  5  rate 0.50  cash   -1010  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
   event-day slice (traded, tagged): candidate 6 trades/2 bombs -650 [cpi,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -2240 + inventory +1000 (21 bombs) = MTM -1240   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -2240 + inventory +1530 (21 bombs) = MTM -710   | baseline MTM -730 (21 bombs)
   DISCOVERY    refused(late): 16 episodes (14 also blocked otherwise), entered when rule off: 2, bombs 1, cash -30, worst -40, share MAE<-150: 0.00
   CONFIRMATION refused(late): 4 episodes (4 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
   VERDICT: INCONCLUSIVE — 4/20 confirmation refused episodes [never promoted]
@@ -128,7 +124,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades 10  bombs  5  rate 0.50  cash   -1010  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
   event-day slice (traded, tagged): candidate 6 trades/3 bombs -600 [cpi,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -2260 + inventory +1000 (21 bombs) = MTM -1260   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -2260 + inventory +1530 (21 bombs) = MTM -730   | baseline MTM -730 (21 bombs)
   DISCOVERY    refused(levels_invalid): 0 episodes (0 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
   CONFIRMATION refused(levels_invalid): 0 episodes (0 also blocked otherwise), entered when rule off: 0, bombs 0, cash +0, worst +0, share MAE<-150: 0.00
   VERDICT: INCONCLUSIVE — 0/20 confirmation refused episodes [never promoted]
@@ -146,7 +142,7 @@ regime tags (vt_break / vt_deep / sgi_low — reporting only): 2026-08-17 vt_bre
     CONFIRMATION A  trades 10  bombs  5  rate 0.50  cash   -1010  worst  -380  MAE  -410  fill-min med 4
     CONFIRMATION B  trades  1  bombs  0  rate 0.00  cash    -200  worst  -200  MAE  -130  fill-min med nan
   event-day slice (traded, tagged): candidate 10 trades/5 bombs -720 [cpi,month_end_rebalance,nfp] | baseline 6 trades/3 bombs -600 [cpi,nfp]
-  book, all sessions (asof 2026-09-11): cash -2960 + inventory +1530 (29 bombs) = MTM -1430   | baseline MTM -1260 (21 bombs)
+  book, all sessions (asof 2026-09-11): cash -2960 + inventory +2060 (29 bombs) = MTM -900   | baseline MTM -730 (21 bombs)
   DISCOVERY    refused(vt_broken): 38 episodes (29 also blocked otherwise), entered when rule off: 11, bombs 5, cash -620, worst -190, share MAE<-150: 0.00
   CONFIRMATION refused(vt_broken): 15 episodes (12 also blocked otherwise), entered when rule off: 4, bombs 3, cash -80, worst -110, share MAE<-150: 0.00
   VERDICT: INCONCLUSIVE — 15/20 confirmation refused episodes [never promoted]

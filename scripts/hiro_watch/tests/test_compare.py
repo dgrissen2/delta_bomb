@@ -116,6 +116,10 @@ class _Marks:
     def close_mid(self, date, expiry, strike):
         return self.mids.get(strike)
 
+    def spread_mid(self, date, expiry, k_long, k_short):
+        a, b = self.mids.get(k_long), self.mids.get(k_short)
+        return None if a is None or b is None else a - b
+
 
 def test_book_marks_settles_and_flags_unmarked(tmp_path):
     t = C.trades(_base_log())
@@ -135,6 +139,22 @@ def test_book_marks_settles_and_flags_unmarked(tmp_path):
     assert b["mtm"] == -100.0 + 350.0 and b["unmarked"] == []
     b2 = C.book(t, asof=D2, marks=_Marks({}), spx_dir=tmp_path)
     assert len(b2["unmarked"]) == 1 and np.isnan(b2["table"].value_usd.iloc[0])
+
+
+def test_spread_mid_uses_one_minute_for_both_legs_and_book_floors_at_zero(tmp_path):
+    """Marking each leg at its own last valid minute priced three real bombs below zero (2026-09-11)."""
+    f = pd.DataFrame(dict(strike=[7500.0, 7495.0, 7500.0, 7495.0], min=[600, 600, 959, 300],
+                          bid=[1.0, 0.4, 0.5, 3.0], ask=[1.2, 0.6, 0.7, 3.2]))
+    mc = C.MarkCache.__new__(C.MarkCache)
+    mc.frame = lambda date, expiry: f                                  # noqa: ARG005
+    assert mc.spread_mid(D1, "2026-09-25", 7500.0, 7495.0) == pytest.approx(0.6)   # minute 600, both legs
+    assert mc.spread_mid(D1, "2026-09-25", 7500.0, 7490.0) is None                 # no common minute
+    t = C.trades(_base_log())
+    pd.DataFrame(dict(min=[960], close=[7397.0])).to_parquet(tmp_path / f"{D1}.parquet")
+    neg = C.book(t, asof=D1, marks=_Marks({7500.0: 38.5, 7495.0: 40.0}), spx_dir=tmp_path)
+    assert neg["table"].value_usd.tolist() == [0.0]                    # a long vertical is never negative
+    wide = C.book(t, asof=D1, marks=_Marks({7500.0: 90.0, 7495.0: 40.0}), spx_dir=tmp_path)
+    assert wide["table"].value_usd.tolist() == [500.0]                 # and never worth more than its width
 
 
 def test_verdict_credit_lost_fill_is_immediate_reject():
