@@ -1,0 +1,115 @@
+{
+  "errors": [],
+  "checks": [
+    {
+      "filter": "combined",
+      "date": "2026-08-27",
+      "candles": 78,
+      "title": "<b>2026-08-27</b>   ·   5-min   ·   Thrust + staircase   ·   1 entry",
+      "times": [
+        "12:40"
+      ],
+      "rows": 1
+    },
+    {
+      "filter": "combined",
+      "date": "2026-08-28",
+      "candles": 78,
+      "title": "<b>2026-08-28</b>   ·   5-min   ·   Thrust + staircase   ·   2 entries",
+      "times": [
+        "10:45",
+        "10:55"
+      ],
+      "rows": 2
+    },
+    {
+      "filter": "combined",
+      "date": "2026-09-03",
+      "candles": 78,
+      "title": "<b>2026-09-03</b>   ·   5-min   ·   Thrust + staircase   ·   3 entries",
+      "times": [
+        "11:05",
+        "11:15",
+        "13:40"
+      ],
+      "rows": 3
+    },
+    {
+      "filter": "thrust-only",
+      "date": "2026-08-28",
+      "candles": 78,
+      "title": "<b>2026-08-28</b>   ·   5-min   ·   Thrust only   ·   1 entry",
+      "times": [
+        "10:45"
+      ],
+      "rows": 1
+    },
+    {
+      "filter": "thrust-only",
+      "date": "2026-09-03",
+      "candles": 78,
+      "title": "<b>2026-09-03</b>   ·   5-min   ·   Thrust only   ·   2 entries",
+      "times": [
+        "11:05",
+        "11:30"
+      ],
+      "rows": 2
+    },
+    {
+      "filter": "combined/thrust type",
+      "date": "2026-08-28",
+      "candles": 78,
+      "title": "<b>2026-08-28</b>   ·   5-min   ·   Thrust + staircase   ·   1 entry",
+      "times": [
+        "10:45"
+      ],
+      "rows": 1
+    },
+    {
+      "filter": "combined/thrust type",
+      "date": "2026-09-03",
+      "candles": 78,
+      "title": "<b>2026-09-03</b>   ·   5-min   ·   Thrust + staircase   ·   1 entry",
+      "times": [
+        "11:05"
+      ],
+      "rows": 1
+    },
+    {
+      "filter": "combined/staircase type",
+      "date": "2026-08-27",
+      "candles": 78,
+      "title": "<b>2026-08-27</b>   ·   5-min   ·   Thrust + staircase   ·   1 entry",
+      "times": [
+        "12:40"
+      ],
+      "rows": 1
+    },
+    {
+      "filter": "combined/staircase type",
+      "date": "2026-08-28",
+      "candles": 78,
+      "title": "<b>2026-08-28</b>   ·   5-min   ·   Thrust + staircase   ·   1 entry",
+      "times": [
+        "10:55"
+      ],
+      "rows": 1
+    },
+    {
+      "filter": "combined/staircase type",
+      "date": "2026-09-03",
+      "candles": 78,
+      "title": "<b>2026-09-03</b>   ·   5-min   ·   Thrust + staircase   ·   2 entries",
+      "times": [
+        "11:15",
+        "13:40"
+      ],
+      "rows": 2
+    }
+  ],
+  "entry_info": "passed",
+  "mode_and_type_filters": "passed",
+  "empty_state": "passed",
+  "navigation": "passed",
+  "legacy_redirects": "passed"
+}

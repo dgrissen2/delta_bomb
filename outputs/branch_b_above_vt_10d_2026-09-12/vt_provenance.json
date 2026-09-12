@@ -1,0 +1,278 @@
+{
+  "scope": "Latest ten complete cached SPX sessions opening strictly above same-date Vol Trigger, selected as of 2026-09-11. Note provenance only; no new strategy evaluation.",
+  "levels_path": "/Users/dgrissen/Dev/core_spotgamma_spx_vix_data/offset_historical_spotgamma_data.csv",
+  "levels_sha256": "ca6091b2ff6c2e8ce4efa0257a2519cf731385bbd876b4e8c170857ea235f61c",
+  "sessions": [
+    {
+      "date": "2026-09-08",
+      "vol_trigger": 7715.0,
+      "levels_csv_line": 2204,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-09-08_Founders_Note__Tue_September_08_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "a2d69dbb09c43bae90455d82a6cf7e4a61542d588c63f4173ac1fabab915cd59",
+      "publication_time_as_labeled": "2026-09-08T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Tue, September 08, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Tuesday, September 08, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 63,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 71,
+        "extract": "| SG Volatility Trigger\u2122: | $7720.65 | $7715 | $770 | $29270 | $718 | $3000 | $295 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-09-04",
+      "vol_trigger": 7720.0,
+      "levels_csv_line": 2203,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-09-04_Founders_Note__Fri_September_04_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "38a1116c7ff6765862a23addb1da706c63352792174e69b9a2f8ba96efa7f1b6",
+      "publication_time_as_labeled": "2026-09-04T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Fri, September 04, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Friday, September 04, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 63,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 71,
+        "extract": "| SG Volatility Trigger\u2122: | $7729.88 | $7720 | $772 | $29270 | $718 | $3000 | $295 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-09-03",
+      "vol_trigger": 7675.0,
+      "levels_csv_line": 2202,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-09-03_Founders_Note__Thu_September_03_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "71646788c86baab49186c29a838a468a5369af142a71da0bc85573c1963f6b11",
+      "publication_time_as_labeled": "2026-09-03T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Thu, September 03, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Thursday, September 03, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 64,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 72,
+        "extract": "| SG Volatility Trigger\u2122: | $7684.5 | $7675 | $765 | $29070 | $710 | $3000 | $295 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-28",
+      "vol_trigger": 7700.0,
+      "levels_csv_line": 2198,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-28_Founders_Note__Fri_August_28_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "aa0531424ed769a31996bd785a4f86e4ff7d8515cf7ea0287c271ecb7e1eb7e6",
+      "publication_time_as_labeled": "2026-08-28T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Fri, August 28, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Friday, August 28, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 159,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 167,
+        "extract": "| SG Volatility Trigger\u2122: | $7713.07 | $7700 | $769 | $29070 | $719 | $3000 | $300 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-27",
+      "vol_trigger": 7675.0,
+      "levels_csv_line": 2197,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-27_Founders_Note__Thu_August_27_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "fc65efb8b89a715d37f5f90b3061ccc28dbafd0f446360f55ad444dfa80f5182",
+      "publication_time_as_labeled": "2026-08-27T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Thu, August 27, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Thursday, August 27, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 121,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 129,
+        "extract": "| SG Volatility Trigger\u2122: | $7688.63 | $7675 | $766 | $29070 | $712 | $3000 | $300 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-25",
+      "vol_trigger": 7660.0,
+      "levels_csv_line": 2195,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-25_Founders_Note__Tue_August_25_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "81979d8108af9e7259073ba527e3878f39daf598ed08a5799ac4892d6d6204b9",
+      "publication_time_as_labeled": "2026-08-25T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Tue, August 25, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Tuesday, August 25, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 116,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 124,
+        "extract": "| SG Volatility Trigger\u2122: | $7675.55 | $7660 | $765 | $29060 | $706 | $3000 | $300 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-17",
+      "vol_trigger": 7765.0,
+      "levels_csv_line": 2189,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-17_Founders_Note__Mon_August_17_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "2c1ebd46f5e2220faff7cdf305053e294b9d45278aeca5a08d9d3d6b59532009",
+      "publication_time_as_labeled": "2026-08-17T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Mon, August 17, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Monday, August 17, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 116,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 124,
+        "extract": "| SG Volatility Trigger\u2122: | $7785.9 | $7765 | $776 | $29470 | $729 | $3015 | $303 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-14",
+      "vol_trigger": 7745.0,
+      "levels_csv_line": 2188,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-14_Founders_Note__Fri_August_14_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "ec0418c0118ab840ebb1ac15059a72665984572c547564fdeb06bf0729e12ebc",
+      "publication_time_as_labeled": "2026-08-14T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Fri, August 14, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Friday, August 14, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 153,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 161,
+        "extract": "| SG Volatility Trigger\u2122: | $7766.77 | $7745 | $774 | $28525 | $729 | $3010 | $301 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-13",
+      "vol_trigger": 7720.0,
+      "levels_csv_line": 2187,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-13_Founders_Note__Thu_August_13_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "9c4d4683b6cd23c2a219213101df0b08c4d0dc153888b533900e332436dc680a",
+      "publication_time_as_labeled": "2026-08-13T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Thu, August 13, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Thursday, August 13, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 133,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 141,
+        "extract": "| SG Volatility Trigger\u2122: | $7741.2 | $7720 | $772 | $29520 | $723 | $2990 | $301 |"
+      },
+      "note_spx_vt_matches_csv": true
+    },
+    {
+      "date": "2026-08-12",
+      "vol_trigger": 7720.0,
+      "levels_csv_line": 2186,
+      "note_path": "/Users/dgrissen/Dev/sg_note_scraper/founders_notes/articles/2026-08-12_Founders_Note__Wed_August_12_2026_at_7_00_AM_ET/article.md",
+      "note_sha256": "58ffd77bed5e322e6fae84a74f891d0c54d6a58d843044ea8ee5787797f13333",
+      "publication_time_as_labeled": "2026-08-12T07:00:00-04:00",
+      "publication_timezone": "America/New_York",
+      "header": {
+        "line": 1,
+        "extract": "# Founder's Note: Wed, August 12, 2026 at 7:00 AM ET"
+      },
+      "publication": {
+        "line": 3,
+        "extract": "**Date:** Wednesday, August 12, 2026 at 07:00 AM   "
+      },
+      "table_header": {
+        "line": 114,
+        "extract": "|  | /ESU26 | SPX | SPY | NDX | QQQ | RUT | IWM |"
+      },
+      "vol_trigger_extract": {
+        "line": 122,
+        "extract": "| SG Volatility Trigger\u2122: | $7742.7 | $7720 | $770 | $29500 | $718 | $2990 | $299 |"
+      },
+      "note_spx_vt_matches_csv": true
+    }
+  ],
+  "publication_vs_capture_caveat": "All selected VT values match same-date notes labeled 07:00 AM ET, supporting pre-open publication. The levels CSV does not preserve captured-at or revision history. Publication labeling does not prove that the local engine possessed the value at the open; some September rows were appended later, documented in docs/hiro_watch/session_2026-09-08.md.",
+  "raw_timestamp_convention": "SPX parquet stores min/open/high/low/close and discards original timestamps. Use first min=570 OPEN to define opening cohort, not first-bar CLOSE. Raw interval-start versus interval-end semantics are not certified by the cache. Carousel assumes start labels: five-minute [t,t+5) is available at t+5; next stored one-minute open is a reference price, not an option fill. min=960 is excluded from the 390-label RTH convention.",
+  "spx_path_template": "/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/{date}.parquet",
+  "spy_volume_overlap": {
+    "available": false,
+    "last_cached_date": "2026-06-11",
+    "paths_checked": [
+      "/Users/dgrissen/Dev/central_trade_data/databento/spy_ohlcv_1m/spy_ohlcv_1m.parquet",
+      "/Users/dgrissen/Dev/central_trade_data/databento/equities_1m/SPY/full_history.parquet"
+    ]
+  }
+}

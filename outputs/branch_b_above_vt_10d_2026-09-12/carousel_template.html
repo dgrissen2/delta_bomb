@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Branch B · Above VT · Entry dashboard</title>
+<script src="plotly.min.js"></script>
+<style>
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;margin:0;background:#fafafa;color:#222}
+header{background:#1b1b2f;color:#fff;padding:10px 16px} header h1{margin:0;font-size:17px}
+header p{margin:4px 0 0;font-size:12px;color:#bbb}
+.bar{position:sticky;top:0;background:#fff;border-bottom:1px solid #ddd;padding:8px 16px;z-index:9;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+button{font-size:14px;padding:6px 12px;cursor:pointer;border:1px solid #888;border-radius:6px;background:#fff;color:#222}
+button:hover{background:#f0f0f4}button:disabled{opacity:.4;cursor:default}
+[hidden]{display:none!important}
+#empty-state{padding:40px 16px;color:#666}
+#filter-count{font-size:12px;color:#555}
+.entry-type-control{display:inline-flex;align-items:center;gap:5px}
+.info-button{border:1px solid #8b95a5;border-radius:50%;width:20px;height:20px;padding:0;font:600 13px Georgia,serif;color:#52627a;line-height:18px}
+.info-button:hover{background:#edf2fa;color:#1565c0}
+#entry-info{width:min(570px,calc(100vw - 64px));border:1px solid #ccd1dc;border-radius:10px;padding:22px 24px;color:#222;box-shadow:0 12px 60px #0003}
+#entry-info::backdrop{background:#1b1b2f66}
+#entry-info h2{margin:0 34px 14px 0;font-size:20px}
+#entry-info p,#entry-info li{font-size:14px;line-height:1.6}
+#entry-info ul{padding-left:20px}
+#info-close{position:absolute;right:12px;top:12px;border:0;font-size:22px;padding:0 6px;color:#666}
+select{font-size:13px;padding:6px;border:1px solid #aaa;border-radius:5px;background:#fff}
+#counter{font-size:13px;color:#333;min-width:44px}
+.slide{padding:8px 16px;max-width:1640px}
+.display-controls{display:flex;gap:16px;align-items:center;flex-wrap:wrap;font-size:12px;padding:8px 16px;border-bottom:1px solid #e5e5e5;background:#fff}
+label{cursor:pointer;white-space:nowrap}input{accent-color:#1b1b2f;vertical-align:middle}
+label.disabled{opacity:.4;cursor:default}
+#day-info{font-size:12px;color:#555;padding:3px 0 8px;display:flex;gap:18px;flex-wrap:wrap}
+#chart{height:860px;width:100%;background:#fff}
+details{margin:10px 16px;font-size:12px;max-width:1608px;line-height:1.65}
+summary{cursor:pointer;font-weight:600}details p{margin:6px 0}a{color:#1565c0}
+.entry-wrap{padding:0 16px 20px;max-width:1608px;overflow:auto}
+.entry-wrap h2{font-size:14px;margin:8px 0}.entry-wrap p{font-size:12px;color:#666;margin:6px 0}
+table{border-collapse:collapse;width:100%;font-size:12px;background:#fff;white-space:nowrap}
+th,td{padding:8px 10px;border-bottom:1px solid #e5e5e5;text-align:right}th{font-weight:600;background:#f1f2f5}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+.thrust{color:#1b5e20}.staircase{color:#d66a00}.muted{color:#777}
+#fatal{color:#a00000;padding:16px;display:none}
+footer{font-size:11px;color:#666;padding:12px 16px 20px;border-top:1px solid #ddd}
+@media(max-width:850px){#chart{height:700px}.bar{gap:6px}.slide{padding:8px}.display-controls{gap:9px}}
+</style></head><body>
+<header><h1 id="heading"></h1><p id="intro"></p>
+<p>Five-minute SPX candles · EMA5 green / EMA9 red / EMA20 blue · VT dotted · ADX diagnostic. ▲ = entry reference. Use ← / → keys.</p></header>
+<div class="bar">
+<label for="mode-select">Mode:</label><select id="mode-select" aria-label="Entry mode">
+<option value="thrust">Thrust only</option><option value="staircase" selected>Thrust + staircase</option>
+</select>
+<button id="info-mode" class="info-button" type="button" aria-label="About the selected entry mode" title="About this entry mode">i</button>
+<button id="prev" aria-label="Previous session">◀ Prev</button><button id="next" aria-label="Next session">Next ▶</button>
+<span id="counter" aria-live="polite"></span><select id="date-select" aria-label="Choose session"></select>
+<span id="filter-count" aria-live="polite"></span>
+</div>
+<div class="display-controls">
+<span class="muted">Show:</span>
+<span class="entry-type-control"><label><input id="show-thrust" type="checkbox" checked> <span class="thrust">▲ Thrust entries</span></label><button id="info-thrust" class="info-button" type="button" aria-label="About thrust entries" title="About thrust entries">i</button></span>
+<span class="entry-type-control"><label id="staircase-control"><input id="show-staircase" type="checkbox" checked> <span class="staircase">▲ Staircase entries</span></label><button id="info-staircase" class="info-button" type="button" aria-label="About staircase entries" title="About staircase entries">i</button></span>
+<label><input id="show-labels" type="checkbox" checked> Entry times</label>
+<label><input id="show-ema" type="checkbox" checked> EMA 5 / 9 / 20</label>
+<label><input id="show-vt" type="checkbox" checked> Vol Trigger</label>
+<label><input id="show-raw" type="checkbox"> All qualifying bars</label>
+</div>
+<div id="fatal"></div>
+<dialog id="entry-info" aria-labelledby="info-title"><button id="info-close" type="button" aria-label="Close entry explanation">×</button><h2 id="info-title"></h2><div id="info-body"></div></dialog>
+<div id="empty-state" hidden role="status">No dates have entries matching the selected types. Select an entry type to continue.</div>
+<div id="chart-panel" class="slide"><div id="day-info"></div><div id="chart"></div></div>
+<div id="entry-panel" class="entry-wrap"><h2 id="entry-heading"></h2><p>References mark the next stored one-minute open after the completed signal interval. These are candidate put-sale times, not option fills.</p>
+<table><thead><tr><th>Admission</th><th>Signal interval</th><th>Available / entry reference</th><th>SPX reference</th><th>vs VT</th><th>Break bp</th><th>Fan / ATR</th><th>Extension / ATR</th><th>EMA5 Δ₂ / ATR</th></tr></thead><tbody id="entry-table"></tbody></table>
+</div>
+<details><summary>Rules, timing and data</summary>
+<p><b>Common rules:</b> EMA5 &gt; EMA9 &gt; EMA20, both adjacent gaps widening, total EMA5−EMA20 fan ≥ 0.10 ATR, green signal candle, and close no more than 1.50 ATR above EMA5. The original VWAP condition is omitted from both SPX price-only versions. ADX is display only.</p>
+<p><b>Thrust:</b> close at least 10 basis points above the highest candle body of the preceding three bars (or the available two at the session start); basis points use the current close as denominator.</p>
+<p><b>Staircase:</b> an additional admission: three rising closes, the two prior candles green with bodies larger than their combined wicks, close at/above the prior body-top, and EMA5 rising at least 0.60 ATR over two bars. A bar passing both is labeled thrust.</p>
+<p><b>Timing:</b> entry decisions 10:00–14:30 ET inclusive. Candles are labeled by assumed interval start; a 09:55–10:00 signal becomes available at 10:00, with the stored 10:00 one-minute open as its reference. The cache does not retain enough timestamp metadata to independently certify start/end labels; no executable fill or return is asserted.</p>
+<p><b>One marker per run:</b> each version emits the first qualifying bar and rearms after any failed condition. Staircase can start or bridge a run, so it can also suppress a later thrust marker. The mode selects the rule package; entry-type checkboxes filter its displayed entries and dates without recalculating rules. “All qualifying bars” adds small circles at signal closes, including repeats of the selected types, within the entry window.</p>
+<p><b>Dates:</b> the underlying sample is the latest ten complete cached sessions through September 11, 2026 whose 09:30 open is strictly above same-date VT. The carousel and date selector show only sessions with entries matching the current mode and selected entry types. All ten remain in the research data. No intraday VT or SG-index gate. Averages and ATR use earlier available regular-session history, including intervening below-VT days.</p>
+<p><b>Scope:</b> entries only; fixed-time baseline skipped. No HIRO, volume, VWAP substitute, exits, option simulation or threshold search. Ten dates are a visual prototype, not an accuracy estimate.</p>
+<p><a href="selected_days.csv">Selected days</a> · <a href="entries.csv">Entry data</a> · <a href="bar_diagnostics.csv">Every bar’s conditions</a> · <a href="README.md">Research notes</a> · <a href="manifest.json">Data manifest</a></p>
+</details>
+<footer>Separate research slug: branch_b_above_vt_10d_2026-09-12 · Chart layout and colors taken from the requested saved BVT carousel; indicators labeled for this EMA experiment.</footer>
+<script>
+'use strict';
+const DATA = __PAYLOAD__;
+const initialHash = new URLSearchParams(location.hash.slice(1));
+let variant = initialHash.get('mode')==='thrust' ? 'thrust' : 'staircase';
+const $ = id => document.getElementById(id);
+const time = m => `${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`;
+const number = (v,n=2) => v == null || !Number.isFinite(v) ? '—' : v.toFixed(n);
+const signed = v => `${v>=0?'+':''}${number(v)}`;
+const checked = id => $(id).checked;
+const colors = {thrust:'#1b5e20',staircase:'#d66a00'};
+const commonHelp='<p><b>Shared trend requirements:</b> EMA5 is above EMA9, which is above EMA20; both gaps are widening; the total fan is at least 0.10 ATR. The signal candle is green and its close is no more than 1.50 ATR above EMA5.</p>';
+const entryHelp={
+  thrust:{title:'Thrust — a decisive upward break',body:
+    '<p>Looks for a strong push out of recent congestion while the five-minute trend is expanding upward. For Branch B, this identifies a candidate time to sell the first put ahead of a possible further rise.</p>'+
+    '<p><b>What qualifies:</b> the completed five-minute close must be at least 10 basis points (0.10%) above the highest candle body of the previous three bars. Bodies use open/close prices, not the wick highs.</p>'+commonHelp+
+    '<p><b>When it fires:</b> the first qualifying candle in a run, after that candle completes. Another entry requires a failed condition followed by a fresh qualification.</p>'},
+  staircase:{title:'Staircase — a steady climb in steps',body:
+    '<p>Looks for an orderly upward climb whose individual steps may be too small to pass the thrust threshold. It adds a gradual-trend entry to the same bullish five-minute setup.</p>'+
+    '<ul><li>Three consecutive closes rise, and the current close reaches or exceeds the prior three-bar body-top.</li><li>The two preceding candles are green, with each body larger than its combined upper and lower wicks.</li><li>EMA5 rises at least 0.60 ATR over two bars.</li></ul>'+commonHelp+
+    '<p><b>How the combined mode works:</b> either thrust or staircase can start a qualifying run. A bar passing both is labeled thrust. An earlier staircase can replace a later thrust entry in the same run.</p>'}
+};
+function showEntryInfo(type){
+  const help=entryHelp[type];
+  $('info-title').textContent=help.title;
+  $('info-body').innerHTML=help.body+'<p class="muted">This explains the entry type overall. This prototype uses SPX prices, omits VWAP, and shows candidate times rather than option fills or proven accuracy.</p>';
+  $('entry-info').showModal();
+}
+$('info-mode').onclick=()=>showEntryInfo(variant);
+$('info-thrust').onclick=()=>showEntryInfo('thrust');
+$('info-staircase').onclick=()=>showEntryInfo('staircase');
+$('info-close').onclick=()=>$('entry-info').close();
+$('entry-info').addEventListener('click',e=>{
+  const box=$('entry-info').getBoundingClientRect();
+  if(e.target===$('entry-info')&&(e.clientX<box.left||e.clientX>box.right||e.clientY<box.top||e.clientY>box.bottom))$('entry-info').close();
+});
+const modeName = () => variant==='thrust' ? 'Thrust only' : 'Thrust + staircase';
+let index = 0;
+let filteredDays = [];
+let renderVersion = 0;
+const dateSelect = $('date-select');
+function matchingEntries(day){
+  return day.events.filter(e=>e.variant===variant && checked(`show-${e.kind}`));
+}
+function rebuildDates(preferredDate=filteredDays[index]?.date){
+  filteredDays=DATA.days.filter(day=>matchingEntries(day).length>0);
+  index=Math.max(0,filteredDays.findIndex(day=>day.date===preferredDate));
+  dateSelect.replaceChildren();
+  filteredDays.forEach(day=>{
+    const n=matchingEntries(day).length;
+    dateSelect.add(new Option(`${day.date} · ${n} ${n===1?'entry':'entries'}`,day.date));
+  });
+  const empty=filteredDays.length===0;
+  dateSelect.disabled=empty;
+  $('prev').disabled=filteredDays.length<2; $('next').disabled=filteredDays.length<2;
+  $('empty-state').hidden=!empty;
+  $('chart-panel').hidden=empty; $('entry-panel').hidden=empty;
+  $('filter-count').textContent=`${filteredDays.length} of ${DATA.days.length} dates have matching entries`;
+}
+function updateModeControls(){
+  $('mode-select').value=variant;
+  if(variant==='thrust')$('show-staircase').checked=false;
+  $('show-staircase').disabled=variant==='thrust';
+  $('staircase-control').classList.toggle('disabled',variant==='thrust');
+}
+function traceLine(x,y,title,color,width=1.7,dash='solid',axis='y'){
+  return {type:'scatter',mode:'lines',x,y,name:title,line:{color,width,dash},
+    xaxis:axis==='y'?'x':'x2',yaxis:axis,hovertemplate:`%{x}<br>${title}: %{y:.2f}<extra></extra>`};
+}
+function markerHover(e){
+  return `<b>${e.kind==='thrust'?'THRUST':'STAIRCASE'}</b><br>`+
+    `Signal ${time(e.signal_min)}–${time(e.known_min)}<br>`+
+    `Available ${time(e.known_min)} ET<br>Entry reference ${time(e.entry_reference_min)}: ${number(e.entry_reference_px)}<br>`+
+    `Break ${number(e.break_bps,1)} bp · fan ${number(e.fan_atr)} ATR<br>`+
+    `Extension ${number(e.ext_atr)} ATR · EMA5 Δ₂ ${number(e.slope2_atr)} ATR<br>`+
+    `SPX price reference; no option fill`;
+}
+async function render(){
+  const version=++renderVersion;
+  window.carouselReady=false;
+  const name=modeName();
+  const visibleTotal=filteredDays.reduce((sum,day)=>sum+matchingEntries(day).length,0);
+  $('heading').textContent=`Branch B · Above VT · ${name}`;
+  $('intro').textContent=`${visibleTotal} matching entry references · ${filteredDays.length} of ${DATA.days.length} sampled sessions · SPX price-only transfer; original VWAP requirement omitted`;
+  document.title=`Branch B · Above VT · ${name}`;
+  if(!filteredDays.length){
+    $('counter').textContent='0 / 0';
+    history.replaceState(null,'',`#mode=${variant}`);
+    window.carouselReady=true;
+    return;
+  }
+  const day=filteredDays[index], bars=day.bars, x=bars.map(b=>time(b.min5));
+  const events=day.events.filter(e=>e.variant===variant);
+  const shown=matchingEntries(day);
+  dateSelect.value=day.date;
+  $('counter').textContent=`${index+1} / ${filteredDays.length}`;
+  history.replaceState(null,'',`#mode=${variant}&date=${day.date}`);
+  $('day-info').innerHTML=`<span>09:30 open <b>${number(day.open)}</b></span><span>VT <b>${number(day.vt,0)}</b></span>`+
+    `<span>Open − VT <b>${signed(day.open-day.vt)} pts</b></span><span>Entry window <b>10:00–14:30 ET</b></span>`+
+    `<span>${shown.filter(e=>e.kind==='thrust').length} thrust · ${shown.filter(e=>e.kind==='staircase').length} staircase shown</span>`;
+  const data=[{type:'candlestick',x,open:bars.map(b=>b.open),high:bars.map(b=>b.high),
+    low:bars.map(b=>b.low),close:bars.map(b=>b.close),name:'SPX',showlegend:false,
+    increasing:{line:{color:'#26a69a'}},decreasing:{line:{color:'#ef5350'}},line:{width:1.3},xaxis:'x',yaxis:'y',
+    text:bars.map(b=>`<b>${day.date} ${time(b.min5)}–${time(b.min5+5)} ET</b><br>`+
+      `O ${number(b.open)} · H ${number(b.high)}<br>L ${number(b.low)} · C ${number(b.close)}<br>`+
+      `Completed ${time(b.min5+5)} · ATR ${number(b.atr)}`),hoverinfo:'text'}];
+  if(checked('show-ema')){
+    data.push(traceLine(x,bars.map(b=>b.jaw),'EMA20 · jaw','#1565c0'));
+    data.push(traceLine(x,bars.map(b=>b.teeth),'EMA9 · teeth','#c62828'));
+    data.push(traceLine(x,bars.map(b=>b.lips),'EMA5 · lips','#2e7d32'));
+  }
+  if(checked('show-vt')) data.push(traceLine(x,x.map(()=>day.vt),'Vol Trigger','#111111',2.2,'dot'));
+  for(const kind of ['thrust','staircase']){
+    const subset=shown.filter(e=>e.kind===kind);
+    if(subset.length) data.push({type:'scatter',mode:checked('show-labels')?'markers+text':'markers',
+      x:subset.map(e=>time(e.entry_reference_min)),y:subset.map(e=>e.entry_reference_px),
+      marker:{symbol:'triangle-up',size:15,color:colors[kind],line:{color:'#fff',width:1}},
+      name:kind==='thrust'?'Thrust entry':'Staircase entry',text:subset.map(e=>time(e.entry_reference_min)),
+      textposition:'bottom center',textfont:{size:10,color:colors[kind]},
+      hovertext:subset.map(markerHover),hoverinfo:'text',xaxis:'x',yaxis:'y'});
+  }
+  if(checked('show-raw')){
+    const raw=bars.filter(b=>(variant==='thrust'?b.thrust_ok:b.staircase_ok)&&
+      b.known_min>=600&&b.known_min<=870&&checked(b.thrust_raw?'show-thrust':'show-staircase'));
+    data.push({type:'scatter',mode:'markers',x:raw.map(b=>time(b.min5)),y:raw.map(b=>b.close),
+      name:'Qualifying signal close (incl. repeats)',marker:{symbol:'circle-open',size:7,color:'#607d8b',line:{width:1.5}},
+      hovertext:raw.map(b=>`Qualifying bar ${time(b.min5)}–${time(b.known_min)}<br>Signal close ${number(b.close)}<br>`+
+        `Available ${time(b.known_min)} · break ${number(b.break_bps,1)} bp<br>Includes repeat qualifications; not another entry`),
+      hoverinfo:'text',xaxis:'x',yaxis:'y'});
+  }
+  data.push(traceLine(x,bars.map(b=>b.adx),'ADX(14)','#6a1b9a',1.8,'solid','y2'));
+  const layout=JSON.parse(JSON.stringify(DATA.layout));
+  layout.title.text=`<b>${day.date}</b>   ·   5-min   ·   ${name}   ·   ${shown.length} ${shown.length===1?'entry':'entries'}`;
+  layout.uirevision=day.date;
+  layout.xaxis.type='category'; layout.xaxis.categoryorder='array'; layout.xaxis.categoryarray=x;
+  layout.xaxis2.categoryorder='array'; layout.xaxis2.categoryarray=x;
+  // Keep VT visible when enabled; hiding it restores the tighter candle scale.
+  const low=Math.min(...bars.map(b=>b.low),checked('show-vt')?day.vt:Infinity);
+  const high=Math.max(...bars.map(b=>b.high),checked('show-vt')?day.vt:-Infinity);
+  const pad=(high-low)*.09;
+  layout.yaxis.range=[low-pad,high+pad];
+  layout.height=window.innerWidth<850?700:860;
+  await Plotly.react('chart',data,layout,{scrollZoom:true,displaylogo:false,responsive:true});
+  if(version!==renderVersion)return;
+  $('entry-heading').textContent=`${events.length} ${events.length===1?'entry':'entries'} · ${shown.length} visible`;
+  $('entry-table').innerHTML=shown.length ? shown.map(e=>`<tr><td class="${e.kind}">▲ ${e.kind==='thrust'?'Thrust':'Staircase'}</td>`+
+    `<td>${time(e.signal_min)}–${time(e.known_min)}</td><td>${time(e.known_min)} ET</td>`+
+    `<td>${number(e.entry_reference_px)}</td><td>${signed(e.entry_reference_px-day.vt)}</td>`+
+    `<td>${number(e.break_bps,1)}</td><td>${number(e.fan_atr)}</td><td>${number(e.ext_atr)}</td><td>${number(e.slope2_atr)}</td></tr>`).join(''):
+    `<tr><td colspan="9" class="muted">No matching entries.</td></tr>`;
+  window.carouselReady=true;
+}
+function safeRender(){render().catch(error=>{$('fatal').style.display='block';$('fatal').textContent=`Chart error: ${error.message}`;console.error(error);});}
+function step(delta){if(!filteredDays.length)return;index=(index+delta+filteredDays.length)%filteredDays.length;safeRender();}
+$('prev').onclick=()=>step(-1); $('next').onclick=()=>step(1);
+dateSelect.onchange=()=>{index=filteredDays.findIndex(day=>day.date===dateSelect.value);safeRender();};
+$('mode-select').onchange=()=>{
+  const preferredDate=filteredDays[index]?.date;
+  variant=$('mode-select').value;
+  // A newly selected package starts with all of its applicable entry types visible.
+  $('show-thrust').checked=true; $('show-staircase').checked=variant==='staircase';
+  updateModeControls(); rebuildDates(preferredDate); safeRender();
+};
+document.querySelectorAll('input[type="checkbox"]').forEach(el=>el.onchange=()=>{
+  if(el.id==='show-thrust'||el.id==='show-staircase')rebuildDates();
+  safeRender();
+});
+document.addEventListener('keydown',e=>{
+  if($('entry-info').open)return;
+  if(['SELECT','TEXTAREA'].includes(e.target.tagName)||
+     (e.target.tagName==='INPUT'&&e.target.type!=='checkbox'))return;
+  if(e.key==='ArrowRight'){e.preventDefault();step(1);}if(e.key==='ArrowLeft'){e.preventDefault();step(-1);}
+});
+updateModeControls();
+rebuildDates(initialHash.get('date')||location.hash.slice(1));
+safeRender();
+</script></body></html>

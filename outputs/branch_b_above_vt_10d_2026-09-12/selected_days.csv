@@ -1,0 +1,11 @@
+date,open,vt,sg_index,levels_csv_row,complete,data_issue,source_path,source_sha256
+2026-08-12,7765.46,7720.0,3.4519,2186,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-12.parquet,216775574672b1fa5a890d0652fd0c4ed7d286f25662b6611d872429227ee36f
+2026-08-13,7763.18,7720.0,4.0795,2187,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-13.parquet,2109e0e19801ae4483c173d6c6dac5feb15139f3740d7c6f9800231cc815a8a7
+2026-08-14,7806.6,7745.0,6.0882,2188,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-14.parquet,0d610bc0fbfa45030e38a711f2b05bbc10e2a1acf46032d23304f060ed06a5ce
+2026-08-17,7790.68,7765.0,3.9985,2189,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-17.parquet,d979050c0b8f28711ad556133b16328455ec48b365d294a17ba3346acb79e0fd
+2026-08-25,7676.66,7660.0,0.1767,2195,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-25.parquet,cf26a73077e87e28345f4e6950ce4fd1ae171d9ebe1d257ac21b235121bbca63
+2026-08-27,7710.34,7675.0,1.437,2197,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-27.parquet,69c4a216ed61fe17e87c2e148a75afdb09669ba215812612b88a7eef319c1bbe
+2026-08-28,7735.17,7700.0,2.6646,2198,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-08-28.parquet,32a4068b62c4728e81fea15efd33c90c4a1a9eb7ad03a173b36056b60ca6fbcd
+2026-09-03,7686.71,7675.0,0.88,2202,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-09-03.parquet,6876e442ae2c8191d96fc41d7c1e0bfc934a02c5d3ad391f364ebb86d4080149
+2026-09-04,7750.1900000000005,7720.0,4.391,2203,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-09-04.parquet,372c9ee6a9569094f90c4d6e118715e48bd3b9aa12b121c228f44a7e3601eff2
+2026-09-08,7717.81,7715.0,1.95,2204,True,,/Users/dgrissen/Dev/central_trade_data/thetadata/spx_index_1m_ohlc/2026-09-08.parquet,74f15b0edd0f33d31d0b9b315b61b42d64f6cbdc41d2b4daa55ec2508cbde727
