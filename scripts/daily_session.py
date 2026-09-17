@@ -25,6 +25,7 @@ import gzip
 import hashlib
 import json
 import logging
+import os
 import shutil
 import subprocess
 import functools
@@ -63,7 +64,8 @@ def hiro_capture(day: str, stage: Path) -> dict:
         if cap and Path(cap.get("series_csv", "")).exists():
             log.info("reusing staged capture in %s", stage)
             return cap
-    cmd = [str(HIRO_PY), "-m", "hiro_tickers.historical_backfill", "--port", "9222",
+    port = os.environ.get("BROWSER_CDP_PORT", "9222")        # set by the browser-pool lease wrapper
+    cmd = [str(HIRO_PY), "-m", "hiro_tickers.historical_backfill", "--port", port,
            "--end-date", day, "--sessions", "1", "--out-dir", str(stage)]
     log.info("capture → %s", stage)
     r = subprocess.run(cmd, cwd=HIRO_FINDER, capture_output=True, text=True)
@@ -72,7 +74,7 @@ def hiro_capture(day: str, stage: Path) -> dict:
     m = json.load(open(stage / "manifest.json")) if (stage / "manifest.json").exists() else {}
     cap = m.get("sessions", {}).get(day)
     if r.returncode != 0 or not cap or cap.get("status") not in (None, "available", "success"):
-        refuse(f"HIRO capture for {day} failed (exit {r.returncode}); is Chrome on :9222 logged in to SpotGamma?")
+        refuse(f"HIRO capture for {day} failed (exit {r.returncode}); is Chrome on :{port} logged in to SpotGamma?")
     return cap
 
 
