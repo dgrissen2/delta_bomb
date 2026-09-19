@@ -1,5 +1,10 @@
 # B06 / sector IV: fixed-rule expansion from fifty to 150 dates
 
+**Audit correction (19 September 2026): these frozen tables describe days opening
+above VT, not entries continuously above VT. The audit found 80 below-VT entries
+and 54 days that crossed VT. Read [the audit and corrected scope comparisons](reviews_2026-09-19/AUDIT_FINDINGS.md)
+before interpreting these results. Original tables are preserved.**
+
 Completed 19 September 2026. Comparison-set and sampling-protocol commit: **998c31b**.
 Central data/provenance commit: **b6b5057** in central_trade_data.
 All four IV policies are retained, including bid-IV recovery. The original five-row table
@@ -11,21 +16,22 @@ not change a successful first move. Accuracy is first priority; opportunity coun
 ## CIO reading
 
 **The apparent IV advantage did not carry to the additional data.** On the 100 additional dates,
-plain B06 reached +5 first on 371/666 signals, 55.7%. All four frozen IV requirements did worse:
+plain B06 reached +5 first on 371/666 signals, 55.7%. All four frozen IV requirements had lower observed hit rates:
 50.0% original, 51.8% bid-IV recovery, 52.8% with the 100% guard and 50.5% with the 50% guard. None beat plain B06
 in the pooled 150 days either. The filters reduced opportunities without increasing observed
 accuracy. The earlier 50-day percentages reproduced exactly; they were not corrected away.
 They were an encouraging result that failed this extension check.
 
-The result is not explained solely by adding 2025. On the 34 newly added 2026 dates,
+The 34 newly added 2026 dates also provide no positive replication evidence. On those dates,
 plain B06 scored 141/224, 62.9%; the four filters scored 58.0%, 58.6%, 55.3% and 54.5%.
+This small subgroup cannot separate a regime effect from sample fragility.
 The positive-looking pooled 2026 rows further below include the original 50 dates and must
 not be mistaken for a successful replication within 2026.
 
 These results do not support making any of these four IV conditions a required B06 filter.
 For the additional 100 days, the original policy’s uplift interval is −11.0 to −0.4 percentage points; the other three
 additional-100-day intervals include zero. All pooled-150-day intervals include zero. This does not establish
-that every possible IV idea is useless, but the original 72–76% observations are not a
+that IV is harmful or that every possible IV idea is useless. The original 69.6–75.9% observations are not a
 reliable basis for expecting higher accuracy from these unchanged rules. We did not select
 new thresholds, discard difficult dates or redefine success to recover the earlier result.
 
