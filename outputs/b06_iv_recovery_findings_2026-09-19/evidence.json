@@ -1,0 +1,1368 @@
+{
+  "schema_version": 1,
+  "title": "B06 midpoint IV recovery: archived experiment and findings evidence",
+  "documented_on": "2026-09-19",
+  "scope": "Documentation of a completed in-memory empirical run; no production/dashboard mutation.",
+  "protocol": {
+    "name": "B06 midpoint IV recovery diagnostic",
+    "date": "2026-09-19",
+    "scope": "Same fifty sampled days, 374 parents, eleven sectors; no new observations, no file mutations. Previously examined sample: exploratory sensitivity study, not out-of-sample validation.",
+    "score": "+5 SPX points before -15 within original 60 minutes; no post-target assessment.",
+    "variants": {
+      "original": "Existing positive finite ordered bid/mid/ask IV and quote rules; reproduce saved ATM measures and original classifications.",
+      "midpoint": "Drop only bid-IV validity and bid-IV<=mid-IV checks. Keep strictly positive finite bid quote, midpoint and ask, ordered quotes, positive finite midpoint/ask IV with midpoint IV<=ask IV; original endpoint identity, underlying age0..60 seconds, expiry8..65DTE.",
+      "guarded_100": "Use midpoint-selected strikes/expirations; reject the whole ATM minute if any selected quote has spread/midpoint>1.00 or lacks positive ordered quote at the immediately preceding native minute or shows bid<0.5*previous_bid while ask>=0.9*previous_ask OR ask>2*previous_ask while bid<=1.1*previous_bid. Never search for farther strikes to evade these guards.",
+      "guarded_50": "Same as guarded_100 except spread/midpoint<=0.50; predeclared sensitivity only."
+    },
+    "primary": "guarded_100 is the primary candidate. No threshold search or promotion based on greatest observed hit rate.",
+    "measurement": "Identical log-strike variance interpolation, calendar30-day total variance interpolation and average call/put variance. All30 minutes T-35..T-6 required. Negative second-half slope and negative change in slope; six of eleven, missing-sector bounds yes/no/unknown unchanged. Invalid bid IV yields no invented bid-side uncertainty bound.",
+    "quality_evaluation": "Recoverable sector-minute and sector/event windows, previously valid observations lost/changed, same-contract preceding/following-minute diagnostics for audit only, unchanged quoted prices, source width and shock. No lookahead in admissibility.",
+    "outcome_evaluation": "All four variants' broad falling and accelerating groups, target/adverse/neither, retained/added/lost entries and successful targets, active days, frozen original-membership matched cohorts, paired whole-date 10000-draw bootstrap seed20260919 across all50days. No independent-entry assumptions; no reoptimization.",
+    "validation": "Original ATM baseline reproduced from raw data; original239/51/84 baseline and93/67 selected. Synthetic guard boundary tests, missing-prior handling, no fallback and causal invariance; check original source hashes before/after."
+  },
+  "protocol_sha256": "1faf009c2b8624dd87f8ebd28d9be8cfe6902a786411348e170c6295959e3cee",
+  "experiment_source": "import hashlib,importlib.util,json,time\nfrom pathlib import Path\nfrom concurrent.futures import ThreadPoolExecutor,as_completed\nimport numpy as np\nimport pandas as pd\nROOT=Path('/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13')\nVARIANTS=['original','midpoint','guarded_100','guarded_50']\nSYMS=['XLC','XLY','XLP','XLE','XLF','XLV','XLI','XLB','XLRE','XLK','XLU']\nEPS=1e-12\nspec=importlib.util.spec_from_file_location('frozen_surface',ROOT/'surface.py')\nsurf=importlib.util.module_from_spec(spec);spec.loader.exec_module(surf)\ndef digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()\ndef safe(x):\n if isinstance(x,dict):return {str(k):safe(v) for k,v in x.items()}\n if isinstance(x,(list,tuple)):return [safe(v) for v in x]\n if isinstance(x,np.ndarray):return safe(x.tolist())\n if isinstance(x,(np.integer,np.bool_)):return x.item()\n if isinstance(x,(float,np.floating)):return float(x) if np.isfinite(x) else None\n return x\ndef emit(tag,x):print(tag,json.dumps(safe(x),allow_nan=False),flush=True)\ndef add_quality(p):\n p=p.sort_values(['expiration','right','strike','timestamp']).reset_index(drop=True).copy()\n p['row_id']=np.arange(len(p))\n g=p.groupby(['expiration','right','strike'],sort=False)\n pb,pa,pt=g.bid.shift(1),g.ask.shift(1),g.timestamp.shift(1)\n prev=((p.timestamp-pt).dt.total_seconds().eq(60)&np.isfinite(pb)&np.isfinite(pa)&pb.gt(0)&pa.ge(pb))\n p['previous_ok']=prev\n p['quote_shock']=prev&(((p.bid<.5*pb)&(p.ask>=.9*pa))|((p.ask>2*pa)&(p.bid<=1.1*pb)))\n p['width']=(p.ask-p.bid)/p.midpoint\n p['price_update']=prev&(p.bid.ne(pb)|p.ask.ne(pa))\n oldv=p.valid.to_numpy()\n fields=['strike','bid','midpoint','ask','underlying_price','implied_vol','ask_implied_vol']\n p['mid_valid']=(np.isfinite(p[fields])&p[fields].gt(0)).all(axis=1)&p.endpoint_match&p.bid.le(p.midpoint)&p.midpoint.le(p.ask)&p.implied_vol.le(p.ask_implied_vol)&p.reported_underlying_age_seconds.between(0,60)&p.dte.between(8,65)&p.right.isin(['C','P'])\n assert (~oldv|p.mid_valid.to_numpy()).all()\n p['x']=np.log(p.strike/p.underlying_price)\n pv,nv,nt=g.implied_vol.shift(1),g.implied_vol.shift(-1),g.timestamp.shift(-1)\n neighbors=(p.timestamp-pt).dt.total_seconds().eq(60)&(nt-p.timestamp).dt.total_seconds().eq(60)&np.isfinite(pv)&np.isfinite(nv)&pv.gt(0)&nv.gt(0)\n p['neighbor_deviation']=np.where(neighbors,100*(p.implied_vol-(pv+nv)/2).abs(),np.nan)\n p['unchanged_quotes']=prev&p.bid.eq(pb)&p.ask.eq(pa)\n p['iv_changed']=prev&p.implied_vol.ne(pv)\n return p\ndef make_surface(p,valid_col,grid):\n q=p[p[valid_col]].copy()\n keys=['timestamp','right','dte']\n low=q[q.x.le(0)].sort_values('x',kind='stable').groupby(keys,sort=False).tail(1)\n high=q[q.x.ge(0)].sort_values('x',kind='stable').groupby(keys,sort=False).head(1)\n f=['underlying_price','underlying_timestamp','x','implied_vol','width','previous_ok','quote_shock','price_update','row_id']\n pairs=low[keys+f].merge(high[keys+f],on=keys,suffixes=('_lo','_hi'),validate='one_to_one')\n pairs=pairs[pairs.underlying_price_lo.eq(pairs.underlying_price_hi)&pairs.underlying_timestamp_lo.eq(pairs.underlying_timestamp_hi)].copy()\n gap=(pairs.x_hi-pairs.x_lo).to_numpy()\n weight=np.divide(pairs.x_hi.to_numpy(),gap,out=np.ones(len(pairs)),where=gap!=0)\n pairs['variance']=weight*pairs.implied_vol_lo**2+(1-weight)*pairs.implied_vol_hi**2\n pairs['max_width']=pairs[['width_lo','width_hi']].max(axis=1)\n pairs['prior_ok']=pairs.previous_ok_lo & pairs.previous_ok_hi\n pairs['shock']=pairs.quote_shock_lo | pairs.quote_shock_hi\n pairs['updated']=pairs.price_update_lo | pairs.price_update_hi\n tenors=np.sort(p.loc[p.dte.between(8,65),'dte'].unique())\n if 30 in tenors:tenors=np.array([30]);weights=np.array([1.])\n else:\n  lower=tenors[tenors<30];upper=tenors[tenors>30]\n  assert len(lower) and len(upper)\n  tenors=np.array([lower[-1],upper[0]])\n  weights=np.array([tenors[1]-30,30-tenors[0]])/(tenors[1]-tenors[0])\n arr=pd.DataFrame(index=grid)\n variances=[];widths=[];prior=[];shocks=[];updates=[];spots=[];utimes=[]\n for dte,w in zip(tenors,weights):\n  for right in ['C','P']:\n   z=pairs[pairs.dte.eq(dte)&pairs.right.eq(right)].set_index('timestamp').reindex(grid)\n   variances.append(w*dte/30*z.variance/2)\n   widths.append(z.max_width)\n   prior.append(z.prior_ok.fillna(False).astype(bool))\n   shocks.append(z.shock.fillna(True).astype(bool))\n   updates.append(z.updated.fillna(False).astype(bool))\n   spots.append(z.underlying_price_lo);utimes.append(z.underlying_timestamp_lo)\n all_variances=pd.concat(variances,axis=1)\n valid=all_variances.notna().all(axis=1)\n spot=pd.concat(spots,axis=1);uts=pd.concat(utimes,axis=1)\n valid &= spot.eq(spot.iloc[:,0],axis=0).all(axis=1)&uts.eq(uts.iloc[:,0],axis=0).all(axis=1)\n arr['iv']=100*np.sqrt(all_variances.sum(axis=1)).where(valid)\n arr['max_width']=pd.concat(widths,axis=1).max(axis=1)\n arr['prior_ok']=pd.concat(prior,axis=1).all(axis=1)\n arr['shock']=pd.concat(shocks,axis=1).any(axis=1)\n arr['updated']=pd.concat(updates,axis=1).any(axis=1)\n arr['guard100']=valid&arr.max_width.le(1.)&arr.prior_ok&~arr.shock\n arr['guard50']=valid&arr.max_width.le(.5)&arr.prior_ok&~arr.shock\n return arr,pairs\ndef guard_tests():\n def ok(bid,ask,pbid,pask,cap=1,known=True):\n  mid=(bid+ask)/2\n  shock=(bid<.5*pbid and ask>=.9*pask) or (ask>2*pask and bid<=1.1*pbid)\n  return bid>0 and ask>=bid and known and (ask-bid)/mid<=cap and not shock\n assert ok(.6,1.15,.6,1.15)\n assert not ok(.6,1.15,.6,1.15,.5)\n assert not ok(.01,1.63,1.11,1.51)\n assert not ok(.65,2.8,.65,.8)\n assert ok(.6,.8,1.2,1.6)\n assert not ok(0,.8,.6,.8)\n assert not ok(.6,.8,.6,.8,known=False)\n assert ok(.5,1.5,.5,1.5)\n assert not ok(.5,1.50001,.5,1.50001)\n assert not ok(.49,1.1,1.,1.1)\n return 10\ndates=pd.read_csv(ROOT/'selected_days.csv').date.tolist()\nparents=pd.read_csv(ROOT/'b06_parents.csv')\nassert len(dates)==50 and len(parents)==374\nbyday={d:f for d,f in parents.groupby('date')}\nmetadata=[ROOT/'surfaces'/f'{d}_{s}.json' for d in dates for s in SYMS]\njobs=[json.loads(p.read_text()) for p in metadata if p.exists()]\nassert len(jobs)==537\ninput_hashes={}\nfor job in jobs:input_hashes.update(job['signature']['inputs'])\ncontrol_paths=[ROOT/f for f in ['surface.py','breadth.py','b06_parents.csv','selected_days.csv','basket_event_features.csv','sector_event_features.csv','event_paths.csv']]\ncontrol_hashes={str(p):digest(p) for p in control_paths}\nassert digest(ROOT/'surface.py')==jobs[0]['signature']['code_sha256']\nstarted=time.monotonic()\nemit('PRE_OUTCOME_PROTOCOL',PROTOCOL)\nemit('PROTOCOL_SHA256',hashlib.sha256(json.dumps(PROTOCOL,sort_keys=True).encode()).hexdigest())\nemit('GUARD_TESTS',{'passed':guard_tests()})\ndef process(job):\n day,sym=job['date'],job['symbol'];iv=[];greeks=[]\n for path,sha in job['signature']['inputs'].items():\n  assert digest(path)==sha,path\n  d=pd.read_parquet(path)\n  (iv if 'implied_volatility' in path else greeks).append(d)\n prepared=surf._prepare(pd.concat(iv,ignore_index=True),pd.concat(greeks,ignore_index=True))\n p=add_quality(prepared)\n old=pd.read_parquet(job['path']).set_index('timestamp')\n grid=old.index\n assert len(grid)==300 and not grid.has_duplicates\n original,opairs=make_surface(p,'valid',grid)\n relaxed,rpairs=make_surface(p,'mid_valid',grid)\n np.testing.assert_allclose(original.iv.to_numpy(),old.atm.to_numpy(),rtol=0,atol=1e-10,equal_nan=True)\n series={'original':original.iv,'midpoint':relaxed.iv,'guarded_100':relaxed.iv.where(relaxed.guard100),'guarded_50':relaxed.iv.where(relaxed.guard50)}\n s_gaps=old.atm_call_status.eq('no_strike_bracket')|old.atm_put_status.eq('no_strike_bracket')\n coverage=[];quality=[];features=[]\n for variant,values in series.items():\n  avail=values.notna();oldavail=old.atm.notna()\n  coverage.append({'date':day,'symbol':sym,'variant':variant,'valid_minutes':int(avail.sum()),'recovered_minutes':int((avail&~oldavail).sum()),'recovered_S_minutes':int((avail&s_gaps).sum()),'lost_original_minutes':int((~avail&oldavail).sum()),'changed_original_minutes':int((avail&oldavail&(values-old.atm).abs().gt(1e-8)).sum())})\n  pairs=opairs if variant=='original' else rpairs\n  used=pairs[pairs.timestamp.isin(grid[avail])]\n  ids=np.unique(np.r_[used.row_id_lo.to_numpy(dtype=int),used.row_id_hi.to_numpy(dtype=int)])\n  nodes=p.iloc[ids]\n  deviations=nodes.neighbor_deviation.dropna().to_numpy()\n  quality.append({'variant':variant,'n':len(nodes),'missing_bid_iv_nodes':int((~nodes.valid).sum()),'with_neighbors':len(deviations),'neighbor_over1':int((deviations>1).sum()),'neighbor_over5':int((deviations>5).sum()),'prior_ok':int(nodes.previous_ok.sum()),'unchanged':int(nodes.unchanged_quotes.sum()),'unchanged_iv_moves':int((nodes.unchanged_quotes&nodes.iv_changed).sum()),'deviations':deviations,'widths':nodes.width.to_numpy()})\n  for event in byday.get(day,pd.DataFrame()).itertuples():\n   ix=np.arange(int(event.parent_min)-35-570,int(event.parent_min)-5-570)\n   assert len(ix)==30 and ix.min()>=0 and ix.max()<300\n   window=values.iloc[ix].to_numpy()\n   available=bool(np.isfinite(window).all())\n   b1=b2=a=np.nan\n   if available:\n    weights=np.arange(15)-7\n    b1=float(np.dot(weights,window[:15])/280)\n    b2=float(np.dot(weights,window[15:])/280)\n    a=(b2-b1)/15\n   update_frame=original if variant=='original' else relaxed\n   updates=update_frame.updated.iloc[ix].to_numpy()\n   features.append({'date':day,'episode_id':event.episode_id,'parent_min':int(event.parent_min),'symbol':sym,'variant':variant,'available':available,'samples':int(np.isfinite(window).sum()),'b1':b1,'b2':b2,'acceleration':a,'falling':bool(available and b2<-EPS),'accelerating':bool(available and b2<-EPS and a<-EPS),'quote_change_both_halves':bool(available and updates[:15].any() and updates[15:].any())})\n causal=None\n if (day,sym) in [('2026-01-06','XLRE'),('2026-01-28','XLF')]:\n  cut=pd.Timestamp(day+' 10:15',tz='America/New_York') if sym=='XLRE' else pd.Timestamp(day+' 14:01',tz='America/New_York')\n  prefix=add_quality(prepared[prepared.timestamp.le(cut)])\n  gp=grid[grid<=cut]\n  check,_=make_surface(prefix,'mid_valid',gp)\n  for col in ['iv','max_width','prior_ok','shock','guard100','guard50']:\n   np.testing.assert_allclose(check[col].to_numpy(dtype=float),relaxed.loc[gp,col].to_numpy(dtype=float),rtol=0,atol=1e-10,equal_nan=True)\n  causal={'date':day,'symbol':sym,'cutoff':str(cut),'passed':True}\n return coverage,quality,features,causal\ncoverage=[];quality=[];features=[];causal=[]\nwith ThreadPoolExecutor(max_workers=2) as pool:\n tasks=[pool.submit(process,j) for j in jobs]\n for number,task in enumerate(as_completed(tasks),1):\n  c,q,f,check=task.result()\n  coverage.extend(c);quality.extend(q);features.extend(f)\n  if check:causal.append(check)\n  if number%50==0:emit('PROGRESS',{'sector_days':number,'total':len(jobs),'elapsed_seconds':round(time.monotonic()-started,1)})\nfeatures=pd.DataFrame(features)\nexpected=pd.MultiIndex.from_tuples([(e.date,e.episode_id,e.parent_min,s,v) for e in parents.itertuples() for s in SYMS for v in VARIANTS],names=['date','episode_id','parent_min','symbol','variant'])\nfeatures=features.set_index(list(expected.names)).reindex(expected).reset_index()\nfor c in ['available','falling','accelerating','quote_change_both_halves']:features[c]=features[c].fillna(False).astype(bool)\nfeatures.samples=features.samples.fillna(0).astype(int)\nassert len(features)==374*11*4\noldfeatures=pd.read_csv(ROOT/'sector_event_features.csv',float_precision='round_trip')\noldfeatures=oldfeatures[oldfeatures.descriptor.eq('atm')]\ncheck=features[features.variant.eq('original')].merge(oldfeatures,on=['date','episode_id','parent_min','symbol'],validate='one_to_one')\nassert check.available_x.eq(check.available_y).all()\nnp.testing.assert_allclose(check.b1,check.first_half_slope.where(check.available_y),rtol=0,atol=1e-10,equal_nan=True)\nnp.testing.assert_allclose(check.b2,check.second_half_slope.where(check.available_y),rtol=0,atol=1e-10,equal_nan=True)\nnp.testing.assert_allclose(check.acceleration_x,check.acceleration_y,rtol=0,atol=1e-10,equal_nan=True)\nfeatures['accelerating_with_quote_changes']=features.accelerating&features.quote_change_both_halves\nbasket=features.groupby(['variant','date','episode_id','parent_min'],sort=True).agg(coverage=('available','sum'),falling_count=('falling','sum'),accelerating_count=('accelerating','sum'),accelerating_with_quote_changes=('accelerating_with_quote_changes','sum')).reset_index()\nbasket['missing']=11-basket.coverage\nfor kind in ['falling','accelerating']:\n n=basket[kind+'_count'];basket[kind+'_state']=np.where(n>=6,'yes',np.where(n+basket.missing<6,'no','unknown'))\noldbasket=pd.read_csv(ROOT/'basket_event_features.csv');oldbasket=oldbasket[oldbasket.descriptor.eq('atm')]\nbcheck=basket[basket.variant.eq('original')].merge(oldbasket,on=['date','episode_id','parent_min'],validate='one_to_one')\nassert bcheck.coverage_x.eq(bcheck.coverage_y).all()\nassert bcheck.falling_count.eq(bcheck.n_second_half_falling).all() and bcheck.accelerating_count.eq(bcheck.n_falling_accelerating).all()\nemit('FEATURE_FREEZE_BEFORE_OUTCOMES',{'sha256':hashlib.sha256(features.to_csv(index=False).encode()).hexdigest(),'basket_sha256':hashlib.sha256(basket.to_csv(index=False).encode()).hexdigest(),'original_reproduced':True,'causal_checks':causal,'elapsed_seconds':round(time.monotonic()-started,1)})\ncoverage=pd.DataFrame(coverage)\ncoverage_summary=coverage.groupby('variant').sum(numeric_only=True).to_dict(orient='index')\nfor variant in VARIANTS:\n fv=features[features.variant.eq(variant)]\n original=features[features.variant.eq('original')].set_index(['episode_id','symbol'])\n joined=fv.set_index(['episode_id','symbol']).join(original[['available']],rsuffix='_original')\n coverage_summary[variant].update({'valid_sector_windows':int(fv.available.sum()),'recovered_sector_windows':int((joined.available&~joined.available_original).sum()),'lost_original_sector_windows':int((~joined.available&joined.available_original).sum()),'fully_covered_entries':int(basket[basket.variant.eq(variant)].coverage.eq(11).sum())})\nemit('COVERAGE',coverage_summary)\nemit('COVERAGE_BY_SECTOR',coverage.groupby(['variant','symbol']).sum(numeric_only=True).reset_index().to_dict(orient='records'))\nfor variant in VARIANTS:\n q=[x for x in quality if x['variant']==variant]\n ds=np.concatenate([x['deviations'] for x in q]);ws=np.concatenate([x['widths'] for x in q])\n totals={k:sum(x[k] for x in q) for k in ['n','missing_bid_iv_nodes','with_neighbors','neighbor_over1','neighbor_over5','prior_ok','unchanged','unchanged_iv_moves']}\n totals.update({'median_neighbor_deviation_pp':np.median(ds) if len(ds) else None,'p95_neighbor_deviation_pp':np.quantile(ds,.95) if len(ds) else None,'median_relative_spread':np.median(ws) if len(ws) else None})\n emit('QUOTE_QUALITY_'+variant,totals)\n# Outcome inspection starts only after all variants, coverage and classifications are frozen.\noutcomes=pd.read_csv(ROOT/'event_paths.csv',float_precision='round_trip')\nassert len(outcomes)==374 and outcomes.episode_id.is_unique\nassert outcomes.outcome.value_counts().to_dict()=={'target_first':239,'neither':84,'adverse_first':51}\nbasket=basket.merge(outcomes[['date','episode_id','parent_min','outcome']],on=['date','episode_id','parent_min'],validate='many_to_one')\ngroups={'all':outcomes}\nfor v in VARIANTS:\n b=basket[basket.variant.eq(v)]\n for kind in ['falling','accelerating']:\n  for state in ['yes','no','unknown']:groups[v+'_'+kind+'_'+state]=b[b[kind+'_state'].eq(state)]\n for state in ['yes','no','unknown']:groups[v+'_within_falling_acceleration_'+state]=b[b.falling_state.eq('yes')&b.accelerating_state.eq(state)]\nold=basket[basket.variant.eq('original')].set_index('episode_id')\nfor v in VARIANTS[1:]:\n b=basket[basket.variant.eq(v)].set_index('episode_id')\n orig=old.accelerating_state.eq('yes');new=b.accelerating_state.eq('yes')\n for tag,mask in [('retained_original',orig&new),('lost_original',orig&~new),('newly_selected',~orig&new)]:\n  groups[v+'_'+tag]=b.loc[mask].reset_index()\n groups[v+'_new_from_unknown']=b.loc[old.accelerating_state.eq('unknown')&new].reset_index()\n groups[v+'_new_from_no']=b.loc[old.accelerating_state.eq('no')&new].reset_index()\ndef describe(df):\n counts=df.outcome.value_counts()\n return {'n':len(df),'days':df.date.nunique(),'targets':int(counts.get('target_first',0)),'adverse':int(counts.get('adverse_first',0)),'neither':int(counts.get('neither',0)),'hit_rate':float(df.outcome.eq('target_first').mean()) if len(df) else None}\nsummaries={k:describe(v) for k,v in groups.items()}\nassert summaries['original_accelerating_yes']['n']==93 and summaries['original_accelerating_yes']['targets']==67\nassert summaries['original_falling_yes']['n']==217 and summaries['original_falling_yes']['targets']==144\nemit('OUTCOME_SUMMARIES',summaries)\nrng=np.random.default_rng(20260919);draw=rng.integers(0,50,size=(10000,50))\ndaily={};rates={}\nfor name,g in groups.items():\n z=g.assign(target=g.outcome.eq('target_first')).groupby('date').agg(n=('episode_id','size'),target=('target','sum')).reindex(dates,fill_value=0)\n a=z[['n','target']].to_numpy(dtype=float);daily[name]=a;total=a[draw].sum(axis=1)\n rates[name]=np.divide(total[:,1],total[:,0],out=np.full(10000,np.nan),where=total[:,0]>0)\ncontrasts={}\nfor v in VARIANTS:\n comparisons=[(v+'_accelerating_yes','all'),(v+'_accelerating_yes',v+'_falling_yes'),(v+'_within_falling_acceleration_yes',v+'_within_falling_acceleration_no')]\n if v!='original':comparisons.append((v+'_accelerating_yes','original_accelerating_yes'))\n for a,b in comparisons:\n  diff=rates[a]-rates[b];finite=np.isfinite(diff)\n  estimate=summaries[a]['hit_rate']-summaries[b]['hit_rate'] if summaries[a]['hit_rate'] is not None and summaries[b]['hit_rate'] is not None else None\n  deletions=[]\n  for i in range(50):\n   aa=daily[a].sum(axis=0)-daily[a][i];bb=daily[b].sum(axis=0)-daily[b][i]\n   if aa[0]>0 and bb[0]>0:deletions.append(aa[1]/aa[0]-bb[1]/bb[0])\n  contrasts[a+'__minus__'+b]={'estimate_pp':100*estimate if estimate is not None else None,'interval_pp':(100*np.quantile(diff[finite],[.025,.975])).tolist() if finite.any() else None,'defined_draws':int(finite.sum()),'delete_day_range_pp':[100*min(deletions),100*max(deletions)] if deletions else None}\nemit('PAIRED_DATE_BOOTSTRAP',contrasts)\nemit('TOY_JAN6_1015',basket[basket.episode_id.eq('2026-01-06_b06_615_1')].to_dict(orient='records'))\nemit('QUOTE_UPDATES_DIAGNOSTIC',{v:{'accelerating_selected':int((basket.variant.eq(v)&basket.accelerating_state.eq('yes')).sum()),'selected_with_six_sectors_having_price_changes_in_both_halves':int((basket.variant.eq(v)&basket.accelerating_state.eq('yes')&basket.accelerating_with_quote_changes.ge(6)).sum())} for v in VARIANTS})\nfor path,sha in control_hashes.items():assert digest(path)==sha,path\nfor path,sha in input_hashes.items():assert digest(path)==sha,path\nemit('VERIFICATION',{'all_raw_hashes_unchanged':len(input_hashes),'control_hashes_unchanged':len(control_hashes),'sector_days_reproduced':len(jobs),'fifty_sampled_days':len(dates),'parents':len(parents),'synthetic_guard_checks':10,'causal_prefix_checks':len(causal),'elapsed_seconds':round(time.monotonic()-started,1),'files_written':0})\n",
+  "experiment_stdout": "PRE_OUTCOME_PROTOCOL {\"name\": \"B06 midpoint IV recovery diagnostic\", \"date\": \"2026-09-19\", \"scope\": \"Same fifty sampled days, 374 parents, eleven sectors; no new observations, no file mutations. Previously examined sample: exploratory sensitivity study, not out-of-sample validation.\", \"score\": \"+5 SPX points before -15 within original 60 minutes; no post-target assessment.\", \"variants\": {\"original\": \"Existing positive finite ordered bid/mid/ask IV and quote rules; reproduce saved ATM measures and original classifications.\", \"midpoint\": \"Drop only bid-IV validity and bid-IV<=mid-IV checks. Keep strictly positive finite bid quote, midpoint and ask, ordered quotes, positive finite midpoint/ask IV with midpoint IV<=ask IV; original endpoint identity, underlying age0..60 seconds, expiry8..65DTE.\", \"guarded_100\": \"Use midpoint-selected strikes/expirations; reject the whole ATM minute if any selected quote has spread/midpoint>1.00 or lacks positive ordered quote at the immediately preceding native minute or shows bid<0.5*previous_bid while ask>=0.9*previous_ask OR ask>2*previous_ask while bid<=1.1*previous_bid. Never search for farther strikes to evade these guards.\", \"guarded_50\": \"Same as guarded_100 except spread/midpoint<=0.50; predeclared sensitivity only.\"}, \"primary\": \"guarded_100 is the primary candidate. No threshold search or promotion based on greatest observed hit rate.\", \"measurement\": \"Identical log-strike variance interpolation, calendar30-day total variance interpolation and average call/put variance. All30 minutes T-35..T-6 required. Negative second-half slope and negative change in slope; six of eleven, missing-sector bounds yes/no/unknown unchanged. Invalid bid IV yields no invented bid-side uncertainty bound.\", \"quality_evaluation\": \"Recoverable sector-minute and sector/event windows, previously valid observations lost/changed, same-contract preceding/following-minute diagnostics for audit only, unchanged quoted prices, source width and shock. No lookahead in admissibility.\", \"outcome_evaluation\": \"All four variants' broad falling and accelerating groups, target/adverse/neither, retained/added/lost entries and successful targets, active days, frozen original-membership matched cohorts, paired whole-date 10000-draw bootstrap seed20260919 across all50days. No independent-entry assumptions; no reoptimization.\", \"validation\": \"Original ATM baseline reproduced from raw data; original239/51/84 baseline and93/67 selected. Synthetic guard boundary tests, missing-prior handling, no fallback and causal invariance; check original source hashes before/after.\"}\nPROTOCOL_SHA256 \"1faf009c2b8624dd87f8ebd28d9be8cfe6902a786411348e170c6295959e3cee\"\nGUARD_TESTS {\"passed\": 10}\nPROGRESS {\"sector_days\": 50, \"total\": 537, \"elapsed_seconds\": 20.3}\nPROGRESS {\"sector_days\": 100, \"total\": 537, \"elapsed_seconds\": 41.3}\nPROGRESS {\"sector_days\": 150, \"total\": 537, \"elapsed_seconds\": 61.9}\nPROGRESS {\"sector_days\": 200, \"total\": 537, \"elapsed_seconds\": 84.7}\nPROGRESS {\"sector_days\": 250, \"total\": 537, \"elapsed_seconds\": 108.8}\nPROGRESS {\"sector_days\": 300, \"total\": 537, \"elapsed_seconds\": 131.4}\nPROGRESS {\"sector_days\": 350, \"total\": 537, \"elapsed_seconds\": 156.4}\nPROGRESS {\"sector_days\": 400, \"total\": 537, \"elapsed_seconds\": 178.7}\nPROGRESS {\"sector_days\": 450, \"total\": 537, \"elapsed_seconds\": 198.9}\nPROGRESS {\"sector_days\": 500, \"total\": 537, \"elapsed_seconds\": 224.7}\nFEATURE_FREEZE_BEFORE_OUTCOMES {\"sha256\": \"f9ecb370d4fadadd633bf18bfaf11141d43429eb9d4a181145548aebd719f0f5\", \"basket_sha256\": \"eed2a1cf07f36f427c4ce1cada622950f97045558de75f3ff48eac244dd8511a\", \"original_reproduced\": true, \"causal_checks\": [{\"date\": \"2026-01-06\", \"symbol\": \"XLRE\", \"cutoff\": \"2026-01-06 10:15:00-05:00\", \"passed\": true}, {\"date\": \"2026-01-28\", \"symbol\": \"XLF\", \"cutoff\": \"2026-01-28 14:01:00-05:00\", \"passed\": true}], \"elapsed_seconds\": 244.5}\nCOVERAGE {\"guarded_100\": {\"valid_minutes\": 140162, \"recovered_minutes\": 810, \"recovered_S_minutes\": 810, \"lost_original_minutes\": 15881, \"changed_original_minutes\": 101, \"valid_sector_windows\": 3423, \"recovered_sector_windows\": 36, \"lost_original_sector_windows\": 391, \"fully_covered_entries\": 76}, \"guarded_50\": {\"valid_minutes\": 108929, \"recovered_minutes\": 23, \"recovered_S_minutes\": 23, \"lost_original_minutes\": 46327, \"changed_original_minutes\": 0, \"valid_sector_windows\": 2615, \"recovered_sector_windows\": 5, \"lost_original_sector_windows\": 1168, \"fully_covered_entries\": 3}, \"midpoint\": {\"valid_minutes\": 160137, \"recovered_minutes\": 4904, \"recovered_S_minutes\": 4904, \"lost_original_minutes\": 0, \"changed_original_minutes\": 1024, \"valid_sector_windows\": 3970, \"recovered_sector_windows\": 192, \"lost_original_sector_windows\": 0, \"fully_covered_entries\": 262}, \"original\": {\"valid_minutes\": 155233, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0, \"valid_sector_windows\": 3778, \"recovered_sector_windows\": 0, \"lost_original_sector_windows\": 0, \"fully_covered_entries\": 114}}\nCOVERAGE_BY_SECTOR [{\"variant\": \"guarded_100\", \"symbol\": \"XLB\", \"valid_minutes\": 14023, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 871, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLC\", \"valid_minutes\": 9694, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 4851, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLE\", \"valid_minutes\": 14464, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 485, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLF\", \"valid_minutes\": 14461, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 270, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLI\", \"valid_minutes\": 14862, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 88, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLK\", \"valid_minutes\": 14885, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 65, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLP\", \"valid_minutes\": 13949, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 827, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLRE\", \"valid_minutes\": 4911, \"recovered_minutes\": 748, \"recovered_S_minutes\": 748, \"lost_original_minutes\": 3302, \"changed_original_minutes\": 91}, {\"variant\": \"guarded_100\", \"symbol\": \"XLU\", \"valid_minutes\": 12129, \"recovered_minutes\": 62, \"recovered_S_minutes\": 62, \"lost_original_minutes\": 2006, \"changed_original_minutes\": 10}, {\"variant\": \"guarded_100\", \"symbol\": \"XLV\", \"valid_minutes\": 14496, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 454, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_100\", \"symbol\": \"XLY\", \"valid_minutes\": 12288, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 2662, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLB\", \"valid_minutes\": 9031, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 5863, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLC\", \"valid_minutes\": 8337, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 6208, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLE\", \"valid_minutes\": 13763, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 1186, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLF\", \"valid_minutes\": 13937, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 794, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLI\", \"valid_minutes\": 10620, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 4330, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLK\", \"valid_minutes\": 13468, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 1482, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLP\", \"valid_minutes\": 11424, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 3352, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLRE\", \"valid_minutes\": 329, \"recovered_minutes\": 22, \"recovered_S_minutes\": 22, \"lost_original_minutes\": 7158, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLU\", \"valid_minutes\": 9171, \"recovered_minutes\": 1, \"recovered_S_minutes\": 1, \"lost_original_minutes\": 4903, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLV\", \"valid_minutes\": 11466, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 3484, \"changed_original_minutes\": 0}, {\"variant\": \"guarded_50\", \"symbol\": \"XLY\", \"valid_minutes\": 7383, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 7567, \"changed_original_minutes\": 0}, {\"variant\": \"midpoint\", \"symbol\": \"XLB\", \"valid_minutes\": 14950, \"recovered_minutes\": 56, \"recovered_S_minutes\": 56, \"lost_original_minutes\": 0, \"changed_original_minutes\": 23}, {\"variant\": \"midpoint\", \"symbol\": \"XLC\", \"valid_minutes\": 14949, \"recovered_minutes\": 404, \"recovered_S_minutes\": 404, \"lost_original_minutes\": 0, \"changed_original_minutes\": 126}, {\"variant\": \"midpoint\", \"symbol\": \"XLE\", \"valid_minutes\": 14950, \"recovered_minutes\": 1, \"recovered_S_minutes\": 1, \"lost_original_minutes\": 0, \"changed_original_minutes\": 50}, {\"variant\": \"midpoint\", \"symbol\": \"XLF\", \"valid_minutes\": 14950, \"recovered_minutes\": 219, \"recovered_S_minutes\": 219, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"midpoint\", \"symbol\": \"XLI\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"midpoint\", \"symbol\": \"XLK\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"midpoint\", \"symbol\": \"XLP\", \"valid_minutes\": 14950, \"recovered_minutes\": 174, \"recovered_S_minutes\": 174, \"lost_original_minutes\": 0, \"changed_original_minutes\": 175}, {\"variant\": \"midpoint\", \"symbol\": \"XLRE\", \"valid_minutes\": 10754, \"recovered_minutes\": 3289, \"recovered_S_minutes\": 3289, \"lost_original_minutes\": 0, \"changed_original_minutes\": 389}, {\"variant\": \"midpoint\", \"symbol\": \"XLU\", \"valid_minutes\": 14834, \"recovered_minutes\": 761, \"recovered_S_minutes\": 761, \"lost_original_minutes\": 0, \"changed_original_minutes\": 258}, {\"variant\": \"midpoint\", \"symbol\": \"XLV\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 3}, {\"variant\": \"midpoint\", \"symbol\": \"XLY\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLB\", \"valid_minutes\": 14894, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLC\", \"valid_minutes\": 14545, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLE\", \"valid_minutes\": 14949, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLF\", \"valid_minutes\": 14731, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLI\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLK\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLP\", \"valid_minutes\": 14776, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLRE\", \"valid_minutes\": 7465, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLU\", \"valid_minutes\": 14073, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLV\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}, {\"variant\": \"original\", \"symbol\": \"XLY\", \"valid_minutes\": 14950, \"recovered_minutes\": 0, \"recovered_S_minutes\": 0, \"lost_original_minutes\": 0, \"changed_original_minutes\": 0}]\nQUOTE_QUALITY_original {\"n\": 1125861, \"missing_bid_iv_nodes\": 0, \"with_neighbors\": 1118442, \"neighbor_over1\": 4794, \"neighbor_over5\": 44, \"prior_ok\": 1122261, \"unchanged\": 948130, \"unchanged_iv_moves\": 785848, \"median_neighbor_deviation_pp\": 0.07500000000000007, \"p95_neighbor_deviation_pp\": 0.3699999999999981, \"median_relative_spread\": 0.19277108433734935}\nQUOTE_QUALITY_midpoint {\"n\": 1163470, \"missing_bid_iv_nodes\": 7373, \"with_neighbors\": 1155717, \"neighbor_over1\": 5514, \"neighbor_over5\": 80, \"prior_ok\": 1159572, \"unchanged\": 983155, \"unchanged_iv_moves\": 811888, \"median_neighbor_deviation_pp\": 0.07500000000000007, \"p95_neighbor_deviation_pp\": 0.37000000000000366, \"median_relative_spread\": 0.1971830985915492}\nQUOTE_QUALITY_guarded_100 {\"n\": 1014862, \"missing_bid_iv_nodes\": 954, \"with_neighbors\": 1011137, \"neighbor_over1\": 3633, \"neighbor_over5\": 13, \"prior_ok\": 1014862, \"unchanged\": 847741, \"unchanged_iv_moves\": 700890, \"median_neighbor_deviation_pp\": 0.07500000000000007, \"p95_neighbor_deviation_pp\": 0.3599999999999992, \"median_relative_spread\": 0.1794871794871795}\nQUOTE_QUALITY_guarded_50 {\"n\": 781088, \"missing_bid_iv_nodes\": 23, \"with_neighbors\": 777838, \"neighbor_over1\": 1788, \"neighbor_over5\": 5, \"prior_ok\": 781088, \"unchanged\": 635414, \"unchanged_iv_moves\": 523019, \"median_neighbor_deviation_pp\": 0.07000000000000339, \"p95_neighbor_deviation_pp\": 0.3349999999999964, \"median_relative_spread\": 0.15298507462686572}\nOUTCOME_SUMMARIES {\"all\": {\"n\": 374, \"days\": 49, \"targets\": 239, \"adverse\": 51, \"neither\": 84, \"hit_rate\": 0.6390374331550802}, \"original_falling_yes\": {\"n\": 217, \"days\": 48, \"targets\": 144, \"adverse\": 36, \"neither\": 37, \"hit_rate\": 0.663594470046083}, \"original_falling_no\": {\"n\": 95, \"days\": 36, \"targets\": 59, \"adverse\": 13, \"neither\": 23, \"hit_rate\": 0.6210526315789474}, \"original_falling_unknown\": {\"n\": 62, \"days\": 25, \"targets\": 36, \"adverse\": 2, \"neither\": 24, \"hit_rate\": 0.5806451612903226}, \"original_accelerating_yes\": {\"n\": 93, \"days\": 35, \"targets\": 67, \"adverse\": 13, \"neither\": 13, \"hit_rate\": 0.7204301075268817}, \"original_accelerating_no\": {\"n\": 216, \"days\": 47, \"targets\": 132, \"adverse\": 27, \"neither\": 57, \"hit_rate\": 0.6111111111111112}, \"original_accelerating_unknown\": {\"n\": 65, \"days\": 33, \"targets\": 40, \"adverse\": 11, \"neither\": 14, \"hit_rate\": 0.6153846153846154}, \"original_within_falling_acceleration_yes\": {\"n\": 93, \"days\": 35, \"targets\": 67, \"adverse\": 13, \"neither\": 13, \"hit_rate\": 0.7204301075268817}, \"original_within_falling_acceleration_no\": {\"n\": 86, \"days\": 39, \"targets\": 53, \"adverse\": 13, \"neither\": 20, \"hit_rate\": 0.6162790697674418}, \"original_within_falling_acceleration_unknown\": {\"n\": 38, \"days\": 29, \"targets\": 24, \"adverse\": 10, \"neither\": 4, \"hit_rate\": 0.631578947368421}, \"midpoint_falling_yes\": {\"n\": 237, \"days\": 49, \"targets\": 153, \"adverse\": 37, \"neither\": 47, \"hit_rate\": 0.6455696202531646}, \"midpoint_falling_no\": {\"n\": 108, \"days\": 38, \"targets\": 66, \"adverse\": 13, \"neither\": 29, \"hit_rate\": 0.6111111111111112}, \"midpoint_falling_unknown\": {\"n\": 29, \"days\": 14, \"targets\": 20, \"adverse\": 1, \"neither\": 8, \"hit_rate\": 0.6896551724137931}, \"midpoint_accelerating_yes\": {\"n\": 112, \"days\": 39, \"targets\": 78, \"adverse\": 15, \"neither\": 19, \"hit_rate\": 0.6964285714285714}, \"midpoint_accelerating_no\": {\"n\": 238, \"days\": 47, \"targets\": 146, \"adverse\": 31, \"neither\": 61, \"hit_rate\": 0.6134453781512605}, \"midpoint_accelerating_unknown\": {\"n\": 24, \"days\": 16, \"targets\": 15, \"adverse\": 5, \"neither\": 4, \"hit_rate\": 0.625}, \"midpoint_within_falling_acceleration_yes\": {\"n\": 112, \"days\": 39, \"targets\": 78, \"adverse\": 15, \"neither\": 19, \"hit_rate\": 0.6964285714285714}, \"midpoint_within_falling_acceleration_no\": {\"n\": 112, \"days\": 42, \"targets\": 67, \"adverse\": 18, \"neither\": 27, \"hit_rate\": 0.5982142857142857}, \"midpoint_within_falling_acceleration_unknown\": {\"n\": 13, \"days\": 10, \"targets\": 8, \"adverse\": 4, \"neither\": 1, \"hit_rate\": 0.6153846153846154}, \"guarded_100_falling_yes\": {\"n\": 166, \"days\": 45, \"targets\": 110, \"adverse\": 25, \"neither\": 31, \"hit_rate\": 0.6626506024096386}, \"guarded_100_falling_no\": {\"n\": 74, \"days\": 32, \"targets\": 41, \"adverse\": 12, \"neither\": 21, \"hit_rate\": 0.5540540540540541}, \"guarded_100_falling_unknown\": {\"n\": 134, \"days\": 42, \"targets\": 88, \"adverse\": 14, \"neither\": 32, \"hit_rate\": 0.6567164179104478}, \"guarded_100_accelerating_yes\": {\"n\": 69, \"days\": 32, \"targets\": 49, \"adverse\": 9, \"neither\": 11, \"hit_rate\": 0.7101449275362319}, \"guarded_100_accelerating_no\": {\"n\": 169, \"days\": 44, \"targets\": 100, \"adverse\": 24, \"neither\": 45, \"hit_rate\": 0.591715976331361}, \"guarded_100_accelerating_unknown\": {\"n\": 136, \"days\": 43, \"targets\": 90, \"adverse\": 18, \"neither\": 28, \"hit_rate\": 0.6617647058823529}, \"guarded_100_within_falling_acceleration_yes\": {\"n\": 69, \"days\": 32, \"targets\": 49, \"adverse\": 9, \"neither\": 11, \"hit_rate\": 0.7101449275362319}, \"guarded_100_within_falling_acceleration_no\": {\"n\": 49, \"days\": 26, \"targets\": 28, \"adverse\": 9, \"neither\": 12, \"hit_rate\": 0.5714285714285714}, \"guarded_100_within_falling_acceleration_unknown\": {\"n\": 48, \"days\": 28, \"targets\": 33, \"adverse\": 7, \"neither\": 8, \"hit_rate\": 0.6875}, \"guarded_50_falling_yes\": {\"n\": 88, \"days\": 31, \"targets\": 56, \"adverse\": 14, \"neither\": 18, \"hit_rate\": 0.6363636363636364}, \"guarded_50_falling_no\": {\"n\": 39, \"days\": 22, \"targets\": 17, \"adverse\": 7, \"neither\": 15, \"hit_rate\": 0.4358974358974359}, \"guarded_50_falling_unknown\": {\"n\": 247, \"days\": 49, \"targets\": 166, \"adverse\": 30, \"neither\": 51, \"hit_rate\": 0.6720647773279352}, \"guarded_50_accelerating_yes\": {\"n\": 29, \"days\": 17, \"targets\": 22, \"adverse\": 4, \"neither\": 3, \"hit_rate\": 0.7586206896551724}, \"guarded_50_accelerating_no\": {\"n\": 103, \"days\": 32, \"targets\": 52, \"adverse\": 16, \"neither\": 35, \"hit_rate\": 0.5048543689320388}, \"guarded_50_accelerating_unknown\": {\"n\": 242, \"days\": 49, \"targets\": 165, \"adverse\": 31, \"neither\": 46, \"hit_rate\": 0.6818181818181818}, \"guarded_50_within_falling_acceleration_yes\": {\"n\": 29, \"days\": 17, \"targets\": 22, \"adverse\": 4, \"neither\": 3, \"hit_rate\": 0.7586206896551724}, \"guarded_50_within_falling_acceleration_no\": {\"n\": 17, \"days\": 10, \"targets\": 7, \"adverse\": 4, \"neither\": 6, \"hit_rate\": 0.4117647058823529}, \"guarded_50_within_falling_acceleration_unknown\": {\"n\": 42, \"days\": 25, \"targets\": 27, \"adverse\": 6, \"neither\": 9, \"hit_rate\": 0.6428571428571429}, \"midpoint_retained_original\": {\"n\": 93, \"days\": 35, \"targets\": 67, \"adverse\": 13, \"neither\": 13, \"hit_rate\": 0.7204301075268817}, \"midpoint_lost_original\": {\"n\": 0, \"days\": 0, \"targets\": 0, \"adverse\": 0, \"neither\": 0, \"hit_rate\": null}, \"midpoint_newly_selected\": {\"n\": 19, \"days\": 12, \"targets\": 11, \"adverse\": 2, \"neither\": 6, \"hit_rate\": 0.5789473684210527}, \"midpoint_new_from_unknown\": {\"n\": 19, \"days\": 12, \"targets\": 11, \"adverse\": 2, \"neither\": 6, \"hit_rate\": 0.5789473684210527}, \"midpoint_new_from_no\": {\"n\": 0, \"days\": 0, \"targets\": 0, \"adverse\": 0, \"neither\": 0, \"hit_rate\": null}, \"guarded_100_retained_original\": {\"n\": 68, \"days\": 31, \"targets\": 49, \"adverse\": 9, \"neither\": 10, \"hit_rate\": 0.7205882352941176}, \"guarded_100_lost_original\": {\"n\": 25, \"days\": 18, \"targets\": 18, \"adverse\": 4, \"neither\": 3, \"hit_rate\": 0.72}, \"guarded_100_newly_selected\": {\"n\": 1, \"days\": 1, \"targets\": 0, \"adverse\": 0, \"neither\": 1, \"hit_rate\": 0.0}, \"guarded_100_new_from_unknown\": {\"n\": 1, \"days\": 1, \"targets\": 0, \"adverse\": 0, \"neither\": 1, \"hit_rate\": 0.0}, \"guarded_100_new_from_no\": {\"n\": 0, \"days\": 0, \"targets\": 0, \"adverse\": 0, \"neither\": 0, \"hit_rate\": null}, \"guarded_50_retained_original\": {\"n\": 29, \"days\": 17, \"targets\": 22, \"adverse\": 4, \"neither\": 3, \"hit_rate\": 0.7586206896551724}, \"guarded_50_lost_original\": {\"n\": 64, \"days\": 30, \"targets\": 45, \"adverse\": 9, \"neither\": 10, \"hit_rate\": 0.703125}, \"guarded_50_newly_selected\": {\"n\": 0, \"days\": 0, \"targets\": 0, \"adverse\": 0, \"neither\": 0, \"hit_rate\": null}, \"guarded_50_new_from_unknown\": {\"n\": 0, \"days\": 0, \"targets\": 0, \"adverse\": 0, \"neither\": 0, \"hit_rate\": null}, \"guarded_50_new_from_no\": {\"n\": 0, \"days\": 0, \"targets\": 0, \"adverse\": 0, \"neither\": 0, \"hit_rate\": null}}\nPAIRED_DATE_BOOTSTRAP {\"original_accelerating_yes__minus__all\": {\"estimate_pp\": 8.139267437180154, \"interval_pp\": [-0.8725833496849501, 17.537482305286773], \"defined_draws\": 10000, \"delete_day_range_pp\": [6.6981190638773285, 10.124605823102595]}, \"original_accelerating_yes__minus__original_falling_yes\": {\"estimate_pp\": 5.683563748079878, \"interval_pp\": [-2.300796982343648, 14.149513872166771], \"defined_draws\": 10000, \"delete_day_range_pp\": [4.279339820439754, 7.176171295314826]}, \"original_within_falling_acceleration_yes__minus__original_within_falling_acceleration_no\": {\"estimate_pp\": 10.41510377594399, \"interval_pp\": [-4.073110039081584, 24.413537147355523], \"defined_draws\": 10000, \"delete_day_range_pp\": [8.135914444294023, 12.529396394042337]}, \"midpoint_accelerating_yes__minus__all\": {\"estimate_pp\": 5.739113827349119, \"interval_pp\": [-2.763525624410449, 14.253718000812675], \"defined_draws\": 10000, \"delete_day_range_pp\": [4.635622204682988, 7.387057387057383]}, \"midpoint_accelerating_yes__minus__midpoint_falling_yes\": {\"estimate_pp\": 5.085895117540684, \"interval_pp\": [-2.387003822459432, 12.980482119236726], \"defined_draws\": 10000, \"delete_day_range_pp\": [4.0047021943573675, 6.570048309178745]}, \"midpoint_within_falling_acceleration_yes__minus__midpoint_within_falling_acceleration_no\": {\"estimate_pp\": 9.82142857142857, \"interval_pp\": [-3.9714193748681264, 23.37090690635884], \"defined_draws\": 10000, \"delete_day_range_pp\": [8.141160027952488, 12.589194699286443]}, \"midpoint_accelerating_yes__minus__original_accelerating_yes\": {\"estimate_pp\": -2.400153609831035, \"interval_pp\": [-9.205780984026033, 2.6463765244537916], \"defined_draws\": 10000, \"delete_day_range_pp\": [-2.9317909852413226, 0.17921146953404632]}, \"guarded_100_accelerating_yes__minus__all\": {\"estimate_pp\": 7.110749438115171, \"interval_pp\": [-3.2337911843234304, 18.085296013956835], \"defined_draws\": 10000, \"delete_day_range_pp\": [5.142371440713978, 9.177688791813289]}, \"guarded_100_accelerating_yes__minus__guarded_100_falling_yes\": {\"estimate_pp\": 4.749432512659335, \"interval_pp\": [-3.984496330331245, 13.832410901030478], \"defined_draws\": 10000, \"delete_day_range_pp\": [3.193033381712629, 6.061157626501634]}, \"guarded_100_within_falling_acceleration_yes__minus__guarded_100_within_falling_acceleration_no\": {\"estimate_pp\": 13.871635610766052, \"interval_pp\": [-4.325042407054971, 32.129960317460316], \"defined_draws\": 10000, \"delete_day_range_pp\": [9.696969696969704, 17.56854256854257]}, \"guarded_100_accelerating_yes__minus__original_accelerating_yes\": {\"estimate_pp\": -1.0285179990649818, \"interval_pp\": [-7.321449476981083, 5.111185418305794], \"defined_draws\": 10000, \"delete_day_range_pp\": [-2.7450980392156765, 0.015812776723589383]}, \"guarded_50_accelerating_yes__minus__all\": {\"estimate_pp\": 11.958325650009217, \"interval_pp\": [-3.0910989681260617, 27.69923296026253], \"defined_draws\": 10000, \"delete_day_range_pp\": [9.690512430238451, 14.999999999999991]}, \"guarded_50_accelerating_yes__minus__guarded_50_falling_yes\": {\"estimate_pp\": 12.225705329153602, \"interval_pp\": [0.24738693357173017, 26.098514211886293], \"defined_draws\": 10000, \"delete_day_range_pp\": [9.662288930581608, 14.532520325203247]}, \"guarded_50_within_falling_acceleration_yes__minus__guarded_50_within_falling_acceleration_no\": {\"estimate_pp\": 34.68559837728195, \"interval_pp\": [7.841503267973862, 65.0], \"defined_draws\": 10000, \"delete_day_range_pp\": [29.19540229885057, 43.3048433048433]}, \"guarded_50_accelerating_yes__minus__original_accelerating_yes\": {\"estimate_pp\": 3.819058212829063, \"interval_pp\": [-9.19549296953465, 17.93155070144054], \"defined_draws\": 10000, \"delete_day_range_pp\": [0.8426966292134797, 6.439393939393934]}}\nTOY_JAN6_1015 [{\"variant\": \"guarded_100\", \"date\": \"2026-01-06\", \"episode_id\": \"2026-01-06_b06_615_1\", \"parent_min\": 615, \"coverage\": 5, \"falling_count\": 4, \"accelerating_count\": 2, \"accelerating_with_quote_changes\": 2, \"missing\": 6, \"falling_state\": \"unknown\", \"accelerating_state\": \"unknown\", \"outcome\": \"adverse_first\"}, {\"variant\": \"guarded_50\", \"date\": \"2026-01-06\", \"episode_id\": \"2026-01-06_b06_615_1\", \"parent_min\": 615, \"coverage\": 3, \"falling_count\": 2, \"accelerating_count\": 0, \"accelerating_with_quote_changes\": 0, \"missing\": 8, \"falling_state\": \"unknown\", \"accelerating_state\": \"unknown\", \"outcome\": \"adverse_first\"}, {\"variant\": \"midpoint\", \"date\": \"2026-01-06\", \"episode_id\": \"2026-01-06_b06_615_1\", \"parent_min\": 615, \"coverage\": 11, \"falling_count\": 10, \"accelerating_count\": 6, \"accelerating_with_quote_changes\": 5, \"missing\": 0, \"falling_state\": \"yes\", \"accelerating_state\": \"yes\", \"outcome\": \"adverse_first\"}, {\"variant\": \"original\", \"date\": \"2026-01-06\", \"episode_id\": \"2026-01-06_b06_615_1\", \"parent_min\": 615, \"coverage\": 8, \"falling_count\": 7, \"accelerating_count\": 4, \"accelerating_with_quote_changes\": 3, \"missing\": 3, \"falling_state\": \"yes\", \"accelerating_state\": \"unknown\", \"outcome\": \"adverse_first\"}]\nQUOTE_UPDATES_DIAGNOSTIC {\"original\": {\"accelerating_selected\": 93, \"selected_with_six_sectors_having_price_changes_in_both_halves\": 57}, \"midpoint\": {\"accelerating_selected\": 112, \"selected_with_six_sectors_having_price_changes_in_both_halves\": 63}, \"guarded_100\": {\"accelerating_selected\": 69, \"selected_with_six_sectors_having_price_changes_in_both_halves\": 43}, \"guarded_50\": {\"accelerating_selected\": 29, \"selected_with_six_sectors_having_price_changes_in_both_halves\": 20}}\nVERIFICATION {\"all_raw_hashes_unchanged\": 1966, \"control_hashes_unchanged\": 7, \"sector_days_reproduced\": 537, \"fifty_sampled_days\": 50, \"parents\": 374, \"synthetic_guard_checks\": 10, \"causal_prefix_checks\": 2, \"elapsed_seconds\": 246.3, \"files_written\": 0}\n",
+  "results": {
+    "PROGRESS": {
+      "sector_days": 500,
+      "total": 537,
+      "elapsed_seconds": 224.7
+    },
+    "FEATURE_FREEZE_BEFORE_OUTCOMES": {
+      "sha256": "f9ecb370d4fadadd633bf18bfaf11141d43429eb9d4a181145548aebd719f0f5",
+      "basket_sha256": "eed2a1cf07f36f427c4ce1cada622950f97045558de75f3ff48eac244dd8511a",
+      "original_reproduced": true,
+      "causal_checks": [
+        {
+          "date": "2026-01-06",
+          "symbol": "XLRE",
+          "cutoff": "2026-01-06 10:15:00-05:00",
+          "passed": true
+        },
+        {
+          "date": "2026-01-28",
+          "symbol": "XLF",
+          "cutoff": "2026-01-28 14:01:00-05:00",
+          "passed": true
+        }
+      ],
+      "elapsed_seconds": 244.5
+    },
+    "COVERAGE": {
+      "guarded_100": {
+        "valid_minutes": 140162,
+        "recovered_minutes": 810,
+        "recovered_S_minutes": 810,
+        "lost_original_minutes": 15881,
+        "changed_original_minutes": 101,
+        "valid_sector_windows": 3423,
+        "recovered_sector_windows": 36,
+        "lost_original_sector_windows": 391,
+        "fully_covered_entries": 76
+      },
+      "guarded_50": {
+        "valid_minutes": 108929,
+        "recovered_minutes": 23,
+        "recovered_S_minutes": 23,
+        "lost_original_minutes": 46327,
+        "changed_original_minutes": 0,
+        "valid_sector_windows": 2615,
+        "recovered_sector_windows": 5,
+        "lost_original_sector_windows": 1168,
+        "fully_covered_entries": 3
+      },
+      "midpoint": {
+        "valid_minutes": 160137,
+        "recovered_minutes": 4904,
+        "recovered_S_minutes": 4904,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 1024,
+        "valid_sector_windows": 3970,
+        "recovered_sector_windows": 192,
+        "lost_original_sector_windows": 0,
+        "fully_covered_entries": 262
+      },
+      "original": {
+        "valid_minutes": 155233,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0,
+        "valid_sector_windows": 3778,
+        "recovered_sector_windows": 0,
+        "lost_original_sector_windows": 0,
+        "fully_covered_entries": 114
+      }
+    },
+    "COVERAGE_BY_SECTOR": [
+      {
+        "variant": "guarded_100",
+        "symbol": "XLB",
+        "valid_minutes": 14023,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 871,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLC",
+        "valid_minutes": 9694,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 4851,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLE",
+        "valid_minutes": 14464,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 485,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLF",
+        "valid_minutes": 14461,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 270,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLI",
+        "valid_minutes": 14862,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 88,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLK",
+        "valid_minutes": 14885,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 65,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLP",
+        "valid_minutes": 13949,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 827,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLRE",
+        "valid_minutes": 4911,
+        "recovered_minutes": 748,
+        "recovered_S_minutes": 748,
+        "lost_original_minutes": 3302,
+        "changed_original_minutes": 91
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLU",
+        "valid_minutes": 12129,
+        "recovered_minutes": 62,
+        "recovered_S_minutes": 62,
+        "lost_original_minutes": 2006,
+        "changed_original_minutes": 10
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLV",
+        "valid_minutes": 14496,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 454,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_100",
+        "symbol": "XLY",
+        "valid_minutes": 12288,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 2662,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLB",
+        "valid_minutes": 9031,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 5863,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLC",
+        "valid_minutes": 8337,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 6208,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLE",
+        "valid_minutes": 13763,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 1186,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLF",
+        "valid_minutes": 13937,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 794,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLI",
+        "valid_minutes": 10620,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 4330,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLK",
+        "valid_minutes": 13468,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 1482,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLP",
+        "valid_minutes": 11424,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 3352,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLRE",
+        "valid_minutes": 329,
+        "recovered_minutes": 22,
+        "recovered_S_minutes": 22,
+        "lost_original_minutes": 7158,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLU",
+        "valid_minutes": 9171,
+        "recovered_minutes": 1,
+        "recovered_S_minutes": 1,
+        "lost_original_minutes": 4903,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLV",
+        "valid_minutes": 11466,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 3484,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "guarded_50",
+        "symbol": "XLY",
+        "valid_minutes": 7383,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 7567,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLB",
+        "valid_minutes": 14950,
+        "recovered_minutes": 56,
+        "recovered_S_minutes": 56,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 23
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLC",
+        "valid_minutes": 14949,
+        "recovered_minutes": 404,
+        "recovered_S_minutes": 404,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 126
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLE",
+        "valid_minutes": 14950,
+        "recovered_minutes": 1,
+        "recovered_S_minutes": 1,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 50
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLF",
+        "valid_minutes": 14950,
+        "recovered_minutes": 219,
+        "recovered_S_minutes": 219,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLI",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLK",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLP",
+        "valid_minutes": 14950,
+        "recovered_minutes": 174,
+        "recovered_S_minutes": 174,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 175
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLRE",
+        "valid_minutes": 10754,
+        "recovered_minutes": 3289,
+        "recovered_S_minutes": 3289,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 389
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLU",
+        "valid_minutes": 14834,
+        "recovered_minutes": 761,
+        "recovered_S_minutes": 761,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 258
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLV",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 3
+      },
+      {
+        "variant": "midpoint",
+        "symbol": "XLY",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLB",
+        "valid_minutes": 14894,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLC",
+        "valid_minutes": 14545,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLE",
+        "valid_minutes": 14949,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLF",
+        "valid_minutes": 14731,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLI",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLK",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLP",
+        "valid_minutes": 14776,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLRE",
+        "valid_minutes": 7465,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLU",
+        "valid_minutes": 14073,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLV",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      },
+      {
+        "variant": "original",
+        "symbol": "XLY",
+        "valid_minutes": 14950,
+        "recovered_minutes": 0,
+        "recovered_S_minutes": 0,
+        "lost_original_minutes": 0,
+        "changed_original_minutes": 0
+      }
+    ],
+    "QUOTE_QUALITY_original": {
+      "n": 1125861,
+      "missing_bid_iv_nodes": 0,
+      "with_neighbors": 1118442,
+      "neighbor_over1": 4794,
+      "neighbor_over5": 44,
+      "prior_ok": 1122261,
+      "unchanged": 948130,
+      "unchanged_iv_moves": 785848,
+      "median_neighbor_deviation_pp": 0.07500000000000007,
+      "p95_neighbor_deviation_pp": 0.3699999999999981,
+      "median_relative_spread": 0.19277108433734935
+    },
+    "QUOTE_QUALITY_midpoint": {
+      "n": 1163470,
+      "missing_bid_iv_nodes": 7373,
+      "with_neighbors": 1155717,
+      "neighbor_over1": 5514,
+      "neighbor_over5": 80,
+      "prior_ok": 1159572,
+      "unchanged": 983155,
+      "unchanged_iv_moves": 811888,
+      "median_neighbor_deviation_pp": 0.07500000000000007,
+      "p95_neighbor_deviation_pp": 0.37000000000000366,
+      "median_relative_spread": 0.1971830985915492
+    },
+    "QUOTE_QUALITY_guarded_100": {
+      "n": 1014862,
+      "missing_bid_iv_nodes": 954,
+      "with_neighbors": 1011137,
+      "neighbor_over1": 3633,
+      "neighbor_over5": 13,
+      "prior_ok": 1014862,
+      "unchanged": 847741,
+      "unchanged_iv_moves": 700890,
+      "median_neighbor_deviation_pp": 0.07500000000000007,
+      "p95_neighbor_deviation_pp": 0.3599999999999992,
+      "median_relative_spread": 0.1794871794871795
+    },
+    "QUOTE_QUALITY_guarded_50": {
+      "n": 781088,
+      "missing_bid_iv_nodes": 23,
+      "with_neighbors": 777838,
+      "neighbor_over1": 1788,
+      "neighbor_over5": 5,
+      "prior_ok": 781088,
+      "unchanged": 635414,
+      "unchanged_iv_moves": 523019,
+      "median_neighbor_deviation_pp": 0.07000000000000339,
+      "p95_neighbor_deviation_pp": 0.3349999999999964,
+      "median_relative_spread": 0.15298507462686572
+    },
+    "OUTCOME_SUMMARIES": {
+      "all": {
+        "n": 374,
+        "days": 49,
+        "targets": 239,
+        "adverse": 51,
+        "neither": 84,
+        "hit_rate": 0.6390374331550802
+      },
+      "original_falling_yes": {
+        "n": 217,
+        "days": 48,
+        "targets": 144,
+        "adverse": 36,
+        "neither": 37,
+        "hit_rate": 0.663594470046083
+      },
+      "original_falling_no": {
+        "n": 95,
+        "days": 36,
+        "targets": 59,
+        "adverse": 13,
+        "neither": 23,
+        "hit_rate": 0.6210526315789474
+      },
+      "original_falling_unknown": {
+        "n": 62,
+        "days": 25,
+        "targets": 36,
+        "adverse": 2,
+        "neither": 24,
+        "hit_rate": 0.5806451612903226
+      },
+      "original_accelerating_yes": {
+        "n": 93,
+        "days": 35,
+        "targets": 67,
+        "adverse": 13,
+        "neither": 13,
+        "hit_rate": 0.7204301075268817
+      },
+      "original_accelerating_no": {
+        "n": 216,
+        "days": 47,
+        "targets": 132,
+        "adverse": 27,
+        "neither": 57,
+        "hit_rate": 0.6111111111111112
+      },
+      "original_accelerating_unknown": {
+        "n": 65,
+        "days": 33,
+        "targets": 40,
+        "adverse": 11,
+        "neither": 14,
+        "hit_rate": 0.6153846153846154
+      },
+      "original_within_falling_acceleration_yes": {
+        "n": 93,
+        "days": 35,
+        "targets": 67,
+        "adverse": 13,
+        "neither": 13,
+        "hit_rate": 0.7204301075268817
+      },
+      "original_within_falling_acceleration_no": {
+        "n": 86,
+        "days": 39,
+        "targets": 53,
+        "adverse": 13,
+        "neither": 20,
+        "hit_rate": 0.6162790697674418
+      },
+      "original_within_falling_acceleration_unknown": {
+        "n": 38,
+        "days": 29,
+        "targets": 24,
+        "adverse": 10,
+        "neither": 4,
+        "hit_rate": 0.631578947368421
+      },
+      "midpoint_falling_yes": {
+        "n": 237,
+        "days": 49,
+        "targets": 153,
+        "adverse": 37,
+        "neither": 47,
+        "hit_rate": 0.6455696202531646
+      },
+      "midpoint_falling_no": {
+        "n": 108,
+        "days": 38,
+        "targets": 66,
+        "adverse": 13,
+        "neither": 29,
+        "hit_rate": 0.6111111111111112
+      },
+      "midpoint_falling_unknown": {
+        "n": 29,
+        "days": 14,
+        "targets": 20,
+        "adverse": 1,
+        "neither": 8,
+        "hit_rate": 0.6896551724137931
+      },
+      "midpoint_accelerating_yes": {
+        "n": 112,
+        "days": 39,
+        "targets": 78,
+        "adverse": 15,
+        "neither": 19,
+        "hit_rate": 0.6964285714285714
+      },
+      "midpoint_accelerating_no": {
+        "n": 238,
+        "days": 47,
+        "targets": 146,
+        "adverse": 31,
+        "neither": 61,
+        "hit_rate": 0.6134453781512605
+      },
+      "midpoint_accelerating_unknown": {
+        "n": 24,
+        "days": 16,
+        "targets": 15,
+        "adverse": 5,
+        "neither": 4,
+        "hit_rate": 0.625
+      },
+      "midpoint_within_falling_acceleration_yes": {
+        "n": 112,
+        "days": 39,
+        "targets": 78,
+        "adverse": 15,
+        "neither": 19,
+        "hit_rate": 0.6964285714285714
+      },
+      "midpoint_within_falling_acceleration_no": {
+        "n": 112,
+        "days": 42,
+        "targets": 67,
+        "adverse": 18,
+        "neither": 27,
+        "hit_rate": 0.5982142857142857
+      },
+      "midpoint_within_falling_acceleration_unknown": {
+        "n": 13,
+        "days": 10,
+        "targets": 8,
+        "adverse": 4,
+        "neither": 1,
+        "hit_rate": 0.6153846153846154
+      },
+      "guarded_100_falling_yes": {
+        "n": 166,
+        "days": 45,
+        "targets": 110,
+        "adverse": 25,
+        "neither": 31,
+        "hit_rate": 0.6626506024096386
+      },
+      "guarded_100_falling_no": {
+        "n": 74,
+        "days": 32,
+        "targets": 41,
+        "adverse": 12,
+        "neither": 21,
+        "hit_rate": 0.5540540540540541
+      },
+      "guarded_100_falling_unknown": {
+        "n": 134,
+        "days": 42,
+        "targets": 88,
+        "adverse": 14,
+        "neither": 32,
+        "hit_rate": 0.6567164179104478
+      },
+      "guarded_100_accelerating_yes": {
+        "n": 69,
+        "days": 32,
+        "targets": 49,
+        "adverse": 9,
+        "neither": 11,
+        "hit_rate": 0.7101449275362319
+      },
+      "guarded_100_accelerating_no": {
+        "n": 169,
+        "days": 44,
+        "targets": 100,
+        "adverse": 24,
+        "neither": 45,
+        "hit_rate": 0.591715976331361
+      },
+      "guarded_100_accelerating_unknown": {
+        "n": 136,
+        "days": 43,
+        "targets": 90,
+        "adverse": 18,
+        "neither": 28,
+        "hit_rate": 0.6617647058823529
+      },
+      "guarded_100_within_falling_acceleration_yes": {
+        "n": 69,
+        "days": 32,
+        "targets": 49,
+        "adverse": 9,
+        "neither": 11,
+        "hit_rate": 0.7101449275362319
+      },
+      "guarded_100_within_falling_acceleration_no": {
+        "n": 49,
+        "days": 26,
+        "targets": 28,
+        "adverse": 9,
+        "neither": 12,
+        "hit_rate": 0.5714285714285714
+      },
+      "guarded_100_within_falling_acceleration_unknown": {
+        "n": 48,
+        "days": 28,
+        "targets": 33,
+        "adverse": 7,
+        "neither": 8,
+        "hit_rate": 0.6875
+      },
+      "guarded_50_falling_yes": {
+        "n": 88,
+        "days": 31,
+        "targets": 56,
+        "adverse": 14,
+        "neither": 18,
+        "hit_rate": 0.6363636363636364
+      },
+      "guarded_50_falling_no": {
+        "n": 39,
+        "days": 22,
+        "targets": 17,
+        "adverse": 7,
+        "neither": 15,
+        "hit_rate": 0.4358974358974359
+      },
+      "guarded_50_falling_unknown": {
+        "n": 247,
+        "days": 49,
+        "targets": 166,
+        "adverse": 30,
+        "neither": 51,
+        "hit_rate": 0.6720647773279352
+      },
+      "guarded_50_accelerating_yes": {
+        "n": 29,
+        "days": 17,
+        "targets": 22,
+        "adverse": 4,
+        "neither": 3,
+        "hit_rate": 0.7586206896551724
+      },
+      "guarded_50_accelerating_no": {
+        "n": 103,
+        "days": 32,
+        "targets": 52,
+        "adverse": 16,
+        "neither": 35,
+        "hit_rate": 0.5048543689320388
+      },
+      "guarded_50_accelerating_unknown": {
+        "n": 242,
+        "days": 49,
+        "targets": 165,
+        "adverse": 31,
+        "neither": 46,
+        "hit_rate": 0.6818181818181818
+      },
+      "guarded_50_within_falling_acceleration_yes": {
+        "n": 29,
+        "days": 17,
+        "targets": 22,
+        "adverse": 4,
+        "neither": 3,
+        "hit_rate": 0.7586206896551724
+      },
+      "guarded_50_within_falling_acceleration_no": {
+        "n": 17,
+        "days": 10,
+        "targets": 7,
+        "adverse": 4,
+        "neither": 6,
+        "hit_rate": 0.4117647058823529
+      },
+      "guarded_50_within_falling_acceleration_unknown": {
+        "n": 42,
+        "days": 25,
+        "targets": 27,
+        "adverse": 6,
+        "neither": 9,
+        "hit_rate": 0.6428571428571429
+      },
+      "midpoint_retained_original": {
+        "n": 93,
+        "days": 35,
+        "targets": 67,
+        "adverse": 13,
+        "neither": 13,
+        "hit_rate": 0.7204301075268817
+      },
+      "midpoint_lost_original": {
+        "n": 0,
+        "days": 0,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 0,
+        "hit_rate": null
+      },
+      "midpoint_newly_selected": {
+        "n": 19,
+        "days": 12,
+        "targets": 11,
+        "adverse": 2,
+        "neither": 6,
+        "hit_rate": 0.5789473684210527
+      },
+      "midpoint_new_from_unknown": {
+        "n": 19,
+        "days": 12,
+        "targets": 11,
+        "adverse": 2,
+        "neither": 6,
+        "hit_rate": 0.5789473684210527
+      },
+      "midpoint_new_from_no": {
+        "n": 0,
+        "days": 0,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 0,
+        "hit_rate": null
+      },
+      "guarded_100_retained_original": {
+        "n": 68,
+        "days": 31,
+        "targets": 49,
+        "adverse": 9,
+        "neither": 10,
+        "hit_rate": 0.7205882352941176
+      },
+      "guarded_100_lost_original": {
+        "n": 25,
+        "days": 18,
+        "targets": 18,
+        "adverse": 4,
+        "neither": 3,
+        "hit_rate": 0.72
+      },
+      "guarded_100_newly_selected": {
+        "n": 1,
+        "days": 1,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 1,
+        "hit_rate": 0
+      },
+      "guarded_100_new_from_unknown": {
+        "n": 1,
+        "days": 1,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 1,
+        "hit_rate": 0
+      },
+      "guarded_100_new_from_no": {
+        "n": 0,
+        "days": 0,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 0,
+        "hit_rate": null
+      },
+      "guarded_50_retained_original": {
+        "n": 29,
+        "days": 17,
+        "targets": 22,
+        "adverse": 4,
+        "neither": 3,
+        "hit_rate": 0.7586206896551724
+      },
+      "guarded_50_lost_original": {
+        "n": 64,
+        "days": 30,
+        "targets": 45,
+        "adverse": 9,
+        "neither": 10,
+        "hit_rate": 0.703125
+      },
+      "guarded_50_newly_selected": {
+        "n": 0,
+        "days": 0,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 0,
+        "hit_rate": null
+      },
+      "guarded_50_new_from_unknown": {
+        "n": 0,
+        "days": 0,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 0,
+        "hit_rate": null
+      },
+      "guarded_50_new_from_no": {
+        "n": 0,
+        "days": 0,
+        "targets": 0,
+        "adverse": 0,
+        "neither": 0,
+        "hit_rate": null
+      }
+    },
+    "PAIRED_DATE_BOOTSTRAP": {
+      "original_accelerating_yes__minus__all": {
+        "estimate_pp": 8.139267437180154,
+        "interval_pp": [
+          -0.8725833496849501,
+          17.537482305286773
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          6.6981190638773285,
+          10.124605823102595
+        ]
+      },
+      "original_accelerating_yes__minus__original_falling_yes": {
+        "estimate_pp": 5.683563748079878,
+        "interval_pp": [
+          -2.300796982343648,
+          14.149513872166771
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          4.279339820439754,
+          7.176171295314826
+        ]
+      },
+      "original_within_falling_acceleration_yes__minus__original_within_falling_acceleration_no": {
+        "estimate_pp": 10.41510377594399,
+        "interval_pp": [
+          -4.073110039081584,
+          24.413537147355523
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          8.135914444294023,
+          12.529396394042337
+        ]
+      },
+      "midpoint_accelerating_yes__minus__all": {
+        "estimate_pp": 5.739113827349119,
+        "interval_pp": [
+          -2.763525624410449,
+          14.253718000812675
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          4.635622204682988,
+          7.387057387057383
+        ]
+      },
+      "midpoint_accelerating_yes__minus__midpoint_falling_yes": {
+        "estimate_pp": 5.085895117540684,
+        "interval_pp": [
+          -2.387003822459432,
+          12.980482119236726
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          4.0047021943573675,
+          6.570048309178745
+        ]
+      },
+      "midpoint_within_falling_acceleration_yes__minus__midpoint_within_falling_acceleration_no": {
+        "estimate_pp": 9.82142857142857,
+        "interval_pp": [
+          -3.9714193748681264,
+          23.37090690635884
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          8.141160027952488,
+          12.589194699286443
+        ]
+      },
+      "midpoint_accelerating_yes__minus__original_accelerating_yes": {
+        "estimate_pp": -2.400153609831035,
+        "interval_pp": [
+          -9.205780984026033,
+          2.6463765244537916
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          -2.9317909852413226,
+          0.17921146953404632
+        ]
+      },
+      "guarded_100_accelerating_yes__minus__all": {
+        "estimate_pp": 7.110749438115171,
+        "interval_pp": [
+          -3.2337911843234304,
+          18.085296013956835
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          5.142371440713978,
+          9.177688791813289
+        ]
+      },
+      "guarded_100_accelerating_yes__minus__guarded_100_falling_yes": {
+        "estimate_pp": 4.749432512659335,
+        "interval_pp": [
+          -3.984496330331245,
+          13.832410901030478
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          3.193033381712629,
+          6.061157626501634
+        ]
+      },
+      "guarded_100_within_falling_acceleration_yes__minus__guarded_100_within_falling_acceleration_no": {
+        "estimate_pp": 13.871635610766052,
+        "interval_pp": [
+          -4.325042407054971,
+          32.129960317460316
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          9.696969696969704,
+          17.56854256854257
+        ]
+      },
+      "guarded_100_accelerating_yes__minus__original_accelerating_yes": {
+        "estimate_pp": -1.0285179990649818,
+        "interval_pp": [
+          -7.321449476981083,
+          5.111185418305794
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          -2.7450980392156765,
+          0.015812776723589383
+        ]
+      },
+      "guarded_50_accelerating_yes__minus__all": {
+        "estimate_pp": 11.958325650009217,
+        "interval_pp": [
+          -3.0910989681260617,
+          27.69923296026253
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          9.690512430238451,
+          14.999999999999991
+        ]
+      },
+      "guarded_50_accelerating_yes__minus__guarded_50_falling_yes": {
+        "estimate_pp": 12.225705329153602,
+        "interval_pp": [
+          0.24738693357173017,
+          26.098514211886293
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          9.662288930581608,
+          14.532520325203247
+        ]
+      },
+      "guarded_50_within_falling_acceleration_yes__minus__guarded_50_within_falling_acceleration_no": {
+        "estimate_pp": 34.68559837728195,
+        "interval_pp": [
+          7.841503267973862,
+          65
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          29.19540229885057,
+          43.3048433048433
+        ]
+      },
+      "guarded_50_accelerating_yes__minus__original_accelerating_yes": {
+        "estimate_pp": 3.819058212829063,
+        "interval_pp": [
+          -9.19549296953465,
+          17.93155070144054
+        ],
+        "defined_draws": 10000,
+        "delete_day_range_pp": [
+          0.8426966292134797,
+          6.439393939393934
+        ]
+      }
+    },
+    "TOY_JAN6_1015": [
+      {
+        "variant": "guarded_100",
+        "date": "2026-01-06",
+        "episode_id": "2026-01-06_b06_615_1",
+        "parent_min": 615,
+        "coverage": 5,
+        "falling_count": 4,
+        "accelerating_count": 2,
+        "accelerating_with_quote_changes": 2,
+        "missing": 6,
+        "falling_state": "unknown",
+        "accelerating_state": "unknown",
+        "outcome": "adverse_first"
+      },
+      {
+        "variant": "guarded_50",
+        "date": "2026-01-06",
+        "episode_id": "2026-01-06_b06_615_1",
+        "parent_min": 615,
+        "coverage": 3,
+        "falling_count": 2,
+        "accelerating_count": 0,
+        "accelerating_with_quote_changes": 0,
+        "missing": 8,
+        "falling_state": "unknown",
+        "accelerating_state": "unknown",
+        "outcome": "adverse_first"
+      },
+      {
+        "variant": "midpoint",
+        "date": "2026-01-06",
+        "episode_id": "2026-01-06_b06_615_1",
+        "parent_min": 615,
+        "coverage": 11,
+        "falling_count": 10,
+        "accelerating_count": 6,
+        "accelerating_with_quote_changes": 5,
+        "missing": 0,
+        "falling_state": "yes",
+        "accelerating_state": "yes",
+        "outcome": "adverse_first"
+      },
+      {
+        "variant": "original",
+        "date": "2026-01-06",
+        "episode_id": "2026-01-06_b06_615_1",
+        "parent_min": 615,
+        "coverage": 8,
+        "falling_count": 7,
+        "accelerating_count": 4,
+        "accelerating_with_quote_changes": 3,
+        "missing": 3,
+        "falling_state": "yes",
+        "accelerating_state": "unknown",
+        "outcome": "adverse_first"
+      }
+    ],
+    "QUOTE_UPDATES_DIAGNOSTIC": {
+      "original": {
+        "accelerating_selected": 93,
+        "selected_with_six_sectors_having_price_changes_in_both_halves": 57
+      },
+      "midpoint": {
+        "accelerating_selected": 112,
+        "selected_with_six_sectors_having_price_changes_in_both_halves": 63
+      },
+      "guarded_100": {
+        "accelerating_selected": 69,
+        "selected_with_six_sectors_having_price_changes_in_both_halves": 43
+      },
+      "guarded_50": {
+        "accelerating_selected": 29,
+        "selected_with_six_sectors_having_price_changes_in_both_halves": 20
+      }
+    },
+    "VERIFICATION": {
+      "all_raw_hashes_unchanged": 1966,
+      "control_hashes_unchanged": 7,
+      "sector_days_reproduced": 537,
+      "fifty_sampled_days": 50,
+      "parents": 374,
+      "synthetic_guard_checks": 10,
+      "causal_prefix_checks": 2,
+      "elapsed_seconds": 246.3,
+      "files_written": 0
+    }
+  },
+  "earlier_gap_diagnostic": {
+    "source": "import importlib.util,json,math\nfrom pathlib import Path\nfrom collections import Counter\nimport numpy as np\nimport pandas as pd\nroot=Path('outputs/b06_sector_surface_50d_2026-09-13')\nspec=importlib.util.spec_from_file_location('diagnostic_surface',root/'surface.py')\nm=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)\nselected=pd.read_csv(root/'selected_days.csv').date.tolist()\nsyms=['XLC','XLY','XLP','XLE','XLF','XLV','XLI','XLB','XLRE','XLK','XLU']\njobs=[]\nfor date in selected:\n for sym in syms:\n  path=root/'surfaces'/f'{date}_{sym}.parquet'\n  if not path.exists():continue\n  z=pd.read_parquet(path,columns=['timestamp','atm','atm_call_status','atm_put_status'])\n  s=z.atm_call_status.eq('no_strike_bracket')|z.atm_put_status.eq('no_strike_bracket')\n  if s.any():jobs.append((date,sym,z,s))\nprint('JOBS',len(jobs),'S_MINUTES',sum(int(j[3].sum()) for j in jobs),flush=True)\nrecords=[]; node_records=[]; failures=Counter(); toy=[]\nfor j,(date,sym,old,s_mask) in enumerate(jobs):\n meta=json.loads((root/'surfaces'/f'{date}_{sym}.json').read_text())\n ivs=[];greeks=[]\n for path in meta['signature']['inputs']:\n  d=pd.read_parquet(path)\n  (ivs if 'implied_volatility' in path else greeks).append(d)\n p=m._prepare(pd.concat(ivs,ignore_index=True),pd.concat(greeks,ignore_index=True))\n # Relax only bid-IV requirements. Retain positive bid quote, positive midpoint/ask IV,\n # endpoint identity, price ordering, underlying age and original expiry limits.\n numeric=['strike','bid','midpoint','ask','underlying_price','implied_vol','ask_implied_vol']\n relaxed=(np.isfinite(p[numeric])&p[numeric].gt(0)).all(axis=1)\n relaxed &= p.endpoint_match & p.bid.le(p.midpoint)&p.midpoint.le(p.ask)\n relaxed &= p.implied_vol.le(p.ask_implied_vol)\n relaxed &= p.reported_underlying_age_seconds.between(0,60)&p.dte.between(8,65)&p.right.isin(['C','P'])\n assert (~p.valid|relaxed).all()\n p['relaxed']=relaxed\n # Same-contract adjacent observations, with no gap filling or smoothing.\n p=p.sort_values(['expiration','right','strike','timestamp']).reset_index(drop=True)\n contract=p.groupby(['expiration','right','strike'],sort=False)\n for col in ['implied_vol','bid','ask','timestamp']:\n  p['prev_'+col]=contract[col].shift(1)\n  p['next_'+col]=contract[col].shift(-1)\n previous_one=(p.timestamp-p.prev_timestamp).dt.total_seconds().eq(60)\n next_one=(p.next_timestamp-p.timestamp).dt.total_seconds().eq(60)\n p['has_previous']=previous_one & p.prev_implied_vol.gt(0) & np.isfinite(p.prev_implied_vol)\n p['has_neighbors']=p.has_previous & next_one & p.next_implied_vol.gt(0) & np.isfinite(p.next_implied_vol)\n p['step_iv_pp']=np.where(p.has_previous,100*(p.implied_vol-p.prev_implied_vol).abs(),np.nan)\n p['neighbor_deviation_pp']=np.where(p.has_neighbors,100*(p.implied_vol-(p.prev_implied_vol+p.next_implied_vol)/2).abs(),np.nan)\n p['inside_neighbor_range']=np.where(p.has_neighbors,(p.implied_vol>=p[['prev_implied_vol','next_implied_vol']].min(axis=1))&(p.implied_vol<=p[['prev_implied_vol','next_implied_vol']].max(axis=1)),False)\n p['unchanged_quotes']=p.has_previous&p.bid.eq(p.prev_bid)&p.ask.eq(p.prev_ask)\n p['changed_iv']=p.has_previous&p.implied_vol.ne(p.prev_implied_vol)\n data={c:p[c].to_numpy() for c in p.columns}\n data['valid']=p.relaxed.to_numpy()\n indexes=p.groupby('timestamp',sort=True).indices\n bykey={(str(row.expiration),str(row.right),float(row.strike),row.timestamp):i for i,row in enumerate(p.itertuples())}\n old=old.set_index('timestamp')\n stamps=old.index[(old.atm_call_status.eq('no_strike_bracket')|old.atm_put_status.eq('no_strike_bracket'))]\n recovered=0\n for ts in stamps:\n  idx=indexes[ts]; coords=[]; chosen=[]; reasons=[]\n  for right in ['C','P']:\n   coord,status=m._tenor_coordinate(data,idx[data['right'][idx]==right],None)\n   if coord is None:reasons.append(right+':'+status)\n   else:\n    coords.append(coord)\n    for ex in coord['provenance']['expiries']:\n     for quote in ex['quotes']:\n      chosen.append(bykey[(ex['expiration'],right,quote['strike'],ts)])\n  good=len(coords)==2 and coords[0]['underlying']==coords[1]['underlying'] and all(np.isfinite(c['value'][1]) and c['value'][1]>0 for c in coords)\n  if not good:\n   failures.update(reasons or ['inconsistent_underlying'])\n   continue\n  recovered+=1\n  value=float(np.sqrt((coords[0]['value'][1]**2+coords[1]['value'][1]**2)/2))\n  for i in sorted(set(chosen)):\n   r=p.iloc[i]\n   node_records.append({\n    'date':date,'symbol':sym,'time':ts.strftime('%H:%M'),'expiration':r.expiration,'right':r.right,'strike':float(r.strike),\n    'bid_iv_missing':not bool(r.valid),'bid_iv':float(r.bid_implied_vol),\n    'iv_pp':100*float(r.implied_vol),'previous_iv_pp':100*float(r.prev_implied_vol) if pd.notna(r.prev_implied_vol) else None,\n    'next_iv_pp':100*float(r.next_implied_vol) if pd.notna(r.next_implied_vol) else None,\n    'bid':float(r.bid),'midpoint':float(r.midpoint),'ask':float(r.ask),'spot':float(r.underlying_price),\n    'relative_spread':float((r.ask-r.bid)/r.midpoint),'step_iv_pp':float(r.step_iv_pp),\n    'neighbor_deviation_pp':float(r.neighbor_deviation_pp),'has_previous':bool(r.has_previous),\n    'has_neighbors':bool(r.has_neighbors),'inside_neighbor_range':bool(r.inside_neighbor_range),\n    'unchanged_quotes':bool(r.unchanged_quotes),'changed_iv':bool(r.changed_iv),'iv_error':float(r.iv_error)\n   })\n  if date=='2026-01-06' and 580<=ts.hour*60+ts.minute<=609:toy.append({'symbol':sym,'time':ts.strftime('%H:%M'),'recovered_atm_iv':value})\n records.append({'symbol':sym,'date':date,'S_minutes':len(stamps),'recovered_minutes':recovered})\n if (j+1)%15==0:print('PROGRESS',j+1,'/',len(jobs),flush=True)\nr=pd.DataFrame(records);n=pd.DataFrame(node_records)\nprint('COVERAGE',r.groupby('symbol')[['S_minutes','recovered_minutes']].sum().to_json(orient='index'),flush=True)\nprint('COUNTS',json.dumps({'S_minutes':int(r.S_minutes.sum()),'recovered_minutes':int(r.recovered_minutes.sum()),'selected_contract_minutes':len(n),'new_bid_iv_excluded_contract_minutes':int(n.bid_iv_missing.sum()),'candidate_dates':r.date.nunique(),'candidate_sector_days':len(r)}),flush=True)\ndef summary(x):\n a=x[x.has_neighbors];b=x[x.has_previous]\n return {'n':len(x),'with_neighbors':len(a),'with_previous':len(b),\n 'iv_pp_quantiles':x.iv_pp.quantile([0,.5,.95,.99,1]).to_dict(),\n 'step_iv_pp_quantiles':b.step_iv_pp.quantile([.5,.9,.95,.99,1]).to_dict(),\n 'neighbor_deviation_pp_quantiles':a.neighbor_deviation_pp.quantile([.5,.9,.95,.99,1]).to_dict(),\n 'neighbor_deviation_over_1pp':int(a.neighbor_deviation_pp.gt(1).sum()),\n 'neighbor_deviation_over_5pp':int(a.neighbor_deviation_pp.gt(5).sum()),\n 'inside_neighbor_range':int(a.inside_neighbor_range.sum()),\n 'relative_spread_quantiles':x.relative_spread.quantile([.5,.9,.95,.99,1]).to_dict(),\n 'unchanged_quotes_previous':int(b.unchanged_quotes.sum()),\n 'iv_moves_with_unchanged_quotes':int((b.unchanged_quotes&b.changed_iv).sum()),\n 'relative_spread_over_100pct':int(x.relative_spread.gt(1).sum()),\n 'bid_iv_zero':int(x.bid_iv.eq(0).sum()),\n 'bid_iv_nonfinite':int((~np.isfinite(x.bid_iv)).sum())}\nfor group,rows in [('bid_iv_excluded',n[n.bid_iv_missing]),('already_accepted_companion_quotes',n[~n.bid_iv_missing])]:\n print('DIAGNOSTICS',group,json.dumps(summary(rows)),flush=True)\nprint('EXCLUDED_BY_SECTOR',n[n.bid_iv_missing].groupby('symbol').apply(lambda x:pd.Series({'n':len(x),'median_neighbor_deviation_pp':x.neighbor_deviation_pp.median(),'p95_neighbor_deviation_pp':x.neighbor_deviation_pp.quantile(.95),'median_relative_spread':x.relative_spread.median(),'pct_unchanged_quotes':100*x.loc[x.has_previous,'unchanged_quotes'].mean()}),include_groups=False).to_json(orient='index'),flush=True)\ncols=['date','symbol','time','expiration','right','strike','previous_iv_pp','iv_pp','next_iv_pp','neighbor_deviation_pp','bid','ask','spot','iv_error']\nprint('LARGEST_DEVIATIONS',n[n.bid_iv_missing&n.has_neighbors].nlargest(10,'neighbor_deviation_pp')[cols].to_json(orient='records'),flush=True)\nprint('TOY_RECOVERED',json.dumps(toy),flush=True)\nprint('UNRECOVERED_FAILURES',dict(failures),flush=True)\n",
+    "completed_stdout": "PROGRESS 75 / 75\nCOVERAGE {\"XLB\":{\"S_minutes\":56,\"recovered_minutes\":56},\"XLC\":{\"S_minutes\":405,\"recovered_minutes\":404},\"XLE\":{\"S_minutes\":1,\"recovered_minutes\":1},\"XLF\":{\"S_minutes\":219,\"recovered_minutes\":219},\"XLP\":{\"S_minutes\":174,\"recovered_minutes\":174},\"XLRE\":{\"S_minutes\":3585,\"recovered_minutes\":3289},\"XLU\":{\"S_minutes\":871,\"recovered_minutes\":761}}\nCOUNTS {\"S_minutes\": 5311, \"recovered_minutes\": 4904, \"selected_contract_minutes\": 37612, \"new_bid_iv_excluded_contract_minutes\": 6263, \"candidate_dates\": 47, \"candidate_sector_days\": 75}\nDIAGNOSTICS bid_iv_excluded {\"n\": 6263, \"with_neighbors\": 6174, \"with_previous\": 6192, \"iv_pp_quantiles\": {\"0.0\": 3.12, \"0.5\": 14.16, \"0.95\": 26.680000000000003, \"0.99\": 29.34, \"1.0\": 52.42}, \"step_iv_pp_quantiles\": {\"0.5\": 0.20000000000000018, \"0.9\": 0.7800000000000001, \"0.95\": 1.1699999999999988, \"0.99\": 2.5445000000000078, \"1.0\": 42.169999999999995}, \"neighbor_deviation_pp_quantiles\": {\"0.5\": 0.14500000000000068, \"0.9\": 0.5849999999999994, \"0.95\": 0.8800000000000002, \"0.99\": 2.2550000000000003, \"1.0\": 21.319999999999993}, \"neighbor_deviation_over_1pp\": 247, \"neighbor_deviation_over_5pp\": 17, \"inside_neighbor_range\": 4267, \"relative_spread_quantiles\": {\"0.5\": 0.9469696969696969, \"0.9\": 1.9158878504672898, \"0.95\": 1.9797297297297298, \"0.99\": 1.9937500000000001, \"1.0\": 1.9941176470588236}, \"unchanged_quotes_previous\": 5970, \"iv_moves_with_unchanged_quotes\": 4544, \"relative_spread_over_100pct\": 2889, \"bid_iv_zero\": 6263, \"bid_iv_nonfinite\": 0}\nDIAGNOSTICS already_accepted_companion_quotes {\"n\": 31349, \"with_neighbors\": 31104, \"with_previous\": 31153, \"iv_pp_quantiles\": {\"0.0\": 7.76, \"0.5\": 15.770000000000001, \"0.95\": 21.97, \"0.99\": 26.69040000000001, \"1.0\": 45.01}, \"step_iv_pp_quantiles\": {\"0.5\": 0.10000000000000009, \"0.9\": 0.40999999999999925, \"0.95\": 0.63, \"0.99\": 1.5600000000000003, \"1.0\": 19.110000000000003}, \"neighbor_deviation_pp_quantiles\": {\"0.5\": 0.08000000000000229, \"0.9\": 0.32000000000000084, \"0.95\": 0.49000000000000155, \"0.99\": 1.3200000000000016, \"1.0\": 13.62}, \"neighbor_deviation_over_1pp\": 471, \"neighbor_deviation_over_5pp\": 16, \"inside_neighbor_range\": 21596, \"relative_spread_quantiles\": {\"0.5\": 0.6147540983606559, \"0.9\": 1.4858490566037736, \"0.95\": 1.7187499999999998, \"0.99\": 1.957547169811321, \"1.0\": 1.9915966386554624}, \"unchanged_quotes_previous\": 29004, \"iv_moves_with_unchanged_quotes\": 21447, \"relative_spread_over_100pct\": 8287, \"bid_iv_zero\": 0, \"bid_iv_nonfinite\": 0}\nEXCLUDED_BY_SECTOR {\"XLB\":{\"n\":87.0,\"median_neighbor_deviation_pp\":0.195,\"p95_neighbor_deviation_pp\":0.491,\"median_relative_spread\":1.9573170732,\"pct_unchanged_quotes\":91.9540229885},\"XLC\":{\"n\":438.0,\"median_neighbor_deviation_pp\":0.1,\"p95_neighbor_deviation_pp\":0.505,\"median_relative_spread\":1.5919847328,\"pct_unchanged_quotes\":97.2157772622},\"XLE\":{\"n\":2.0,\"median_neighbor_deviation_pp\":4.085,\"p95_neighbor_deviation_pp\":5.1155,\"median_relative_spread\":1.846875,\"pct_unchanged_quotes\":0.0},\"XLF\":{\"n\":219.0,\"median_neighbor_deviation_pp\":0.05,\"p95_neighbor_deviation_pp\":0.32,\"median_relative_spread\":1.8670520231,\"pct_unchanged_quotes\":95.8904109589},\"XLP\":{\"n\":270.0,\"median_neighbor_deviation_pp\":0.085,\"p95_neighbor_deviation_pp\":0.42875,\"median_relative_spread\":1.4645669291,\"pct_unchanged_quotes\":96.2962962963},\"XLRE\":{\"n\":4019.0,\"median_neighbor_deviation_pp\":0.16,\"p95_neighbor_deviation_pp\":0.975,\"median_relative_spread\":0.7,\"pct_unchanged_quotes\":97.6070528967},\"XLU\":{\"n\":1228.0,\"median_neighbor_deviation_pp\":0.145,\"p95_neighbor_deviation_pp\":0.735,\"median_relative_spread\":1.7222222222,\"pct_unchanged_quotes\":92.8276999176}}\nLARGEST_DEVIATIONS [{\"date\":\"2026-02-12\",\"symbol\":\"XLRE\",\"time\":\"11:12\",\"expiration\":\"2026-02-20\",\"right\":\"P\",\"strike\":44.0,\"previous_iv_pp\":10.25,\"iv_pp\":52.42,\"next_iv_pp\":51.95,\"neighbor_deviation_pp\":21.32,\"bid\":0.65,\"ask\":2.8,\"spot\":43.28,\"iv_error\":0.0179},{\"date\":\"2026-02-12\",\"symbol\":\"XLRE\",\"time\":\"11:11\",\"expiration\":\"2026-02-20\",\"right\":\"P\",\"strike\":44.0,\"previous_iv_pp\":10.25,\"iv_pp\":10.25,\"next_iv_pp\":52.42,\"neighbor_deviation_pp\":21.085,\"bid\":0.65,\"ask\":0.8,\"spot\":43.3,\"iv_error\":0.0071},{\"date\":\"2026-01-07\",\"symbol\":\"XLU\",\"time\":\"10:13\",\"expiration\":\"2026-02-06\",\"right\":\"C\",\"strike\":42.0,\"previous_iv_pp\":26.8,\"iv_pp\":9.91,\"next_iv_pp\":16.84,\"neighbor_deviation_pp\":11.91,\"bid\":0.01,\"ask\":1.63,\"spot\":42.45,\"iv_error\":18.8605},{\"date\":\"2026-02-12\",\"symbol\":\"XLRE\",\"time\":\"11:15\",\"expiration\":\"2026-02-20\",\"right\":\"P\",\"strike\":44.0,\"previous_iv_pp\":51.95,\"iv_pp\":29.19,\"next_iv_pp\":29.49,\"neighbor_deviation_pp\":11.53,\"bid\":0.65,\"ask\":1.65,\"spot\":43.27,\"iv_error\":0.023},{\"date\":\"2026-02-12\",\"symbol\":\"XLRE\",\"time\":\"11:14\",\"expiration\":\"2026-02-20\",\"right\":\"P\",\"strike\":44.0,\"previous_iv_pp\":51.95,\"iv_pp\":51.95,\"next_iv_pp\":29.19,\"neighbor_deviation_pp\":11.38,\"bid\":0.65,\"ask\":2.8,\"spot\":43.26,\"iv_error\":0.028},{\"date\":\"2026-01-28\",\"symbol\":\"XLF\",\"time\":\"14:01\",\"expiration\":\"2026-02-27\",\"right\":\"C\",\"strike\":52.5,\"previous_iv_pp\":17.52,\"iv_pp\":8.66,\"next_iv_pp\":16.99,\"neighbor_deviation_pp\":8.595,\"bid\":0.01,\"ask\":1.63,\"spot\":52.86,\"iv_error\":16.8946},{\"date\":\"2026-06-01\",\"symbol\":\"XLRE\",\"time\":\"09:32\",\"expiration\":\"2026-07-17\",\"right\":\"C\",\"strike\":43.0,\"previous_iv_pp\":30.59,\"iv_pp\":16.52,\"next_iv_pp\":16.3,\"neighbor_deviation_pp\":6.925,\"bid\":0.7,\"ask\":2.4,\"spot\":43.74,\"iv_error\":0.1129},{\"date\":\"2026-01-09\",\"symbol\":\"XLU\",\"time\":\"10:01\",\"expiration\":\"2026-02-06\",\"right\":\"C\",\"strike\":42.5,\"previous_iv_pp\":13.08,\"iv_pp\":26.41,\"next_iv_pp\":26.66,\"neighbor_deviation_pp\":6.54,\"bid\":0.02,\"ask\":2.95,\"spot\":42.83,\"iv_error\":7.1419},{\"date\":\"2026-01-07\",\"symbol\":\"XLB\",\"time\":\"10:01\",\"expiration\":\"2026-02-06\",\"right\":\"P\",\"strike\":48.0,\"previous_iv_pp\":32.76,\"iv_pp\":21.19,\"next_iv_pp\":21.53,\"neighbor_deviation_pp\":5.955,\"bid\":0.04,\"ask\":3.25,\"spot\":46.98,\"iv_error\":6.9684},{\"date\":\"2026-04-21\",\"symbol\":\"XLU\",\"time\":\"09:59\",\"expiration\":\"2026-05-22\",\"right\":\"C\",\"strike\":45.0,\"previous_iv_pp\":31.05,\"iv_pp\":30.81,\"next_iv_pp\":18.79,\"neighbor_deviation_pp\":5.89,\"bid\":0.4,\"ask\":3.4,\"spot\":45.4,\"iv_error\":0.1154}]\nTOY_RECOVERED [{\"symbol\": \"XLC\", \"time\": \"09:43\", \"recovered_atm_iv\": 17.365782417824175}, {\"symbol\": \"XLC\", \"time\": \"09:44\", \"recovered_atm_iv\": 17.445871014551884}, {\"symbol\": \"XLC\", \"time\": \"09:45\", \"recovered_atm_iv\": 17.492184950816924}, {\"symbol\": \"XLC\", \"time\": \"09:49\", \"recovered_atm_iv\": 17.4594385408148}, {\"symbol\": \"XLC\", \"time\": \"09:53\", \"recovered_atm_iv\": 17.395335611188422}, {\"symbol\": \"XLC\", \"time\": \"09:54\", \"recovered_atm_iv\": 17.457213163233586}, {\"symbol\": \"XLC\", \"time\": \"09:55\", \"recovered_atm_iv\": 17.47569859459831}, {\"symbol\": \"XLC\", \"time\": \"09:56\", \"recovered_atm_iv\": 17.42802506766274}, {\"symbol\": \"XLC\", \"time\": \"09:57\", \"recovered_atm_iv\": 17.395335611188422}, {\"symbol\": \"XLC\", \"time\": \"09:58\", \"recovered_atm_iv\": 17.378264987521973}, {\"symbol\": \"XLC\", \"time\": \"09:59\", \"recovered_atm_iv\": 17.346280449540338}, {\"symbol\": \"XLC\", \"time\": \"10:00\", \"recovered_atm_iv\": 17.457213163233586}, {\"symbol\": \"XLC\", \"time\": \"10:01\", \"recovered_atm_iv\": 17.407111781723597}, {\"symbol\": \"XLC\", \"time\": \"10:02\", \"recovered_atm_iv\": 17.42802506766274}, {\"symbol\": \"XLC\", \"time\": \"10:03\", \"recovered_atm_iv\": 17.59177041448267}, {\"symbol\": \"XLC\", \"time\": \"10:04\", \"recovered_atm_iv\": 17.257965460242808}, {\"symbol\": \"XLC\", \"time\": \"10:05\", \"recovered_atm_iv\": 17.308287529096194}, {\"symbol\": \"XLC\", \"time\": \"10:06\", \"recovered_atm_iv\": 17.257965460242808}, {\"symbol\": \"XLC\", \"time\": \"10:07\", \"recovered_atm_iv\": 17.257965460242808}, {\"symbol\": \"XLC\", \"time\": \"10:08\", \"recovered_atm_iv\": 17.296050735636275}, {\"symbol\": \"XLC\", \"time\": \"10:09\", \"recovered_atm_iv\": 17.308287529096194}, {\"symbol\": \"XLRE\", \"time\": \"09:47\", \"recovered_atm_iv\": 15.3621330177729}, {\"symbol\": \"XLRE\", \"time\": \"09:48\", \"recovered_atm_iv\": 15.629697188910141}, {\"symbol\": \"XLU\", \"time\": \"09:40\", \"recovered_atm_iv\": 22.251510030586083}, {\"symbol\": \"XLU\", \"time\": \"09:41\", \"recovered_atm_iv\": 22.14538077836889}, {\"symbol\": \"XLU\", \"time\": \"09:42\", \"recovered_atm_iv\": 22.125295757144162}, {\"symbol\": \"XLU\", \"time\": \"09:43\", \"recovered_atm_iv\": 22.06975519826601}, {\"symbol\": \"XLU\", \"time\": \"09:44\", \"recovered_atm_iv\": 22.065089978693276}, {\"symbol\": \"XLU\", \"time\": \"09:45\", \"recovered_atm_iv\": 22.03395177457996}, {\"symbol\": \"XLU\", \"time\": \"09:46\", \"recovered_atm_iv\": 21.961655116058175}, {\"symbol\": \"XLU\", \"time\": \"09:47\", \"recovered_atm_iv\": 21.936615754440073}, {\"symbol\": \"XLU\", \"time\": \"09:48\", \"recovered_atm_iv\": 21.856796874046434}, {\"symbol\": \"XLU\", \"time\": \"09:49\", \"recovered_atm_iv\": 21.666263606859978}, {\"symbol\": \"XLU\", \"time\": \"09:50\", \"recovered_atm_iv\": 21.46079159615981}, {\"symbol\": \"XLU\", \"time\": \"09:51\", \"recovered_atm_iv\": 20.530368861813034}, {\"symbol\": \"XLU\", \"time\": \"09:52\", \"recovered_atm_iv\": 20.4828362471729}, {\"symbol\": \"XLU\", \"time\": \"09:53\", \"recovered_atm_iv\": 17.124759727200523}, {\"symbol\": \"XLU\", \"time\": \"09:54\", \"recovered_atm_iv\": 17.188234296392498}, {\"symbol\": \"XLU\", \"time\": \"09:55\", \"recovered_atm_iv\": 17.132165145282695}, {\"symbol\": \"XLU\", \"time\": \"09:56\", \"recovered_atm_iv\": 17.188234296392498}, {\"symbol\": \"XLU\", \"time\": \"09:57\", \"recovered_atm_iv\": 17.237358984361848}, {\"symbol\": \"XLU\", \"time\": \"09:58\", \"recovered_atm_iv\": 17.203517119350654}, {\"symbol\": \"XLU\", \"time\": \"09:59\", \"recovered_atm_iv\": 17.153138894838747}, {\"symbol\": \"XLU\", \"time\": \"10:00\", \"recovered_atm_iv\": 17.132165145282695}, {\"symbol\": \"XLU\", \"time\": \"10:01\", \"recovered_atm_iv\": 17.132165145282695}, {\"symbol\": \"XLU\", \"time\": \"10:02\", \"recovered_atm_iv\": 17.121682693857355}, {\"symbol\": \"XLU\", \"time\": \"10:03\", \"recovered_atm_iv\": 17.03623883359436}, {\"symbol\": \"XLU\", \"time\": \"10:04\", \"recovered_atm_iv\": 17.033934502098262}, {\"symbol\": \"XLU\", \"time\": \"10:05\", \"recovered_atm_iv\": 16.750480526024834}, {\"symbol\": \"XLU\", \"time\": \"10:06\", \"recovered_atm_iv\": 16.754310684493806}, {\"symbol\": \"XLU\", \"time\": \"10:07\", \"recovered_atm_iv\": 16.760969289547145}, {\"symbol\": \"XLU\", \"time\": \"10:08\", \"recovered_atm_iv\": 16.778073597351472}, {\"symbol\": \"XLU\", \"time\": \"10:09\", \"recovered_atm_iv\": 16.75275849736307}]\nUNRECOVERED_FAILURES {'C:no_strike_bracket': 210, 'P:no_strike_bracket': 201}\n"
+  },
+  "earlier_context": {
+    "user_supplied_text": "1. IV with comparable prices: does the options market tell us something prices haven’t already told us? Imagine two B06 breakouts where the same number of sectors are rising and their typical price gains are almost identical. We paired 73 examples like that, then asked whether the options data separated their outcomes. IV describes how much future movement is priced into options. Our “IV-confirmed” label meant at least six sectors had falling IV, with the slope becoming more negative between the two halves of our lookback. Matching the price conditions helps prevent us from mistaking “prices were already stronger” for “IV supplied useful information.”\nThink of three bins for what happened next: rose five points first, fell fifteen points first, or reached neither within the hour. Among the 73 IV-confirmed entries, those bins contained 51, 12 and 10. Among the 73 comparable entries without confirmation, they contained 42, 12 and 19. That is the interesting result: the confirmed group had nine more upward targets and nine fewer unresolved moves. The number of large downward moves was exactly the same. What seems to work is identifying breakouts more likely to produce the initial upward movement we want.\nWhat hasn’t worked is identifying breakouts that are demonstrably safer or more persistent. The twelve adverse outcomes didn’t disappear, and the successful moves weren’t less likely to reverse afterward. Also, these weren’t identical experiments conducted under identical conditions: most matched entries occurred on different dates, and we didn’t equalize every feature of their price paths. Chance or those remaining differences could explain the apparent advantage. The promising claim is “IV may help identify initial progress.” We haven’t established “IV tells us this breakout won’t fail.”\n2. Acceleration beyond falling IV: does “falling faster” add anything? Falling and accelerating are different things. Suppose IV moves from 20.0% to 19.9% to 19.6% over equal periods: it fell a little, then fell more. Its decline accelerated. If it moves from 20.0% to 19.7% to 19.6%, it is still falling, but the decline slowed. Our actual calculation compares fitted slopes over two halves of the window. Here we started with entries where IV was already falling broadly, then asked whether requiring the additional acceleration condition improved the result.\nThere were 217 broadly falling-IV entries. Acceleration qualified in 93, definitely did not qualify in 86, and was unknown in 38. The qualifying group reached the target 72.0% of the time, versus 61.6% for definite nonqualifiers. That looks useful until we ask what the extra restriction throws away. Falling IV alone included 144 successful signals; requiring acceleration retained only 67. We gained a higher observed success percentage while discarding 77 successes. Both facts matter: a higher percentage can come at a very expensive reduction in opportunities.\nThe extra requirement also didn’t produce stickier winners. Among winners with enough observation time, 28.1% of acceleration qualifiers returned below entry within fifteen subsequent minute closes, versus 15.6% of nonqualifiers. Those differences remain uncertain. There is another complication: qualifiers had a median of eight sectors with falling IV, versus six among nonqualifiers. Some apparent benefit could therefore come from broader IV decline, rather than acceleration itself. Acceleration offers an initial-target hint, but we haven’t shown that the second derivative deserves the credit—or that its benefit justifies excluding more than half the successful opportunities.\n3. Useful moves versus brief pops: what does our “win” actually measure? Picture entering SPX at 6,000. It reaches 6,005, so our test records a success. Twenty minutes later it falls to 5,998. The recorded success is still correct: it reached our upward target before the downward boundary. But that record alone says nothing about whether the rally lasted. We had been asking, “Did price reach the first useful destination?” This follow-up asked, “What happened after it got there?”\nAmong 237 winners with later observations available, 87—36.7%—subsequently closed below their entry price before the original hour ended. However, a winner that reaches its target early has much longer to reverse than one reaching it near the deadline. To make observation time more comparable, we also examined the first fifteen subsequent minute closes, using only winners with all fifteen available. In that check, 49 of 222—22.1%—returned below entry. So a meaningful portion of our successes were moves that later disappeared. The remaining winners weren’t necessarily strong continuing trends; some simply stayed above entry.\nThe IV condition did not demonstrate protection against those givebacks. That means its higher initial hit rate cannot be translated into confidence that holding longer will work. But a price reversal is also not automatically a failed Branch B trade. If the intended option construction had already completed during the favorable move, the later reversal might be economically irrelevant. The distinction is between getting the movement needed to complete the trade and predicting a sustained rally. Our tests provide evidence about the first price movement; they have not established either sustained momentum or actual option-trade profitability.\n\n\nFriday 4:43 PM\n\n\n\n\n\n\n\nthe distinction is between getting the movement needed to complete the trade and predicting a sustained rally. Our tests provide evidence about the first price movement; they have not established either sustained momentum or actual option-trade profitability. -->yes but we only care about the first price movement.  so explain what this test showed with first price movement and if we did something to improve it over plain vanilla B06\n\n\n\n\n\n\n\nFriday 4:49 PM\n\n\n\n\n\n\nContext automatically compacted\n\n\n\n\n\n\nYes—then reaching the first +5 is what matters, and a reversal afterward does not invalidate the result. Our existing success definition is: SPX reaches +5 points before −15 points, within one hour.\nThe study of what happened after +5 did not improve B06. It examined what happened after your objective had already been achieved. The IV filtering tests, however, did identify a historical improvement:\nWhich B06 signals we take\tSignals\tReached +5 first\tHit rate\nPlain B06\t374\t239\t63.9%\nOnly when IV was falling broadly\t217\t144\t66.4%\nOnly when IV was falling with downward acceleration in at least six sectors\t93\t67\t72.0%\n\n\nThe strongest filter improved the observed hit rate by 8.1 percentage points. Think of it as being more selective: take approximately one-quarter of B06 signals and get a higher proportion of successful first moves. The cost was substantial: it kept 67 successful opportunities and passed on 172 other successful opportunities. That tradeoff can still fit your stated priority of accuracy first.\nWe also checked whether IV was merely selecting stronger-looking price moves. Among 73 pairs with comparable sector-price participation and return strength, the IV-confirmed side produced 51 successes versus 42—69.9% versus 57.5%. That supports the possibility that IV helps distinguish breakouts that reach your target from those that stall.\nSo yes: we found a promising way to improve first-move accuracy over plain B06 in this sample. The improvement remains uncertain because the sample is limited and repeatedly studied. It is a research finding; we haven’t installed it as a dashboard filter yet.",
+    "verified_matched_price_and_post_target_findings_snapshot": "# Test 2: does the original IV condition help among comparable price setups?\n\n17 September 2026. Executed after test 1 was saved and independently verified.\n**The IV target-rate advantage survives these price controls as a promising but uncertain\nassociation. It still does not reduce adverse outcomes or winner givebacks.**\n\nWe found **73 one-to-one pairs, 146 parents**, with exactly the same number of rising\nsectors and very similar signed median sector returns. This is a historical comparison\nsample; matched membership itself is not an executable entry rule.\n\n| Matched original IV state | Signals / dates / causal advances | +5 first | −15 first | Neither |\n|---|---:|---:|---:|---:|\n| Confirmed | 73 / 28 / 39 | 51 = 69.9% | 12 = 16.4% | 10 = 13.7% |\n| Definite nonconfirmation | 73 / 27 / 32 | 42 = 57.5% | 12 = 16.4% | 19 = 26.0% |\n\nThe target difference is **+12.3 percentage points**, with descriptive whole-date 95%\ninterval **−3.5 to +27.4**. Adverse difference is exactly zero in this sample, interval\n−12.1 to +12.5. The observed separation is nine more targets and nine fewer neither\noutcomes, not fewer damaging false starts. Neither difference is −12.3 points, interval\n−24.2 to −0.2; this related contrast is exploratory and unadjusted for prior tests.\n\nOriginal scoring stays +5 SPX points before −15 within sixty minutes from the observed\nentry open. Both groups have zero ambiguous cases. A neither is an unresolved price\npath within the hour, not necessarily a failed option construction.\n\n![Matched IV comparison and support](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/comparison.png)\n\n## What was matched, and what IV means here\n\nThis uses the **original** IV condition: at least six of eleven sector ETFs have negative\nlatest-half ATM IV slope **and** negative acceleration. The existing constant thirty-day\nspot-relative ATM measure and T−35…T−6 reference remain unchanged. It is not the later\nsame-sector price-up/IV-down rule. The full original population remains 93 IV yes,\n216 definite IV no and 65 unknown. Unknown is never counted as no.\n\nPrice controls use each ETF's full-window endpoint return, 10000×(last/first−1), bps.\nRequire all eleven ETFs to have complete positive finite thirty-sample price coverage.\nMatch exactly on count of returns >1e−12 bps. Match the **signed median** return of those\nsame eleven ETFs within a fixed ten-bps gap (0.10% price return). This is a practical\nsimilarity tolerance fixed before matching, not a validated or optimized threshold.\n\nMatching maximizes pair count first, then minimizes total absolute strength distance,\nwithout replacement. Parent-ID sorting makes tied assignments deterministic. Date, clock\nand outcomes do not select pairs. Code/source hashes were frozen before matching; pair\nIDs, exclusions and balance diagnostics were frozen before joining original outcomes.\n\nThe actual matches are much closer than the allowed gap: **median 0.58 bps, maximum\n3.92 bps**, with a mean signed IV-yes minus IV-no gap of −0.15 bps. No wider tolerance\nor alternative matching version was tried.\n\n| Price feature | Eligible pre-match IV yes / no means | Matched IV yes / no means | Standardized mean difference, before → after |\n|---|---:|---:|---:|\n| Number of rising sectors | 6.63 / 7.07 | 6.70 / 6.70 | −0.179 → 0.000 |\n| Median sector return, bps | 4.85 / 8.95 | 5.09 / 5.24 | −0.302 → −0.011 |\n\nBoth standardized differences use the same respective **pre-match pooled sample SD**:\n2.44 sectors and 13.54 bps. They do not switch scales to flatter the post-match balance.\nEach arm has identical counts across rising-sector strata 2…11. The pair and balance\nrecords preserve every actual difference.\n\n## How many comparable entries remain?\n\nThe disjoint flow accounts for all 374 parents:\n\n| Step | Parents |\n|---|---:|\n| Original B06 | 374 |\n| Incomplete eleven-sector price coverage, excluded | 97 |\n| Complete price coverage remaining | 277 |\n| IV unknown within complete price coverage, excluded | 41 |\n| Known IV and complete price coverage | 236: 76 yes, 160 no |\n| Matched | 146: 73 yes, 73 no |\n| Eligible but unmatched | 90: 3 yes, 87 no |\n\nOverall IV unknown is still 65: 24 also lack complete price coverage, so these overlap\nwith the first exclusion. Among eligible unmatched, seventeen have no counterpart within\nthe exact-count/caliper rule (two yes, fifteen no); seventy-three have eligible edges but\nare unmatched because each counterpart may be used only once (one yes, seventy-two no).\n\nWe retained **73/76 = 96.1%** of price-eligible IV-yes observations and **73/93 = 78.5%**\nof all IV-yes observations. The matched IV-yes arm contains **51/67 = 76.1%** of the\noriginal IV condition's targets. The twenty original IV-yes parents outside this\ncomparison contain sixteen targets, one adverse and three neither outcomes. Their\nexclusion is a comparability/coverage limitation, not evidence those signals should be\navoided. The full matched sample contains 93 targets out of the original 239; its\nconfirmed arm contains 51. Do not transfer original full-sample N to this comparison.\n\n## Did the matched winners hold up better?\n\nNo clear improvement: among original targets with fifteen subsequent closes available,\n**16/48 = 33.3%** of matched IV-yes winners later close below entry, versus\n**12/38 = 31.6%** of matched IV-no winners. Difference +1.8 points, interval −16.8 to\n+21.1. Three confirmed and four nonconfirmed targets arrive too late for that common\nfollow-up and remain excluded consistently. This secondary diagnostic preserves the\noriginal winners and does not infer option execution or economic failure.\n\n## What remains uncontrolled\n\nOnly **three of the seventy-three pairs share a date**. Median entry time is 12:20 ET\nfor IV yes and 12:50 ET for IV no. Both arms' three busiest dates supply sixteen entries;\nthe groups cover different dates and causal advances. Matching does not control time,\nadvance maturity, leadership identities, dispersion, SPX price path or market regime.\nPrice snapshots accompany options observations and are not an independent sector feed.\n\nTherefore the finding weakens the simple explanation that IV only picks a higher count\nof rising sectors or stronger median returns. It does **not** prove IV is independent\nof all price behavior, identify fresh option demand or establish a dealer-hedging mechanism.\nThe inherited midpoint IV/acceleration signs are not resolved by conservative propagated\nquote envelopes; a predictive association and reliably measured repricing are different\nclaims. No quote uncertainty was reinterpreted as a statistical confidence interval.\n\n## Uncertainty and disposition\n\nTen thousand identical whole-date draws, seed20260917, retain all fifty sampled dates\nincluding the zero-entry date. Matched membership is fixed; each arm uses its own\nresampled denominator. There are no undefined draws. These are **conditional fixed-cohort**\nintervals; resampling may disrupt balance, and uncertainty from choosing the match or\nmatching design is not included. Individual pairs were not treated as independent and\nwere not rematched after outcomes.\n\nDeleting any one date leaves the target difference positive, **+10.1 to +16.1 points**.\nThat stability to a single date is useful but does not make the broader interval exclude\nzero or create fresh validation. All observations have already been explored, outcomes\noverlap, and intervals are unadjusted for the series of hypotheses tried.\n\n**Brent's interpretation:** retain the narrower progress-versus-stalling thesis; no\nfalse-start or durability protection is established. **Research decision:** this is\nmore encouraging than the participation-change test, and it supplies a concrete matched\nsample for inspection. It earns preservation as a candidate association, not a deployed\nIV veto or a claim that option-construction accuracy improved. Do not retune matching.\nQuant independently verified matching optimality by ordered dynamic programming and\nreproduced all labels, exclusions, balance diagnostics, daily cells, intervals and deletions.\nNo material implementation or report defects were found. Fourteen targeted tests plus\nthirty subtests pass, including matching traps, no reuse, missingness and balance scaling.\n\n[Protocol](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/PROTOCOL.md),\n[frozen pairs](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/pairs_before_outcomes.csv),\n[paired outcomes](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/pair_outcomes.csv),\n[all parents and exclusion reasons](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/event_ledger.csv),\n[balance](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/price_balance_before_outcomes.json),\n[full summaries/intervals](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/summary.json),\n[independent verification](/Users/dgrissen/Dev/delta_bomb/outputs/b06_iv_matched_price_2026-09-17/independent_verification.json).\n# B06 test 6: what happens after the original +5 target?\n\n17 September 2026. **A substantial minority of original winners give back the move.\nThe IV condition's higher initial hit rate does not demonstrate better follow-through.**\nAll original scores remain unchanged. A later below-entry close is not an option loss:\nthe intended option construction might already have completed.\n\n## The baseline answer\n\nThe same 374 B06 entries produced **239 original targets**, 51 adverse-first outcomes\nand 84 neither outcomes, with zero ambiguous cases. Of those 239 targets:\n\n- **87** later have a completed one-minute close below the original entry price.\n- **150** have later closes available, but none below entry before the original deadline.\n- **Two** reach target in the final minute and have no later close to assess.\n\nThus **87/237 = 36.7% of assessable winners reverse below entry**. Among those 87,\nthe first qualifying close occurs a median **ten minute bars after the target bar**,\nwith middle half six to 24.5 bars and range one to fifty. Some are quick givebacks;\nothers happen much later. The 150 without an observed reversal are not proven durable\ntrends: they may stop advancing or give back some of the five points while staying above entry.\n\nThe unchanged initial score is **+5 SPX points before −15 within sixty native minute\nintervals**, from the original observed entry open. It measures an initial favorable\ntouch, not lasting momentum, actual option completion or option profitability.\n\n![Post-target givebacks and comparable observation windows](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/comparison.png)\n\n## Equal observation time: the fifteen-minute check\n\nAn early target has much longer to reverse before the original hour ends. The median\ntarget minute starts twelve minutes after entry, leaving **47 subsequent closes**.\nRemaining support ranges from zero to 59, with middle half 33–54.\n\nWe therefore fixed a separate check before inspecting paths: the **first fifteen later\ncloses after target**, restricted to winners with all fifteen available before the original\ndeadline. Fifteen is one quarter of the original hour; it was not selected for its result.\n\n| Existing context | Original target rate | Reversal before original deadline, among assessable targets | Reversal within fifteen later closes, among eligible targets | Targets excluded from fifteen-close check |\n|---|---:|---:|---:|---:|\n| All B06 | 239/374 = **63.9%** | 87/237 = **36.7%** | 49/222 = **22.1%** | 17 |\n| IV yes | 67/93 = **72.0%** | 26/66 = **39.4%** | 18/64 = **28.1%** | 3 |\n| IV no | 132/216 = 61.1% | 47/131 = 35.9% | 24/119 = 20.2% | 13 |\n| IV unknown | 40/65 = 61.5% | 14/40 = 35.0% | 7/39 = 17.9% | 1 |\n\nThis common duration helps compare observation windows, but only among targets reached\nearly enough. It does not estimate what would happen to late targets given another\nfifteen minutes, nor remove differences in the winners selected by each context. The\nshort-followed winners are excluded consistently even if they reverse before their deadline.\n\nThe frozen timing bands illustrate why remaining time matters:\n\n| Target-minute offset from entry | Targets | Later below-entry closes | Assessable targets | Available later closes |\n|---|---:|---:|---:|---:|\n| 0–14 | 133 | 60 | 133 | 45–59 |\n| 15–29 | 57 | 18 | 57 | 30–44 |\n| 30–44 | 32 | 7 | 32 | 16–29 observed |\n| 45–59 | 17 | 2 | 15 | 0–14 |\n\nThe third band's theoretical support is 15–29 closes; this sample contains no target\nat offset 44. A lower raw reversal fraction among late targets is not proof that late\nentries or late targets are better. No timing threshold was used to select signals.\n\n## Did the improved IV hit rate mean better follow-through?\n\n**There is no demonstrated improvement in that dimension.** IV-positive entries retain\ntheir higher initial target rate, but their observed winner-reversal rates are slightly\nhigher, both through the original deadline and in the common fifteen-close window.\n\nIV yes minus all B06:\n\n| Descriptor | Difference | Paired whole-date 95% interval |\n|---|---:|---:|\n| Original target fraction | +8.1 percentage points | −1.1 to +17.8 |\n| Reversal among assessable targets | +2.7 points | −6.6 to +11.0 |\n| Reversal within fifteen later closes | +6.1 points | −3.2 to +14.7 |\n| Target **and** no observed later reversal / all entries | +2.9 points | −5.3 to +12.0 |\n\nHigher reversal is less favorable for this particular path diagnostic. The last row is\n**40/93 = 43.0%** for IV yes versus **150/374 = 40.1%** overall. It counts only targets with\nat least one later close and no observed reversal; the zero-follow-up targets do not enter\nits numerator. This is a joint descriptive event, **not a replacement win rate**. Its\nuncertain advantage is much smaller than the initial +8.1-point target-rate difference.\n\nIV here is the unchanged six-of-eleven falling-and-accelerating ATM condition. Unknown\nsector membership stays unknown; this test adds no new surface, threshold or quote filter.\n\n## The IV/price disagreement groups\n\nPrice participation means the original six-of-eleven positive sector-return condition.\n\n| Existing group | Original targets | Later reversal / assessable targets | Fifteen-close reversal / eligible targets |\n|---|---:|---:|---:|\n| A: IV yes, price yes | 45/62 = 72.6% | 18/45 = **40.0%** | 11/44 = **25.0%** |\n| C: IV no, price yes | 88/153 = 57.5% | 33/88 = **37.5%** | 18/84 = **21.4%** |\n| B: IV yes, price no | 17/26 = 65.4% | 8/16 = **50.0%** | 7/15 = **46.7%** |\n| D: IV no, price no | 40/54 = 74.1% | 13/39 = **33.3%** | 6/32 = **18.8%** |\n\n**A versus C:** IV accompanies more initial targets inside broad price participation,\nbut the winners do not show fewer givebacks. Their full-window reversal difference is\n+2.5 points, interval −15.2 to +18.8; the fifteen-close difference is +3.6 points,\ninterval −11.1 to +18.1. This does not establish lasting follow-through beyond price context.\n\n**B versus D:** IV without broad price participation remains unconvincing. Its fifteen-close\nreversal fraction is higher, but this comparison rests on only fifteen versus 32 eligible\ntargets. The difference is +27.9 points with interval −4.6 to +63.0; do not promote D as\nan inverse signal from these observations.\n\n**B versus C:** the IV-only disagreement group's initial target-rate advantage also does\nnot establish better persistence. Its fifteen-close reversal difference is +25.2 points,\ninterval −3.6 to +59.8. Both memberships differ, so this cannot isolate an IV effect.\n\nThe full tables preserve price yes/no/unknown and all nine joint cells, including every\nunknown combination. Groups overlap; their results are not independent confirmations.\n\n## Timing rules, uncertainty and limits\n\nFor entry minute e and target-touch minute m, inspect closes of bars m+1 through e+59.\nThe last original bar closes at deadline e+60 and is included; the bar starting at e+60\nis excluded. Equality to entry does not count as below (rounding tolerance 1e−8 points).\nWicks alone do not count. The entire target-touch minute is deliberately omitted, as\nnominated in the original shortlist. Its final close follows its high, but this\nlater-minute diagnostic excludes givebacks within that minute. It also misses later\nintraminute dips that recover by the close. Lag is measured between minute bars, not\nfrom an invented exact target-touch instant.\n\nAll fifty dates, including July 13 with no B06, enter shared 10,000 whole-date draws,\nseed 20260917. Every contrast/metric has 10,000 valid draws, and all sixteen intervals\ninclude zero. Delete-date checks retain the IV-versus-baseline reversal differences'\npositive direction: +0.6 to +4.1 points over the original window and +3.4 to +7.2 over\nfifteen closes. A−C reversal differences can change sign. These are descriptive checks,\nnot adjusted for earlier research or independent of regime effects. Conditioning on\nwinners itself changes composition; this is not a causal persistence comparison.\n\n**CIO conclusion:** B06 often supplies the initial movement our score asks for, but a\nmeaningful fraction of those moves are later given back. IV's observed hit-rate advantage\ndoes not come with demonstrated protection from that giveback. A completed Branch B\nconstruction could still make a later reversal economically irrelevant. Keep the original\nwinners and this separate path record; add no retrospective entry veto or new exit rule.\n\n## Reproducibility\n\nAll 374 original outcomes were replayed from the exact saved native minute data. Thirteen\nboundary, timing and eligibility tests passed; Ruff passed. An independent audit caught a\ndefault CSV parser rounding difference in 55 unused sector-return display values (maximum\n3.55e−15 basis points). The initial frozen run was archived and round-trip parsing restored\nliteral source metadata. All path ledgers, summaries and uncertainty results remained\nbyte-identical; no definition, group or outcome changed. The correction is documented.\n\n- [Exact protocol](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/PROTOCOL.md).\n- [Every original entry and post-target path](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/event_ledger.csv).\n- [All sixteen context summaries](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/group_summary.csv).\n- [Target timing, observation windows and reversal lags](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/timing_distributions.csv).\n- [Fixed target-timing bands](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/target_timing_bands.csv).\n- [Paired date uncertainty](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/paired_date_bootstrap.json).\n- [Brent and Quant decisions](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/PERSONA_DECISIONS.md).\n- [Independent numerical audit](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/independent_verification.json).\n- [Metadata correction record](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/metadata_precision_correction.json).\n- [Final verification manifest](/Users/dgrissen/Dev/delta_bomb/outputs/b06_post_target_2026-09-17/verification_manifest.json).\n",
+    "scope_note": "Original historical studies; not recomputed under recovered-IV classifications. Source claims of prior independent review refer to those earlier studies only."
+  },
+  "documentation_metadata": {
+    "documentation_environment": {
+      "python": "3.13.1",
+      "numpy": "2.4.5",
+      "pandas": "3.0.3"
+    },
+    "controls_sha256_at_documentation": {
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/surface.py": "9eeee1ab9752f824c1f2a677912b6d5d3bfa8ebdcede5f7513bcebd24508de28",
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/breadth.py": "ef908f78f5baf5f3457421f2d2f7331a4216e3abd940ada3ddb208fda0d93a4d",
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/b06_parents.csv": "21d78706737250de5e9c1ae22f91894b6826ad53eb3a64bafd00252bc61f2a85",
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/selected_days.csv": "6888fbe388bf57de0da100ab7bb44d58a5305492a0c4d0d835f0f8b57209cd82",
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/basket_event_features.csv": "c92acbf011f907973a19254dd8cfe7208504665d160e013a16a2232cca37b848",
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/sector_event_features.csv": "fda263fdd72e25e01dcb4b98da1c0ffbec52ca25e96d396dc43bd44a2b2c8bf5",
+      "/Users/dgrissen/Dev/delta_bomb/outputs/b06_sector_surface_50d_2026-09-13/event_paths.csv": "e5616a1564ea11b820115be2033dc3b24500dfce0d8cd721db18bc48df7beb2d"
+    },
+    "missing_expiry_panels": [
+      {
+        "date": "2026-01-09",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-01-13",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-01-15",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-01-16",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-04-14",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-05-11",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-05-13",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-05-14",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-05-18",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-06-15",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-06-16",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-07-13",
+        "symbol": "XLRE"
+      },
+      {
+        "date": "2026-07-14",
+        "symbol": "XLRE"
+      }
+    ],
+    "selected_days": [
+      "2026-01-02",
+      "2026-01-06",
+      "2026-01-07",
+      "2026-01-09",
+      "2026-01-13",
+      "2026-01-15",
+      "2026-01-16",
+      "2026-01-22",
+      "2026-01-28",
+      "2026-02-03",
+      "2026-02-09",
+      "2026-02-10",
+      "2026-02-11",
+      "2026-02-12",
+      "2026-02-23",
+      "2026-02-25",
+      "2026-02-26",
+      "2026-04-06",
+      "2026-04-07",
+      "2026-04-14",
+      "2026-04-17",
+      "2026-04-21",
+      "2026-04-23",
+      "2026-04-24",
+      "2026-04-27",
+      "2026-05-05",
+      "2026-05-06",
+      "2026-05-07",
+      "2026-05-11",
+      "2026-05-13",
+      "2026-05-14",
+      "2026-05-18",
+      "2026-05-21",
+      "2026-05-27",
+      "2026-06-01",
+      "2026-06-03",
+      "2026-06-15",
+      "2026-06-16",
+      "2026-06-17",
+      "2026-06-22",
+      "2026-07-01",
+      "2026-07-06",
+      "2026-07-07",
+      "2026-07-13",
+      "2026-07-14",
+      "2026-07-31",
+      "2026-08-03",
+      "2026-08-04",
+      "2026-08-07",
+      "2026-08-10"
+    ]
+  },
+  "reproducibility_limit": "Requires pre-existing source study artifacts and central_trade_data cache; neither the full source study nor raw data is included in this isolated documentation commit."
+}
