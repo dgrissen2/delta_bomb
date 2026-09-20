@@ -52,6 +52,6 @@ Output: `CLAUDE_STRATEGY_RECHECK.md`.
 The reviewer reproduced two proposed B09 control outcomes despite the explicit
 no-new-tests scope. They are disclosed as already inspected. No formal B07/B05
 transfer or SPX outcome study was run. The separate SPX measurement collection
-remains in progress. REVIEW_RESPONSE.md and the final proposal record which
+has now completed; see the final proposal’s post-review readiness update. REVIEW_RESPONSE.md and the final proposal record which
 conditions were accepted, which claims were narrowed, and which optional cells
 were deferred.

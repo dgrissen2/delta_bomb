@@ -322,4 +322,18 @@ interpretation is deliberately narrower than a claim that MAD itself works.
 These conditions are implementation requirements for any future study. This
 review task has not run the B07/B05 transfers, the coverage sensitivities, or the
 SPX disagreement/OR outcome tests. The separately authorized SPX measurement
-backfill continues independently.
+backfill is now complete; see the post-review readiness update below.
+
+
+## Post-review data-readiness update — SPX complete
+
+The separately authorized SPXW measurement history is now complete for January 2,
+2024–September 18, 2026, with sixty prior warmup sessions: 183,844/184,011 scored
+windows (99.91%) and 3,405/3,405 usable baselines. Earlier inventory/pending wording
+above describes what was available when the proposal was reviewed. The new
+[SPX report](/Users/dgrissen/Dev/delta_bomb/outputs/spx_iv_mad_2024_2026_2026-09-20/FINDINGS.md)
+documents the three dates with unavailable windows, the one native endpoint-pairing
+repair, and all independent calculation checks. Central provenance commit: 82df4f5.
+This satisfies the measurement-building step; event-level common coverage and the
+proposed SPX/sector disagreement outcome comparison have not been tested. No third
+strategy review or new efficacy claim follows from completing the data.
