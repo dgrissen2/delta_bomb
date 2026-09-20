@@ -88,11 +88,35 @@ unique entries;43positive,48negative,1flat. B05's five cases are especially thin
 - All new raw/derived data belong under `/Users/dgrissen/Dev/central_trade_data/`;
   maintain its changelog and data dictionary. Never infer missing minute prices.
 
-Next authorized test: reuse cached SPY relative volume across all five current
-cohorts. Keep the established five completed minutes / same-clock median of60
-strictly prior source sessions and fixed RVOL>1 threshold. Preserve unknowns and
-compare high versus ordinary volume on observed coverage. The existing cache ends
-June11,2026, so it cannot evaluate2026H2. This is Nasdaq-venue SPY volume, not
-consolidated volume or signed order flow. Earlier B09-only RVOL did not improve
-accuracy; this next test extends the identical feature to the whole working set.
-No new data download or parameter sweep is authorized for this step.
+## Completed volume extension: no new filter adopted
+
+The fixed cached SPY RVOL test is complete across all five cohorts. Use five
+completed minutes T−5…T−1 / same-clock median of 60 strictly prior source sessions,
+with RVOL>1 fixed in advance. This is Nasdaq-venue volume, not consolidated volume
+or signed buying pressure. No new data was fetched and no threshold was swept.
+
+| Cohort | High-volume winners/N | Ordinary-volume winners/N | Unknown N |
+|---|---:|---:|---:|
+| B09 + F4 OR SPX | 84/136 (61.8%) | 92/148 (62.2%) | 34 |
+| B05 + F4 | 29/44 (65.9%) | 30/44 (68.2%) | 24 |
+| B09 persistence | 126/200 (63.0%) | 145/236 (61.4%) | 56 |
+| Original B07 six-sector | 20/33 (60.6%) | 29/44 (65.9%) | 14 |
+| All combined | 173/274 (63.1%) | 198/318 (62.3%) | 93 |
+
+Combined high−ordinary difference +0.87 pp, paired date-cluster 95% CI −8.08 to
++9.52 pp. The common observed population already hits 371/592 (62.7%); high volume
+adds only +0.47 pp relative to that while excluding 198 observed winners. Do not
+claim B05 improves from full-sample 62.5% to high-volume 65.9%: its volume-observed
+unfiltered population already hits 67.0%. Compare the same measurement coverage.
+
+Only 592/685 combined entries have usable RVOL: 52 lack current data and 41 lack
+complete reference history. The cache ends June 11, 2026, so 2026 H2 is entirely
+unmeasured. Keep unknowns separate; never classify missing volume as ordinary.
+Half-year counts and within-date/hour controls do not establish a useful advantage.
+No high-volume gate or opposite low-volume gate is part of the current working set.
+
+Full report: `outputs/b09_working_set_volume_2026-09-20/FINDINGS.md`; canonical
+learning notebook section 11.36. Data and exact missing-entry ledger:
+`/Users/dgrissen/Dev/central_trade_data/thetadata/b09_working_set_volume_2026-09-20-v1/`.
+All 685 native price/VT paths, 125 summary rows, 1,195 day deletions and causal
+feature measurements were checked. The small persistence hint remains exploratory.
