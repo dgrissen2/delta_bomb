@@ -4,6 +4,8 @@ Analysis of the Delta Bomb options strategy (SPX hedges + upside calls) from Dis
 
 ## Contents
 
+- [MEMORY.md](MEMORY.md) — current Branch B research working set, fixed scoring rules, verified findings, and the next bounded experiment.
+- [Branch B learning notebook](outputs/ohlcv_branch_design_2026-09-12/OHLCV_BRANCH_COMBINATIONS.md) — consolidated OHLCV/IV findings; section 11.35 records the current five-cohort set, endpoint distributions, confidence intervals, and day-removal stability.
 - `scripts/hiro_engine/` — **the Delta Bomb signal engine** (paper-only): live SPX 1-min + HIRO evaluation of the frozen rules, silent paper executor, console event stream, backtesting (verification / sweep / rehearsal), and the R9 scorecard. Docs: `docs/hiro_engine/` (requirements v2.2, design v1.1, tasks v1.2, build_notes, RUNBOOK). Run: `cd scripts && ~/Dev/virtualenvs/gamma_chaser/bin/python -m hiro_engine {live|backtest|verify|scorecard|sweep}`. Tests: `pytest scripts/hiro_engine/tests`.
 - `docs/delta_bombs.html` — the analysis: mechanics, SPX put playbook, the 50/20 → 3 bombs walkthrough, call side, evidence, and a Charlie McElligott positioning read.
 - `docs/specs/p1_nvda_tail_sale_backtest.md` — P1 (NVDA tail sale + buyback) backtest spec v0.3 with Charlie/Codex reviews; `docs/specs/spx_1min_delta_bomb_leg_in_strategy.md` — SPX leg-in evidence from spy_chaser 1-min trend work, Codex errata, CIO memo, Feynman explanation (touch stats in `docs/replay/spx_touch_stats_full*.parquet`).

@@ -1,0 +1,10 @@
+{
+  "source_reports": {
+    "/Users/dgrissen/Dev/delta_bomb/outputs/b09_combined_expansion_2026-09-20/FINDINGS.md": "216d3978683f31246912f66339a0dd58b8dd51bb3b7dbd95a24cadc643307d06",
+    "/Users/dgrissen/Dev/delta_bomb/outputs/b09_timeout_endpoints_2026-09-20/FINDINGS.md": "a39b0bb776c364706a91e80993702a908cec7cd7f469e11425a3fbfff901bc31",
+    "/Users/dgrissen/Dev/delta_bomb/outputs/b09_outcome_stability_2026-09-20/TABLES_WITH_CI.md": "73f8e1c5acf1d8e3b1775bad14e52371c7f71efbd2ebcdaf5c810a4f2f68f357",
+    "/Users/dgrissen/Dev/delta_bomb/outputs/b09_outcome_stability_2026-09-20/FINDINGS.md": "81cc4f0672499d18b69f410e2b74e75ec1122b245c4149dc5f5473a61068c456",
+    "/Users/dgrissen/Dev/delta_bomb/outputs/b09_outcome_stability_2026-09-20/CHARLIE_INTERPRETATION.md": "49b58bb5d10c248205a208aaf1162cdecca6ead71dd9f29e355f54a2c0adccd3"
+  },
+  "new_experiments_in_this_consolidation": false
+}
