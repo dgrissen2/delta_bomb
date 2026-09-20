@@ -1,3 +1,32 @@
+# Independent review execution and proposal revision
+
+The original research results remain in project commit 1948538 and central commit
+8bcb070; Charlie-framework proposal e083ba7 is preserved as the pre-review snapshot.
+This commit executes the previously saved review request, stores both actual
+Claude outputs and their execution metadata, revises the proposal, and appends
+six detailed learnings in the canonical notebook. It does not change original
+48-cell results, price triggers, measurement code, dashboards or raw data.
+
+Actual verdicts: original FAIL (12 findings), revised CONDITIONAL PASS (7 findings).
+The final author response narrows claims and specifies coverage, sparse-result and
+shared-window conditions. No third review or unconditional approval is claimed.
+The first reviewer’s linear-payoff substitution was rejected; the recheck accepted
+the user's first +5 before −10 objective and reproduced the amended arithmetic.
+
+Both original/reviewed proposal snapshots and full reviewer outputs are retained,
+with SHA-256 in REVIEW_EXECUTION.json and external execution artifact directories.
+The reviewer's unauthorized replay of two proposed B09 sign controls is disclosed:
+those outcomes are now observed, not prospective. No B07/B05 or SPX strategy tests
+were executed. SPX measurement collection remains separately authorized and active.
+
+Verification: primary counts and uncertainty values reconciled; both review wrapper
+runs exited successfully; documentation diff checked. No numerical source files
+were edited. This is a strategy/logic review, not a substitute for a full independent
+code audit. See REVIEW_RESPONSE.md for all 19 finding dispositions and LEARNING_NOTE.md
+for the canonical note added by this commit.
+
+## Original proposal commit notes — historical, superseded where revised above
+
 Propose bounded B07/B05 MAD transfers and an SPX IV disagreement test
 
 Preserve the distinction between completed B09 evidence and proposed follow-up

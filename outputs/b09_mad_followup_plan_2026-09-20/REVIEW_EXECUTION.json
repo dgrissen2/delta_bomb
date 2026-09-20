@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-20",
+  "model": "claude-opus-5",
+  "effort": "xhigh",
+  "tools": "default",
+  "permission_mode": "auto",
+  "original": {
+    "verdict": "FAIL",
+    "findings": 12,
+    "elapsed_seconds": 451,
+    "artifacts": "/Users/dgrissen/.cache/agent-review-runs/20260920T114545Z-claude-strategy-review-generic-strategy-review-37643"
+  },
+  "recheck": {
+    "verdict": "CONDITIONAL PASS",
+    "findings": 7,
+    "elapsed_seconds": 523,
+    "artifacts": "/Users/dgrissen/.cache/agent-review-runs/20260920T120210Z-claude-strategy-review-generic-strategy-review-41677"
+  },
+  "final_author_revision_independently_rechecked": false,
+  "reviewer_calculated_previously_proposed_controls": true,
+  "snapshot_sha256": {
+    "CHARLIE_PROPOSAL_pre_review.md": "76b845068075a0b0d040b74c4c342aa23052731a7c263619f717db2badbbae7e",
+    "CHARLIE_PROPOSAL_reviewed_revision.md": "4f4858a787c69057ce311a45581c1433aea1a8f085dc54fe5f50529114538510",
+    "CLAUDE_STRATEGY_REVIEW.md": "29ccd4eeae1191cbf00c2aa7f8de56ab670e9eceb0975599c324013867197e01",
+    "CLAUDE_STRATEGY_RECHECK.md": "97d24115a2d6194d91e5f7842fdc1bdf7f8ab4aa51869b4e11d1a6a4581d66ff"
+  }
+}

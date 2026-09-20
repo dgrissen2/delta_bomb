@@ -1,5 +1,7 @@
 # B09 MAD grid — both direction definitions
 
+> **September20 independent-review update:** Claude Opus5 completed a strategy/logic review of these findings and the follow-up proposal, returning **FAIL** on the original framing/plan. The original execution-status statements below are historical. Numerical results are unchanged. See the [full review](/Users/dgrissen/Dev/delta_bomb/outputs/b09_mad_followup_plan_2026-09-20/CLAUDE_STRATEGY_REVIEW.md) and [author response](/Users/dgrissen/Dev/delta_bomb/outputs/b09_mad_followup_plan_2026-09-20/REVIEW_RESPONSE.md). The review did not independently replay every membership or establish a trading edge.
+
 Completed September 20, 2026. **48/48 predeclared cells evaluated. Independent Claude review NOT RUN.**
 This side conversation prohibits launching separate reviewer agents. Local checks below are not
 a substitute for independent Claude review and do not constitute its sign-off.

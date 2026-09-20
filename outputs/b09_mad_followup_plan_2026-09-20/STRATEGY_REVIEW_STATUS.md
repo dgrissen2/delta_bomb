@@ -1,10 +1,21 @@
-# Independent Claude strategy review — NOT RUN / PENDING
+# Independent Claude strategy review — complete, conditional pass
 
 September 20, 2026.
 
 The user explicitly requested [claude-strategy-review](/Users/dgrissen/Dev/persona-review-kit/skills/claude-strategy-review/SKILL.md). Its instructions were read. The skill specifies an independent Claude Opus 5 review with xhigh effort and tools enabled.
 
-The developer instruction for this side conversation prohibits interacting with or launching separate reviewer agents. Consequently no Claude reviewer process, alternative agent, new task, or handoff was launched. This is an execution restriction, not a tool failure or a strategy verdict. There is no independent Charlie or Claude sign-off. Applying the canonical Charlie framework in the current conversation does not supply independent review.
+The original side conversation prohibited separate reviewer agents, so it saved
+this request without launching or queuing a review. On September 20 the user
+explicitly requested execution in the main conversation. The review was launched
+at 11:45:45 UTC using Claude Opus5, xhigh effort, default tools and auto permission
+mode, through the requested skill. It completed in 451 seconds with FAIL and 12 findings. The author assessed every finding in REVIEW_RESPONSE.md, amended the proposal, and retained the unedited original and review. The focused independent recheck completed in 523 seconds with CONDITIONAL PASS and seven findings. The author then narrowed claims and added explicit coverage, sparse-result and overlap conditions; those final edits have not received a third review.
+
+Actual run artifacts:
+`/Users/dgrissen/.cache/agent-review-runs/20260920T114545Z-claude-strategy-review-generic-strategy-review-37643`.
+Project output: `CLAUDE_STRATEGY_REVIEW.md`; live progress:
+`claude_review_progress.log`. The existing Charlie text remains author framing,
+not an independent review. The concurrently running SPX data backfill is separate
+from strategy outcome testing; see REVIEW_EXECUTION_CONTEXT.md.
 
 ## Concrete review request
 
@@ -15,7 +26,7 @@ Use a generic independent strategy/logic review. Inspect primary data and source
 Specific questions:
 
 1. Do B07 and B05 have a coherent transfer hypothesis, and is choosing B05 over the older B03 challenger adequately justified without pretending this choice was predeclared before all earlier research?
-2. Is the four-primary-cell budget, plus four explicitly named sign controls, bounded enough? Are there undisclosed extra comparisons or choices that could make the result an optimizer in disguise?
+2. Is the four-primary-cell budget, plus six explicitly named sign controls (including two on B09 first), bounded enough? Are there undisclosed extra comparisons or choices that could make the result an optimizer in disguise?
 3. Are the population, causal above-VT rule, T−1 information clock, native-minute +5/−10 outcome, missingness, and filter-before-spacing policies consistent? Could any proposed comparison condition on future information?
 4. Do the claims properly distinguish larger parent N, retained N, active dates, unique opportunities, and overlapping signals? Does the report keep weak partial 2026 H2 results and all unknown groups visible?
 5. Is the proposed 30-day ATM SPXW construction actually comparable to the ETF feature? What contract, quote-quality, model, source-time, or interpolation assumptions must be verified first?
@@ -32,4 +43,15 @@ Specific questions:
 - [Existing parent comparisons](/Users/dgrissen/Dev/central_trade_data/thetadata/branch_b_iv_full_2024_2026_2026-09-19-v1/comparison.csv).
 - Exact parent source paths and SPX source inventory listed in the proposal.
 
-No review has been dispatched, scheduled, or queued automatically. A completed future review must have its actual artifact path and findings recorded before this status changes.
+Both reviews completed successfully as tool runs; their strategy verdicts differ because the proposal was revised. The original FAIL is preserved. The latest independent verdict is CONDITIONAL PASS for exploratory research, not unconditional sign-off or evidence of a trading edge.
+
+Recheck artifacts:
+`/Users/dgrissen/.cache/agent-review-runs/20260920T120210Z-claude-strategy-review-generic-strategy-review-41677`.
+Output: `CLAUDE_STRATEGY_RECHECK.md`.
+
+The reviewer reproduced two proposed B09 control outcomes despite the explicit
+no-new-tests scope. They are disclosed as already inspected. No formal B07/B05
+transfer or SPX outcome study was run. The separate SPX measurement collection
+remains in progress. REVIEW_RESPONSE.md and the final proposal record which
+conditions were accepted, which claims were narrowed, and which optional cells
+were deferred.

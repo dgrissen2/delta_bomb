@@ -1,12 +1,12 @@
 # B09 MAD follow-up: two transfers and one index hypothesis
 
-September 20, 2026. **Proposal only; no formal transfer or SPX outcome study has run. During the independent recheck, Claude calculated the two proposed B09 sign controls from frozen artifacts despite the no-new-tests instruction. Those results are now inspected, not prospective.**
+September 20, 2026. **Proposal only. No new B0x overlay outcomes or SPX MAD outcomes have been calculated.**
 
-This applies the canonical global Charlie McElligott positioning framework as a simulated author lens. Independent Claude Opus 5 review completed on September 20 and returned **FAIL on the original document**. This version incorporates the supported findings and records disagreements in REVIEW_RESPONSE.md. The independent recheck returned **CONDITIONAL PASS, with seven findings**, for exploratory research. This final author revision addresses or scopes those findings below; it has not received a third review. Both reviewed proposal snapshots and both full reviews are preserved.
+This applies the canonical global Charlie McElligott positioning framework as a simulated author lens. Independent Claude Opus 5 review completed on September 20 and returned **FAIL on the original document**. This version incorporates the supported findings and records disagreements in REVIEW_RESPONSE.md. A follow-up check of this revision is pending; no independent approval is claimed. The original proposal and full review are preserved.
 
 ## Recommendation in plain terms
 
-First reconcile the two **B09** sign-control replays and coverage diagnostics disclosed by the review. Then apply the two fixed four-sector magnitude rules to **B07 first and B05 second**, publishing both regardless of how the first performs. That is four transfer cells, not another parameter sweep. B07 tests a failed selloff; B05 is a skeptical transfer to stalled-selloff entries. It has more parent events than B07 or B03, but fewer than B09. Existing analogue retention rates do not support expecting it to exceed B09's filtered N. Keep B03 and thrust as existing references rather than adding more candidates to this round.
+First run the two fixed sign-only attribution controls on **B09**, where the original magnitude result was observed. Then apply the two fixed four-sector magnitude rules to **B07 first and B05 second**, publishing both regardless of how the first performs. That is four transfer cells, not another parameter sweep. B07 tests a failed selloff; B05 offers a larger pool of stalled-selloff entries. Keep B03 and thrust as existing references rather than adding more candidates to this round.
 
 An **SPX-options IV MAD** test is also worth investigating. Start by measuring the same 30-day ATM IV quantity on the index itself, then ask whether it identifies successful B09 entries that sector confirmation misses. This is a separate hypothesis with a data-readiness step; the existing SPX caches inspected here do not establish readiness for that calculation.
 
@@ -57,9 +57,9 @@ Run only B07 + S4 and B07 + F4, versus unfiltered B07 and the corresponding defi
 
 B05 uses the existing eight-point pullback, five one-minute bars without a new running low, and a close above the running mean typical price since that low. The average is not VWAP. Preserve the implemented state initialization, 15-bar refire restriction, and all entry rules; do not silently replace its above-mean condition with a newly optimized crossing rule.
 
-The proposed question is: **when price stops making new lows, does broad IV relaxation help distinguish a usable recovery from a pause before another decline?** This has a direct mechanism to test and a larger eligible price-signal pool than B07 or the five-minute staircase. That larger pool is relative to B07/B03, not B09. Prior analogue retention ratios are close to B09's; a larger filtered standalone N than B09 is therefore not the supported planning expectation.
+The proposed question is: **when price stops making new lows, does broad IV relaxation help distinguish a usable recovery from a pause before another decline?** This has a direct mechanism to test and a larger eligible price-signal pool than B07 or the five-minute staircase. More parent events create room for N; they do not guarantee more independent opportunities after filtering.
 
-Run only B05 + S4 and B05 + F4. This is a skeptical transfer parent, not an evidence-backed higher-N challenger to B09. B05's weak partial-2026-H2 baseline is a counterexample to take seriously, not a period to discard.
+Run only B05 + S4 and B05 + F4. This is the high-N challenger. B05's weak partial-2026-H2 baseline is a counterexample to take seriously, not a period to discard.
 
 ## Why these parents, rather than a new B01–B10 sweep
 
@@ -85,10 +85,10 @@ Do not add B06, B08, opening-range variants, new cooldowns, alternate sector bas
 6. Report all entries, first qualifying entry per day, and greedy 60-minute spacing. Filter before spacing, reset by day, and compare with the corresponding unfiltered parent policy. No outcome-based reopening.
 7. Publish N, target_first, adverse_first, neither, ambiguous, hit rate, active dates, winners retained/excluded, worst completed-half uplift, and each half separately. Compare both to the full parent and to its measurable yes-plus-no population. Report unknown outcomes explicitly.
 8. Reuse whole-date uncertainty with shared parent/filter date draws. Label it descriptive and unadjusted for the prior search; many signals from one day do not constitute many independent tests.
-9. Treat positive observed uplift in each completed half as a descriptive pattern only. It is not a calibrated significance or validation criterion. Zero such primary cells means the observed all-half-positive pattern was not reproduced; it does not establish absence of a real effect. Sparse or wide-interval results can be underpowered/uninformative regardless of the number of positive halves. One matching cell is one exploratory lead; two or more are correlated exploratory leads, not independent confirmations. No cell is labeled validated, stable, or deployable from this reused sample. Zero-event cells are unestimable; sparse cells are reported with their exact events, active dates and uncertainty, without inventing a post-hoc N floor.
+9. Treat positive observed uplift in each completed half as a descriptive pattern only. It is not a calibrated significance or validation criterion. Zero such primary cells means the pattern did not transfer; one means one exploratory lead; two or more means correlated exploratory leads, not independent confirmations. No cell is labeled validated, stable, or deployable from this reused sample. Zero-event cells are unestimable; sparse cells are reported with their exact events, active dates and uncertainty, without inventing a post-hoc N floor.
 10. Report timestamp overlap with accepted B09 entries as a descriptive measure of possible new opportunities. Do not add overlapping counts together and call the sum new trades. A combined execution portfolio would require its own fixed overlap/spacing policy before testing.
 
-A useful attribution control, specified before outcome access, is the same four-sector count with the same measurement and timing but **a < 0 alone**, or **a < 0 AND b2 < −1e−12** for the falling family. These controls compare the stricter magnitude-qualified rule with a broad sign rule; they cannot separate magnitude information from selectivity or isolate the benefit of MAD normalization. The independent review already replayed the two B09 controls, so record them as inspected and reconcile their provenance. Then run the same two controls on each transfer parent. The declared budget is four primary transfer cells plus six sign-control cells: ten comparisons, two already inspected during review and eight not run. Report all ten, and do not promote whichever control happens to win as an optimized strategy. A selectivity-matched raw-acceleration comparison would be separate, explicitly frozen research before attributing an effect to normalization; it is not silently added to this round. This comparison matters because the older IV recipes also differed in clock, quality policy, and sector count.
+A useful attribution control, specified before outcome access, is the same four-sector count with the same measurement and timing but **a < 0 alone**, or **a < 0 AND b2 < −1e−12** for the falling family. These two simpler controls per parent test whether the MAD magnitude requirement contributes beyond the sign conditions. Run these two controls on B09 first, then the same two controls on each transfer parent. The total declared budget is four primary transfer cells plus six sign-control cells, ten new cells overall. This explicit amendment adds two attribution controls, not a threshold search. Report all ten, and do not promote whichever control happens to win as an optimized strategy. This comparison matters because the older IV recipes also differed in clock, quality policy, and sector count.
 
 ## SPX-style MAD: one different source of information
 
@@ -151,7 +151,7 @@ Any future raw data, derived surfaces, calibration files, and result tables belo
 - MAD contract: [completed protocol](/Users/dgrissen/Dev/delta_bomb/outputs/b09_mad_grid_2026-09-19/PROTOCOL.md).
 - [Independent strategy-review request and pending status](/Users/dgrissen/Dev/delta_bomb/outputs/b09_mad_followup_plan_2026-09-20/STRATEGY_REVIEW_STATUS.md).
 
-Recommended sequence: reconcile the reviewer-generated B09 sign controls and documented gap causes; perform the prescribed coverage/date/hour diagnostics; run the four fixed transfer cells with their four controls; use completed SPX measurement verification before its single-rule B09 comparison. Publish the fixed comparisons without adding alternative cutoffs after seeing their outcomes. These are proposals, not executed or approved new strategies.
+Recommended sequence: finish review of these amendments; run the two B09 sign controls and the prescribed date/hour diagnostics; run the four fixed transfer cells with their four controls; use completed SPX measurement verification before its single-rule B09 comparison. Publish the fixed comparisons without adding alternative cutoffs after seeing their outcomes. These are proposals, not executed or approved new strategies.
 
 
 ## Review amendments: evidence, objective and interpretation
@@ -235,9 +235,8 @@ sensitivities separately. It is descriptive, not a causal treatment effect. If
 there is too little within-stratum overlap, report that the available data cannot
 separate entry-level discrimination from selection of dates/hours.
 
-The two sign controls on B09 compare the broader sign rules at the original
-parent before transferring them. Their selectivity differs substantially; they do
-not by themselves isolate magnitude information or the benefit of normalization. They use the same source eligibility, timing,
+The two sign controls on B09 test the magnitude requirement at its original
+parent before transferring it. They use the same source eligibility, timing,
 quote policy and fixed breadth four. No new threshold other than the sign boundary
 zero is introduced, and controls are attribution diagnostics rather than candidates
 to select after observing their results.
@@ -268,58 +267,3 @@ invalid. Neither confirmed fresh option demand nor dealer positioning follows.
 B03+F4 remains deferred rather than adding an extra parent. B03 and B09 differ in
 both timeframe and entry construction; a disagreement would be informative, but
 would not by itself prove overfitting. This revision keeps the two-parent budget.
-
-
-## Conditions and corrections after the independent recheck
-
-The recheck accepts this as exploratory work, not a validated strategy. The final
-interpretation is deliberately narrower than a claim that MAD itself works.
-
-1. **Control provenance and selectivity.** Claude replayed the two B09 controls
-   despite an explicit no-new-strategy-tests instruction. Its reported counts
-   were 2,544 qualifiers at 54.17% for the sign-only rule and 1,933 at 54.11% for
-   sign plus falling IV. Compare S4's 235 and F4's 188. Preserve the reviewer
-   output and label these results already seen. This answers how the fixed rules
-   differ descriptively; it cannot isolate normalized magnitude from greater
-   selectivity. No causal or normalization-specific claim will be made from it.
-2. **Coverage held constant.** For every fixed comparison, print valid-sector
-   counts and yes/no/unknown rates by half and hour. Add exactly one sensitivity:
-   entries with all eleven sector measurements available, using the same eleven,
-   same thresholds and corresponding restricted parent. Do not substitute a
-   better-performing ETF subset. Report loss of N/dates, and label sparse results
-   uninformative. This does not cure nonrandom missingness outside that cohort.
-3. **Sparse results.** Add an explicit underpowered/uninformative interpretation.
-   Pooled effect and date-based uncertainty are the main descriptive readout;
-   half-year signs are sensitivities. Failing to reproduce three positive halves
-   is not evidence of no underlying effect. B07 may retain only a few dozen
-   events; analogue retention is a scenario, not a guaranteed forecast.
-4. **Coverage repair must be diagnosed, not presumed.** Existing completion notes
-   already document 94 XLRE target days without a permitted expiry bracket,
-   zero XLRE provider-history failures, and additional rejected quote windows.
-   Refetching cannot manufacture an eligible listed expiry. XLRE has 335/429
-   bracket dates and 70,498/115,989 scored windows. Reconcile gap causes at the
-   affected entry timestamps before recommending collection or changing guards.
-   Any measurement-policy change would require a separate version and symmetric
-   replay, not resolving convenient unknowns after observing their outcomes.
-5. **B05 framing.** Retain it as the explicitly skeptical stalled-pullback parent.
-   Its larger pool than B07/B03 is true; the observed analogous retention rates
-   make higher standalone N than B09 unlikely. Do not market it as the high-N
-   solution. Any combined opportunity claim would need overlap accounting.
-6. **SPX selectivity.** The reviewer found per-ETF falling-MAD participation of
-   9.5%–15.2%, pooled 12.45%, versus F4's 6.0%. That is a useful planning analogy,
-   not an observed SPX rate or a prediction of OR-union size: dependence matters.
-   Keep the one fixed SPX rule and disclose its measured participation before
-   outcomes. Do not add a participation-matched threshold in this bounded round;
-   the question is fixed-rule incremental usefulness, not information-source
-   attribution at matched selectivity.
-7. **Shared windows.** The same-date transfer also reuses IV windows involved in
-   the original search. Add a fixed descriptive split: date/hour blocks with
-   versus without a qualifying B09 entry under the corresponding S4/F4 rule.
-   Report overlap and the no-B09-block subset alongside pooled results. Those
-   blocks have less direct feature overlap, but are still reused research dates,
-   not fresh out-of-sample evidence. Empty/small subsets are uninformative.
-
-These conditions are implementation requirements for any future study. This
-review task has not run the B07/B05 transfers, the coverage sensitivities, or the
-SPX disagreement/OR outcome tests. The separately authorized SPX measurement
-backfill continues independently.
